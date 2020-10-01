@@ -1,0 +1,379 @@
+doctype html
+<html lang='en'>
+head
+  //- Functionality
+  meta(charset='utf-8')
+  meta(name='viewport', content='width=device-width,initial-scale=1')
+  //- This site is not optimized for PWA usage at the moment.
+    However, it could be quite well-suited for it.
+  //- link(rel='manifest' href='/site.webmanifest')
+
+  //- Preloads
+    link(rel='preload' href='/css/main.css' as='style')
+    link(rel='preload' href='/js/main.js' as='script')
+    link(rel='preload' href='/js/lumen.js' as='script')
+    link(rel='preload' href='/js/load.js' as='script')
+  link(rel='preload' href='/static/js/mainframe.js' as='script' crossorigin)
+
+  //- Misc.
+  link(rel='author' href='humans.txt')
+
+  //- Opengraph Static
+  meta(property='og:url' content='https://www.scp-mainframe.app')
+  meta(property='og:type' content='website')
+  meta(property='og:image' content='/static/media/meta_header.png')
+
+  //- Twitter Static
+    If used officially, 'twitter:creator' would be removed.
+    Linking to an article on Twitter may confuse the reader into thinking I (Monkatraz) made it.
+  meta(name='twitter:card' content='summary')
+  meta(name='twitter:site' content='@scpwiki')
+  meta(name='twitter:creator' content='@monkatraz')
+
+
+  //- Dynamic Metadata
+    All of this will change depending on the loaded article.
+  - var metaTitle = 'SCP MAINFRAME'
+  - var metaDescription = 'An (unofficial) experimental SCP Wiki replacement design concept.'
+  title #{metaTitle}
+  meta(property='og:title' content=metaTitle)
+  meta(name="description" content=metaDescription)
+  meta(property='og:description' content=metaDescription)
+  
+
+  //- Theming, Icons
+  - var metaThemeColor = '#850005'
+  meta(name='theme-color' content=metaThemeColor)
+  meta(name='msapplication-TileColor' content=metaThemeColor)
+
+  link(rel='icon' type='image/png' sizes='32x32' href='/favicon-32x32.png')
+  link(rel='icon' type='image/png' sizes='16x16' href='/favicon-16x16.png')
+  link(rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png')
+  link(rel='mask-icon' href='/safari-pinned-tab.svg' color=metaThemeColor)
+
+  //- Self-hosted Stuff
+    script(src='/js/main.js')
+  link(rel='stylesheet', href='/static/css/critical.css')
+  script(src='/static/js/mainframe.js' type='module')
+
+  //- Pug Mixins
+  include _basic-mixins
+
+  
+body
+  // 
+    Hi, person who is reading this. This is my SCPWiki design concept, Mainframe.
+    It is extremely lightweight wiki, using a serverless/static SPA interface.
+    If you wish to know more about me, or contact me, go here: [https://www.monkasite.com/]
+    If you're curious and wish to ask a few questions, my DMs on Discord are open. [Monkatraz#7929]
+
+    Please note:
+      * This is COMPLETELY unofficial. I asked nobody - and told nobody - about this project.
+      * This is a prototype.
+        - Significant portions of the site are intentionally nonfunctional.
+      * I made this in my spare time, and for free.
+      * This site was intentionally designed not to be backwards compatible.
+        - Trust me - it's better because of it.
+      * This site's framework is probably not good for anything but an SCP-style wiki.
+    
+    If you notice any issues (particularly ones related to security or accessibility), please:
+      1. Take screenshots, record videos, create code samples, etc.
+      2. Create an issue here: [https://github.com/Monkatraz/scp-mainframe]
+
+  //- All nodes which do not have an explicit categorical/semantic or utility function should:
+        * be checked for if they have any reason to exist
+        * have their role set to 'presentation'
+      This will ensure that cosmetic nodes are transparent inside the accessibility tree.
+  div#app(role='presentation')
+
+    header#header(aria-label='Page Header')
+      div#header_logo(role='presentation')
+        a#logo_link(href='/' title='Go to home page')
+        img#logo_emblem(
+          src='/static/media/logo.svg' 
+          alt='SCP Foundation Logo'
+          onload='this.classList.add("loaded")')
+        h1#logo_title THE MAINFRAME
+        small#logo_slogan Secure, Contain, Protect
+
+    nav#navbar(aria-label='Navigation')
+
+      div#navbar_items(role='presentation')
+        div#navbar_links(
+          role='menubar' 
+          aria-label='Navigation Links')
+          +nav-dropdown('ARTICLES')
+            +nav-dropdown-link('/') SCP Series VI
+            +nav-dropdown-link('/') SCP Series V
+            +nav-dropdown-link('/') SCP Series IV
+            +nav-dropdown-link('/') SCP Series III
+            +nav-dropdown-link('/') SCP Series II
+            +nav-dropdown-link('/') SCP Series I
+          
+          +nav-dropdown('LIBRARY')
+
+          +nav-dropdown('BACKGROUND')
+
+          +nav-dropdown('POLICY')
+
+          +nav-dropdown('CONTACT')
+
+        div#navbar_search(role='presentation')
+          input#navbar_search_input(
+            title='Search Field'
+            type='search' 
+            minlength='1'
+            name='topbar_search'
+            required)
+          +mdi('search')#navbar_search_icon
+          span#navbar_search_placeholder(aria-hidden='true') Search...
+      
+        
+    //- All 'dynamic' content, including the sidebar.
+    aside#sidebar(aria-label='Sidebar')
+      #sidebar_nav
+        +tooltip('Return to homepage')
+          +button(false).btn#sbn_home #[+mdi('home')]
+        +button(false).btn#sbn_new #[+mdi('tab-add')] New Page
+      
+      #sidebar_social
+        a(href='http://scp-foundation.deviantart.com/').btn.sidebar_social_link
+          +mdi('deviantart')
+        a(href='https://www.facebook.com/scpfoundation').btn.sidebar_social_link
+          +mdi('facebook')
+        a(href='https://twitter.com/scpwiki').btn.sidebar_social_link
+          +mdi('twitter')
+        a(href='http://www.reddit.com/r/SCP').btn.sidebar_social_link
+          +mdi('reddit')
+        a(href='https://www.instagram.com/scpfoundationwiki').btn.sidebar_social_link
+          +mdi('instagram')
+        a(href='https://www.twitch.tv/scpwiki').btn.sidebar_social_link
+          +mdi('twitch')
+    
+
+    main#content(aria-label='Content')
+
+      //- Content Tabs
+      //- TODO: Roll-up editor panel, completely seamless
+      div#tabs(role='tablist' aria-label='Content Tabs')
+        div#tabs_buttons(role='presentation')
+
+          +tab-button('tabs','article', true).btn.tabs_button ARTICLE
+          +tab-button('tabs','preface').btn.tabs_button PREFACE
+          +tab-button('tabs','discuss').btn.tabs_button DISCUSS
+        
+        //- TODO: Turn this into a Reef component
+        //- TODO: Make the Aria labels change dependent on state
+        div#rating
+          span#rt_lbl RATING
+          span#rt_cur +3685
+          +button()#rtbtn_up.btn(aria-label='Vote positively about this article')
+            +mdi('plus')
+          +button()#rtbtn_down.btn(aria-label='Vote negatively about this article')
+            +mdi('minus')
+          +button()#rtbtn_meh.btn(aria-label='Vote indifferently about this article')
+            +mdi('plus-minus')
+
+      //- Controlled by the buttons above
+          Content of these panels is nearly entirely dynamic
+      div#tabs_panels(role='presentation')
+
+        +tab-panel('tabs','article', true).rhythm
+          p I've spent way too much time and effort on this, but I think it payed off. Just look at it! It's so smooth! And yet it's still somehow 10x lighter than Wikidot is! Also it doesn't suck, like Wikidot does. 
+          h1 This site look's pretty cool, yo
+          h2 But that's not all!
+          p It's got an editor! I think! Not yet, uhhh....
+          br
+          h2.fs-serif             This is some serifed text.
+          h2.fs-display           This is some display text.
+          h2.fs-sans              This is some standard text.
+          h2.fs-mono.fw-normal    This is some monospace text.
+          p This is some very normal, easy to read text. #[mark I could have some highlighted text.]
+          p: b Here is some bolded text.
+          p: strong Here is some strong text.
+          p: i Here is some italic text.
+          p: em Here is some emphasis text.
+          p: s Don't read this, it's strikethrough!
+          p: u You done messed up, this is underlined text.
+          p: mark I'm very important marked text.
+          hr
+          p.fs-serif   This is some serifed text.
+          p.fs-display This is some display text.
+          p.fs-sans    This is some standard text.
+          p.fs-mono    This is some monospace text.
+          hr
+          p.fs-serif   0123456789 10 11 12 13 14 15 16
+          p.fs-display 0123456789 10 11 12 13 14 15 16
+          p.fs-sans    0123456789 10 11 12 13 14 15 16
+          p.fs-mono    0123456789 10 11 12 13 14 15 16
+          hr
+          p.fs-mono    0123 456789 12 123 1234 12 1234567
+          p.fs-mono    This should be the same in length.
+          br
+          pre: code.lang-stylus.
+            font-set($font, $autosize = false)
+              +cache('font-' + $font)
+                --font-cap: unquote('var(--font-' + $font + '-cap)')
+                font-family: unquote('var(--font-' + $font + ')')
+                if $font is 'display' or $font is display
+                  font-weight: 500
+                else if $font is 'mono' or $font is mono
+                  overflow-wrap: break-word
+
+            .rhythm
+              // Default Rhythm Settings
+              --rhythm-baseline: 1.5
+              --rhythm-reference-font-size: 1rem
+              
+              // Auto-calculated Vars (don't change these)
+              --rhythm-baseline-row: calc(--rhythm-baseline / 2)
+              --rhythm-baseline-unit: calc(--rhythm-reference-font-size * --rhythm-baseline)
+              --rhythm-baseline-unit-row: calc(--rhythm-baseline-unit / 2)
+
+              // Setup
+              display: grid
+              grid-template-rows: repeat(auto-fill, minmax(--rhythm-baseline-unit, auto));
+              // Divide by 2 again because top + bottom = 2rows otherwise
+              grid-row-gap: calc(--rhythm-baseline-unit / 2 )
+              row-gap: calc(--rhythm-baseline-unit / 2 )
+              line-height: --rhythm-baseline
+
+              // These tags are 'top-level' tags. 
+              // They're intended to be used with the grid.
+              // Anything else should probably be put inside a div.
+              $block-tags = 'div, main, article, section, hgroup'
+              $break-tags = 'br, hr'
+              $figure-tags = 'img, figure'
+              $text-tags = 'p, span, small'
+              $display-tags = 'h1, h2, h3, h4, h5, h6'
+
+              // Tag selections based off of relationships or proximity.
+              $headings-to-text = headings('> ', ' + p')
+              $headings-to-hr = headings('> ', ' + hr')
+
+          pre: code.lang-pug.
+            //- Content Tabs
+            //- TODO: Roll-up editor panel, completely seamless
+            div#tabs(role='tablist' aria-label='Content Tabs')
+              div#tabs_buttons(role='presentation')
+
+                +tab-button('tabs','article', true).tabs_button ARTICLE
+                +tab-button('tabs','preface').tabs_button PREFACE
+                +tab-button('tabs','discuss').tabs_button DISCUSS
+              
+              //- TODO: Turn this into a Reef component
+              //- TODO: Make the Aria labels change dependent on state
+              div#rating
+                span#rt_lbl RATING
+                span#rt_cur +3685
+                +button()#rtbtn_up.rating_button(aria-label='Vote positively about this article')
+                  +mdi('plus')
+                +button()#rtbtn_down.rating_button(aria-label='Vote negatively about this article')
+                  +mdi('minus')
+                +button()#rtbtn_meh.rating_button(aria-label='Vote indifferently about this article')
+                  +mdi('plus-minus')
+
+          pre: code.language-js.
+            // PrismJS plugin helper
+            const _prismPlugin = (link = '') => {
+              const type = /\.css$/.test(link) ? 'stylesheet' : 'script'
+              return loadLink(
+                type,
+                `https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/${link}`
+              ).catch(() => {
+                console.warn(`PrismJS ${type} (${link}) failed to load.`)
+              })
+            }
+          
+          p Man, it sure would suck if #[code.language-js console.log('oh god I became code')] oh jeezus help
+
+          br
+          - var scpNum = '3685'
+
+          h6 Special Containment Procedures
+          p The 2 kilometer exclusion zone surrounding SCP-#{scpNum} has been acquired and is now being maintained by Foundation security personnel. The entirety of this zone's perimeter has been fenced, and the only official entrance is located on the western edge of the zone. Persons without proper Foundation credentials are not to be allowed within the exclusion zone under any circumstances. 
+          
+          p Disinformation is to be proliferated claiming that the complex containing SCP-#{scpNum} is an extremely hazardous chemical and nuclear weapons development site. Further disinformation is to be implanted into historical institutions about the factual personnel and outcomes of the Uranprojekt. Any historical evidence for the Uranprojekt constructing anything beyond simple reactor piles is to be suppressed.
+          
+          p The area surrounding SCP-#{scpNum} is affected by significant radioactive contamination. Personnel and equipment present within the zone are to be subjected to regular screening. If equipment cannot be decontaminated, it is to be buried within the nuclear waste repository present on-site. Personnel are to be cycled out if they exceed radioactivity exposure limits.
+          
+          p Primary and secondary containment of the SCP-#{scpNum} spacetime anomaly is currently being maintained by equipment not produced by the Foundation. Primary and secondary containment is being managed by an Uranprojekt containment devices. The location of the primary containment device is unknown. Secondary containment is being managed by a series of stabilization panels installed in the perimeter of the SCP-#{scpNum} structure. It is unknown if or when any of the containment equipment will fail.
+
+          br
+          h1 Very Important Thing
+          h2 Very Important Thing
+          h3 Very Important Thing
+          h4 Very Important Thing
+          h5 Very Important Thing
+          h6 Very Important Thing
+          br
+          h1 Very Important Thing
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h2 Very Important Thing
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h3 Very Important Thing
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h4 Very Important Thing
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h5 Very Important Thing
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h6 Very Important Thing
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          
+          h1 Very Important Thing
+          hr
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h2 Very Important Thing
+          hr
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h3 Very Important Thing
+          hr
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h4 Very Important Thing
+          hr
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h5 Very Important Thing
+          hr
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+          h6 Very Important Thing
+          hr
+          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+          br
+
+          p Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor. Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+
+          p Et doloremque delectus qui omnis assumenda et ea omnis architecto. Ut fugit non non aut tempora. Eos ut enim nam iste inventore veniam explicabo fuga architecto. Repellendus maxime quis mollitia. Ex illo expedita odio placeat repellendus illo distinctio. Excepturi eum quam. Doloremque eum sed placeat debitis. Nisi eos et nisi quidem voluptatem non dolores beatae cum. Repellat aspernatur sunt dolore et aut laborum at id veritatis. Sed commodi est aut. Sint cupiditate repudiandae temporibus enim sint illo quasi est dolorem. Voluptate tenetur ut debitis odit rerum qui totam vel pariatur. Et odit eos consequatur. Culpa quod iusto non et sapiente maxime et libero consequuntur. Iure corrupti voluptatem quasi delectus quis eveniet et commodi unde. Vel et rerum ab occaecati. Doloribus alias voluptas necessitatibus ducimus aut nesciunt enim. Ab error reiciendis ut omnis repellendus omnis ut qui. Aut consequatur molestias omnis ut.
+ 
+          p Quis consequatur dolorem quis suscipit libero inventore cupiditate ad. Odio asperiores adipisci reprehenderit perferendis quis rerum consequatur quod quae. Optio facilis earum quo dolores fuga. Totam corporis qui rerum fuga aspernatur et odio.
+ 
+          p Labore dolor odio consequatur optio nulla libero odit dolorum. Et exercitationem totam placeat natus laborum eaque consequatur. Sed nemo eum explicabo nostrum quidem ut. Atque recusandae dolore debitis alias. Non iusto incidunt.
+
+          p Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor. Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+
+          p Et doloremque delectus qui omnis assumenda et ea omnis architecto. Ut fugit non non aut tempora. Eos ut enim nam iste inventore veniam explicabo fuga architecto. Repellendus maxime quis mollitia. Ex illo expedita odio placeat repellendus illo distinctio. Excepturi eum quam. Doloremque eum sed placeat debitis. Nisi eos et nisi quidem voluptatem non dolores beatae cum. Repellat aspernatur sunt dolore et aut laborum at id veritatis. Sed commodi est aut. Sint cupiditate repudiandae temporibus enim sint illo quasi est dolorem. Voluptate tenetur ut debitis odit rerum qui totam vel pariatur. Et odit eos consequatur. Culpa quod iusto non et sapiente maxime et libero consequuntur. Iure corrupti voluptatem quasi delectus quis eveniet et commodi unde. Vel et rerum ab occaecati. Doloribus alias voluptas necessitatibus ducimus aut nesciunt enim. Ab error reiciendis ut omnis repellendus omnis ut qui. Aut consequatur molestias omnis ut.
+ 
+          p Quis consequatur dolorem quis suscipit libero inventore cupiditate ad. Odio asperiores adipisci reprehenderit perferendis quis rerum consequatur quod quae. Optio facilis earum quo dolores fuga. Totam corporis qui rerum fuga aspernatur et odio.
+ 
+          p Labore dolor odio consequatur optio nulla libero odit dolorum. Et exercitationem totam placeat natus laborum eaque consequatur. Sed nemo eum explicabo nostrum quidem ut. Atque recusandae dolore debitis alias. Non iusto incidunt.
+
+        +tab-panel('tabs','preface')
+        +tab-panel('tabs','discuss')
+        
+    footer#footer
+
+  div#script-container(role='presentation' style='display: none;')
+    //- All of our other scripts.
+      script(src='/js/lumen.js')
+      script(src='/js/load.js')
+</html>

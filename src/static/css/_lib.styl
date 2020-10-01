@@ -1,0 +1,298 @@
+// TODO: Stop using --implicit-vars due to just finickyness
+// TODO: Follow sass-gudelin and rename all functions and mixins to be lowercase
+// TODO: Make constants uppercase
+// TODO: Add the 'shame.styl' file
+// TODO: Add back top: center, left: center, etc.
+// Disable some Stylus stuff
+vendors = offical
+
+// Helpers
+ensure(val, type)
+  if val is a 'boolean' and type isnt defined and val is false
+    error('Expected conditional to evaluate to true but got false')
+  unless val is a type
+    error('expected a ' + type + ', but got ' + typeof(val))
+
+// Calc Helpers (used for colvar mainly)
+
+calc-mix(var1, var2, ratio = 0.5)
+  if unit(ratio) is '%'
+    ratio = unit(ratio,'') / 100
+  if ratio = 0.5
+    return 'calc((%s + %s) / 2)' % (var1 var2)
+  else
+    return 'calc((%s * %s) + (%s * %s))' % (var1 (1 - ratio) var2 ratio)
+
+calc-op(op, vars...)
+  if length(vars) < 2
+    return vars[0]
+
+  str = 'calc(%s)' % unquote(join(op, vars))
+  return str
+
+// Color
+
+// colvar('color')
+// colvar('color' brightness)
+
+// colvar('color', (lighten 20%), (mix 'othercolor' 50%))
+
+colvar(name, functions...)
+  hue        = colvar-component(name, 'h')
+  saturation = colvar-component(name, 's')
+  lightness  = colvar-component(name, 'l')
+  alpha      = colvar-component(name, 'a')
+  unless functions
+    return 'hsla(%s, %s, %s, %s)' % (hue saturation lightness alpha)
+
+  if functions
+    for keys in functions
+      parameters = clone(keys)
+      function = shift(parameters)
+
+      if function is lighten
+        val = parameters[0]
+        if unit(val) is '%'
+          lightness = calc-op('+', lightness, val)
+        else if unit(val) is ''
+          lightness = calc-op('*', lightness, val)
+
+      if function is darken
+        val = parameters[0]
+        if unit(val) is '%'
+          lightness = calc-op('-', lightness, val)
+        else if unit(val) is ''
+          lightness = calc-op('/', lightness, val)
+
+      if function is mix
+        othercolor = colvar-shred(parameters[0])
+        mix = 0.5
+        mix = parameters[1] if parameters[1]
+
+        hue        = calc-mix(hue, othercolor[0], mix)
+        saturation = calc-mix(saturation, othercolor[1], mix)
+        lightness  = calc-mix(lightness, othercolor[2], mix)
+        alpha      = calc-mix(alpha, othercolor[3], mix)
+
+    return 'hsla(%s, %s, %s, %s)' % (hue saturation lightness alpha)
+
+
+colvar-set(name, val)
+  if name and type(val) is 'hsla'
+    --colvar-{name}-h: hue(val)
+    --colvar-{name}-s: saturation(val)
+    --colvar-{name}-l: lightness(val)
+    --colvar-{name}-a: alpha(val)
+  else
+    error('Expected a colvar name string and a HSL/HSLA value | ' + (name) + ' | ' + (val))
+
+colvar-component(name, type)
+  name = unquote(name)
+  
+  unless type is a 'string'
+    type = type + ''
+  component = ''
+  if type is 'h' or type is 'hue'
+    component = h
+  if type is 's' or type is 'saturation'
+    component = s
+  if type is 'l' or type is 'lightness'
+    component = l
+  if type is 'a' or type is 'alpha'
+    component = a
+
+  return 'var(--colvar-%s-%s)' % (name component)
+
+colvar-shred(identifier)
+  if type(identifier) is 'hsla'
+    hue        = hue(identifier)
+    saturation = saturation(identifier)
+    lightness  = lightness(identifier)
+    alpha      = alpha(identifier)
+    return (hue saturation lightness alpha)
+  else if identifier
+    hue        = 'var(--colvar-%s-h)' % identifier
+    saturation = 'var(--colvar-%s-s)' % identifier
+    lightness  = 'var(--colvar-%s-l)' % identifier
+    alpha      = 'var(--colvar-%s-a)' % identifier
+    return (hue saturation lightness alpha)
+
+// Property Functions
+
+// Stylus unfortunately, like most preprocessors, does not support the [rgba(triplet, opacity)] syntax.
+// This is a simple replacement for that functionality.
+vgba(triplet, opacity)
+  'rgba(%s, %s)' % (triplet opacity)
+
+// Properties
+
+// Makes an object appear higher.
+shadow-elevation(height = 1, boost = 1)
+  boost = (boost * (unit(height,'') / 8))
+  height = unit(height, '')px
+  unless unit(height, '') is 0
+    box-shadow: 0 (height / 2) height 0 rgba(black, 0.5 * boost),
+                0 0 0 (0.075px * height) (rgba(black, 0.1 * boost))
+  if unit(height, '') is 0
+    box-shadow: none
+
+// Grid-Kiss Hilarious Stylus Fork
+use('grid-kiss-stylus/grid-kiss.js')
+grid-kiss()
+  display: grid
+
+  list = grid-kiss-list(arguments)
+
+  props = 'align-content', 'justify-content', 
+          'grid-template-rows', 'grid-template-columns', 'grid-template-areas'
+  propvals = list[0]
+  for val, i in propvals
+    prop = props[i]
+    add-property(prop, val) if val
+
+  grid-kiss-zone(zone)
+    {zone[0]}
+      props = '', 'grid-area', 'justify-self', 'align-self'
+      for val, i in zone
+        unless i is 0
+          prop = props[i]
+          add-property(prop, val) if val
+          
+  zones = list[1]
+  if zones
+    if length(slice(zones[1], 0, 1)) isnt 1
+      for zone in zones
+        grid-kiss-zone(zone)
+    else
+      grid-kiss-zone(zones)
+
+
+// Selection Functions
+
+// This is just a helper function to select all headings. Because that's always REALLY annoying.
+select-headings(prefix = '', suffix = '')
+  headings = ()
+  for num in (1..6)
+    push(headings, prefix + 'h' + num + suffix)
+    
+  return join(', ', headings)
+
+// This lets select tags from: a list of strings, a string that is a list, or a pure list
+// The prefix lets you use a combinator (say '> ') on your tags.
+// You can tell the function to cache the result by providing a unique string. 
+// Otherwise pass a boolean false if you don't want the result cached.
+select-listed(prefix = '', useCache = false, selectors...)
+  // We'll convert anything provided to a string for safety
+  // This lets you provide the selectors in either args = '1, 2, 3' or args = 1, 2, 3
+  $selector = replace(' ', '', join(',', selectors))
+
+  for $tag in split(',',$selector)
+    {prefix + $tag}
+      if useCache is a 'string' and useCache isnt ''
+        +cache(useCache)
+          {block}
+      else
+        {block}
+
+// Media Functions
+
+// +match-media(size, inclusivity)
+// size: any-in: ['narrow', 'thin', 'small', 'normal', 'wide'] 
+// inclusivity: any-in: ['only', 'up', 'below']
+// Sizes, by default, will match like so:
+//    narrow: < 400px (small phones)
+//    thin:   > 400px (normal phones)
+//    small:  < 800px (tablets)
+//    normal: > 1000px (average desktop)
+//    wide:   > 1400px (extra wide monitors)
+use('match-media.js')
+match-media(size, inclusivity)
+  $s = match-media-string(size, inclusivity)
+  @media $s
+    {block}
+
+$bp-thin   = 400px
+$bp-small  = 800px
+$bp-normal = 1000px
+$bp-wide   = 1400px
+
+// +has-only-touch()
+// For touch devices - regardless of size.
+// Any features where you intend it to be for 'mobile' should probably use this instead.
+// The exception is for the 'size' of readable content. 
+// Making things easier to read should be based off screen size.
+has-only-touch()
+  @media (pointer: coarse), (any-hover: none), (hover: none)
+    {block}
+    
+// +uses-reduced-motion()
+// Reduced motion accessibility
+// Probably not needed but it's just more consistent with how the rest of the media queries are done
+uses-reduced-motion()
+  @media (prefers-reduced-motion)
+    {block}
+
+// +onHover()
+// Shoves hover stuff in a hover media query
+on-hover()
+  @media (any-hover: hover), (hover: hover) 
+    &:hover:not(:active) 
+      {block}
+
+// +on-hovertouch()
+// Smart hovering - only 'hovers' if the device can hover, otherwise it works off of only touch events
+on-hovertouch()
+  &.touch:not(:active) 
+    {block}
+  +on-hover()
+    {block}
+
+// Mixins
+
+// hide-scrollbars()
+// Gets rid of scrollbars, but allows scrolling.
+hide-scrollbars()
+  scrollbar-width: none
+  &::-webkit-scrollbar
+    display: none
+
+// hide-visually()
+// Hides content visually but not to screen readers.
+hide-visually()
+  position: absolute
+  overflow: hidden
+  clip: rect(1px, 1px, 1px, 1px)
+  width: 1px
+  height: 1px
+  white-space: nowrap
+  clip-path: inset(100%)
+
+// Adds ::after and ::before pseudo-elements labeling the element for screen-readers.
+// Like such: &::before = '[Start of $text]', &::after = '[End of $text]'
+label-for-screenreaders(text)
+  &::before,
+  &::after
+    hide-visually()
+
+  &::before
+    content: '[Start of ' + text + '.]'
+
+  &::after
+    content: '[End of ' + text + '.]'
+
+// Resets
+
+resetStyling()
+  +cache('reset-styling') // TODO: Determine if this is a good idea or not
+    margin: 0
+    margin-block-end: 0
+    margin-block-start: 0
+    padding: 0
+    padding-block-start: 0
+    padding-block-end: 0
+    outline: none
+    border: none
+    background: none
+    color: --col-text
+    text-decoration: none
+    font: inherit

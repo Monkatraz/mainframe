@@ -1,0 +1,21 @@
+@charset 'UTF-8'
+@import 'sanitize.css'
+// Reset
+html
+  cursor: auto
+input
+  font: inherit
+
+// Library and variables
+@require '_lib'
+// Components
+// @require 'components/**/*-critical'
+
+:root
+  colvar-set(asdf, hsla(0, 0%, 10%, 1))
+  colvar-set(asdf2, hsla(0, 100%, 100%, 0.5))
+
+  color: colvar(asdf)
+
+  &:active
+    width: 1000px

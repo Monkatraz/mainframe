@@ -1,0 +1,22 @@
+<svg width="120" height="60" viewBox="0 -30 120 30" xmlns="http://www.w3.org/2000/svg" fill="#323232">
+	<style>
+	@keyframes load-wave {
+	0% {
+	transform: translateY(15px); }
+	100% {
+	transform: translateY(-15px); }
+	}
+
+	.ld1 {
+	animation: load-wave 0.3s -0.9s infinite alternate ease-in-out; }
+	.ld2 {
+	animation: load-wave 0.3s -0.8s infinite alternate ease-in-out; }
+	.ld3 {
+	animation: load-wave 0.3s -0.7s infinite alternate ease-in-out; }
+	</style>
+    <circle cx="15" cy="-15" r="15" class="ld1"></circle>
+
+    <circle cx="60" cy="-15" r="15" class="ld2"></circle>
+
+    <circle cx="105" cy="-15" r="15" class="ld3"></circle>
+</svg>

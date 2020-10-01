@@ -1,0 +1,15 @@
+# Editor or misc. files
+.cache
+.vscode
+.npm
+.eslintcache
+# NPM and/or Snowpack Dependencies
+node_modules
+web_modules
+# Snowpack Output (Built or dev version of website)
+public
+.build
+build
+# Keys are scary
+.env
+.env.local

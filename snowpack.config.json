@@ -1,0 +1,37 @@
+{
+  "mount": {
+    "public": "/",
+    "src": "/"
+  },
+  "exclude": [
+    "**/node_modules/**/*",
+    "**/__tests__/*",
+    "**/*.@(spec|test).@(js|mjs)"
+  ],
+  "installOptions": {
+    "polyfillNode": true,
+    "installTypes": true,
+    "treeshake": true
+  },
+  "devOptions": {
+    "out": "./build/",
+    "fallback": "index.pug",
+    "open": "none"
+  },
+  "buildOptions": {
+    "clean": true,
+    "metaDir": "static/snowpack"
+  },
+  "plugins": [
+    "@snowpack/plugin-dotenv",
+    "./snowpack/compile-css.js",
+    "./snowpack/compile-html.js",
+    [
+      "@snowpack/plugin-optimize",
+      {
+        "minifyCSS": false,
+        "target": "es2018"
+      }
+    ]
+  ]
+}
