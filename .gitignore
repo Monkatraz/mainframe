@@ -7,7 +7,6 @@
 node_modules
 web_modules
 # Snowpack Output (Built or dev version of website)
-public
 .build
 build
 # Keys are scary
