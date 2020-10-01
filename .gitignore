@@ -3,6 +3,7 @@
 .vscode
 .npm
 .eslintcache
+.local
 # NPM and/or Snowpack Dependencies
 node_modules
 web_modules
