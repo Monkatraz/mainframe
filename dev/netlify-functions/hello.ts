@@ -1,4 +1,4 @@
-import type { Handler, Context, APIGatewayEvent } from 'aws-lambda'
+import { Handler, Context, APIGatewayEvent } from 'aws-lambda'
 
 const handler: Handler = async (event: APIGatewayEvent, context: Context) => {
   return {

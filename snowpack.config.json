@@ -20,7 +20,8 @@
   },
   "buildOptions": {
     "clean": true,
-    "metaDir": "static/snowpack"
+    "metaDir": "static/snowpack",
+    "sourceMaps": true
   },
   "plugins": [
     "@snowpack/plugin-dotenv",
