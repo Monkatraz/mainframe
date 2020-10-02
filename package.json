@@ -6,8 +6,11 @@
   "license": "MIT",
   "private": "true",
   "scripts": {
-    "start": "npx snowpack dev",
-    "build": "npx snowpack build",
+    "dev": "npx netlify dev",
+    "snowpack:dev": "npx snowpack dev",
+    "snowpack:build": "npx snowpack build",
+    "netlify-funcs:build": "npx netlify-lambda build ./dev/netlify-functions",
+    "build": "npm run snowpack:build & npm run netlify-funcs:build",
     "test": "echo \"This website source does not include a test runner by default.\" && exit 1"
   },
   "homepage": "www.scp-mainframe.app",
@@ -26,10 +29,13 @@
   "devDependencies": {
     "@snowpack/plugin-dotenv": "^2.0.2",
     "@snowpack/plugin-optimize": "^0.2.2",
+    "@types/aws-lambda": "^8.10.63",
     "autoprefixer": "^10.0.1",
     "css-mquery-packer": "^1.2.4",
     "cssnano": "^4.1.10",
     "cssnano-preset-advanced": "^4.0.7",
+    "netlify-cli": "^2.64.1",
+    "netlify-lambda": "^2.0.1",
     "postcss": "^8.1.1",
     "postcss-combine-duplicated-selectors": "^10.0.2",
     "postcss-discard-duplicates": "^4.0.2",

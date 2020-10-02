@@ -1,6 +1,8 @@
 # Mainframe
 ## An unofficial proof-of-concept for the [SCP-Wiki](www.scpwiki.com).
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/78e6519c-b9ab-440a-9a77-ef79694eac65/deploy-status)](https://app.netlify.com/sites/scp-mainframe/deploys)
+
 Mainframe is a personal attempt to create an affordable, modern replacement for the SCP-Wiki website.
 
 Right off the bat, Mainframe is:

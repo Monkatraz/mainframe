@@ -1,5 +1,12 @@
+// Imports
 import FaunaDB from 'faunadb'
 var q = FaunaDB.query
+
+// Constants
+
+const REMOTE_API: string = import.meta.env.SNOWPACK_PUBLIC_REMOTE_API
+
+fetch(REMOTE_API + 'hello').then(result => console.log(result))
 
 // Database Objects
 type queryResult = {
@@ -92,10 +99,8 @@ class Client {
 
 // Init Clients
 const FAUNADB_READER_KEY: string = import.meta.env.SNOWPACK_PUBLIC_FAUNADB_READER_KEY
-const FAUNADB_ADMIN_KEY: string = import.meta.env.SNOWPACK_PUBLIC_BAD_FAUNADB_ADMIN_KEY
 export const Clients = {
-  Reader: new Client(FAUNADB_READER_KEY),
-  Admin: new Client(FAUNADB_ADMIN_KEY)
+  Reader: new Client(FAUNADB_READER_KEY)
 }
 
 Clients.Reader.get.pageRef('scp/3685').then(result => console.log(result))

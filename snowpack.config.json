@@ -24,8 +24,8 @@
   },
   "plugins": [
     "@snowpack/plugin-dotenv",
-    "./snowpack/compile-css.js",
-    "./snowpack/compile-html.js",
+    "./dev/snowpack/compile-css.js",
+    "./dev/snowpack/compile-html.js",
     [
       "@snowpack/plugin-optimize",
       {

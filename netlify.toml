@@ -1,0 +1,17 @@
+[build]
+command = "npm run build"
+functions = "netlify-functions"
+publish = "build"
+
+[dev]
+framework = "#custom"
+command = "npm run snowpack:dev"
+targetPort = 8080
+port = 8000
+publish = "build"
+autoLaunch = false
+
+[[redirects]]
+from = "/*"
+to = "/index.html"
+status = 200

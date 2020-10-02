@@ -4,7 +4,7 @@ const stylus = require('stylus')
 
 // This silences PostCSS depecrated plugin warnings
 const oldWarn = console.warn
-console.warn = () => {}
+console.warn = () => {  }
 
 const postcssPluginsPath = './postcss-plugins/'
 const postcssPlugins = [
@@ -38,7 +38,7 @@ console.warn = oldWarn
 // @ts-ignore
 const postcssRenderer = postcss(postcssPlugins)
 
-const stylusPaths = ['./src/static/css/', './snowpack/stylus-plugins/']
+const stylusPaths = ['./src/static/css/', './dev/snowpack/stylus-plugins/']
 
 // Renderers
 const stylusRender = function (str = '', path = '') {

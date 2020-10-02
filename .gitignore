@@ -13,3 +13,5 @@ build
 # Keys are scary
 .env
 .env.local
+# Local Netlify folder
+.netlify

@@ -30,7 +30,7 @@
   },
   "include": [
     "./src",
-    "./types"
+    "dev/types"
   ],
   "exclude": [
     "./node_modules"
