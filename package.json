@@ -9,7 +9,8 @@
     "dev": "npx netlify dev",
     "snowpack:dev": "npx snowpack dev",
     "netlify-funcs:build": "npx netlify-lambda build ./dev/netlify-functions",
-    "build": "npx run snowpack build && npm run netlify-funcs:build",
+    "build": "npx run snowpack build & npm run netlify-funcs:build",
+    "build:netlify": "snowpack build & netlify-lambda build ./dev/netlify-functions",
     "test": "echo \"This website source does not include a test runner by default.\" && exit 1"
   },
   "homepage": "www.scp-mainframe.app",
