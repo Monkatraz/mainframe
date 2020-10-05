@@ -1,14 +1,14 @@
 # Editor or misc. files
-.cache
-.vscode
+/.cache/
+/.vscode/
+/.eslintcache/
+/.local/
+# NPM
 .npm
-.eslintcache
-.local
-# NPM and/or Snowpack Dependencies
 node_modules
-web_modules
-# Snowpack Output (Built or dev version of website)
-.build
-build
+# Build folders
+/.build/
+/build/
+/netlify-functions/
 # Local Netlify folder
-.netlify
+/.netlify/
