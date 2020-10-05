@@ -38,7 +38,7 @@
     "css-mquery-packer": "^1.2.4",
     "cssnano": "^4.1.10",
     "cssnano-preset-advanced": "^4.0.7",
-    "netlify-cli": "^2.64.1",
+    "netlify-cli": "^2.65.0",
     "netlify-lambda": "^2.0.1",
     "postcss": "^8.1.1",
     "postcss-combine-duplicated-selectors": "^10.0.2",
