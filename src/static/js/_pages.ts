@@ -42,6 +42,7 @@ interface IPageMetadata {
   tags: Tags[]
 }
 
+// TODO: Add flags (like '_cc' or '_verified-licensing')
 interface IPage {
   path: string
   meta: IPageMetadata
@@ -101,6 +102,12 @@ class Page implements IPage {
 
   constructor(path: string = '') {
     this.path = path
+  }
+}
+
+type Lazyify<T> = {
+  [P in keyof T]: {
+    (): Promise<T>
   }
 }
 

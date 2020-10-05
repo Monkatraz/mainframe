@@ -3,11 +3,6 @@
     "public": "/",
     "src": "/"
   },
-  "exclude": [
-    "**/node_modules/**/*",
-    "**/__tests__/*",
-    "**/*.@(spec|test).@(js|mjs)"
-  ],
   "installOptions": {
     "polyfillNode": true,
     "installTypes": true,
@@ -21,7 +16,7 @@
   "buildOptions": {
     "clean": true,
     "metaDir": "static/snowpack",
-    "sourceMaps": true
+    "sourceMaps": false
   },
   "plugins": [
     "@snowpack/plugin-dotenv",

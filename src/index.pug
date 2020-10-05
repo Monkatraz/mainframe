@@ -12,13 +12,12 @@ head
   //- TODO: License widget
   //- TODO: Vendor loader
   //- TODO: Add back all the CSS (.svelte components)
+  //- TODO: Web-worker for caching web pages and PWA stuff (Use Workbox)
 
   //- Preloads
-    link(rel='preload' href='/css/main.css' as='style')
-    link(rel='preload' href='/js/main.js' as='script')
-    link(rel='preload' href='/js/lumen.js' as='script')
-    link(rel='preload' href='/js/load.js' as='script')
-  link(rel='preload' href='/static/js/mainframe.js' as='script' crossorigin)
+  link(rel='preload' href='/static/css/critical.css' as='style')
+  link(rel='modulepreload' href='/static/js/mainframe.js')
+
 
   //- Misc.
   link(rel='author' href='humans.txt')
@@ -57,7 +56,6 @@ head
   link(rel='mask-icon' href='/safari-pinned-tab.svg' color=metaThemeColor)
 
   //- Self-hosted Stuff
-    script(src='/js/main.js')
   link(rel='stylesheet', href='/static/css/critical.css')
   script(src='/static/js/mainframe.js' type='module')
 
@@ -66,25 +64,6 @@ head
 
   
 body
-  // 
-    Hi, person who is reading this. This is my SCPWiki design concept, Mainframe.
-    It is extremely lightweight wiki, using a serverless/static SPA interface.
-    If you wish to know more about me, or contact me, go here: [https://www.monkasite.com/]
-    If you're curious and wish to ask a few questions, my DMs on Discord are open. [Monkatraz#7929]
-
-    Please note:
-      * This is COMPLETELY unofficial. I asked nobody - and told nobody - about this project.
-      * This is a prototype.
-        - Significant portions of the site are intentionally nonfunctional.
-      * I made this in my spare time, and for free.
-      * This site was intentionally designed not to be backwards compatible.
-        - Trust me - it's better because of it.
-      * This site's framework is probably not good for anything but an SCP-style wiki.
-    
-    If you notice any issues (particularly ones related to security or accessibility), please:
-      1. Take screenshots, record videos, create code samples, etc.
-      2. Create an issue here: [https://github.com/Monkatraz/scp-mainframe]
-
   //- All nodes which do not have an explicit categorical/semantic or utility function should:
         * be checked for if they have any reason to exist
         * have their role set to 'presentation'
@@ -167,7 +146,6 @@ body
           +tab-button('tabs','preface').btn.tabs_button PREFACE
           +tab-button('tabs','discuss').btn.tabs_button DISCUSS
         
-        //- TODO: Turn this into a Reef component
         //- TODO: Make the Aria labels change dependent on state
         div#rating
           span#rt_lbl RATING
@@ -376,9 +354,5 @@ body
         +tab-panel('tabs','discuss')
         
     footer#footer
-
-  div#script-container(role='presentation' style='display: none;')
-    //- All of our other scripts.
-      script(src='/js/lumen.js')
-      script(src='/js/load.js')
+    
 </html>
