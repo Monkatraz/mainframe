@@ -82,6 +82,7 @@ TODO         text
 *.hbs        text
 *.hbt        text
 *.jade       text
+*.pug        text
 *.latte      text
 *.mustache   text
 *.njk        text
