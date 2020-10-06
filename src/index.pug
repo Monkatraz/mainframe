@@ -8,12 +8,6 @@ head
     However, it could be quite well-suited for it.
   //- link(rel='manifest' href='/site.webmanifest')
 
-  //- TODO: Add humans.txt button somewhere
-  //- TODO: License widget
-  //- TODO: Vendor loader
-  //- TODO: Add back all the CSS (.svelte components)
-  //- TODO: Web-worker for caching web pages and PWA stuff (Use Workbox)
-
   //- Preloads
   link(rel='preload' href='/static/css/critical.css' as='style')
   link(rel='modulepreload' href='/static/js/mainframe.js')
@@ -138,7 +132,6 @@ body
     main#content(aria-label='Content')
 
       //- Content Tabs
-      //- TODO: Roll-up editor panel, completely seamless
       div#tabs(role='tablist' aria-label='Content Tabs')
         div#tabs_buttons(role='presentation')
 
