@@ -1,44 +1,31 @@
 # Mainframe
 
-### Main Targets
+### In Progress
 - [ ] FaunaDB API
 - [ ] Minimum needed for Netlify API
 - [ ] Svelte compiling
 - [ ] Svelte component loader
-- [ ] Port previous CSS over (requires Svelte)
+- [ ] Porting previous CSS over (requires Svelte)
 
 ### Libraries to implement
-- [ ] CodeMirror
-- [ ] Anime.js
-- [ ] Tippy.js
-- [ ] Chart.js
-- [ ] Workbox
-
-### API
+- [ ] Add CodeMirror
+- [ ] Add Anime.js
+- [ ] Add Tippy.js
+- [ ] Add Chart.js
+- [ ] Add Workbox
 - [ ] FaunaDB query throttling system
-
-### FaunaDB Database
 - [ ] Create private database
 - [ ] Create user collection and basic login system
 - [ ] Create page index / function that prevents scraping and limits query shapes
 - [ ] Create a page generator script
-
-### Schemas
 - [ ] Create a flattened page schema with reduced nesting
-- [ ] Page appearance and staff-controlled page flags
+- [ ] Page appearance and staff-controlled page flags schema
 - [ ] Create a private user-data schema
 - [ ] Create a public user-data schema
-
-### Modules
 - [ ] Object schema validation function collection
-- [ ] Language handler
-
-### General
-- [ ] Shared modules directory
+- [ ] Language handler module or import
 - [ ] Change Prism.js color scheme
 - [ ] Better style Prism.js toolbar and language tip
-
-### Snowpack
 - [ ] Add source map support for the Stylus and Pug compilers
 - [ ] Add import alias support for the Stylus and Pug compilers (likely regex based)
 
@@ -53,17 +40,6 @@
 - [x] FaunaDB basic API
 - [x] Netlify hosting
 - [x] Path aliases
-- [x] Iconify
-- [x] Prism.js
+- [x] Add Iconify
+- [x] Add Prism.js
 - [x] Lazy loader module
-
-----
-
-## Ideas
-
-### Random
-- Dark mode
-
-### Editor
-- Rolling and resizable editor panel
-- Validations list to the side
