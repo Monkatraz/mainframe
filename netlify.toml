@@ -10,6 +10,9 @@ autoLaunch = false
 command = "npm run build:netlify"
 functions = "netlify-functions"
 publish = "build"
+[build.environment]
+NPM_FLAGS = "--no-optional"
+
 
 [[redirects]]
 from = "/*"
