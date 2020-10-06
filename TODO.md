@@ -9,6 +9,7 @@
 
 ### Libraries to implement
 - [ ] CodeMirror
+- [ ] Iconify
 - [ ] Prism.js
 - [ ] Anime.js
 - [ ] Tippy.js
