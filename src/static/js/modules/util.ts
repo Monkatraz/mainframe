@@ -26,7 +26,7 @@ namespace Async {
     asyncTimerFn?: () => Promise<any>
   ): Promise<true> {
     if (typeof asyncTimerFn !== 'function') {
-      asyncTimerFn = () => sleep(200)
+      asyncTimerFn = () => sleep(100)
     }
     while ((await conditionFn()) === false) {
       await asyncTimerFn()
@@ -63,6 +63,7 @@ namespace Async {
   }
 }
 
+/** Library of function creation wrappers. */
 namespace Wrap {
   /**
    * Returns a new 'locked' async function, constructed using the specified function.
@@ -104,7 +105,9 @@ namespace Wrap {
   }
 }
 
+/** Contains all environment variables. */
 namespace ENV {
+  /** API related env. variables. Usually database related. */
   export namespace API {
     // Database
     export const FDB_CLIENT_READER: string = import.meta.env.SNOWPACK_PUBLIC_API_FDB_CLIENT_READER
@@ -114,4 +117,26 @@ namespace ENV {
   }
 }
 
-export { Async, Wrap, ENV }
+const LOADSCRIPT_TIMEOUT_INTERVAL = 10000
+/** Async. loads scripts from relative path / URL.
+ *  Promise resolves once the script has fully loaded.
+ *  If it takes too long to download the script, the promise will reject.
+ */
+function appendScript(src: string): Promise<void> {
+  return new Promise(async (resolve, reject) => {
+    const timeout = setTimeout(reject, LOADSCRIPT_TIMEOUT_INTERVAL)
+    const _resolve = () => { clearTimeout(timeout); resolve() }
+
+    // Wait for the script container to load (just in case)
+    await Async.waitFor(() => document.querySelector('#script-container') !== null)
+
+    const script = document.createElement('script')
+    script.src = src
+    script.onload = _resolve
+    // TypeScript doesn't realize that I've checked for null
+    const container = document.querySelector('#script-container') as Element
+    container.appendChild(script)
+  })
+}
+
+export { Async, Wrap, ENV, appendScript }

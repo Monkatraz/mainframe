@@ -1,5 +1,5 @@
 // Imports
-import { ENV } from '../_util'
+import { ENV } from '@modules/util'
 // FaunaDB
 import FaunaDB from 'faunadb'
 var q = FaunaDB.query
@@ -208,11 +208,7 @@ const Clients = {
   Reader: new Client(ENV.API.FDB_CLIENT_READER)
 }
 
-Clients.Reader.query(qe.Fields(qe.Data(qe.Search('pages_by_path', 'scp/3685'))))
-  .then(result => console.log(result))
-
 
 // Remote API Calls
 // TODO: Netlify API module
-
-fetch(ENV.API.LAMBDA + 'hello').then(result => console.log(result))
+// fetch(ENV.API.LAMBDA + 'hello').then(result => console.log(result))

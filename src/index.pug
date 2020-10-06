@@ -10,7 +10,10 @@ head
 
   //- Preloads
   link(rel='preload' href='/static/css/critical.css' as='style')
+  link(rel='preload' href='/static/css/main.css' as='style')
   link(rel='modulepreload' href='/static/js/mainframe.js')
+  link(rel='modulepreload' href='/web_modules/faunadb.js')
+  link(rel='modulepreload' href='/static/js/loader.js')
 
 
   //- Misc.
@@ -51,7 +54,6 @@ head
 
   //- Self-hosted Stuff
   link(rel='stylesheet', href='/static/css/critical.css')
-  script(src='/static/js/mainframe.js' type='module')
 
   //- Pug Mixins
   include _basic-mixins
@@ -250,16 +252,41 @@ body
                   +mdi('plus-minus')
 
           pre: code.language-js.
-            // PrismJS plugin helper
-            const _prismPlugin = (link = '') => {
-              const type = /\.css$/.test(link) ? 'stylesheet' : 'script'
-              return loadLink(
-                type,
-                `https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/${link}`
-              ).catch(() => {
-                console.warn(`PrismJS ${type} (${link}) failed to load.`)
-              })
-            }
+            /**
+            * Returns a 'promisified' transformation of a FaunaDB document response.
+            * Getting a property of this object will always return a (caching) promise.
+            * This promise will resolve to the desired field's value once the background query (or caching) is complete.
+            * Using this function wisely will mean that only the needed sections of documents will be downloaded.
+            * Additionally, for every field a `_qfield` variant is created, which returns an FQL expression for that field.
+            * @example 
+            * const lazyDoc = await Clients.Reader.queryLazy(q.Data(q.Search('pages_by_path', 'scp/3685')))
+            * let val = await lazyDoc.cooldata // Takes some time due to inital database query
+            * let val2 = await lazyDoc.cooldata // Very fast now - returns from cache: Promise.resolve([cached data])
+            */
+            public async queryLazy(obj: FaunaDB.Expr): Promise<queryResult<IQueryLazyResponse> | {}> {
+              let result = await this.query(qe.Fields(obj))
+              // Return the err object if it failed
+              if (result.ok === false) return result
+
+              // Object that will be returned
+              let body: IQueryLazyResponse | {} = {}
+              // Factory for promise getter function thingy
+              const _createGetter = (field: string) => {
+                /** Queries the FaunaDB database for this field of the document or returns an already retrieved response.
+                *  Errors must be caught manually - these getters do not return a `queryResult` object.
+                */
+                return () => {
+                  return new Promise<any>((resolve) => {
+                    // Query database for document
+                    this.query(q.Select(field, obj)).then((result) => {
+                      if (result.ok === false) throw new Error('Error reading lazy field of document.')
+                      // Memoize/cache the function and return the query response body
+                      Object.defineProperty(body, field, { get: () => Promise.resolve(result.body) })
+                      resolve(result.body)
+                    })
+                  })
+                }
+              }
           
           p Man, it sure would suck if #[code.language-js console.log('oh god I became code')] oh jeezus help
 
@@ -347,5 +374,10 @@ body
         +tab-panel('tabs','discuss')
         
     footer#footer
+    
+  div#script-container(role='presentation' style='display: none;')
+    link(rel='stylesheet', href='/static/css/main.css')
+    script(src='/static/js/mainframe.js' type='module')
+    script(src='/static/js/loader.js' type='module')
     
 </html>

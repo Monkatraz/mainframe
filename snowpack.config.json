@@ -19,6 +19,10 @@
     "metaDir": "static/snowpack",
     "sourceMaps": false
   },
+  "alias": {
+    "@modules": "./src/static/js/modules",
+    "@vendor": "./src/vendor"
+  },
   "plugins": [
     "@snowpack/plugin-dotenv",
     "./dev/snowpack/compile-css.js",
@@ -27,7 +31,6 @@
       "@snowpack/plugin-optimize",
       {
         "minifyCSS": false,
-        "preloadModules": true,
         "target": "es2018"
       }
     ]

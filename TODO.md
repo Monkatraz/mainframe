@@ -9,8 +9,6 @@
 
 ### Libraries to implement
 - [ ] CodeMirror
-- [ ] Iconify
-- [ ] Prism.js
 - [ ] Anime.js
 - [ ] Tippy.js
 - [ ] Chart.js
@@ -37,7 +35,8 @@
 
 ### General
 - [ ] Shared modules directory
-- [ ] Path aliases
+- [ ] Change Prism.js color scheme
+- [ ] Better style Prism.js toolbar and language tip
 
 ### Snowpack
 - [ ] Add source map support for the Stylus and Pug compilers
@@ -53,6 +52,10 @@
 ### Done
 - [x] FaunaDB basic API
 - [x] Netlify hosting
+- [x] Path aliases
+- [x] Iconify
+- [x] Prism.js
+- [x] Lazy loader module
 
 ----
 

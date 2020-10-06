@@ -25,6 +25,12 @@
     "paths": {
       "*": [
         "web_modules/.types/*"
+      ],
+      "@modules/*": [
+        "./src/static/js/modules/*"
+      ],
+      "@vendor/*": [
+        "./src/vendor/*"
       ]
     }
   },
