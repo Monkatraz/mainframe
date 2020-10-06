@@ -4,7 +4,7 @@ const stylus = require('stylus')
 
 // This silences PostCSS depecrated plugin warnings
 const oldWarn = console.warn
-console.warn = () => {  }
+console.warn = () => { }
 
 const postcssPluginsPath = './postcss-plugins/'
 const postcssPlugins = [
@@ -77,7 +77,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
     },
     async load ({ filePath = '' }) {
       // Don't load partials
-      if (/\\_.*\.styl$/.test(filePath)) return { '.css': false }
+      if (/\\_.*\.styl$/.test(filePath)) return {}
 
       try {
         // Get our file
@@ -99,7 +99,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
       } catch (err) {
         console.error(err)
         if (err.message) console.error(err.message)
-        return { '.css': false }
+        return {}
       }
     }
   }

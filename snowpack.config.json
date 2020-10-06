@@ -6,7 +6,8 @@
   "installOptions": {
     "polyfillNode": true,
     "installTypes": true,
-    "treeshake": true
+    "treeshake": true,
+    "sourceMaps": false
   },
   "devOptions": {
     "out": "./build/",

@@ -21,7 +21,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
     },
     async load ({ filePath }) {
       // Don't load partials
-      if (/\\_.*\.pug$/.test(filePath)) return { '.html': false }
+      if (/\\_.*\.pug$/.test(filePath)) return {}
 
       try {
         // Get our file
@@ -36,7 +36,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
       } catch (err) {
         console.error(err)
         if (err.message) console.error(err.message)
-        return { '.html': false }
+        return {}
       }
     }
   }

@@ -9,7 +9,7 @@
     "dev": "npx netlify dev",
     "snowpack:dev": "npx snowpack dev",
     "netlify-funcs:build": "npx netlify-lambda build ./dev/netlify-functions",
-    "build": "npx snowpack build & npm netlify-funcs:build",
+    "build": "npx snowpack build & npm run netlify-funcs:build",
     "build:netlify": "snowpack build && netlify-lambda build ./dev/netlify-functions",
     "test": "echo \"This website source does not include a test runner by default.\" && exit 1"
   },
@@ -24,7 +24,9 @@
   ],
   "module": "esnext",
   "dependencies": {
-    "faunadb": "^3.0.1"
+    "animejs": "^3.2.0",
+    "faunadb": "^3.0.1",
+    "prismjs": "^1.21.0"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.10.4",
