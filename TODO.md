@@ -7,7 +7,7 @@
 - [ ] Svelte component loader
 - [ ] Porting previous CSS over (requires Svelte)
 
-### Libraries to implement
+### General
 - [ ] Add CodeMirror
 - [ ] Add Anime.js
 - [ ] Add Tippy.js
