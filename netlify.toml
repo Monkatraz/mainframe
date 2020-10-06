@@ -19,4 +19,4 @@ status = 200
 [[headers]]
 for = "/*"
 [headers.values]
-Content-Security-Policy = "default-src https:; script-src 'self' https://cdnjs.cloudflare.com https://code.iconify.design; child-src 'self'; object-src 'none';"
+Content-Security-Policy = "script-src 'self' https://cdnjs.cloudflare.com https://code.iconify.design; child-src 'self'; object-src 'none';"
