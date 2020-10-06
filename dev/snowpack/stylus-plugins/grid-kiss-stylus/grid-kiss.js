@@ -72,16 +72,6 @@ module.exports = function () {
       )
       _pushProp(getGridAreas({ zones, rowIndexes, colIndexes }))
 
-      // grid.props.set('display', 'grid')
-      // grid.props.set('align-content', getAlignContent({ rows }))
-      // grid.props.set('justify-content', getJustifyContent({ cols }))
-      // grid.props.set('grid-template-rows', rowDims.join(' '))
-      // grid.props.set('grid-template-columns', colDims.join(' '))
-      // grid.props.set(
-      //   'grid-template-areas',
-      //   getGridAreas({ zones, rowIndexes, colIndexes, indent })
-      // )
-
       // zone declarations
       zones
         .filter((zone) => zone.selector)
@@ -98,10 +88,6 @@ module.exports = function () {
           _pushProp(name)
           _pushProp(getJustifySelf(zone))
           _pushProp(getAlignSelf(zone))
-
-          // zone.props.set('grid-area', name)
-          // zone.props.set('justify-self', getJustifySelf(zone))
-          // zone.props.set('align-self', getAlignSelf(zone))
 
           if (zoneProps.length !== 0) {
             zonesList.push([rule, ...zoneProps])
