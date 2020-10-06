@@ -2,10 +2,12 @@
 
 ### In Progress
 - [ ] FaunaDB API
+- [ ] Consider making the FaunaDB API untyped due to its sheer dynamic complexity
 - [ ] Minimum needed for Netlify API
 - [ ] Svelte compiling
 - [ ] Svelte component loader
 - [ ] Porting previous CSS over (requires Svelte)
+- [ ] Page router
 
 ### General
 - [ ] Add CodeMirror
@@ -28,6 +30,8 @@
 - [ ] Better style Prism.js toolbar and language tip
 - [ ] Add source map support for the Stylus and Pug compilers
 - [ ] Add import alias support for the Stylus and Pug compilers (likely regex based)
+- [ ] Add custom 404 page
+- [ ] Change the SVG logo to not use an inline script
 
 ### Components
 - [ ] Page component

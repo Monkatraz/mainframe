@@ -55,9 +55,9 @@ interface IPage {
 
 class LocalDescription implements ILocalDescription {
   type: [id: string, meta: {}] = ['', {}]
-  title: string = ''
-  subtitle: string = ''
-  description: string = ''
+  title = ''
+  subtitle = ''
+  description = ''
   authors: User[] = []
 
   constructor(from: Partial<ILocalDescription> = {}) {
@@ -67,8 +67,8 @@ class LocalDescription implements ILocalDescription {
 
 class LocalContent implements ILocalContent {
   flags: string[] = []
-  html: string = ''
-  src: string = ''
+  html = ''
+  src = ''
 
   constructor(from: Partial<ILocalContent> = {}) {
     Object.assign(this, from)
@@ -100,7 +100,7 @@ class Page implements IPage {
     'en': new Local
   }
 
-  constructor(path: string = '') {
+  constructor(path = '') {
     this.path = path
   }
 }
@@ -142,9 +142,9 @@ interface ILazyPage {
  */
 class LazyPage {
   public path: string
-  public isReady: boolean = false
+  public isReady = false
   // Ready-gated properties
-  private _ref: string = ''
+  private _ref = ''
   // Load from remote
   public ready: Promise<boolean> = this._init()
 
