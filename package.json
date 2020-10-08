@@ -7,11 +7,13 @@
   "private": "true",
   "scripts": {
     "dev": "npx netlify dev",
-    "snowpack:dev": "npx snowpack dev",
-    "netlify-funcs:build": "npx netlify-lambda build ./dev/netlify-functions",
-    "build": "npx snowpack build & npm run netlify-funcs:build",
-    "build:netlify": "snowpack build && netlify-lambda build ./dev/netlify-functions",
-    "test": "echo \"This website source does not include a test runner by default.\" && exit 1"
+    "dev:snowpack": "npx snowpack dev",
+    "build": "npx run-p build:*",
+    "build:snowpack": "npx snowpack build",
+    "build:lambda": "npx netlify-lambda build ./dev/netlify-functions",
+    "deploy-production": "npx run-s build:snowpack build:lambda \"netlify deploy -p\"",
+    "netlify-build": "snowpack build && netlify-lambda build ./dev/netlify-functions",
+    "test": "echo \"Mainframe does not currently include a test runner.\""
   },
   "homepage": "www.scp-mainframe.app",
   "browserslist": [
@@ -42,6 +44,7 @@
     "cssnano": "^4.1.10",
     "cssnano-preset-advanced": "^4.0.7",
     "netlify-lambda": "^2.0.1",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8.1.1",
     "postcss-combine-duplicated-selectors": "^10.0.2",
     "postcss-discard-duplicates": "^4.0.2",

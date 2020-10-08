@@ -1,13 +1,13 @@
 [dev]
 framework = "#custom"
-command = "npm run snowpack:dev"
+command = "npx run-s dev:*"
 targetPort = 8080
 port = 8000
 publish = "build"
 autoLaunch = false
 
 [build]
-command = "npm run build:netlify"
+command = "npm run netlify-build"
 functions = "netlify-functions"
 publish = "build"
 [build.environment]
