@@ -43,7 +43,6 @@
 - [ ] Tippy component or wrapper library
 - [ ] Navbar
 - [ ] Navbar dropdowns
-- [ ] 
 
 ### Done
 - [x] FaunaDB basic API
