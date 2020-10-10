@@ -1,12 +1,15 @@
-// Fixing missing manual type on PrismJS
+/**
+ * @file Misc. type declarations for the project.
+ * @author Monkatraz
+ */
+// Fixing missing `manual` property on PrismJS
 import '@types/prismjs'
-import type * as typefest from 'type-fest'
 declare module '@types/prismjs' {
   let manual: boolean
 }
-
+// Project-Wide Additions
 declare global {
-  // Functions (that are used as parameters) typing
+  // Function Types
   type NoReturnVal = void | undefined
   type AnyFn<T = void> = (...args: any) => T
   type WrappedFn<T> = (...args: any) => T
@@ -15,20 +18,16 @@ declare global {
   type PromiseRejectFn = (reason?: any) => void
 
   // Semantic Sorta Primitives
-  /** _Strictly_ represents `{ 'key': value }` object.  */
+  /** All JS primitive values. */
+  type Primitive = string | number | bigint | boolean | symbol | null | undefined
+  /** _Strictly_ represents a `{ 'key': value }` object, including functions properties. */
   interface PlainObject {
-    [x: string]: Data | object
+    [x: string]: Primitive | object
   }
-
   /** Any without the fuss. Represents nearly all data objects. Doesn't include undefined or null. */
   type Data = string | number | bigint | boolean | symbol | PlainObject | Array<Data>
-
   /** Create a type that represents either the value or the value wrapped in `PromiseLike`. */
-  type Promisable<T> = typefest.Promisable<T>
-
-  type JSONObject = typefest.JsonObject
-  type JSONArray = typefest.JsonArray
-  type JSONValue = typefest.JsonValue
+  type Promisable<T> = T | PromiseLike<T>
 
   // Fixes import.meta.env for Snowpack
   interface ImportMeta {

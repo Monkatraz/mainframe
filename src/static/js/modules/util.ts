@@ -1,4 +1,8 @@
 /**
+ * @file Utility functions and objects.
+ * @author Monkatraz
+ */
+/**
  * Returns a promise that resolves after the specified number of miliseconds.
  */
 export function sleep(ms: number): Promise<void> {
@@ -13,16 +17,16 @@ export function animationFrame(): Promise<number> {
 }
 
 /**
- * Waits until the specified function returns [true].
+ * Waits until the specified function returns `true`.
  * It will poll either every 200ms, or -
  * it will call the specified async function to determine the polling interval.
  * @param  conditionFn  Optionally async. function that is polled against.
  * @param  asyncTimerFn Async. function that provides the polling interval.
  */
 export async function waitFor(
-  conditionFn: () => Promise<boolean> | boolean,
-  asyncTimerFn?: () => Promise<any>
-): Promise<true> {
+  conditionFn: () => Promisable<boolean>,
+  asyncTimerFn?: () => Promise<void>
+) {
   if (typeof asyncTimerFn !== 'function') {
     asyncTimerFn = () => sleep(100)
   }
@@ -51,7 +55,7 @@ export class Deferred<T = void> extends Promise<T> {
    * Specifically, Deferred.resolve() and Deferred.reject().
    * @param executor Optional argument - allows a function to be executed within the promise as usual.
    */
-  constructor(executor?: (resolve: PromiseResolveFn, reject: PromiseRejectFn) => void) {
+  constructor (executor?: (resolve: PromiseResolveFn, reject: PromiseRejectFn) => void) {
     super((resolve, reject) => {
       this.resolve = resolve
       this.reject = reject

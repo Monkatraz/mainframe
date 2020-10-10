@@ -1,3 +1,7 @@
+/**
+ * @author Monkatraz
+ */
+
 'use strict'
 // Library Imports
 import './_pages'

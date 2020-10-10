@@ -1,13 +1,17 @@
+/**
+ * This file will be a bit messier than the others.
+ * Its job is to load the various plugins and things the site uses.
+ * It loads things in a certain order and priority.
+ * It's nothing special though - it is mostly just appending scripts. It avoids dynamic imports.
+ *
+ * Something to note is that for externally loaded scripts (like Iconify or Prism languages) -
+ * is that their source domains need to be exempted in the CSP found in the netlify.toml file.
+ *
+ * @file Begins the loading of various modules and dependencies as the page loads.
+ * @author Monkatraz
+ */
 // Imports
 import { appendScript } from "@modules/util"
-
-// This file will be a bit messier than the others.
-// Its job is to load the various plugins and things the site uses.
-// It loads things in a certain order and priority.
-// It's nothing special though - it is mostly just appending scripts. It avoids dynamic imports.
-
-// Something to note is that for externally loaded scripts (like Iconify or Prism languages) -
-// is that their source domains need to be exempted in the CSP found in the netlify.toml file.
 
 // Utility Functions
 // TODO: Probably replace this with actual error messages
@@ -21,7 +25,7 @@ function doOnLoad(fn: AnyFn) {
 }
 
 // DOMContentLoaded
-async function onDOMLoaded() {
+function onDOMLoaded() {
   // Components
   // TODO: load components here
 
