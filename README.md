@@ -18,6 +18,11 @@ There is a lot of technical implementation details I could talk about, but that'
 
 If you wish to know more about me, or contact me, you can go to [my personal website.](www.monkasite.com) If you're simply just curious and wish to ask a few questions, my DMs on Discord are open. \[Monkatraz#7929\]
 
+### Some Shoutouts
+This list is not inclusive. It is mostly for some people/projects that cannot be easily credited.
+  * [grid-kiss](https://github.com/sylvainpolletvillard/postcss-grid-kiss): Converted into a Stylus plugin within the project.
+  * [postcss-discard-overridden-props](https://github.com/mcler)
+
 ----
 ## Parameters
 ### Target
