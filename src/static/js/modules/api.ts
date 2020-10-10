@@ -76,7 +76,7 @@ class LazyDocument {
     return this
   }
 
-  public async _eagerload() {
+  public async _eagerLoad() {
     // Just plain get the whole object
     const response = await this._client.query<DataObject>(this._requestExpr)
     if (response.ok === false) throw new Error('Error retrieving document.')
