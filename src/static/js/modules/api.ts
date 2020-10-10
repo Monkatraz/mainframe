@@ -89,7 +89,7 @@ class LazyDocument {
 
   /** Returns the requested field as another `LazyDocument`.
    *  The requested field _must_ be an object for this to work. `LazyDocument` requires key-value pairs. */
-  public async _getlazy(field: string) {
+  public async _getLazy(field: string) {
     const lazydoc = await new LazyDocument(q.Select(field, this._requestExpr), this._client)._start()
     this._setField(field, lazydoc)
     return lazydoc
@@ -148,7 +148,7 @@ const Clients = {
 async function test() {
   const lazydoc = await new LazyDocument(qe.Data(qe.Search('pages_by_path', 'scp/3685')))._start()
   console.log(lazydoc)
-  console.log(await lazydoc._lazy('obj'))
+  console.log(await lazydoc._getLazy('obj'))
 }
 
 test()
