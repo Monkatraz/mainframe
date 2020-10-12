@@ -1,0 +1,4 @@
+# Structure
+#   users  | Secured collection. No public read access.
+#   social | Sister collection to users. Contains public data for users, such as their nickname.
+#   pages  | Collection for UGC pages. Fairly public, searchable by public API key + index query.

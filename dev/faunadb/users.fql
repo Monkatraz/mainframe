@@ -1,0 +1,12 @@
+# This file doesn't actually do anything by itself.
+
+# Index for finding socials by user reference. Public.
+CreateIndex({
+  name: "social_by_user",
+  unique: true,
+  serialized: true,
+  source: Collection("socials"),
+  terms: [{ field: ["data", "user"] }]
+})
+
+Get(Match(Index("social_by_user"), Ref(Collection("users"), "279076375812375046")))

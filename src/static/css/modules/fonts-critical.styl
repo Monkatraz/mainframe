@@ -1,0 +1,165 @@
+@require '_lib'
+
+:root
+  // FONT PARAMETERS
+  // Parameters used for sizing of fonts inside of content, like the article body.
+  --font-content-size: 1
+
+  // FONT FAMILY VARIABLES
+  // Utility Fonts
+
+  // --font-system-x (by itself) attempts to use whatever the relevant default font for your system is. 
+  // This tries to avoid using fairly ancient fallback fonts, or 'web-safe fonts', like Arial.
+  // Instead, this just uses the CSS default rather than force a web-safe font.
+  // Native emoji fonts are always included at the end to hopefully allow rendering of most emoji.
+  // This will always be imperfect. 
+  // For example: Noto is notorious for being on many systems and overriding the correct font.
+  // Regardless, this font stack does its job pretty well.
+  // Also, the order of the fonts does not signify what my preferences for operating systems is.
+
+  --font-system-default: emoji,
+                        'Apple Color Emoji',
+                        'Segoe UI Emoji', 'Segoe UI Symbol',
+                        'Noto Emoji',
+                        system-ui, sans-serif;
+
+  --font-system-sans: ui-sans-serif,
+                      -apple-system,
+                      'Segoe UI',
+                      'Ubuntu',
+                      'Oxygen-Sans',
+                      'Cantarell',
+                      'Roboto', 'Noto',
+                      --font-system-default;
+
+  --font-system-rounded: ui-rounded,
+                        --font-system-sans;
+
+  --font-system-serif: ui-serif,
+                      'Noto Serif',
+                      'Times New Roman',
+                      --font-system-default;
+
+  --font-system-mono: ui-monospace,
+                      'SFMono-Regular', 'Menlo',
+                      'Consolas',
+                      'Roboto Mono', 'Droid Mono',
+                      monospace,
+                      --font-system-default;
+
+
+  // Primary Content Fonts (used the most)
+
+  // This comma delimited string tells some JavaScript to forcibly load the fonts specified within.
+  // Once all of the specified fonts have loaded -
+  // - the 'font-loaded' class will be added to the document.documentElement node.
+  --fonts-to-load: 'Nunito, Inter, Vollkorn, Fira Code'
+
+  // ----
+  // --font-sans is effectively the default font.
+  // --font-display is for headings and the like.
+  // --font-serif is just a good ol' serif font. It isn't used in the UI very much.
+  // --font-mono is meant for code or console output text. It can be used stylistically, however.
+  // ----
+
+  --font-sans:    'Nunito',    var(--font-system-sans)
+  --font-display: 'Inter',     var(--font-system-rounded)
+  --font-serif:   'Vollkorn',  var(--font-system-serif)
+  --font-mono:    'Fira Code', var(--font-system-mono)
+
+  // Correction factors for fonts.
+  --font-sans-cap:    0.75
+  --font-display-cap: 0.75
+  --font-serif-cap:   0.75
+  --font-mono-cap:    0.75
+
+  // TODO: Add these fonts
+  // Stylistic Fonts (loaded when needed)
+  // --font-handwriting is specifically for printed messy handwriting.
+  // --font-cursive is for a fancy, thin cursive font.
+  // Cursive and Handwriting both don't use the 'cursive' fallback.
+  // I don't think anyone wants to see Comic Sans.
+  --font-handwriting: 'Daniel', 'Bradley Hand', var(--font-system-sans)
+  --font-cursive:     'League Script', var(--font-serif)
+  
+// Font Styling Cached Mixins and Classes
+
+// Set Mixin
+font-set($font, $autosize = false)
+  +cache('font-' + $font)
+    --font-cap: unquote('var(--font-' + $font + '-cap)')
+    font-family: unquote('var(--font-' + $font + ')')
+    if $font is 'display' or $font is display
+      font-weight: 500
+    else if $font is 'mono' or $font is mono
+      font-weight: 500
+      letter-spacing: -0.05em
+      word-spacing: -0.05em
+      overflow-wrap: break-word
+
+// Set
+.fs-sans
+  font-set('sans')
+
+.fs-display
+  font-set('display')
+
+.fs-serif
+  font-set('serif')
+
+.fs-mono
+  font-set('mono')
+
+// Weight
+.fw-light
+  font-weight: lighter !important
+
+.fw-normal
+  font-weight: normal !important
+
+.fw-bold
+  font-weight: bolder !important
+
+// Font Setup
+
+// Useful selectors
+$sel-content = 'main, article, section, #sidebar, #tabs_panels'
+$sel-headings = 'h1, h2, h3, h4, h5, h6'
+$sel-code-blocks = 'pre > code'
+$sel-code-inline = 'code, var, samp, samp > kbd'
+$sel-quotes = 'blockquote, q'
+
+html, body
+  font-size: 1rem  // Used for consistent sizing (shouldn't be messed with)
+  line-height: 1.5 // Should also not be messed with
+  // Default Font Settings
+  font-weight: 400
+  font-family: var(--font-sans)
+  --font-cap: var(--font-sans-cap)
+    
+{$sel-content}
+  font-set('sans', true)
+  transition: font-size 0.5s
+  font-size: calc(1rem * var(--font-content-size))
+
+  +match-media(wide, only)
+    font-size: calc(1.05rem * var(--font-content-size))
+
+  +match-media(thin, only)
+    font-size: calc(0.95rem * var(--font-content-size))
+
+  +match-media(narrow, only)
+    font-size: calc(0.9rem * var(--font-content-size))
+
+{$sel-code-inline}, {$sel-code-blocks}
+  font-set('mono')
+
+{$sel-headings}
+  font-set('display')
+
+// Orderly Heading Sizes
+for $num in (0..5)
+  h{$num + 1}
+    $sizes = 2.25em, 2em, 1.75em, 1.5em, 1.25em, 1em
+    $size = $sizes[$num]
+    font-size: $size

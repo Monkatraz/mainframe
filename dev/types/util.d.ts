@@ -17,12 +17,22 @@ declare global {
   type PromiseResolveFn<T = void> = (value?: any | PromiseLike<T> | undefined) => void
   type PromiseRejectFn = (reason?: any) => void
 
+  /** Represents an object whose fields are all functions that return promises. */
+  type Lazyify<T> = {
+    [P in keyof T]: {
+      (): Promisable<T>
+    }
+  }
+
   // Semantic Sorta Primitives
   /** All JS primitive values. */
   type Primitive = string | number | bigint | boolean | symbol | null | undefined
   /** _Strictly_ represents a `{ 'key': value }` object, including functions properties. */
   interface PlainObject {
     [x: string]: Primitive | object
+  }
+  interface LazyObject {
+    [x: string]: Promiseable<Primitive | object>
   }
   /** Any without the fuss. Represents nearly all data objects. Doesn't include undefined or null. */
   type Data = string | number | bigint | boolean | symbol | PlainObject | Array<Data>

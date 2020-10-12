@@ -108,11 +108,24 @@ export const ENV = {
   /** API related env. variables. Usually database related. */
   API: {
     // Database
-    FDB_CLIENT_READER: import.meta.env.SNOWPACK_PUBLIC_API_FDB_CLIENT_READER,
+    FDB_PUBLIC: import.meta.env.SNOWPACK_PUBLIC_API_FDB_PUBLIC,
     FDB_DOMAIN: import.meta.env.SNOWPACK_PUBLIC_API_FDB_DOMAIN,
     // Serverless functions
     LAMBDA: import.meta.env.SNOWPACK_PUBLIC_API_LAMBDA
   }
+}
+
+/** Functional-ish Result class object. It's not quite how Result tends to work - but that's fine here.
+ *  You can check the `Result.ok` field to determine if the operation was successful or not. 
+ *  If it wasn't, the `Result.body` field will contain the Error object. */
+export class Result<B extends boolean, R = Data> {
+  constructor (public ok: B, public body: B extends true ? R : Error) { }
+}
+
+/** Creates a Task like object that returns a `Result` object from a Promise. */
+export function Task<R>(promise: Promise<R>) {
+  return promise.then((body: R) => new Result(true, body))
+    .catch((err: Error) => new Result(false, err))
 }
 
 const LOADSCRIPT_TIMEOUT_INTERVAL = 10000

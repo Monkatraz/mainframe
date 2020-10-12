@@ -1,3 +1,7 @@
+/**
+ * @author Monkatraz
+ */
+
 const postcss = require('postcss')
 module.exports = postcss.plugin('postcss-optimize-nested-ids', () => {
   return (root) => {

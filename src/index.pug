@@ -11,6 +11,7 @@ head
   //- Preloads
   link(rel='preload' href='/static/css/critical.css' as='style')
   link(rel='preload' href='/static/css/main.css' as='style')
+  link(rel='modulepreload' href='/static/js/styling.js')
   link(rel='modulepreload' href='/static/js/mainframe.js')
   link(rel='modulepreload' href='/web_modules/faunadb.js')
   link(rel='modulepreload' href='/static/js/loader.js')
@@ -52,7 +53,7 @@ head
   link(rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png')
   link(rel='mask-icon' href='/safari-pinned-tab.svg' color=metaThemeColor)
 
-  //- Self-hosted Stuff
+  //- Critical Stylesheet
   link(rel='stylesheet', href='/static/css/critical.css')
 
   //- Pug Mixins
@@ -377,6 +378,7 @@ body
     
   div#script-container(role='presentation' style='display: none;')
     link(rel='stylesheet', href='/static/css/main.css')
+    script(src='/static/js/styling.js' type='module')
     script(src='/static/js/mainframe.js' type='module')
     script(src='/static/js/loader.js' type='module')
     

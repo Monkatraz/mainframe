@@ -1,0 +1,119 @@
+# This file doesn't actually do anything by itself.
+# It simply contains all the FQL server-side query calls needed to set up the auth system.
+
+# Index for finding a user by their email address. Used mainly for logging in.
+CreateIndex({
+  name: "users_by_email",
+  unique: true,
+  serialized: true,
+  source: "users",
+  terms: [ { field: ["data", "email"] } ],
+})
+
+# FaunaDB function to validate email addresses.
+# Yes, FaunaDB can do this. It's hilarious.
+# Emails are treated as case insensitive by uppercasing them.
+CreateFunction({
+  name: "validate_email",
+  body: Query(Lambda(
+    "email",
+    ContainsStrRegex(
+      UpperCase(Trim(Var("email"))),
+      "^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}$"
+    )
+  )),
+  role: "server"
+})
+
+# FaunaDB function to validate (constrain) passwords.
+# Password is allowed to be a string between 6-32 characters long.
+# It must only consist of only characters matching the `\S` control character.
+# An exception is that space is allowed in order to allow pass phrases.
+# Redundant spaces on the left or right side of the string are trimmed.
+# This should HOPEFULLY allow people who aren't using English keyboards to use their own alphabet.
+CreateFunction({
+  name: "validate_password",
+  body: Query(Lambda(
+    "password",
+    ContainsStrRegex(
+      Trim(Var("password")),
+      "^[\\S ]{6,32}$"
+    )
+  )),
+  role: "server"
+})
+
+# Create user function.
+# No email validation yet, unfortunately.
+# Have to hook up to an email service.
+CreateFunction({
+  name: "guest_register",
+  body: Query(Lambda(
+    ["email", "password"],
+    If(Call(Function("validate_email"), Var("email")), 
+      If(Call(Function("validate_password"), Var("password")),
+        If(Exists(Match(Index("users_by_email"), Var("email"))),
+          Abort("This email address has already been used."),
+          Let(
+            {
+              user: Select("ref", Create(
+                Collection("users"),
+                {
+                  credentials: { password: Var("password") },
+                  data: {
+                    email: Var("email"),
+                    validated: false
+                  }
+                }
+              )),
+              social: Select("ref", Create(
+                Collection("socials"),
+                {
+                  data: {
+                    authorpage: "",
+                    nickname: "Unnamed User",
+                    tagline: "",
+                    bio: ""
+                  }
+                }
+              ))
+            },
+            Do(
+              Update(Var("user"), { data: {
+                social: Var("social")
+              }}),
+              Update(Var("social"), { data: {
+                user: Var("user")
+              }}),
+              Get(Var("user"))
+            )
+          )
+        ),
+        Abort("Password is either using invalid characters or has an invalid length.")
+      ),
+      Abort("Provided email does not appear to be a valid email address.")
+    )
+  )),
+  role: "server"
+})
+
+# Login function. 
+# The actual login function is unavailable to users, so they must go through this function.
+# Tokens created through this function expire after a day.
+CreateFunction({
+  name: "guest_login",
+  body: Query(Lambda(
+    ["email", "password"], 
+    Login(
+      Match(Index("users_by_email"), Var("email")),
+      {
+        password: Var("password"),
+        ttl: TimeAdd(Now(), 1, "day")
+      }
+    )
+  )),
+  role: "server"
+})
+
+# To use, it would look like:
+# Client.query(q.Call(q.Function('guest_login'), email, password))
