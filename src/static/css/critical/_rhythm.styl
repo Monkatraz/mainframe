@@ -1,0 +1,109 @@
+// 'Rhythm' Automatic Spacing Grid
+// Go to the .rhythm class selector below for an explanation of this class.
+
+// Corrects the height of text tags by adjusting their margins.
+// Lines are centered within their line-height, which is usually larger than the font itself.
+// This causes overpadding at the top and bottom of text nodes.
+// The --font-cap variable is retrieved using JS, but it is usually around 0.75.
+rhythm-set-text-bounds(auto = true)
+  lh = s('(1em * var(--rhythm-baseline))')
+  fh-relative = 'calc((%s - 1rem * var(--font-cap)) *  -0.5)' % lh
+  fh-actual = 'calc((%s - 1em * var(--font-cap)) * -0.5)' % lh
+  
+  margin-top: fh-relative unless auto
+  margin-top: fh-actual if auto
+  margin-bottom: fh-relative unless auto
+  margin-bottom: fh-actual if auto
+
+
+// Adds gutter(s) on the top and/or bottom using baseline row multiples
+rhythm-gutter(top, bottom = top)
+  for edge in (top bottom)
+    if edge isnt false
+      type = var(--rhythm-baseline-unit-row)
+      type = var(--rhythm-baseline-row) if unit(edge) is 'em'
+      name = 'top'
+      name = 'bottom' if edge is bottom
+
+      unless edge is 0
+        if edge isnt 1
+          padding-{name}: 'calc(%s * %s)' % (type edge)
+        else
+          padding-{name}: type
+      if edge is 0
+        padding-{name}: 0
+
+// The 'rhythm grid' constructed here is not a dynamic vertical rhythm grid replacement.
+// At least, not a perfect one.
+// A simple CSS Grid-based vertical rhythm grid would require changes to CSS itself.
+// Instead, this grid attempts to preserve /even spacing/ between objects - especially text baselines.
+// Overlaying a perfectly uniform row-size grid /will/ show that the rhythm grid does not match.
+// I think this is fine.
+// TODO: Rename -cap units to 'correction'
+.rhythm
+  // Default Rhythm Settings
+  --rhythm-baseline: 1.5
+  --rhythm-reference-font-size: 1rem
+  
+  // Auto-calculated Vars (don't change these)
+  --rhythm-baseline-row: calc(var(--rhythm-baseline) / 2)
+  --rhythm-baseline-unit: calc(var(--rhythm-reference-font-size) * var(--rhythm-baseline))
+  --rhythm-baseline-unit-row: calc(var(--rhythm-baseline-unit) / 2)
+
+  // Setup
+  position: relative
+  display: grid
+  grid-template-rows: repeat(auto-fill, minmax(var(--rhythm-baseline-unit), auto))
+  grid-template-columns: 100%
+  // Divide by 2 again because top + bottom = 2rows otherwise
+  grid-row-gap: calc(var(--rhythm-baseline-unit) / 2 )
+  row-gap: calc(var(--rhythm-baseline-unit) / 2 )
+  line-height: var(--rhythm-baseline)
+
+  // These tags are 'top-level' tags. 
+  // They're intended to be used with the grid.
+  // Anything else should probably be put inside a div.
+  $block-tags = 'div, pre, main, article, section, hgroup'
+  $break-tags = 'br, hr'
+  $figure-tags = 'img, figure'
+  $text-tags = 'p, span, small'
+  $display-tags = 'h1, h2, h3, h4, h5, h6'
+
+  // Tag selections based off of relationships or proximity.
+  $headings-to-text = select-headings('> ', ' + p')
+  $headings-to-hr = select-headings('> ', ' + hr')
+
+  // Reset every tag and make sure it has no margins or padding
+  +select-listed('> ', 'rhythm-tags', $block-tags, $break-tags, $figure-tags, $text-tags, $display-tags)
+    grid-column: 1 / 1
+    margin: 0
+    margin-block-end: 0
+    margin-block-start: 0
+    padding: 0
+    padding-block-start: 0
+    padding-block-end: 0
+
+  // Line-height correction
+  +select-listed('> ', 'rhythm-text-correction', $text-tags, $display-tags)
+    position: relative
+    width: 100%
+    line-height: inherit // Fixes the line-height being overridden
+    transition: margin 0.5s ease
+    rhythm-set-text-bounds()
+
+  +select-listed('> ', 'rhythm-break-tags', $break-tags)
+    margin-top: calc(var(--rhythm-baseline-unit-row) * -2)
+
+  > hr
+    // Visually moves HR back down into a centered position
+    position: relative
+    top: calc(var(--rhythm-baseline-unit-row) * 1.5)
+
+  +select-listed('> ', 'rhythm-text-gutters', $text-tags)
+    rhythm-gutter(1,1)
+
+  +select-listed('> ', 'rhythm-heading-gutters', $display-tags)
+    rhythm-gutter(1,1)
+
+  +select-listed('', 'rhythm-headings-to-text', $headings-to-text)
+    rhythm-gutter(0,false)

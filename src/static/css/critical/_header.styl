@@ -1,0 +1,74 @@
+// Header
+:root
+  $bg-terminaleffect = repeating-linear-gradient(0deg, rgba(black,0.1) 0, rgba(black,0.1) 2px, transparent 0, transparent 4px)
+  $bg-luminosity = linear-gradient(180deg, black, ease-in, white)
+  --header-background: $bg-terminaleffect, $bg-luminosity
+  --header-background-color: colvar('accent')
+
+#header
+  contain: strict
+  background: var(--header-background)
+
+  // Background color layer
+  &::before 
+    content: ""
+    position: absolute
+    top: 0
+    left: 0
+    width: 100%
+    height: 100%
+    background: var(--header-background-color)
+    mix-blend-mode: multiply
+
+#header_logo
+  z-index: 1
+  color: white
+  filter: none
+  transition: filter 0.1s
+
+  +on-hovertouch()
+    filter: drop-shadow(0 0 5px white)
+
+  // Simple click effect
+  &:active
+    filter: brightness(80%)
+    transition: filter 0s
+
+#logo_title
+  margin: 0
+  padding: 0
+  // Terminal text effect.
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), white
+  background-size: 100% 2px
+  background-clip: text
+  color: transparent
+  text-shadow: 0 0 5px rgba(white, 0.5)
+  white-space: nowrap
+  word-spacing: -0.25rem
+  font-size: 3rem
+  line-height: @font-size - 1rem
+  font-family: 'Title Font', var(--font-mono)
+
+  +match-media(narrow, only)
+    font-size: 2.5rem
+
+#logo_slogan
+  white-space: nowrap
+  letter-spacing: 1px
+  font-weight: bolder
+  font-size: 1rem
+  // Slight padding if we're not using the centered view
+  +match-media(thin, up)
+    padding-left: 0.25rem
+
+// Small displays
++match-media(thin, below)
+  #logo_emblem
+    opacity: 0.35
+    filter: drop-shadow(0 0 3px white)
+
+  #logo_slogan
+    text-shadow: 0 1px 3px black
+
+  #logo_title, #logo_slogan
+    filter: drop-shadow(0 0 4px rgba(0,0,0,0.5))

@@ -72,307 +72,230 @@ body
         a#logo_link(href='/' title='Go to home page')
         img#logo_emblem(
           src='/static/media/logo.svg' 
-          alt='SCP Foundation Logo'
-          onload='this.classList.add("loaded")')
+          alt='SCP Foundation Logo')
         h1#logo_title THE MAINFRAME
         small#logo_slogan Secure, Contain, Protect
 
     nav#navbar(aria-label='Navigation')
-
-      div#navbar_items(role='presentation')
-        div#navbar_links(
-          role='menubar' 
-          aria-label='Navigation Links')
-          +nav-dropdown('ARTICLES')
-            +nav-dropdown-link('/') SCP Series VI
-            +nav-dropdown-link('/') SCP Series V
-            +nav-dropdown-link('/') SCP Series IV
-            +nav-dropdown-link('/') SCP Series III
-            +nav-dropdown-link('/') SCP Series II
-            +nav-dropdown-link('/') SCP Series I
-          
-          +nav-dropdown('LIBRARY')
-
-          +nav-dropdown('BACKGROUND')
-
-          +nav-dropdown('POLICY')
-
-          +nav-dropdown('CONTACT')
-
-        div#navbar_search(role='presentation')
-          input#navbar_search_input(
-            title='Search Field'
-            type='search' 
-            minlength='1'
-            name='topbar_search'
-            required)
-          +mdi('search')#navbar_search_icon
-          span#navbar_search_placeholder(aria-hidden='true') Search...
-      
         
     //- All 'dynamic' content, including the sidebar.
     aside#sidebar(aria-label='Sidebar')
-      #sidebar_nav
-        +tooltip('Return to homepage')
-          +button(false).btn#sbn_home #[+mdi('home')]
-        +button(false).btn#sbn_new #[+mdi('tab-add')] New Page
-      
-      #sidebar_social
-        a(href='http://scp-foundation.deviantart.com/').btn.sidebar_social_link
-          +mdi('deviantart')
-        a(href='https://www.facebook.com/scpfoundation').btn.sidebar_social_link
-          +mdi('facebook')
-        a(href='https://twitter.com/scpwiki').btn.sidebar_social_link
-          +mdi('twitter')
-        a(href='http://www.reddit.com/r/SCP').btn.sidebar_social_link
-          +mdi('reddit')
-        a(href='https://www.instagram.com/scpfoundationwiki').btn.sidebar_social_link
-          +mdi('instagram')
-        a(href='https://www.twitch.tv/scpwiki').btn.sidebar_social_link
-          +mdi('twitch')
     
-
     main#content(aria-label='Content')
 
-      //- Content Tabs
-      div#tabs(role='tablist' aria-label='Content Tabs')
-        div#tabs_buttons(role='presentation')
+      div#page.rhythm
+        p I've spent way too much time and effort on this, but I think it payed off. Just look at it! It's so smooth! And yet it's still somehow 10x lighter than Wikidot is! Also it doesn't suck, like Wikidot does. 
+        h1 This site look's pretty cool, yo
+        h2 But that's not all!
+        p It's got an editor! I think! Not yet, uhhh....
+        br
+        h2.fs-serif             This is some serifed text.
+        h2.fs-display           This is some display text.
+        h2.fs-sans              This is some standard text.
+        h2.fs-mono.fw-normal    This is some monospace text.
+        p This is some very normal, easy to read text. #[mark I could have some highlighted text.]
+        p: b Here is some bolded text.
+        p: strong Here is some strong text.
+        p: i Here is some italic text.
+        p: em Here is some emphasis text.
+        p: s Don't read this, it's strikethrough!
+        p: u You done messed up, this is underlined text.
+        p: mark I'm very important marked text.
+        hr
+        p.fs-serif   This is some serifed text.
+        p.fs-display This is some display text.
+        p.fs-sans    This is some standard text.
+        p.fs-mono    This is some monospace text.
+        hr
+        p.fs-serif   0123456789 10 11 12 13 14 15 16
+        p.fs-display 0123456789 10 11 12 13 14 15 16
+        p.fs-sans    0123456789 10 11 12 13 14 15 16
+        p.fs-mono    0123456789 10 11 12 13 14 15 16
+        hr
+        p.fs-mono    0123 456789 12 123 1234 12 1234567
+        p.fs-mono    This should be the same in length.
+        br
+        pre: code.lang-stylus.
+          font-set($font, $autosize = false)
+            +cache('font-' + $font)
+              --font-cap: unquote('var(--font-' + $font + '-cap)')
+              font-family: unquote('var(--font-' + $font + ')')
+              if $font is 'display' or $font is display
+                font-weight: 500
+              else if $font is 'mono' or $font is mono
+                overflow-wrap: break-word
 
-          +tab-button('tabs','article', true).btn.tabs_button ARTICLE
-          +tab-button('tabs','preface').btn.tabs_button PREFACE
-          +tab-button('tabs','discuss').btn.tabs_button DISCUSS
-        
-        //- TODO: Make the Aria labels change dependent on state
-        div#rating
-          span#rt_lbl RATING
-          span#rt_cur +3685
-          +button()#rtbtn_up.btn(aria-label='Vote positively about this article')
-            +mdi('plus')
-          +button()#rtbtn_down.btn(aria-label='Vote negatively about this article')
-            +mdi('minus')
-          +button()#rtbtn_meh.btn(aria-label='Vote indifferently about this article')
-            +mdi('plus-minus')
+          .rhythm
+            // Default Rhythm Settings
+            --rhythm-baseline: 1.5
+            --rhythm-reference-font-size: 1rem
+            
+            // Auto-calculated Vars (don't change these)
+            --rhythm-baseline-row: calc(--rhythm-baseline / 2)
+            --rhythm-baseline-unit: calc(--rhythm-reference-font-size * --rhythm-baseline)
+            --rhythm-baseline-unit-row: calc(--rhythm-baseline-unit / 2)
 
-      //- Controlled by the buttons above
-          Content of these panels is nearly entirely dynamic
-      div#tabs_panels(role='presentation')
+            // Setup
+            display: grid
+            grid-template-rows: repeat(auto-fill, minmax(--rhythm-baseline-unit, auto));
+            // Divide by 2 again because top + bottom = 2rows otherwise
+            grid-row-gap: calc(--rhythm-baseline-unit / 2 )
+            row-gap: calc(--rhythm-baseline-unit / 2 )
+            line-height: --rhythm-baseline
 
-        +tab-panel('tabs','article', true).rhythm
-          p I've spent way too much time and effort on this, but I think it payed off. Just look at it! It's so smooth! And yet it's still somehow 10x lighter than Wikidot is! Also it doesn't suck, like Wikidot does. 
-          h1 This site look's pretty cool, yo
-          h2 But that's not all!
-          p It's got an editor! I think! Not yet, uhhh....
-          br
-          h2.fs-serif             This is some serifed text.
-          h2.fs-display           This is some display text.
-          h2.fs-sans              This is some standard text.
-          h2.fs-mono.fw-normal    This is some monospace text.
-          p This is some very normal, easy to read text. #[mark I could have some highlighted text.]
-          p: b Here is some bolded text.
-          p: strong Here is some strong text.
-          p: i Here is some italic text.
-          p: em Here is some emphasis text.
-          p: s Don't read this, it's strikethrough!
-          p: u You done messed up, this is underlined text.
-          p: mark I'm very important marked text.
-          hr
-          p.fs-serif   This is some serifed text.
-          p.fs-display This is some display text.
-          p.fs-sans    This is some standard text.
-          p.fs-mono    This is some monospace text.
-          hr
-          p.fs-serif   0123456789 10 11 12 13 14 15 16
-          p.fs-display 0123456789 10 11 12 13 14 15 16
-          p.fs-sans    0123456789 10 11 12 13 14 15 16
-          p.fs-mono    0123456789 10 11 12 13 14 15 16
-          hr
-          p.fs-mono    0123 456789 12 123 1234 12 1234567
-          p.fs-mono    This should be the same in length.
-          br
-          pre: code.lang-stylus.
-            font-set($font, $autosize = false)
-              +cache('font-' + $font)
-                --font-cap: unquote('var(--font-' + $font + '-cap)')
-                font-family: unquote('var(--font-' + $font + ')')
-                if $font is 'display' or $font is display
-                  font-weight: 500
-                else if $font is 'mono' or $font is mono
-                  overflow-wrap: break-word
+            // These tags are 'top-level' tags. 
+            // They're intended to be used with the grid.
+            // Anything else should probably be put inside a div.
+            $block-tags = 'div, main, article, section, hgroup'
+            $break-tags = 'br, hr'
+            $figure-tags = 'img, figure'
+            $text-tags = 'p, span, small'
+            $display-tags = 'h1, h2, h3, h4, h5, h6'
 
-            .rhythm
-              // Default Rhythm Settings
-              --rhythm-baseline: 1.5
-              --rhythm-reference-font-size: 1rem
-              
-              // Auto-calculated Vars (don't change these)
-              --rhythm-baseline-row: calc(--rhythm-baseline / 2)
-              --rhythm-baseline-unit: calc(--rhythm-reference-font-size * --rhythm-baseline)
-              --rhythm-baseline-unit-row: calc(--rhythm-baseline-unit / 2)
+            // Tag selections based off of relationships or proximity.
+            $headings-to-text = headings('> ', ' + p')
+            $headings-to-hr = headings('> ', ' + hr')
 
-              // Setup
-              display: grid
-              grid-template-rows: repeat(auto-fill, minmax(--rhythm-baseline-unit, auto));
-              // Divide by 2 again because top + bottom = 2rows otherwise
-              grid-row-gap: calc(--rhythm-baseline-unit / 2 )
-              row-gap: calc(--rhythm-baseline-unit / 2 )
-              line-height: --rhythm-baseline
+        pre: code.lang-pug.
+          //- Content Tabs
+          //- TODO: Roll-up editor panel, completely seamless
+          div#tabs(role='tablist' aria-label='Content Tabs')
+            div#tabs_buttons(role='presentation')
 
-              // These tags are 'top-level' tags. 
-              // They're intended to be used with the grid.
-              // Anything else should probably be put inside a div.
-              $block-tags = 'div, main, article, section, hgroup'
-              $break-tags = 'br, hr'
-              $figure-tags = 'img, figure'
-              $text-tags = 'p, span, small'
-              $display-tags = 'h1, h2, h3, h4, h5, h6'
+              +tab-button('tabs','article', true).tabs_button ARTICLE
+              +tab-button('tabs','preface').tabs_button PREFACE
+              +tab-button('tabs','discuss').tabs_button DISCUSS
+            
+            //- TODO: Turn this into a Reef component
+            //- TODO: Make the Aria labels change dependent on state
+            div#rating
+              span#rt_lbl RATING
+              span#rt_cur +3685
+              +button()#rtbtn_up.rating_button(aria-label='Vote positively about this article')
+                +mdi('plus')
+              +button()#rtbtn_down.rating_button(aria-label='Vote negatively about this article')
+                +mdi('minus')
+              +button()#rtbtn_meh.rating_button(aria-label='Vote indifferently about this article')
+                +mdi('plus-minus')
 
-              // Tag selections based off of relationships or proximity.
-              $headings-to-text = headings('> ', ' + p')
-              $headings-to-hr = headings('> ', ' + hr')
+        pre: code.language-js.
+          /**
+          * Returns a 'promisified' transformation of a FaunaDB document response.
+          * Getting a property of this object will always return a (caching) promise.
+          * This promise will resolve to the desired field's value once the background query (or caching) is complete.
+          * Using this function wisely will mean that only the needed sections of documents will be downloaded.
+          * Additionally, for every field a `_qfield` variant is created, which returns an FQL expression for that field.
+          * @example 
+          * const lazyDoc = await Clients.Reader.queryLazy(q.Data(q.Search('pages_by_path', 'scp/3685')))
+          * let val = await lazyDoc.cooldata // Takes some time due to inital database query
+          * let val2 = await lazyDoc.cooldata // Very fast now - returns from cache: Promise.resolve([cached data])
+          */
+          public async queryLazy(obj: FaunaDB.Expr): Promise<queryResult<IQueryLazyResponse> | {}> {
+            let result = await this.query(qe.Fields(obj))
+            // Return the err object if it failed
+            if (result.ok === false) return result
 
-          pre: code.lang-pug.
-            //- Content Tabs
-            //- TODO: Roll-up editor panel, completely seamless
-            div#tabs(role='tablist' aria-label='Content Tabs')
-              div#tabs_buttons(role='presentation')
-
-                +tab-button('tabs','article', true).tabs_button ARTICLE
-                +tab-button('tabs','preface').tabs_button PREFACE
-                +tab-button('tabs','discuss').tabs_button DISCUSS
-              
-              //- TODO: Turn this into a Reef component
-              //- TODO: Make the Aria labels change dependent on state
-              div#rating
-                span#rt_lbl RATING
-                span#rt_cur +3685
-                +button()#rtbtn_up.rating_button(aria-label='Vote positively about this article')
-                  +mdi('plus')
-                +button()#rtbtn_down.rating_button(aria-label='Vote negatively about this article')
-                  +mdi('minus')
-                +button()#rtbtn_meh.rating_button(aria-label='Vote indifferently about this article')
-                  +mdi('plus-minus')
-
-          pre: code.language-js.
-            /**
-            * Returns a 'promisified' transformation of a FaunaDB document response.
-            * Getting a property of this object will always return a (caching) promise.
-            * This promise will resolve to the desired field's value once the background query (or caching) is complete.
-            * Using this function wisely will mean that only the needed sections of documents will be downloaded.
-            * Additionally, for every field a `_qfield` variant is created, which returns an FQL expression for that field.
-            * @example 
-            * const lazyDoc = await Clients.Reader.queryLazy(q.Data(q.Search('pages_by_path', 'scp/3685')))
-            * let val = await lazyDoc.cooldata // Takes some time due to inital database query
-            * let val2 = await lazyDoc.cooldata // Very fast now - returns from cache: Promise.resolve([cached data])
-            */
-            public async queryLazy(obj: FaunaDB.Expr): Promise<queryResult<IQueryLazyResponse> | {}> {
-              let result = await this.query(qe.Fields(obj))
-              // Return the err object if it failed
-              if (result.ok === false) return result
-
-              // Object that will be returned
-              let body: IQueryLazyResponse | {} = {}
-              // Factory for promise getter function thingy
-              const _createGetter = (field: string) => {
-                /** Queries the FaunaDB database for this field of the document or returns an already retrieved response.
-                *  Errors must be caught manually - these getters do not return a `queryResult` object.
-                */
-                return () => {
-                  return new Promise<any>((resolve) => {
-                    // Query database for document
-                    this.query(q.Select(field, obj)).then((result) => {
-                      if (result.ok === false) throw new Error('Error reading lazy field of document.')
-                      // Memoize/cache the function and return the query response body
-                      Object.defineProperty(body, field, { get: () => Promise.resolve(result.body) })
-                      resolve(result.body)
-                    })
+            // Object that will be returned
+            let body: IQueryLazyResponse | {} = {}
+            // Factory for promise getter function thingy
+            const _createGetter = (field: string) => {
+              /** Queries the FaunaDB database for this field of the document or returns an already retrieved response.
+              *  Errors must be caught manually - these getters do not return a `queryResult` object.
+              */
+              return () => {
+                return new Promise<any>((resolve) => {
+                  // Query database for document
+                  this.query(q.Select(field, obj)).then((result) => {
+                    if (result.ok === false) throw new Error('Error reading lazy field of document.')
+                    // Memoize/cache the function and return the query response body
+                    Object.defineProperty(body, field, { get: () => Promise.resolve(result.body) })
+                    resolve(result.body)
                   })
-                }
+                })
               }
-          
-          p Man, it sure would suck if #[code.language-js console.log('oh god I became code')] oh jeezus help
+            }
+        
+        p Man, it sure would suck if #[code.language-js console.log('oh god I became code')] oh jeezus help
 
-          br
-          - var scpNum = '3685'
+        br
+        - var scpNum = '3685'
 
-          h6 Special Containment Procedures
-          p The 2 kilometer exclusion zone surrounding SCP-#{scpNum} has been acquired and is now being maintained by Foundation security personnel. The entirety of this zone's perimeter has been fenced, and the only official entrance is located on the western edge of the zone. Persons without proper Foundation credentials are not to be allowed within the exclusion zone under any circumstances. 
-          
-          p Disinformation is to be proliferated claiming that the complex containing SCP-#{scpNum} is an extremely hazardous chemical and nuclear weapons development site. Further disinformation is to be implanted into historical institutions about the factual personnel and outcomes of the Uranprojekt. Any historical evidence for the Uranprojekt constructing anything beyond simple reactor piles is to be suppressed.
-          
-          p The area surrounding SCP-#{scpNum} is affected by significant radioactive contamination. Personnel and equipment present within the zone are to be subjected to regular screening. If equipment cannot be decontaminated, it is to be buried within the nuclear waste repository present on-site. Personnel are to be cycled out if they exceed radioactivity exposure limits.
-          
-          p Primary and secondary containment of the SCP-#{scpNum} spacetime anomaly is currently being maintained by equipment not produced by the Foundation. Primary and secondary containment is being managed by an Uranprojekt containment devices. The location of the primary containment device is unknown. Secondary containment is being managed by a series of stabilization panels installed in the perimeter of the SCP-#{scpNum} structure. It is unknown if or when any of the containment equipment will fail.
+        h6 Special Containment Procedures
+        p The 2 kilometer exclusion zone surrounding SCP-#{scpNum} has been acquired and is now being maintained by Foundation security personnel. The entirety of this zone's perimeter has been fenced, and the only official entrance is located on the western edge of the zone. Persons without proper Foundation credentials are not to be allowed within the exclusion zone under any circumstances. 
+        
+        p Disinformation is to be proliferated claiming that the complex containing SCP-#{scpNum} is an extremely hazardous chemical and nuclear weapons development site. Further disinformation is to be implanted into historical institutions about the factual personnel and outcomes of the Uranprojekt. Any historical evidence for the Uranprojekt constructing anything beyond simple reactor piles is to be suppressed.
+        
+        p The area surrounding SCP-#{scpNum} is affected by significant radioactive contamination. Personnel and equipment present within the zone are to be subjected to regular screening. If equipment cannot be decontaminated, it is to be buried within the nuclear waste repository present on-site. Personnel are to be cycled out if they exceed radioactivity exposure limits.
+        
+        p Primary and secondary containment of the SCP-#{scpNum} spacetime anomaly is currently being maintained by equipment not produced by the Foundation. Primary and secondary containment is being managed by an Uranprojekt containment devices. The location of the primary containment device is unknown. Secondary containment is being managed by a series of stabilization panels installed in the perimeter of the SCP-#{scpNum} structure. It is unknown if or when any of the containment equipment will fail.
 
-          br
-          h1 Very Important Thing
-          h2 Very Important Thing
-          h3 Very Important Thing
-          h4 Very Important Thing
-          h5 Very Important Thing
-          h6 Very Important Thing
-          br
-          h1 Very Important Thing
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h2 Very Important Thing
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h3 Very Important Thing
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h4 Very Important Thing
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h5 Very Important Thing
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h6 Very Important Thing
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          
-          h1 Very Important Thing
-          hr
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h2 Very Important Thing
-          hr
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h3 Very Important Thing
-          hr
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h4 Very Important Thing
-          hr
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h5 Very Important Thing
-          hr
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
-          h6 Very Important Thing
-          hr
-          p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
-          br
+        br
+        h1 Very Important Thing
+        h2 Very Important Thing
+        h3 Very Important Thing
+        h4 Very Important Thing
+        h5 Very Important Thing
+        h6 Very Important Thing
+        br
+        h1 Very Important Thing
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h2 Very Important Thing
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h3 Very Important Thing
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h4 Very Important Thing
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h5 Very Important Thing
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h6 Very Important Thing
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        
+        h1 Very Important Thing
+        hr
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h2 Very Important Thing
+        hr
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h3 Very Important Thing
+        hr
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h4 Very Important Thing
+        hr
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h5 Very Important Thing
+        hr
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
+        h6 Very Important Thing
+        hr
+        p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        br
 
-          p Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor. Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        p Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor. Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
 
-          p Et doloremque delectus qui omnis assumenda et ea omnis architecto. Ut fugit non non aut tempora. Eos ut enim nam iste inventore veniam explicabo fuga architecto. Repellendus maxime quis mollitia. Ex illo expedita odio placeat repellendus illo distinctio. Excepturi eum quam. Doloremque eum sed placeat debitis. Nisi eos et nisi quidem voluptatem non dolores beatae cum. Repellat aspernatur sunt dolore et aut laborum at id veritatis. Sed commodi est aut. Sint cupiditate repudiandae temporibus enim sint illo quasi est dolorem. Voluptate tenetur ut debitis odit rerum qui totam vel pariatur. Et odit eos consequatur. Culpa quod iusto non et sapiente maxime et libero consequuntur. Iure corrupti voluptatem quasi delectus quis eveniet et commodi unde. Vel et rerum ab occaecati. Doloribus alias voluptas necessitatibus ducimus aut nesciunt enim. Ab error reiciendis ut omnis repellendus omnis ut qui. Aut consequatur molestias omnis ut.
- 
-          p Quis consequatur dolorem quis suscipit libero inventore cupiditate ad. Odio asperiores adipisci reprehenderit perferendis quis rerum consequatur quod quae. Optio facilis earum quo dolores fuga. Totam corporis qui rerum fuga aspernatur et odio.
- 
-          p Labore dolor odio consequatur optio nulla libero odit dolorum. Et exercitationem totam placeat natus laborum eaque consequatur. Sed nemo eum explicabo nostrum quidem ut. Atque recusandae dolore debitis alias. Non iusto incidunt.
+        p Et doloremque delectus qui omnis assumenda et ea omnis architecto. Ut fugit non non aut tempora. Eos ut enim nam iste inventore veniam explicabo fuga architecto. Repellendus maxime quis mollitia. Ex illo expedita odio placeat repellendus illo distinctio. Excepturi eum quam. Doloremque eum sed placeat debitis. Nisi eos et nisi quidem voluptatem non dolores beatae cum. Repellat aspernatur sunt dolore et aut laborum at id veritatis. Sed commodi est aut. Sint cupiditate repudiandae temporibus enim sint illo quasi est dolorem. Voluptate tenetur ut debitis odit rerum qui totam vel pariatur. Et odit eos consequatur. Culpa quod iusto non et sapiente maxime et libero consequuntur. Iure corrupti voluptatem quasi delectus quis eveniet et commodi unde. Vel et rerum ab occaecati. Doloribus alias voluptas necessitatibus ducimus aut nesciunt enim. Ab error reiciendis ut omnis repellendus omnis ut qui. Aut consequatur molestias omnis ut.
 
-          p Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor. Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+        p Quis consequatur dolorem quis suscipit libero inventore cupiditate ad. Odio asperiores adipisci reprehenderit perferendis quis rerum consequatur quod quae. Optio facilis earum quo dolores fuga. Totam corporis qui rerum fuga aspernatur et odio.
 
-          p Et doloremque delectus qui omnis assumenda et ea omnis architecto. Ut fugit non non aut tempora. Eos ut enim nam iste inventore veniam explicabo fuga architecto. Repellendus maxime quis mollitia. Ex illo expedita odio placeat repellendus illo distinctio. Excepturi eum quam. Doloremque eum sed placeat debitis. Nisi eos et nisi quidem voluptatem non dolores beatae cum. Repellat aspernatur sunt dolore et aut laborum at id veritatis. Sed commodi est aut. Sint cupiditate repudiandae temporibus enim sint illo quasi est dolorem. Voluptate tenetur ut debitis odit rerum qui totam vel pariatur. Et odit eos consequatur. Culpa quod iusto non et sapiente maxime et libero consequuntur. Iure corrupti voluptatem quasi delectus quis eveniet et commodi unde. Vel et rerum ab occaecati. Doloribus alias voluptas necessitatibus ducimus aut nesciunt enim. Ab error reiciendis ut omnis repellendus omnis ut qui. Aut consequatur molestias omnis ut.
- 
-          p Quis consequatur dolorem quis suscipit libero inventore cupiditate ad. Odio asperiores adipisci reprehenderit perferendis quis rerum consequatur quod quae. Optio facilis earum quo dolores fuga. Totam corporis qui rerum fuga aspernatur et odio.
- 
-          p Labore dolor odio consequatur optio nulla libero odit dolorum. Et exercitationem totam placeat natus laborum eaque consequatur. Sed nemo eum explicabo nostrum quidem ut. Atque recusandae dolore debitis alias. Non iusto incidunt.
+        p Labore dolor odio consequatur optio nulla libero odit dolorum. Et exercitationem totam placeat natus laborum eaque consequatur. Sed nemo eum explicabo nostrum quidem ut. Atque recusandae dolore debitis alias. Non iusto incidunt.
 
-        +tab-panel('tabs','preface')
-        +tab-panel('tabs','discuss')
+        p Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor. Quibusdam alias ab ea. Nulla ut ea consequuntur doloremque. Sed voluptas consequuntur rerum aut. Fuga laboriosam quibusdam maxime consequuntur enim et inventore labore cupiditate. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
+
+        p Et doloremque delectus qui omnis assumenda et ea omnis architecto. Ut fugit non non aut tempora. Eos ut enim nam iste inventore veniam explicabo fuga architecto. Repellendus maxime quis mollitia. Ex illo expedita odio placeat repellendus illo distinctio. Excepturi eum quam. Doloremque eum sed placeat debitis. Nisi eos et nisi quidem voluptatem non dolores beatae cum. Repellat aspernatur sunt dolore et aut laborum at id veritatis. Sed commodi est aut. Sint cupiditate repudiandae temporibus enim sint illo quasi est dolorem. Voluptate tenetur ut debitis odit rerum qui totam vel pariatur. Et odit eos consequatur. Culpa quod iusto non et sapiente maxime et libero consequuntur. Iure corrupti voluptatem quasi delectus quis eveniet et commodi unde. Vel et rerum ab occaecati. Doloribus alias voluptas necessitatibus ducimus aut nesciunt enim. Ab error reiciendis ut omnis repellendus omnis ut qui. Aut consequatur molestias omnis ut.
+
+        p Quis consequatur dolorem quis suscipit libero inventore cupiditate ad. Odio asperiores adipisci reprehenderit perferendis quis rerum consequatur quod quae. Optio facilis earum quo dolores fuga. Totam corporis qui rerum fuga aspernatur et odio.
+
+        p Labore dolor odio consequatur optio nulla libero odit dolorum. Et exercitationem totam placeat natus laborum eaque consequatur. Sed nemo eum explicabo nostrum quidem ut. Atque recusandae dolore debitis alias. Non iusto incidunt.
         
     footer#footer
     

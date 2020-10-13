@@ -6,7 +6,6 @@
 - [ ] Svelte Stylus-PostCSS
   - PostStylus?
 - [ ] Svelte component loader
-- [ ] Porting previous CSS over (requires Svelte)
 - [ ] Page router
 - [ ] Integrate ReCaptcha
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
@@ -44,6 +43,9 @@
 - [ ] Tippy component or wrapper library
 - [ ] Navbar
 - [ ] Navbar dropdowns
+- [ ] Search bar component
+- [ ] Rating component
+- [ ] Comments / Discussion Tab Component Thingy
 
 ### Done
 - [x] Create private database
@@ -60,3 +62,4 @@
 - [x] Object schema validation function collection
 - [x] Create user collection and basic login system
 - [x] Create a flattened page schema with reduced nesting
+- [x] Port previous CSS over

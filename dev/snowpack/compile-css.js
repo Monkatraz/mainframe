@@ -9,6 +9,7 @@ console.warn = () => { }
 const postcssPluginsPath = './postcss-plugins/'
 const postcssPlugins = [
   require('postcss-normalize')(),
+  require('postcss-center')(),
   require('postcss-easing-gradients')(),
   require(postcssPluginsPath + 'optimizenestedids')(),
   require('css-mquery-packer')({
@@ -16,7 +17,6 @@ const postcssPlugins = [
   }),
   require('postcss-combine-duplicated-selectors')(),
   require('postcss-join-transitions')(),
-  require('postcss-gradient-transparency-fix')(),
   require('postcss-discard-duplicates')(),
   require(postcssPluginsPath + 'discardoverriddenprops')(),
   require('autoprefixer')(),
@@ -26,6 +26,7 @@ const postcssPlugins = [
       {
         normalizeWhitespace: false, // Makes reading output 10x easier
         autoprefixer: false, // Wouldn't change anything
+        discardUnused: false, // Breaks fonts
         mergeRules: false // Already done previously but also causes issues if left on
       }
     ]
@@ -81,7 +82,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
 
       try {
         // Get our file
-        const src = String(await fs.readFile(filePath))
+        const src = await fs.readFile(filePath, { encoding: 'utf-8' })
 
         // Compile Stylus
         const outStylus = await stylusRender(src, filePath)

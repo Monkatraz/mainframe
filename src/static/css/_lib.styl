@@ -1,8 +1,6 @@
-// TODO: Stop using --implicit-vars due to just finickyness
-// TODO: Follow sass-gudelin and rename all functions and mixins to be lowercase
 // TODO: Make constants uppercase
 // TODO: Add the 'shame.styl' file
-// TODO: Add back top: center, left: center, etc.
+// TODO: add scrollbar styling mixins
 // Disable some Stylus stuff
 vendors = offical
 
@@ -136,6 +134,23 @@ shadow-elevation(height = 1, boost = 1)
   if unit(height, '') is 0
     box-shadow: none
 
+// TODO: top, bottom, left, right, etc versions
+// TODO: Figure out if not using a background color is actually possible
+// Adds scroll shadows. Requires usage of backgrounds.
+scroll-shadows(boost = 1, extent = 1, background = colvar('background-light'))
+  alphaval = 0.5 * boost
+  shadow = rgba(30, 30, 30, alphaval)
+  extent1 = 30px * extent
+  extent2 = 10px * extent
+  background: 
+    linear-gradient(background 33%, transparent),
+    linear-gradient(transparent, background 66%) 0 100%,
+    radial-gradient(farthest-side at 50% 0, shadow, rgba(0,0,0,0)),
+    radial-gradient(farthest-side at 50% 100%, shadow, rgba(0,0,0,0)) 0 100%
+  background-repeat: no-repeat
+  background-attachment: local, local, scroll, scroll
+  background-size: 100% extent1, 100% extent1, 100% extent2, 100% extent2
+
 // Grid-Kiss Hilarious Stylus Fork
 use('grid-kiss-stylus/grid-kiss.js')
 grid-kiss()
@@ -223,6 +238,10 @@ $bp-wide   = 1400px
 // Making things easier to read should be based off screen size.
 has-only-touch()
   @media (pointer: coarse), (any-hover: none), (hover: none)
+    {block}
+
+has-only-hover()
+  @media (pointer: fine), (any-hover: hover), (hover: hover)
     {block}
     
 // +uses-reduced-motion()
