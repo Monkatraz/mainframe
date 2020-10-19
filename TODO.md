@@ -1,11 +1,8 @@
 # Mainframe
 
 ### In Progress
-- [ ] Minimum needed for Netlify API
-- [ ] Svelte compiling
-- [ ] Svelte Stylus-PostCSS
-  - PostStylus?
 - [ ] Svelte component loader
+- [ ] Page component
 - [ ] Page router
 - [ ] Integrate ReCaptcha
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
@@ -20,23 +17,19 @@
 - [ ] Add DOMPurify
 - [ ] Add Workbox
 - [ ] Modernizer config with automatic compatibility message
-- [ ] Create a page generator script
-- [ ] User language handler module or import
-- [ ] Change Prism.js color scheme to a better one
 - [ ] Better style Prism.js toolbar and language tip
 - [ ] Add source map support for the Stylus and Pug compilers
 - [ ] Add import alias support for the Stylus and Pug compilers (likely regex based)
 - [ ] Add custom 404 page
-- [ ] Change the SVG logo to not use an inline script
-- [ ] Determine maximum size of a page
+- [ ] Determine maximum file size of a page
 - [ ] Some sort of script or system for data-backups
+- [ ] Gesture controls
 
 ### Users
 - [ ] Author draft pages that are linkable
 - [ ] Account deletion
 
 ### Components
-- [ ] Page component
 - [ ] Licensing Widget
 - [ ] Humans.txt button
 - [ ] Spinner component
@@ -63,3 +56,9 @@
 - [x] Create user collection and basic login system
 - [x] Create a flattened page schema with reduced nesting
 - [x] Port previous CSS over
+- [x] Change Prism.js color scheme to a better one
+- [x] Create a page generator script
+- [x] Minimum needed for Netlify API
+- [x] Svelte compiling
+- [x] Svelte Stylus-PostCSS
+- [x] Change the SVG logo to not use an inline script

@@ -35,9 +35,19 @@ declare global {
     [x: string]: Promiseable<Primitive | object>
   }
   /** Any without the fuss. Represents nearly all data objects. Doesn't include undefined or null. */
-  type Data = string | number | bigint | boolean | symbol | PlainObject | Array<Data>
+  type Data = string | number | bigint | boolean | symbol | DataObject | Array<Data>
+
   /** Create a type that represents either the value or the value wrapped in `PromiseLike`. */
   type Promisable<T> = T | PromiseLike<T>
+
+  /** Matches a JSON object. */
+  export type JSONObject = { [Key in string]?: JSONValue }
+
+  /** Matches a JSON array. */
+  type JSONArray = Array<JSONValue>
+
+  /** Matches any valid JSON value. */
+  export type JSONValue = string | number | boolean | null | JSONObject | JSONArray
 
   // Fixes import.meta.env for Snowpack
   interface ImportMeta {

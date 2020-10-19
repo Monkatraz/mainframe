@@ -21,10 +21,12 @@
   },
   "alias": {
     "@modules": "./src/static/js/modules",
+    "@components": "./src/static/components",
     "@vendor": "./src/vendor"
   },
   "plugins": [
     "@snowpack/plugin-dotenv",
+    "@snowpack/plugin-svelte",
     "./dev/snowpack/compile-css.js",
     "./dev/snowpack/compile-html.js",
     [

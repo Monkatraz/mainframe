@@ -67,7 +67,7 @@ rhythm-gutter(top, bottom = top)
   // Anything else should probably be put inside a div.
   $block-tags = 'div, pre, main, article, section, hgroup'
   $break-tags = 'br, hr'
-  $figure-tags = 'img, figure'
+  $figure-tags = 'img, figure, div.code-toolbar'
   $text-tags = 'p, span, small'
   $display-tags = 'h1, h2, h3, h4, h5, h6'
 
@@ -92,10 +92,11 @@ rhythm-gutter(top, bottom = top)
     transition: margin 0.5s ease
     rhythm-set-text-bounds()
 
-  +select-listed('> ', 'rhythm-break-tags', $break-tags)
-    margin-top: calc(var(--rhythm-baseline-unit-row) * -2)
-
+  > br
+    content: "" // Bizarre CSS quirk fix for Chrome
+  
   > hr
+    margin-top: calc(var(--rhythm-baseline-unit-row) * -2)
     // Visually moves HR back down into a centered position
     position: relative
     top: calc(var(--rhythm-baseline-unit-row) * 1.5)

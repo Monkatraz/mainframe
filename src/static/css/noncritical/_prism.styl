@@ -1,17 +1,27 @@
 @require '_lib'
 
-// PrismJS Syntax highlighting
-// Theme is derived from the standard Tommorow Night theme.
+// PrismJS Syntax highlighting.
+
+// #ABB2BF
+// #5C6370
+// #D19A66
+// #56B6C2
+// #E06C75
+// #E5C07B
+// #98C379
+// #C678DD
+// #61AFEF
+// #2D8EDF
 
 pre[class*=language-]
   position: relative
   width: 100%
   max-width: 100%
-  margin: 0.5em
+  margin: 0
   padding: 0
   contain: content
     
-  color: #ccc
+  color: #ABB2BF
   border-radius: 10px
   shadow-elevation(8)
 
@@ -26,58 +36,67 @@ pre[class*=language-]
 
 pre[class*=language-]>code[class*=language-]
   display: block
-  padding: 1em
+  padding: 1.5em 1em
   width: 100%
   overflow-x: auto
-  background: #2d2d2d
+  background: #282C34
 
 :not(pre)>code[class*=language-]
   display: inline-block
   padding: 0.1em 0.25em
   border-radius: 0.2em
-  background: #2d2d2d
-  color: #ccc
+  background: #282C34
+  color: #ABB2BF
   font-size: 0.9em
   white-space: normal
 
-.token.block-comment,.token.cdata,.token.comment,.token.doctype,.token.prolog
-  color: #999
++prefix-classes('token.')
+  .block-comment, .cdata, .comment, .doctype, .prolog
+    color: #5C6370
 
-.token.punctuation
-  color: #ccc
+  .punctuation
+    color: #FFFFFF30
 
-.token.attr-name,.token.deleted,.token.namespace,.token.tag
-  color: #e2777a
+  .variable, .deleted, .tag
+    color: #E06C75
 
-.token.function-name
-  color: #6196cc
+  .inserted
+    color: #98C379
 
-.token.boolean,.token.function,.token.number
-  color: #f08d49
+  .function, .function-name, .attr-id
+    color: #61AFEF
 
-.token.class-name,.token.constant,.token.property,.token.symbol
-  color: #f8c555
+  .parameter, .property
+    color: #2D8EDF
 
-.token.atrule,.token.builtin,.token.important,.token.keyword,.token.selector
-  color: #cc99cd
+  .attr-name, .attr-value, .class-name, .builtin, .selector
+    color: #E5C07B
 
-.token.attr-value,.token.char,.token.regex,.token.string,.token.variable
-  color: #7ec699
+  .boolean, .number, .constant, .symbol, .unit
+    color: #D19A66
 
-.token.entity,.token.operator,.token.url
-  color: #67cdcc
+  .keyword, .atrule, .important
+    color: #C678DD
 
-.token.bold,.token.important
-  font-weight: 700
+  .namespace, .url, .char, .string
+    color: #98C379
 
-.token.italic
-  font-style: italic
+  .regex, .entity, .operator
+    color: #56B6C2
 
-.token.entity
-  cursor: help
+  +prefix-classes('token.keyword-')
+    .public, .private, .readonly, 
+    .const, .let, .var, .new
+      color: #56B6C2
 
-.token.inserted
-  color: green
+    .this
+      color: #E06C75
+
+  .bold, .important
+    font-weight: 700
+
+  .italic
+    font-style: italic
 
 // Plugins
 

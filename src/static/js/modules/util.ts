@@ -128,14 +128,14 @@ export function Task<R>(promise: Promise<R>) {
     .catch((err: Error) => new Result(false, err))
 }
 
-const LOADSCRIPT_TIMEOUT_INTERVAL = 10000
+const APPENDSCRIPT_TIMEOUT_INTERVAL = 10000
 /** Async. loads scripts from relative path / URL.
  *  Promise resolves once the script has fully loaded.
  *  If it takes too long to download the script, the promise will reject.
  */
 export function appendScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
-    const timeout = setTimeout(reject, LOADSCRIPT_TIMEOUT_INTERVAL)
+    const timeout = setTimeout(reject, APPENDSCRIPT_TIMEOUT_INTERVAL)
     const _resolve = () => { clearTimeout(timeout); resolve() }
 
     // Wait for the script container to load (just in case)
@@ -147,6 +147,28 @@ export function appendScript(src: string): Promise<void> {
         // TypeScript doesn't realize that I've checked for null
         const container = document.querySelector('#script-container') as Element
         container.appendChild(script)
+      })
+  })
+}
+
+const APPENDSTYLESHEET_TIMEOUT_INTERVAL = 10000
+/** Async. loads stylesheets from relative path / URL.
+ *  Promise resolves once the stylesheet has fully loaded.
+ *  If it takes too long to download the stylesheet, the promise will reject.
+ */
+export function appendStylesheet(href: string): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const timeout = setTimeout(reject, APPENDSTYLESHEET_TIMEOUT_INTERVAL)
+    const _resolve = () => { clearTimeout(timeout); resolve() }
+
+    // Wait for the head to load (just in case), not sure if this is needed
+    waitFor(() => document.head !== null)
+      .then(() => {
+        const stylesheet = document.createElement('link')
+        stylesheet.rel = 'stylesheet'
+        stylesheet.href = href
+        stylesheet.onload = _resolve
+        document.head.appendChild(stylesheet)
       })
   })
 }

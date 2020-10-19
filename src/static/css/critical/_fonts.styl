@@ -89,6 +89,9 @@ font-set($font, $autosize = false)
       letter-spacing: -0.05em
       word-spacing: -0.05em
       overflow-wrap: break-word
+    else
+      // Prevent inheritance issues with font-weight
+      font-weight: 400
 
 // Set
 .fs-sans

@@ -26,6 +26,8 @@
   //                        Center of screen | Offset to left edge of body | Remove the offset caused by sidebar
   //                                     v                  v                           v
   --layout-body-centering-factor: calc((50vw - (var(--layout-body-max-width) / 2)) - var(--layout-sidebar-width))
+  // Total height of the header + navbar
+  --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-navbar-height))
 
 #app
   // Shorthands

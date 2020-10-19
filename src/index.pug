@@ -8,14 +8,21 @@ head
     However, it could be quite well-suited for it.
   //- link(rel='manifest' href='/site.webmanifest')
 
-  //- Preloads
+  //- Style Preloads
   link(rel='preload' href='/static/css/critical.css' as='style')
   link(rel='preload' href='/static/css/main.css' as='style')
-  link(rel='modulepreload' href='/static/js/styling.js')
+  //- Img Preloads
+  link(rel='preload' href='/static/media/spinner.svg' as='image')
+  link(rel='preload' href='/static/media/logo.svg' as='image')
+  //- Main JS Preloads
   link(rel='modulepreload' href='/static/js/mainframe.js')
-  link(rel='modulepreload' href='/web_modules/faunadb.js')
   link(rel='modulepreload' href='/static/js/loader.js')
-
+  //- Dependencies Preloads
+  link(rel='modulepreload' href='/static/js/modules/util.js')
+  link(rel='modulepreload' href='/static/js/modules/api.js')
+  link(rel='modulepreload' href='/static/snowpack/env.js')
+  //- Web Module Preloads
+  link(rel='modulepreload' href='/web_modules/faunadb.js')
 
   //- Misc.
   link(rel='author' href='humans.txt')
@@ -59,7 +66,6 @@ head
   //- Pug Mixins
   include _basic-mixins
 
-  
 body
   //- All nodes which do not have an explicit categorical/semantic or utility function should:
         * be checked for if they have any reason to exist
@@ -71,19 +77,19 @@ body
       div#header_logo(role='presentation')
         a#logo_link(href='/' title='Go to home page')
         img#logo_emblem(
-          src='/static/media/logo.svg' 
+          src='/static/media/logo.svg'
           alt='SCP Foundation Logo')
         h1#logo_title THE MAINFRAME
         small#logo_slogan Secure, Contain, Protect
 
     nav#navbar(aria-label='Navigation')
-        
+
     //- All 'dynamic' content, including the sidebar.
     aside#sidebar(aria-label='Sidebar')
-    
+
     main#content(aria-label='Content')
 
-      div#page.rhythm
+      div#page(role='presentation').rhythm
         p I've spent way too much time and effort on this, but I think it payed off. Just look at it! It's so smooth! And yet it's still somehow 10x lighter than Wikidot is! Also it doesn't suck, like Wikidot does. 
         h1 This site look's pretty cool, yo
         h2 But that's not all!
@@ -129,7 +135,7 @@ body
             // Default Rhythm Settings
             --rhythm-baseline: 1.5
             --rhythm-reference-font-size: 1rem
-            
+
             // Auto-calculated Vars (don't change these)
             --rhythm-baseline-row: calc(--rhythm-baseline / 2)
             --rhythm-baseline-unit: calc(--rhythm-reference-font-size * --rhythm-baseline)
@@ -165,7 +171,7 @@ body
               +tab-button('tabs','article', true).tabs_button ARTICLE
               +tab-button('tabs','preface').tabs_button PREFACE
               +tab-button('tabs','discuss').tabs_button DISCUSS
-            
+
             //- TODO: Turn this into a Reef component
             //- TODO: Make the Aria labels change dependent on state
             div#rating
@@ -178,7 +184,7 @@ body
               +button()#rtbtn_meh.rating_button(aria-label='Vote indifferently about this article')
                 +mdi('plus-minus')
 
-        pre: code.language-js.
+        pre: code.language-ts.
           /**
           * Returns a 'promisified' transformation of a FaunaDB document response.
           * Getting a property of this object will always return a (caching) promise.
@@ -214,7 +220,7 @@ body
                 })
               }
             }
-        
+
         p Man, it sure would suck if #[code.language-js console.log('oh god I became code')] oh jeezus help
 
         br
@@ -222,11 +228,11 @@ body
 
         h6 Special Containment Procedures
         p The 2 kilometer exclusion zone surrounding SCP-#{scpNum} has been acquired and is now being maintained by Foundation security personnel. The entirety of this zone's perimeter has been fenced, and the only official entrance is located on the western edge of the zone. Persons without proper Foundation credentials are not to be allowed within the exclusion zone under any circumstances. 
-        
+
         p Disinformation is to be proliferated claiming that the complex containing SCP-#{scpNum} is an extremely hazardous chemical and nuclear weapons development site. Further disinformation is to be implanted into historical institutions about the factual personnel and outcomes of the Uranprojekt. Any historical evidence for the Uranprojekt constructing anything beyond simple reactor piles is to be suppressed.
-        
+
         p The area surrounding SCP-#{scpNum} is affected by significant radioactive contamination. Personnel and equipment present within the zone are to be subjected to regular screening. If equipment cannot be decontaminated, it is to be buried within the nuclear waste repository present on-site. Personnel are to be cycled out if they exceed radioactivity exposure limits.
-        
+
         p Primary and secondary containment of the SCP-#{scpNum} spacetime anomaly is currently being maintained by equipment not produced by the Foundation. Primary and secondary containment is being managed by an Uranprojekt containment devices. The location of the primary containment device is unknown. Secondary containment is being managed by a series of stabilization panels installed in the perimeter of the SCP-#{scpNum} structure. It is unknown if or when any of the containment equipment will fail.
 
         br
@@ -255,7 +261,7 @@ body
         h6 Very Important Thing
         p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
         br
-        
+
         h1 Very Important Thing
         hr
         p Something REALLY important! It goes right here! Yeaaaah. Est nisi ipsam nesciunt. Dolor exercitationem optio similique rerum enim accusamus. Id consequuntur et eos est voluptatem. Iusto enim rerum nobis. Dicta error quis. Illum vero corrupti nihil dolorem libero. Ea ratione et alias magnam amet dolor.
@@ -296,13 +302,11 @@ body
         p Quis consequatur dolorem quis suscipit libero inventore cupiditate ad. Odio asperiores adipisci reprehenderit perferendis quis rerum consequatur quod quae. Optio facilis earum quo dolores fuga. Totam corporis qui rerum fuga aspernatur et odio.
 
         p Labore dolor odio consequatur optio nulla libero odit dolorum. Et exercitationem totam placeat natus laborum eaque consequatur. Sed nemo eum explicabo nostrum quidem ut. Atque recusandae dolore debitis alias. Non iusto incidunt.
-        
+
     footer#footer
-    
+
   div#script-container(role='presentation' style='display: none;')
-    link(rel='stylesheet', href='/static/css/main.css')
-    script(src='/static/js/styling.js' type='module')
     script(src='/static/js/mainframe.js' type='module')
     script(src='/static/js/loader.js' type='module')
-    
+
 </html>
