@@ -13,6 +13,8 @@
  */
 // Imports
 import { appendScript, appendStylesheet } from "@modules/util"
+// Svelte Components
+import Page from '@components/Page.svelte'
 
 // Utility Functions
 // TODO: Probably replace this with actual error messages
@@ -35,6 +37,12 @@ function onDOMLoaded() {
 
   // Components
   // TODO: load components here
+  const PageComponent = new Page({
+    target: document.querySelector('#page') as Element,
+    props: {
+      path: 'scp/3685'
+    }
+  })
 
   // Iconify
   appendScript('https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js')

@@ -19,10 +19,13 @@ declare global {
 
   /** Represents an object whose fields are all functions that return promises. */
   type Lazyify<T> = {
-    [P in keyof T]: {
-      (): Promisable<T>
-    }
+    [P in keyof T]: Promisable<T[P]>
   }
+
+  type Await<T> = T extends PromiseLike<infer U> ? U : T
+  export type PromiseValue<PromiseType, Otherwise = PromiseType> = PromiseType extends Promise<infer Value>
+    ? { 0: PromiseValue<Value>; 1: Value }[PromiseType extends Promise<unknown> ? 0 : 1]
+    : Otherwise
 
   // Semantic Sorta Primitives
   /** All JS primitive values. */
@@ -41,13 +44,13 @@ declare global {
   type Promisable<T> = T | PromiseLike<T>
 
   /** Matches a JSON object. */
-  export type JSONObject = { [Key in string]?: JSONValue }
+  type JSONObject = { [Key in string]?: JSONValue }
 
   /** Matches a JSON array. */
   type JSONArray = Array<JSONValue>
 
   /** Matches any valid JSON value. */
-  export type JSONValue = string | number | boolean | null | JSONObject | JSONArray
+  type JSONValue = string | number | boolean | null | JSONObject | JSONArray
 
   // Fixes import.meta.env for Snowpack
   interface ImportMeta {

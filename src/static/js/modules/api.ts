@@ -5,7 +5,7 @@
 
 // FaunaDB
 import FaunaDB, { Expr, values as v, errors as e } from 'faunadb'
-const q = FaunaDB.query
+export const q = FaunaDB.query
 // Imports
 import { ENV, Task, Result } from '@modules/util'
 
@@ -152,18 +152,17 @@ export const qe = {
  *  @example field = await LazyDocument.field // Type 1
  *  @example _qfield === q.Select(field, obj_query) // Type 2
  */
-class LazyDocument {
-  [field: string]: Promisable<any>
+class LazyDocument<T> {
   // Database values
   private _requestExpr: Expr
   private _client: Client
-  private _fields: string[] = []
+  public _fields: string[] = []
   constructor (requestExpr: Expr, client: Client = Clients.Public) {
     this._requestExpr = requestExpr
     this._client = client
   }
 
-  private _setField(field: string, val: AnyFn | DataValue) {
+  private _setField(field: string, val: any) {
     const opts: PlainObject = { configurable: true, enumerable: true }
     if (typeof val === 'function') opts['get'] = val
     if (typeof val !== 'function') opts['value'] = val
@@ -216,10 +215,22 @@ class LazyDocument {
 
   /** Returns the requested field as another `LazyDocument`.
    *  The requested field _must_ be an object for this to work. `LazyDocument` requires key-value pairs. */
-  public async _getLazy(field: string) {
-    const lazydoc = await new LazyDocument(q.Select(field, this._requestExpr), this._client)._start()
+  public async _getLazy<K extends string & keyof T>(field: K): Promise<Lazyify<T[K]> & LazyDocument<T[K]>> {
+    const lazydoc = await new LazyDocument<T[K]>(q.Select(field, this._requestExpr), this._client)._start()
     this._setField(field, lazydoc)
-    return lazydoc
+    return lazydoc as Lazyify<T[K]> & typeof lazydoc
+  }
+
+  public async _query(fn: (curRequestExpr: Expr) => Expr) {
+    const response = await this._client.query(fn(this._requestExpr))
+    if (response.ok === false) throw new Error('Error retrieving field.')
+    return response.body
+  }
+
+  public async _getFields(field: string) {
+    const response = await this._client.query<string[]>(qe.Fields(q.Select(field, this._requestExpr)))
+    if (response.ok === false) throw new Error('Error retrieving document.')
+    return response.body
   }
 }
 
@@ -260,8 +271,8 @@ class Client {
 
   // TODO: document
   public queryLazy<T = LazyObject>(expr: Expr) {
-    return Task<T & LazyDocument>(new Promise((resolve, reject) => {
-      new LazyDocument(expr, this)._start().then((result) => { resolve(result as T & LazyDocument) })
+    return Task<Lazyify<T> & LazyDocument<T>>(new Promise((resolve, reject) => {
+      new LazyDocument<T>(expr, this)._start().then((result) => { resolve(result as Lazyify<T> & LazyDocument<T>) })
         .catch(reject)
     }))
   }
@@ -305,7 +316,7 @@ export const User = {
   },
   // LocalStorage preferences
   preferences: {
-    langauge: 'en' // TODO: List of languages instead?
+    langs: ['en']
   }
   // TODO: Functions
 }
@@ -462,7 +473,7 @@ export function request(path: string) {
  *  Returned object extends the `LazyDocument` type, which has a couple of utility functions. */
 export function requestLazy(path: string) {
   const expr = qe.Data(qe.Search('pages_by_path', path))
-  return Clients.Public.queryLazy<Lazyify<Page>>(expr)
+  return Clients.Public.queryLazy<Page>(expr)
 }
 
 

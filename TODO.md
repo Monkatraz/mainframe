@@ -2,7 +2,6 @@
 
 ### In Progress
 - [ ] Svelte component loader
-- [ ] Page component
 - [ ] Page router
 - [ ] Integrate ReCaptcha
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
@@ -62,3 +61,4 @@
 - [x] Svelte compiling
 - [x] Svelte Stylus-PostCSS
 - [x] Change the SVG logo to not use an inline script
+- [X] Page component basic page loading
