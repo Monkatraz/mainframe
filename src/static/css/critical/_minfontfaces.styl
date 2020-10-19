@@ -1,0 +1,33 @@
+@require '_lib'
+
+@font-face
+  font-family: 'Nunito'
+  src: local('Nunito Regular'), local('Nunito-Regular'),
+      url('/static/fonts/Nunito-Regular.woff2') format('woff2'),
+      url('/static/fonts/Nunito-Regular.woff') format('woff')
+  font-weight: normal
+  font-style: normal
+  font-display: swap
+
+// Variable fonts
+@supports (font-variation-settings: normal)
+  // Vollkorn v4.106
+  @font-face
+    font-family: 'Vollkorn'
+    src: url('/static/fonts/variable/Vollkorn-VariableFont.woff2') format('woff2')
+    font-weight: 400 900
+    font-display: swap
+
+  // Inter v3.15
+  @font-face
+    font-family: 'Inter'
+    src: url('/static/fonts/variable/Inter-VariableFont.woff2') format('woff2')
+    font-weight: 100 900
+    font-display: swap
+  
+  // Fira Code v5.2
+  @font-face
+    font-family: 'Fira Code'
+    src: url('/static/fonts/variable/FiraCode-VF.woff2') format('woff2')
+    font-weight: 300 700
+    font-display: swap
