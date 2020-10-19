@@ -221,8 +221,8 @@ class LazyDocument<T> {
     return lazydoc as Lazyify<T[K]> & typeof lazydoc
   }
 
-  public async _query(fn: (curRequestExpr: Expr) => Expr) {
-    const response = await this._client.query(fn(this._requestExpr))
+  public async _query<T = DataValue>(fn: (curRequestExpr: Expr) => Expr) {
+    const response = await this._client.query<T>(fn(this._requestExpr))
     if (response.ok === false) throw new Error('Error retrieving field.')
     return response.body
   }
@@ -243,9 +243,7 @@ class Client {
     this.client = new FaunaDB.Client({
       secret: key,
       domain: ENV.API.FDB_DOMAIN,
-      scheme: 'https',
-      timeout: 2000,
-      queryTimeout: 1000
+      scheme: 'https'
     } as any)
   }
 

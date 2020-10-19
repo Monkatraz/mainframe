@@ -1,5 +1,6 @@
 <script lang="ts">
   // Imports
+  import { fade } from 'svelte/transition'
   import * as API from '@modules/api'
   const q = API.q
 
@@ -19,6 +20,8 @@
       // Load some of the things we'll need
       const locals = await document._getLazy('locals')
 
+      // TODO: Speculatively attempt to fetch the desired language
+
       // Get the available languages in our document
       const langs = locals._fields
       // Default language selection is the first in the list
@@ -28,10 +31,8 @@
       // Use first matching language
       if (intersect.length > 0) lang = intersect[0]
 
-      // Now we get our view with the actual data we need in it
-      const view = await locals._getLazy(lang)
-      // We'll pick out the HTML string on FaunaDB's end to save on requests
-      html = await view._query((expr) => q.Select('html', q.Select('root', expr))) as string
+      // We'll pick out the HTML string on FaunaDB's end for reduced latency
+      html = await locals._query<string>((expr) => q.Select('html', q.Select('root', q.Select(lang, expr))))
       loaded = true
 
       // const view = await locals[lang]
@@ -43,10 +44,22 @@
 
 <style lang="stylus">
   @require '_lib'
+  .fetchspinny
+    z-index: 70
+    top: center
+    left: center
+    height: 100%
+    width: 100%
+    background-image: url('/static/media/spinner.svg')
+    background-repeat: no-repeat
+    background-position: 50% 250px
+    background-size: 200px
 
 </style>
 
 <template lang="pug">
   +if('loaded === true')
-    div.rhythm #[+html('html')]
+    div(transition:fade='{{ delay: 100, duration: 250 }}' role='presentation').page.rhythm #[+html('html')]
+    +else
+      div(transition:fade='{{ duration: 100 }}' role='presentation').fetchspinny
 </template>
