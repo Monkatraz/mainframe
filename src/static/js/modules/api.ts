@@ -5,7 +5,6 @@
 
 // FaunaDB
 import FaunaDB, { Expr, values as v, errors as e } from 'faunadb'
-const values = FaunaDB.values
 const q = FaunaDB.query
 // Imports
 import { ENV, Task, Result } from '@modules/util'
@@ -14,6 +13,9 @@ import { ENV, Task, Result } from '@modules/util'
 // NETLIFY
 // -----------
 
+/** Invokes the Netlify Function specified by the `fn` parameter.
+ *  As it returns a `Result`, use `Result.ok` to determine if the invokation succeeded or failed.
+ */
 export async function invokeLambda(fn: string, payload?: any, init?: RequestInit) {
   const url = ENV.API.LAMBDA + fn
   const method = payload ? 'POST' : 'GET'
@@ -305,6 +307,7 @@ export const User = {
   preferences: {
     langauge: 'en' // TODO: List of languages instead?
   }
+  // TODO: Functions
 }
 
 // -----------
@@ -439,6 +442,7 @@ export interface Page {
   }
 }
 
+// Page class with automatic generation of flags (like hasSubpages)
 // pull page to edit or read
 // push page to remote
 //    do diff
@@ -446,7 +450,7 @@ export interface Page {
 //    update fields
 
 // Functions
-
+// TODO: namespace functions
 /** Request a page based off path. Eagerly loads the whole page. */
 export function request(path: string) {
   const expr = qe.Data(qe.Search('pages_by_path', path))
@@ -460,6 +464,7 @@ export function requestLazy(path: string) {
   const expr = qe.Data(qe.Search('pages_by_path', path))
   return Clients.Public.queryLazy<Lazyify<Page>>(expr)
 }
+
 
 addEventListener('DOMContentLoaded', () => {
   const pageTemplate: Page = {
