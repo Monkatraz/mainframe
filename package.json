@@ -34,7 +34,7 @@
     "@babel/preset-typescript": "^7.12.1",
     "@snowpack/plugin-dotenv": "^2.0.3",
     "@snowpack/plugin-optimize": "^0.2.5",
-    "@snowpack/plugin-svelte": "^3.0.0",
+    "@snowpack/plugin-svelte": "^3.0.1",
     "@tsconfig/svelte": "^1.0.10",
     "@types/aws-lambda": "^8.10.64",
     "@types/node": "^14.11.10",
