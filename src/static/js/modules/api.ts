@@ -268,7 +268,7 @@ class Client {
   }
 
   // TODO: document
-  public queryLazy<T = LazyObject>(expr: Expr) {
+  public queryLazy<T = PlainObject>(expr: Expr) {
     return Task<Lazyify<T> & LazyDocument<T>>(new Promise((resolve, reject) => {
       new LazyDocument<T>(expr, this)._start().then((result) => { resolve(result as Lazyify<T> & LazyDocument<T>) })
         .catch(reject)
@@ -458,22 +458,55 @@ export interface Page {
 //    check valid updatable fields
 //    update fields
 
-// Functions
-// TODO: namespace functions
-/** Request a page based off path. Eagerly loads the whole page. */
-export function request(path: string) {
-  const expr = qe.Data(qe.Search('pages_by_path', path))
-  return Clients.Public.query<Page>(expr)
-}
+export class PageHandler {
+  public html = ''
+  public data!: Lazyify<Page> & LazyDocument<Page>
+  constructor (public path = '') { }
 
-/** Requests a page based off path. 
- *  Lazy loads - fields will needed to be `await`ed or used with `.then()`.
- *  Returned object extends the `LazyDocument` type, which has a couple of utility functions. */
-export function requestLazy(path: string) {
-  const expr = qe.Data(qe.Search('pages_by_path', path))
-  return Clients.Public.queryLazy<Page>(expr)
-}
+  public async init() {
+    // The processing of the page like this on FaunaDB's end massively improves latency
+    // The basic gist of is:
+    //  1. Check if the page path exists, if not, abort with boolean false
+    //  2. Create a bunch of variables that build off each other
+    //    - These variables ultimately conclude with 'lang'
+    //    - 'lang' is a string that denotes which field in the `Page`'s `locals` field we need to use
+    //    - It compares against the users preferred languages and picks the first one
+    //    - If none of the languages available match the users, it just uses the first one in `locals`
+    //  3. Dig through the object and select the `html` field from the `root` subpage
+    //  4. Tada
+    // This is a single request - which literally saves seconds.
+    // If it was not done this way, the client would have to process this info and that would take forever
+    const pageExpr = q.If(
+      q.Exists(qe.Search('pages_by_path', this.path)),
+      q.Let(
+        {
+          'path': qe.Search('pages_by_path', this.path),
+          'data': qe.Data(q.Var('path')),
+          'langs': qe.Fields(q.Select('locals', q.Var('data'))),
+          'intersect': q.Intersection(User.preferences.langs, q.Var('langs')),
+          'lang': q.If(
+            q.Not(q.IsEmpty(q.Var('intersect'))),
+            q.Select(0, q.Var('intersect')),
+            q.Select(0, q.Var('langs'))
+          )
+        },
+        q.Select('html', q.Select('root', q.Select(q.Var('lang'), q.Select('locals', q.Var('data')))))
+      ),
+      q.Abort(false)
+    )
+    // Execute query and check if the response is invalid
+    const response = await Clients.Public.query<string | false>(pageExpr)
+    if (!response.ok || response.body === false) return new Result(false, new Error('Invalid page request.'))
 
+    // Start data promise for later, and don't wait for it (in this init function)
+    Clients.Public.queryLazy<Page>(qe.Data(qe.Search('pages_by_path', this.path))).then((response) => {
+      if (response.ok) this.data = response.body
+    })
+
+    // Return HTML
+    return new Result(true, response.body)
+  }
+}
 
 addEventListener('DOMContentLoaded', () => {
   const pageTemplate: Page = {

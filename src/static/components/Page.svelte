@@ -1,44 +1,25 @@
 <script lang="ts">
   // Imports
+  import { onMount } from 'svelte'
   import { fade } from 'svelte/transition'
   import * as API from '@modules/api'
   const q = API.q
 
   // Props
   export let path = ''
-
-  // Set up a few state variables
-  let failed = false
+  
+  // State
+  const Page = new API.PageHandler(path)
   let loaded = false
   let html = ''
 
-  // Get and parse document
-  API.requestLazy(path).then(async (response) => {
-    if (!response.ok) failed = true
-    else {
-      const document = response.body
-      // Load some of the things we'll need
-      const locals = await document._getLazy('locals')
-
-      // TODO: Speculatively attempt to fetch the desired language
-
-      // Get the available languages in our document
-      const langs = locals._fields
-      // Default language selection is the first in the list
-      let lang = langs[0]
-      // Get every language that is within both lists
-      const intersect = langs.filter((lang) => API.User.preferences.langs.includes(lang))
-      // Use first matching language
-      if (intersect.length > 0) lang = intersect[0]
-
-      // We'll pick out the HTML string on FaunaDB's end for reduced latency
-      html = await locals._query<string>((expr) => q.Select('html', q.Select('root', q.Select(lang, expr))))
+  // Init Page handler as quickly as possible
+  onMount(() => {
+    Page.init().then(result => {
+      if (!result.ok) throw new Error()
+      html = result.body
       loaded = true
-
-      // const view = await locals[lang]
-      // html = view.root.html
-      // loaded = true
-    }
+    })
   })
 </script>
 
