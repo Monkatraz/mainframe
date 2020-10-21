@@ -39,6 +39,7 @@ function onDOMLoaded() {
   // TODO: load components here
   const PageComponent = new Page({
     target: document.querySelector('#page') as Element,
+    intro: true,
     props: {
       path: 'scp/3685'
     }

@@ -143,6 +143,16 @@ export const qe = {
     // Use terms if provided
     if (terms) return q.Match(qindex, terms)
     return q.Match(qindex)
+  },
+
+  /** Shorthand function for getting a reference to a `Page` object, using a path as the search term. */
+  PageFind(path: string) {
+    return qe.Search('pages_by_path', path)
+  },
+
+  /** Shorthand function for retrieving a `Page` object, using a path as the search term. */
+  PageData(path: string) {
+    return qe.Data(qe.PageFind(path))
   }
 }
 
@@ -451,19 +461,47 @@ export interface Page {
   }
 }
 
-// Page class with automatic generation of flags (like hasSubpages)
-// pull page to edit or read
-// push page to remote
-//    do diff
-//    check valid updatable fields
-//    update fields
-
 export class PageHandler {
-  public html = ''
+  public lang!: string
+  public targetReady: Promise<boolean>
+  public targetValue!: DataValue
+  public dataReady: Promise<boolean>
   public data!: Lazyify<Page> & LazyDocument<Page>
-  constructor (public path = '') { }
+  constructor (public path = '', public target = 'html') {
+    // TODO: handle exceptions here
+    this.targetReady = (async () => {
+      const response = await this.init()
+      if (response.ok) {
+        this.targetValue = response.body[0]
+        this.lang = response.body[1]
+      }
+      return true
+    })()
+    this.dataReady = (async () => {
+      const response = await Clients.Public.queryLazy<Page>(qe.PageData(this.path))
+      if (response.ok) this.data = response.body
+      return true
+    })()
+  }
 
-  public async init() {
+  private createLangExprBinding(expr: Expr | Expr[]) {
+    return q.Let(
+      {
+        'path': qe.Search('pages_by_path', this.path),
+        'data': qe.Data(q.Var('path')),
+        'langs': qe.Fields(q.Select('locals', q.Var('data'))),
+        'intersect': q.Intersection(User.preferences.langs, q.Var('langs')),
+        'lang': q.If(
+          q.Not(q.IsEmpty(q.Var('intersect'))),
+          q.Select(0, q.Var('intersect')),
+          q.Select(0, q.Var('langs'))
+        )
+      },
+      expr
+    )
+  }
+
+  private async init() {
     // The processing of the page like this on FaunaDB's end massively improves latency
     // The basic gist of is:
     //  1. Check if the page path exists, if not, abort with boolean false
@@ -472,38 +510,29 @@ export class PageHandler {
     //    - 'lang' is a string that denotes which field in the `Page`'s `locals` field we need to use
     //    - It compares against the users preferred languages and picks the first one
     //    - If none of the languages available match the users, it just uses the first one in `locals`
-    //  3. Dig through the object and select the `html` field from the `root` subpage
-    //  4. Tada
+    //  3. Dig through the object and select whatever `target` we want (e.g. 'html')
+    //  4. Put the target expression and the determined language in a tuple/array
+    //  5. Tada
     // This is a single request - which literally saves seconds.
     // If it was not done this way, the client would have to process this info and that would take forever
-    const pageExpr = q.If(
+
+    //  Create our target expression
+    let targetExpr: Expr = {}
+    switch (this.target) {
+      case 'html': {
+        targetExpr = q.Select('html', q.Select('root', q.Select(q.Var('lang'), q.Select('locals', q.Var('data')))))
+      }
+    }
+    // Create our executor expression
+    const expr = q.If(
       q.Exists(qe.Search('pages_by_path', this.path)),
-      q.Let(
-        {
-          'path': qe.Search('pages_by_path', this.path),
-          'data': qe.Data(q.Var('path')),
-          'langs': qe.Fields(q.Select('locals', q.Var('data'))),
-          'intersect': q.Intersection(User.preferences.langs, q.Var('langs')),
-          'lang': q.If(
-            q.Not(q.IsEmpty(q.Var('intersect'))),
-            q.Select(0, q.Var('intersect')),
-            q.Select(0, q.Var('langs'))
-          )
-        },
-        q.Select('html', q.Select('root', q.Select(q.Var('lang'), q.Select('locals', q.Var('data')))))
-      ),
+      this.createLangExprBinding([targetExpr, q.Var('lang')]),
       q.Abort(false)
     )
-    // Execute query and check if the response is invalid
-    const response = await Clients.Public.query<string | false>(pageExpr)
+    // Execute and check if it failed
+    const response = await Clients.Public.query<[DataValue, string] | false>(expr)
     if (!response.ok || response.body === false) return new Result(false, new Error('Invalid page request.'))
 
-    // Start data promise for later, and don't wait for it (in this init function)
-    Clients.Public.queryLazy<Page>(qe.Data(qe.Search('pages_by_path', this.path))).then((response) => {
-      if (response.ok) this.data = response.body
-    })
-
-    // Return HTML
     return new Result(true, response.body)
   }
 }
