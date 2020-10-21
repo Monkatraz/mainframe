@@ -31,7 +31,6 @@
 ### Components
 - [ ] Licensing Widget
 - [ ] Humans.txt button
-- [ ] Spinner component
 - [ ] Tippy component or wrapper library
 - [ ] Navbar
 - [ ] Navbar dropdowns
@@ -62,3 +61,4 @@
 - [x] Svelte Stylus-PostCSS
 - [x] Change the SVG logo to not use an inline script
 - [X] Page component basic page loading
+- [x] Spinner component
