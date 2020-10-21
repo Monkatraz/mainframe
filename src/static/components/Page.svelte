@@ -1,10 +1,10 @@
 <script lang="ts">
   // Imports
-  import { fade } from 'svelte/transition'
-  import { afterUpdate } from 'svelte'
   import * as API from '@modules/api'
-  import { sleep } from '@modules/util'
-  // Components
+  import { sleep, waitFor } from '@modules/util'
+  // Svelte
+  import { afterUpdate } from 'svelte'
+  import { fade } from 'svelte/transition'
   import Spinny from './Spinny.svelte'
 
   // Props
@@ -21,8 +21,10 @@
     loaded = true
   })
 
-  afterUpdate(() => {
-    // Make sure that code blocks get highlighted
+  afterUpdate(async () => {
+    // Highlight code blocks on update
+    // Wait for `window.Prism` to be valid (loaded)
+    await waitFor(() => window.Prism)
     window.Prism.highlightAll()
   })
 </script>
@@ -39,9 +41,5 @@
     +else
       //- We'll wait a little bit so we don't needlessly show the loading spinner
       +await('sleep(300) then _')
-        Spinny(
-          width='150px' top='150px' left='50%',
-          fadeIn='{{ duration: 100 }}',
-          fadeOut='{{ duration: 100 }}'
-        )
+        Spinny(width='150px' top='150px' left='50%')
 </template>

@@ -4,8 +4,8 @@
   export let top = '50%'
   export let left = '50%'
   export let width = '120px'
-  export let fadeIn = {}
-  export let fadeOut = {}
+  export let fadeIn = { duration: 100 } 
+  export let fadeOut = { duration: 100 }
 
   const cssText = `top: ${top}; left: ${left}; width: ${width};`
 
