@@ -55,8 +55,6 @@ function onDOMLoaded() {
     window.Prism.manual = true
     // Divert languages to CDN instead of storing them ourselves
     window.Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/'
-    // Highlight on page load
-    doOnLoad(() => window.Prism.highlightAll())
   }).catch(warnFail)
 }
 

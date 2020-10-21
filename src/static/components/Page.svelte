@@ -1,6 +1,7 @@
 <script lang="ts">
   // Imports
   import { fade } from 'svelte/transition'
+  import { afterUpdate } from 'svelte'
   import * as API from '@modules/api'
   import { sleep } from '@modules/util'
   // Components
@@ -18,6 +19,11 @@
   Page.targetReady.then(() => {
     html = Page.targetValue as string
     loaded = true
+  })
+
+  afterUpdate(() => {
+    // Make sure that code blocks get highlighted
+    window.Prism.highlightAll()
   })
 </script>
 
