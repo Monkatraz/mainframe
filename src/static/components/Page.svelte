@@ -24,7 +24,7 @@
   afterUpdate(async () => {
     // Highlight code blocks on update
     // Wait for `window.Prism` to be valid (loaded)
-    await waitFor(() => window.Prism)
+    await waitFor(() => typeof window.Prism?.highlightAll === 'function')
     window.Prism.highlightAll()
   })
 </script>
