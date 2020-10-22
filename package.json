@@ -28,7 +28,12 @@
   "dependencies": {
     "animejs": "^3.2.1",
     "faunadb": "^3.0.1",
-    "prismjs": "^1.22.0"
+    "pug": "^3.0.0",
+    "prismjs": "^1.22.0",
+    "svelte": "^3.29.0",
+    "svelte-preprocess": "^4.5.1",
+    "svelte-select": "^3.12.0",
+    "tippy.js": "^6.2.7"
   },
   "devDependencies": {
     "@babel/preset-typescript": "^7.12.1",
@@ -53,12 +58,9 @@
     "postcss-easing-gradients": "^3.0.1",
     "postcss-join-transitions": "^1.1.0",
     "postcss-normalize": "^9.0.0",
-    "pug": "^3.0.0",
     "snowpack": "^2.14.3",
     "sort-css-media-queries": "^1.5.2",
     "stylus": "^0.54.8",
-    "svelte": "^3.29.0",
-    "svelte-preprocess": "^4.5.1",
     "typescript": "^4.0.3"
   },
   "optionalDependencies": {
