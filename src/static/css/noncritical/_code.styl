@@ -1,0 +1,39 @@
+@require '_lib'
+
+pre[class*=language-], pre.code
+  position: relative
+  width: 100%
+  max-width: 100%
+  margin: 0
+  padding: 0
+  contain: content
+
+  color: #ABB2BF
+  shadow-elevation(8)
+  border-radius: 10px
+
+  font-size: 15px
+  text-align: left
+  white-space: pre
+  word-break: normal
+  word-wrap: normal
+  tab-size: 4
+  hyphens: none
+
+  code
+    display: block
+    padding: 1.5em 1em
+    width: 100%
+    overflow-x: auto
+    background: #282C34
+
+
+:not(pre) 
+  > code[class*=language-], > code.code
+    display: inline-block
+    padding: 0.1em 0.25em
+    border-radius: 0.2em
+    background: #282C34
+    color: #ABB2BF
+    font-size: 0.9em
+    white-space: normal
