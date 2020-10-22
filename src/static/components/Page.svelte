@@ -3,27 +3,41 @@
   import * as API from '@modules/api'
   import { sleep, waitFor } from '@modules/util'
   // Svelte
-  import { afterUpdate } from 'svelte'
+  import { beforeUpdate, afterUpdate } from 'svelte'
   import { fade } from 'svelte/transition'
   import Spinny from './Spinny.svelte'
 
   // Props
   export let path = ''
+  export let setHTML = ''
 
   // State
-  const Page = new API.PageHandler(path, 'html')
-  let loaded = false
+  let ready = false
   let html = ''
 
-  // Wait until the HTML is ready (loading begins upon `PageHandler` instantiation )
-  Page.targetReady.then(() => {
-    html = Page.targetValue as string
-    loaded = true
+  // Render selected path
+  let lastPath = ''
+  beforeUpdate(async () => {
+    // Update if path isn't the same
+    // If setHTML however, use that instead
+    if (lastPath !== path && setHTML === '') {
+      lastPath = path
+      ready = false
+      // Init new page obj. with the target set to 'html'
+      // This is to retrieve renderable content as soon as possible
+      const Page = new API.PageHandler(path, 'html')
+      // Wait for html to be ready and then set it
+      await Page.targetReady
+      html = Page.targetValue as string
+    } else if (setHTML !== '') {
+      html = setHTML
+    }
+
+    ready = true
   })
 
   afterUpdate(async () => {
     // Highlight code blocks on update
-    // Wait for `window.Prism` to be valid (loaded)
     await waitFor(() => typeof window.Prism?.highlightAll === 'function')
     window.Prism.highlightAll()
   })
@@ -35,7 +49,7 @@
 </style>
 
 <template lang="pug">
-  +if('loaded === true')
+  +if('ready === true')
     div.rhythm(transition:fade='{{ delay: 100, duration: 250 }}' role='presentation') 
       +html('html')
     +else

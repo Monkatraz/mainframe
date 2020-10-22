@@ -37,6 +37,8 @@ declare global {
   interface LazyObject {
     [x: string]: Promiseable<Primitive | object>
   }
+  /** Represents a generic `Class` constructor. */
+  type Class<T = unknown, Arguments extends any[] = any[]> = new (...arguments_: Arguments) => T
   /** Any without the fuss. Represents nearly all data objects. Doesn't include undefined or null. */
   type Data = string | number | bigint | boolean | symbol | DataObject | Array<Data>
 

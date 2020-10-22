@@ -1,16 +1,15 @@
 # Mainframe
 
 ### In Progress
-- [ ] Svelte component loader
 - [ ] Page router
 - [ ] Integrate ReCaptcha
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
   - Force passing a ReCaptcha when registering
 - [ ] Generic cache library
+- [ ] Add Anime.js Svelte library
+- [ ] Add CodeMirror editor component
 
 ### General
-- [ ] Add CodeMirror
-- [ ] Add Anime.js
 - [ ] Add Tippy.js
 - [ ] Add Chart.js
 - [ ] Add DOMPurify
@@ -29,6 +28,7 @@
 - [ ] Account deletion
 
 ### Components
+- [ ] Login component
 - [ ] Licensing Widget
 - [ ] Humans.txt button
 - [ ] Tippy component or wrapper library
@@ -62,3 +62,4 @@
 - [x] Change the SVG logo to not use an inline script
 - [X] Page component basic page loading
 - [x] Spinner component
+- [x] Svelte component loader
