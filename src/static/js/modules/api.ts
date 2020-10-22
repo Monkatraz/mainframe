@@ -468,16 +468,18 @@ export class PageHandler {
   public dataReady: Promise<boolean>
   public data!: Lazyify<Page> & LazyDocument<Page>
   constructor (public path = '', public target = 'html') {
-    // TODO: handle exceptions here
     this.targetReady = (async () => {
       const response = await this.init()
       if (response.ok) {
         this.targetValue = response.body[0]
         this.lang = response.body[1]
+      } else {
+        throw response.body
       }
       return true
     })()
     this.dataReady = (async () => {
+      // TODO: handle exceptions here
       const response = await Clients.Public.queryLazy<Page>(qe.PageData(this.path))
       if (response.ok) this.data = response.body
       return true
@@ -503,7 +505,7 @@ export class PageHandler {
 
   private async init() {
     // The processing of the page like this on FaunaDB's end massively improves latency
-    // The basic gist of is:
+    // The basic gist is:
     //  1. Check if the page path exists, if not, abort with boolean false
     //  2. Create a bunch of variables that build off each other
     //    - These variables ultimately conclude with 'lang'
@@ -527,11 +529,11 @@ export class PageHandler {
     const expr = q.If(
       q.Exists(qe.Search('pages_by_path', this.path)),
       this.createLangExprBinding([targetExpr, q.Var('lang')]),
-      q.Abort(false)
+      q.Abort('Specified path does not match any pages.')
     )
     // Execute and check if it failed
-    const response = await Clients.Public.query<[DataValue, string] | false>(expr)
-    if (!response.ok || response.body === false) return new Result(false, new Error('Invalid page request.'))
+    const response = await Clients.Public.query<[DataValue, string]>(expr)
+    if (!response.ok) return new Result(false, response.body)
 
     return new Result(true, response.body)
   }

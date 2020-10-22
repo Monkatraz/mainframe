@@ -112,7 +112,8 @@ export const ENV = {
     FDB_DOMAIN: import.meta.env.SNOWPACK_PUBLIC_API_FDB_DOMAIN,
     // Serverless functions
     LAMBDA: import.meta.env.SNOWPACK_PUBLIC_API_LAMBDA
-  }
+  },
+  HOMEPAGE: import.meta.env.SNOWPACK_PUBLIC_HOMEPAGE
 }
 
 /** Functional-ish Result class object. It's not quite how Result tends to work - but that's fine here.

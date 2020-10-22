@@ -13,6 +13,8 @@
 
   // State
   let ready = false
+  let failed = false
+  let error: any = {}
   let html = ''
 
   // Render selected path
@@ -23,12 +25,19 @@
     if (lastPath !== path && setHTML === '') {
       lastPath = path
       ready = false
-      // Init new page obj. with the target set to 'html'
-      // This is to retrieve renderable content as soon as possible
-      const Page = new API.PageHandler(path, 'html')
-      // Wait for html to be ready and then set it
-      await Page.targetReady
-      html = Page.targetValue as string
+      failed = false
+      try {
+        // Init new page obj. with the target set to 'html'
+        // This is to retrieve renderable content as soon as possible
+        const Page = new API.PageHandler(path, 'html')
+        // Wait for html to be ready and then set it
+        await Page.targetReady
+        html = Page.targetValue as string
+      } catch (err) {
+        // Display err msg if failed
+        error = err
+        failed = true
+      }
     } else if (setHTML !== '') {
       html = setHTML
     }
@@ -51,7 +60,14 @@
 <template lang="pug">
   +if('ready === true')
     div.rhythm(transition:fade='{{ delay: 100, duration: 250 }}' role='presentation') 
-      +html('html')
+      +if('failed === false')
+        +html('html')
+        +else
+          h2 Error displaying page
+          hr
+          pre.code: code.
+            ERR: {error.name}: {error.message}
+            MSG: {error.description}
     +else
       //- We'll wait a little bit so we don't needlessly show the loading spinner
       +await('sleep(300) then _')

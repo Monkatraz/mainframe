@@ -12,7 +12,7 @@
  * @author Monkatraz
  */
 // Imports
-import { appendScript, appendStylesheet } from "@modules/util"
+import { ENV, appendScript, appendStylesheet } from "@modules/util"
 
 // Utility Functions
 // TODO: Probably replace this with actual error messages
@@ -32,7 +32,7 @@ type LoadComponent = [id: string, comp: typeof SvelteComponent, selector: string
 import Page from '@components/Page.svelte'
 // Components list
 const componentsToLoad: LoadComponent[] = [
-  ['Page', Page, '#page', { path: 'scp/3685' }],
+  ['Page', Page, '#page', { path: ENV.HOMEPAGE }],
 ]
 // Exported components list
 export const Components: { [id: string]: SvelteComponent } = {}
