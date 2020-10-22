@@ -5,6 +5,8 @@
   // Svelte
   import { beforeUpdate, afterUpdate } from 'svelte'
   import { fade } from 'svelte/transition'
+  import { uTip } from '@modules/svelte_lib'
+  // Components
   import Spinny from './Spinny.svelte'
 
   // Props
@@ -61,6 +63,7 @@
   +if('ready === true')
     div.rhythm(transition:fade='{{ delay: 100, duration: 250 }}' role='presentation') 
       +if('failed === false')
+        button(use:uTip=`{{ content: 'Tip test'  }}`) Test!
         +html('html')
         +else
           h2 Error displaying page

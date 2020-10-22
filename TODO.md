@@ -10,7 +10,6 @@
 - [ ] Add CodeMirror editor component
 
 ### General
-- [ ] Add Tippy.js
 - [ ] Add Chart.js
 - [ ] Add DOMPurify
 - [ ] Add Workbox
@@ -63,3 +62,4 @@
 - [X] Page component basic page loading
 - [x] Spinner component
 - [x] Svelte component loader
+- [x] Add Tippy.js
