@@ -10,6 +10,7 @@ Right off the bat, Mainframe is:
   * A modern site, using modern features. There is no IE11 support and there never will be.
   * An upgrade. Mainframe has a lot of things going for it compared to the old wiki. It's almost hard to call it a wiki
     \- it's entirely geared for just displaying pages and handling users.
+  * High performance. Mainframe is heavily optimized for first-load times and smooth runtime performance.
   * Actually good mobile support, with touchscreen gestures.
   * Really accessible. A lot of work was put into a11y - although there is some limitations. (Must have JS, and unfortunately no Opera Mini support)
   * Finally, and absolutely most importantly: _cheap as hell._ Mainframe attempts to do literally everything as cheaply as possible. A SCP Wiki replacement has to support at least 10,000 active users.
