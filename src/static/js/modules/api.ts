@@ -105,10 +105,11 @@ type ErrorHandlers = {
   [errorName: string]: () => void
   default: () => void
 }
-export type errorHandler = (error: Error | string) => void
+export type errorHandler = (error: Error | number | string) => void
 /** Returns an `errorHandler` function, for matching error names to functions. */
 export function newErrorHandler(errors: ErrorHandlers): errorHandler {
-  return (err: Error | string) => {
+  return (err: Error | number | string) => {
+    if (typeof err === 'number') err = err.toString()
     if (err instanceof Error) err = err.name
     // Execute matched error function if it exists
     if (typeof errors[err] === 'function') { return errors[err]() }
