@@ -8,5 +8,3 @@ CreateIndex({
   source: Collection("socials"),
   terms: [{ field: ["data", "user"] }]
 })
-
-Get(Match(Index("social_by_user"), Ref(Collection("users"), "279076375812375046")))
