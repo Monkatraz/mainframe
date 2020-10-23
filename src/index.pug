@@ -94,6 +94,10 @@ body
       div#page(role='presentation')
 
     footer#footer
+      ul#footer_list
+        li Powered by #[span#footer_pmf MAINFRAME].
+        li: +link('https://github.com/Monkatraz/mainframe') #[+mdi('github')] Github
+        li: +link('http://www.scpwiki.com/') #[+sfi()] SCP-Wiki
 
   div#script-container(role='presentation' style='display: none;')
     script(src='/static/js/mainframe.js' type='module')
