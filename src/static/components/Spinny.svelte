@@ -1,5 +1,5 @@
 <script lang='ts'>
-import { tnAnime } from '@js/svelte_lib';
+import { tnAnime } from '@js/components';
 
   import { fade } from 'svelte/transition'
 

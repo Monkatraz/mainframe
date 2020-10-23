@@ -5,7 +5,7 @@
   // Svelte
   import { beforeUpdate, afterUpdate, tick } from 'svelte'
   import { fade } from 'svelte/transition'
-  import { usAnime, usTip } from '@js/svelte_lib'
+  import { usAnime, usTip } from '@js/components'
   // Components
   import Spinny from './Spinny.svelte'
 
