@@ -12,7 +12,7 @@
  * @author Monkatraz
  */
 // Imports
-import { ENV, appendScript, appendStylesheet } from "@modules/util"
+import { appendScript, appendStylesheet } from "@modules/util"
 
 // Utility Functions
 // TODO: Probably replace this with actual error messages
@@ -25,35 +25,10 @@ function doOnLoad(fn: AnyFn) {
   window.addEventListener('load', fn, { once: true })
 }
 
-// Component Types
-import type { SvelteComponent } from 'svelte'
-type LoadComponent = [id: string, comp: typeof SvelteComponent, selector: string, props: PlainObject]
-// Component Imports
-import Page from '@components/Page.svelte'
-// Components list
-const componentsToLoad: LoadComponent[] = [
-  ['Page', Page, '#page', { path: ENV.HOMEPAGE }],
-]
-// Exported components list
-export const Components: { [id: string]: SvelteComponent } = {}
-/** Renders each component in the `components` list. */
-function renderComponents() {
-  componentsToLoad.forEach(([id, comp, selector, props]) => {
-    const component = new comp({
-      target: document.querySelector(selector) as Element,
-      props: props
-    })
-    if (id) Components[id] = component
-  })
-}
-
 // DOMContentLoaded
 async function onDOMLoaded() {
   // Noncritical CSS
-  await appendStylesheet('/static/css/main.css')
-
-  // Components
-  renderComponents()
+  appendStylesheet('/static/css/main.css')
 
   // Iconify
   appendScript('https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js')
