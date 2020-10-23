@@ -10,7 +10,7 @@ import { followCursor as TippyFollowCursor } from 'tippy.js'
 import 'tippy.js/dist/tippy.css'
 import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/animations/scale.css'
-import anime, { AnimeInstance, AnimeParams } from 'animejs'
+import anime, { AnimeParams } from 'animejs'
 
 // --------
 // LOADER
@@ -58,14 +58,16 @@ const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
 }
 /** Creates a tippy.js instance for the element. */
 export function usTip(elem: Element, opts: Partial<TippyProps> = {}) {
-  opts = Object.assign({}, DEFAULT_TIPPY_OPTS, opts)
-  const tp = tippy(elem, opts)
+  const finalOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
+  const tp = tippy(elem, finalOpts)
   return { destroy() { tp.destroy() } }
 }
 
 // --------
 // ANIM
 // --------
+
+// TODO: Figure out animejs layering
 
 /** Creates a function that will play an animejs animation. Specifically for use with Svelte `use:fn`. */
 export function usAnime(opts: AnimeParams) {
@@ -77,13 +79,11 @@ export function usAnime(opts: AnimeParams) {
   }
 }
 
-const SAFE_ANIME_OPTS: AnimeParams = {
+const TNANIME_FORCED_OPTS: AnimeParams = {
   delay: 0,
   autoplay: false,
   loop: false
 }
-// TODO: Function that returns 2 functions [in, out] and handles the state between the two
-// TODO: Figure out animejs layering
 /** Creates a transition function using animejs. Use like any other Svelte transition function.
  *  An issue with this particular type of animejs wrapper is that you cannot have multiple animejs animations playing.
  *  They will conflict and act unusually.
@@ -91,9 +91,8 @@ const SAFE_ANIME_OPTS: AnimeParams = {
 export function tnAnime(opts: AnimeParams) {
   return (elem: Element, inlineOpts: AnimeParams) => {
     // Set up options
-    const runtimeOpts = { targets: elem }
-    const userOpts = Object.assign({}, opts, inlineOpts)
-    const safeOpts = Object.assign({}, userOpts, SAFE_ANIME_OPTS, runtimeOpts)
+    const userOpts = { ...opts, ...inlineOpts }
+    const safeOpts = { ...userOpts, ...TNANIME_FORCED_OPTS, targets: elem }
     // Create anim object
     const anim = anime(safeOpts)
     // We'll have Svelte handle delay
@@ -114,8 +113,7 @@ export function evAnime(opts: AnimeParams) {
   return (event: Event) => {
     if (!event?.target) return
     // Set up options
-    const runtimeOpts = { targets: event.target, autoplay: true }
-    const safeOpts = Object.assign({}, opts, runtimeOpts)
+    const safeOpts = { ...opts, targets: event.target, autoplay: true }
     // Execute animation
     return anime(safeOpts)
   }
