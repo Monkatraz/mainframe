@@ -6,8 +6,8 @@
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
   - Force passing a ReCaptcha when registering
 - [ ] Generic cache library
-- [ ] Add Anime.js Svelte library
 - [ ] Add CodeMirror editor component
+- [ ] Inline Svelte component register
 
 ### General
 - [ ] Add Chart.js
@@ -63,3 +63,4 @@
 - [x] Spinner component
 - [x] Svelte component loader
 - [x] Add Tippy.js
+- [x] Add Anime.js Svelte library
