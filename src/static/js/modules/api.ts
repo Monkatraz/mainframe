@@ -5,6 +5,8 @@
 
 // FaunaDB
 import FaunaDB, { Expr, values as v, errors as e } from 'faunadb'
+// FDB types bug requires that I get a separate non-imported obj for the actual errors
+const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
 import { ENV, Task, Result } from '@modules/util'
@@ -97,6 +99,37 @@ export type QueryInputError = QueryBadRequest | QueryInvalidValue
 export type QueryPermissionError = QueryUnauthorized | QueryMethodNotAllowed | QueryPermissionDenied
 /** Error thrown by FaunaDB when the endpoint had some sort of query agnostic error. */
 export type QueryEndpointError = QueryInternalError | QueryUnavailable
+
+// Simple error handler thingy
+type ErrorHandlers = {
+  [errorName: string]: () => void
+  default: () => void
+}
+export type errorHandler = (error: Error | string) => void
+/** Returns an `errorHandler` function, for matching error names to functions. */
+export function newErrorHandler(errors: ErrorHandlers): errorHandler {
+  return (err: Error | string) => {
+    if (err instanceof Error) err = err.name
+    // Execute matched error function if it exists
+    if (typeof errors[err] === 'function') { return errors[err]() }
+    // Otherwise, execute the default handler
+    return errors.default()
+  }
+}
+
+export function getStatusCode(err: Error) {
+  if (err instanceof FDBErrors.FaunaHTTPError) {
+    const code = err.requestResult.statusCode
+    if (code !== 400) return code
+    // Check if we're using `q.Abort()` and returned a 3 digit code
+    if ((err as any).description.length === 3) {
+      const int = parseInt((err as any).description)
+      if (int) return int
+    }
+  }
+  // Return 400 for unknown
+  return 400
+}
 
 /** FaunaDB JS FQL driver extension. 
  *  All functions within map to valid FaunaDB JS driver functions.
@@ -269,8 +302,6 @@ class Client {
       this.client.query(expr)
         .then((result) => { resolve(result as unknown as T) })
         .catch((err: QueryException) => {
-          // TODO: Error handling (basic Permission denied, bad request, etc.)
-          console.error('FaunaDB error caught - treating as non-fatal')
           console.warn(err)
           reject(err)
         })
@@ -529,7 +560,7 @@ export class PageHandler {
     const expr = q.If(
       q.Exists(qe.Search('pages_by_path', this.path)),
       this.createLangExprBinding([targetExpr, q.Var('lang')]),
-      q.Abort('Specified path does not match any pages.')
+      q.Abort('404')
     )
     // Execute and check if it failed
     const response = await Clients.Public.query<[DataValue, string]>(expr)

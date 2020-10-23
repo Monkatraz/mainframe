@@ -3,7 +3,7 @@
   import * as API from '@modules/api'
   import { sleep, waitFor } from '@modules/util'
   // Svelte
-  import { beforeUpdate, afterUpdate } from 'svelte'
+  import { beforeUpdate, afterUpdate, tick } from 'svelte'
   import { fade } from 'svelte/transition'
   import { usAnime, usTip } from '@js/svelte_lib'
   // Components
@@ -23,11 +23,22 @@
   // Constants
   const localPages = ['404']
 
+
   // State
   let ready = false
   let failed = false
   let error: any = {}
   let html = ''
+
+  // Misc.
+  const errorHandler = API.newErrorHandler({
+    '404': () => {
+      path = '404'
+    },
+    default: () => {
+      failed = true
+    }
+  })
 
   // Render selected path
   let lastPath = ''
@@ -59,7 +70,9 @@
         } catch (err) {
           // Display err msg if failed
           error = err
-          failed = true
+          const code = API.getStatusCode(err)
+          await tick()
+          errorHandler(code)
         }
       }
     } else if (setHTML !== '') {
