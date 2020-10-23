@@ -2,13 +2,10 @@
  * @author Monkatraz
  */
 
-// Library Imports
-import './modules/api'
-
 /** Function for handling the `.touch` pseudo-psuedo CSS class.
  *  It runs on every `Document` touch event, and acts much like a pointerevent.
  */
-function touchClassHandle(evt: TouchEvent) {
+export function touchClassHandle(evt: TouchEvent) {
   // In English:
   // For every touch, get its target, and all of the target's parent nodes.
   // Then, merge them into an array of unique elements.
