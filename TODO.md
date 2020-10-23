@@ -8,6 +8,7 @@
 - [ ] Generic cache library
 - [ ] Add CodeMirror editor component
 - [ ] Inline Svelte component register
+- [ ] Better logo icon thingy
 
 ### General
 - [ ] Add Chart.js
