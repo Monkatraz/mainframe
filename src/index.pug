@@ -13,7 +13,7 @@ head
   link(rel='preload' href='/static/css/main.css' as='style')
   //- Main JS Preloads
   link(rel='modulepreload' href='/static/js/mainframe.js')
-  link(rel='modulepreload' href='/static/js/svelte_lib.js')
+  link(rel='modulepreload' href='/static/js/components.js')
   //- Dependencies Preloads
   link(rel='modulepreload' href='/static/js/modules/util.js')
   link(rel='modulepreload' href='/static/js/modules/api.js')
@@ -97,5 +97,5 @@ body
 
   div#script-container(role='presentation' style='display: none;')
     script(src='/static/js/mainframe.js' type='module')
-    script(src='/static/js/svelte_lib.js' type='module')
+    script(src='/static/js/components.js' type='module')
 </html>
