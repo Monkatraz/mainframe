@@ -38,33 +38,6 @@ export async function waitFor(
 }
 
 /**
- * Deferreds are an extended variant of ordinary JavaScript promises.
- * Specifically, Deferreds have the normally private `resolve, reject` executor functions made public.
- * They can be retrieved through the `Deferred.resolve` and `Deferred.reject` properties.
- * @example 
- * const deferred = new Deferred()
- * deferred.resolve() // or .reject()
- */
-export class Deferred<T = void> extends Promise<T> {
-  /** Resolves the deferred promise. */
-  public resolve!: (value?: T | PromiseLike<T> | undefined) => void
-  /** Rejects the deferred promise. */
-  public reject!: (reason?: any) => void
-  /**
-   * Creates a promise with exposed resolve and reject functions.
-   * Specifically, Deferred.resolve() and Deferred.reject().
-   * @param executor Optional argument - allows a function to be executed within the promise as usual.
-   */
-  constructor (executor?: (resolve: PromiseResolveFn, reject: PromiseRejectFn) => void) {
-    super((resolve, reject) => {
-      this.resolve = resolve
-      this.reject = reject
-      if (executor) executor(resolve, reject)
-    })
-  }
-}
-
-/**
  * Returns a new 'locked' async function, constructed using the specified function.
  * A locked asynchronous function will only allow a singular instance of itself to be running at one time.
  * Additional calls to the function will cause the async. function to wait until they can be ran.
@@ -81,6 +54,7 @@ export function createLock<T extends WrappedPromiseFn<any>>(fn: T) {
     return result
   }
 }
+
 /**
  * Returns a function that will be "queued" to execute only on animation frames.
  * Calling this function multiple times will have it run only once on the next requestAnimationFrame.
