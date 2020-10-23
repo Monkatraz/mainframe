@@ -20,11 +20,6 @@ function warnFail() {
   console.warn(`A plugin failed to load.`)
 }
 
-/** Adds a `'load', { once: true }` event-listener using the specified function. */
-function doOnLoad(fn: AnyFn) {
-  window.addEventListener('load', fn, { once: true })
-}
-
 // DOMContentLoaded
 async function onDOMLoaded() {
   // Noncritical CSS
