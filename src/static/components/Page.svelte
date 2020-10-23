@@ -20,6 +20,9 @@
     easing: 'easeOutQuad'
   })
 
+  // Constants
+  const localPages = ['404']
+
   // State
   let ready = false
   let failed = false
@@ -35,17 +38,29 @@
       lastPath = path
       ready = false
       failed = false
-      try {
-        // Init new page obj. with the target set to 'html'
-        // This is to retrieve renderable content as soon as possible
-        const Page = new API.PageHandler(path, 'html')
-        // Wait for html to be ready and then set it
-        await Page.targetReady
-        html = Page.targetValue as string
-      } catch (err) {
-        // Display err msg if failed
-        error = err
-        failed = true
+      if (localPages.includes(path)) {
+        // Local pages
+        const response = await fetch(`/static/pages/${path}.html`)
+        if (!response.ok) {
+          failed = true
+          error = new Error(response.statusText)
+        } else {
+          html = await response.text()
+        }
+      } else {
+        // Remote pages
+        try {
+          // Init new page obj. with the target set to 'html'
+          // This is to retrieve renderable content as soon as possible
+          const Page = new API.PageHandler(path, 'html')
+          // Wait for html to be ready and then set it
+          await Page.targetReady
+          html = Page.targetValue as string
+        } catch (err) {
+          // Display err msg if failed
+          error = err
+          failed = true
+        }
       }
     } else if (setHTML !== '') {
       html = setHTML
@@ -70,7 +85,6 @@
   +if('ready === true')
     div.rhythm(use:pageFadeIn role='presentation') 
       +if('failed === false')
-        button(use:usTip=`{{ content: 'Tip test'  }}`) Test!
         +html('html')
         +else
           h2 Error displaying page
