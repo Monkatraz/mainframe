@@ -461,6 +461,8 @@ export interface View {
 export interface Page {
   /** URL path, starting from root. Is always unique. */
   path: string
+  /** Version number, used for backwards compatibility handling (if needed) */
+  version: number
   /** Metadata - contains things like `Authors`, the current `revision`, etc. */
   meta: {
     // TODO: user object
@@ -468,10 +470,10 @@ export interface Page {
     authors: Ref[]
     /** Number of revisions (edits) for this page. Starts at 1. */
     revision: number
-    /** Date when this page was created. Use `.date()` method to convert to a JS `Date`. */
-    dateCreated: FaunaDate
-    /** Date when this page was last edited. Use `.date()` method to convert to a JS `Date`. */
-    dateLastEdited: FaunaDate
+    /** Date when this page was created. */
+    dateCreated: Date
+    /** Date when this page was last edited. */
+    dateLastEdited: Date
     /** A list of strings containing meta-contextual labels for a page.
      *  E.g. a flag like 'cc_validated' could be present within this list.
      */
@@ -574,11 +576,12 @@ export class PageHandler {
 addEventListener('DOMContentLoaded', () => {
   const pageTemplate: Page = {
     path: 'scp/3685',
+    version: 1,
     meta: {
       authors: [],
       revision: 1,
-      dateCreated: (new Date) as unknown as FaunaDate,
-      dateLastEdited: (new Date) as unknown as FaunaDate,
+      dateCreated: new Date,
+      dateLastEdited: new Date,
       flags: [],
       tags: []
     },
@@ -597,7 +600,7 @@ addEventListener('DOMContentLoaded', () => {
           description: ''
         },
         root: {
-          html: (document.querySelector('#page') as Element).innerHTML,
+          html: '',
           templatelang: TemplateLangs.Pug,
           template: ''
         },
