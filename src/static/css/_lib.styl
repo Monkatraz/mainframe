@@ -136,18 +136,7 @@ colvar-shred(identifier)
 
 // Font automagic setter
 font-set(font, useCache = true)
-  if useCache
-    +cache('font-' + font)
-      --font-cap: unquote('var(--font-' + font + '-cap)')
-      font-family: unquote('var(--font-' + font + ')')
-      if font is 'display' or font is display
-        font-weight: 500
-      else if font is 'mono' or font is mono
-        font-weight: 500
-        letter-spacing: -0.05em
-        word-spacing: -0.05em
-        overflow-wrap: break-word
-  else
+  font-setter()
     --font-cap: unquote('var(--font-' + font + '-cap)')
     font-family: unquote('var(--font-' + font + ')')
     if font is 'display' or font is display
@@ -157,6 +146,11 @@ font-set(font, useCache = true)
       letter-spacing: -0.05em
       word-spacing: -0.05em
       overflow-wrap: break-word
+  if useCache
+    +cache('font-' + font)
+      font-setter()
+  else
+    font-setter()
 
 // Stylus unfortunately, like most preprocessors, does not support the [rgba(triplet, opacity)] syntax.
 // This is a simple replacement for that functionality.
