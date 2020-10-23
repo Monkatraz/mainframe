@@ -95,7 +95,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
             annotation: false
           }
         })
-        // TODO: Figure out how to get PostCSS sourcemaps to work here
+
         return { '.css': result.css }
       } catch (err) {
         console.error(err)

@@ -1,6 +1,3 @@
-// TODO: Make constants uppercase
-// TODO: Add the 'shame.styl' file
-// TODO: add scrollbar styling mixins
 // Disable some Stylus stuff
 vendors = official
 
@@ -269,11 +266,6 @@ match-media(size, inclusivity)
   @media $s
     {block}
 
-$bp-thin   = 400px
-$bp-small  = 800px
-$bp-normal = 1000px
-$bp-wide   = 1400px
-
 // +has-only-touch()
 // For touch devices - regardless of size.
 // Any features where you intend it to be for 'mobile' should probably use this instead.
@@ -345,7 +337,7 @@ label-for-screenreaders(text)
 // Resets
 
 resetStyling()
-  +cache('reset-styling') // TODO: Determine if this is a good idea or not
+  +cache('reset-styling')
     margin: 0
     margin-block-end: 0
     margin-block-start: 0

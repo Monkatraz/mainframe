@@ -44,7 +44,6 @@ module.exports = {
   }),
   compilerOptions: {
     // Due to Svelte components not being bundled, it's more effective to inline the CSS here.
-    // TODO: Find a way to bundle Svelte CSS
     css: true
   }
 };

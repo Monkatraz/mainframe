@@ -192,9 +192,7 @@ export const qe = {
 
 /** Response object from `Client.queryLazy`. Contains both Promisables and FQL expression fields.
  *
- *  Types: `field: Promisable<FDBValue>`, `_qfield: Expr`
- *  @example field = await LazyDocument.field // Type 1
- *  @example _qfield === q.Select(field, obj_query) // Type 2
+ *  @example field = await LazyDocument.field
  */
 class LazyDocument<T> {
   // Database values
@@ -309,7 +307,11 @@ class Client {
     }))
   }
 
-  // TODO: document
+  /** Returns a lazy loading variant of the requested object. 
+   *  Accessors (`obj.prop`) need to be used with `await` or `.then(val => {})`.
+   *  Once a property has been accessed, it will be cached and won't query the database again.
+   *  @example field = await LazyDocument.field
+   */
   public queryLazy<T = PlainObject>(expr: Expr) {
     return Task<Lazyify<T> & LazyDocument<T>>(new Promise((resolve, reject) => {
       new LazyDocument<T>(expr, this)._start().then((result) => { resolve(result as Lazyify<T> & LazyDocument<T>) })
@@ -317,7 +319,6 @@ class Client {
     }))
   }
 
-  // TODO: Better wrapper for paginate
   /**
    * Wrapper for `FaunaDB.Client.paginate()` Use as normal - meaning errors must be caught manually.
    */
@@ -358,7 +359,6 @@ export const User = {
   preferences: {
     langs: ['en']
   }
-  // TODO: Functions
 }
 
 // -----------
@@ -372,7 +372,7 @@ export interface Social {
    *  Additionally, the actual ID of the `Ref` (not the collection) serves as the URL path for the user. */
   user: Ref
   /** A page (actually a `Subpage` object) specific to the user. Only they can edit it. */
-  authorpage: Subpage
+  authorpage: DocContent
   /** The nickname for this user. They can change it at any time. */
   nickname: string
   /** A very short description for the user.
@@ -414,7 +414,7 @@ export interface Comment {
   /** May be null, or contain a reference to another Comment that this particular comment is replying to. */
   replyingto: Ref | null
   /** Content of the comment. */
-  content: Subpage
+  content: DocContent
 }
 
 // Page Interface
@@ -424,9 +424,8 @@ enum TemplateLangs {
   Pug = 'pug'
 }
 
-// TODO: Rename to be generalized to any html + pug content
-/** `Subpage`s represent the set of objects that actually contain a `Page`'s consumable content. */
-export interface Subpage {
+/** `DocContent`s represent the set of objects that actually contain a `Page`'s (or others) consumable content. */
+export interface DocContent {
   /** Rendered form of the content. */
   html: string
   /** Render flags for the content. */
@@ -452,12 +451,12 @@ export interface View {
     description: string
   }
   /** Page that loads first (default URL). */
-  root: Subpage
+  root: DocContent
   /** List of subpages. Field name / key determines the subpath.
    *  E.g: `articles/mainpath/subpage1`
    */
   subpages: {
-    [path: string]: Subpage
+    [path: string]: DocContent
   }
 }
 
@@ -469,7 +468,6 @@ export interface Page {
   version: number
   /** Metadata - contains things like `Authors`, the current `revision`, etc. */
   meta: {
-    // TODO: user object
     /** Set of users who authored this page and have edit permissions. */
     authors: Ref[]
     /** Number of revisions (edits) for this page. Starts at 1. */

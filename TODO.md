@@ -13,11 +13,7 @@
 - [ ] Add Chart.js
 - [ ] Add DOMPurify
 - [ ] Add Workbox
-- [ ] Modernizer config with automatic compatibility message
 - [ ] Better style Prism.js toolbar and language tip
-- [ ] Add source map support for the Stylus and Pug compilers
-- [ ] Add import alias support for the Stylus and Pug compilers (likely regex based)
-- [ ] Add custom 404 page
 - [ ] Determine maximum file size of a page
 - [ ] Some sort of script or system for data-backups
 - [ ] Gesture controls
@@ -30,7 +26,6 @@
 - [ ] Login component
 - [ ] Licensing Widget
 - [ ] Humans.txt button
-- [ ] Tippy component or wrapper library
 - [ ] Navbar
 - [ ] Navbar dropdowns
 - [ ] Search bar component
@@ -64,3 +59,5 @@
 - [x] Svelte component loader
 - [x] Add Tippy.js
 - [x] Add Anime.js Svelte library
+- [x] Add custom 404 page
+- [x] Tippy component or wrapper library
