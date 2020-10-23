@@ -75,21 +75,21 @@ rhythm-gutter(top, bottom = top)
   $headings-to-text = select-headings('> ', ' + p')
   $headings-to-hr = select-headings('> ', ' + hr')
 
-  // Reset every tag and make sure it has no margins or padding
+  // Reset every tag and make sure it has no margins 
   +select-listed('> ', 'rhythm-tags', $block-tags, $break-tags, $figure-tags, $text-tags, $display-tags)
     margin: 0
     margin-block-end: 0
     margin-block-start: 0
-    padding: 0
-    padding-block-start: 0
-    padding-block-end: 0
 
-  // Line-height correction
+  // Line-height correction, reset text padding
   +select-listed('> ', 'rhythm-text-correction', $text-tags, $display-tags)
     position: relative
     width: 100%
     line-height: inherit // Fixes the line-height being overridden
     rhythm-set-text-bounds()
+    padding: 0
+    padding-block-start: 0
+    padding-block-end: 0
 
   > br
     content: "" // Bizarre CSS quirk fix for Chrome
