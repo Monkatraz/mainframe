@@ -11,19 +11,20 @@ head
   //- Style Preloads
   link(rel='preload' href='/static/css/critical.css' as='style')
   link(rel='preload' href='/static/css/main.css' as='style')
-  //- Img Preloads
-  link(rel='preload' href='/static/media/logo.svg' as='image')
-  link(rel='preload' href='/static/media/spinner.svg' as='image')
   //- Main JS Preloads
   link(rel='modulepreload' href='/static/js/mainframe.js')
   link(rel='modulepreload' href='/static/js/svelte_lib.js')
-  link(rel='modulepreload' href='/static/js/loader.js')
   //- Dependencies Preloads
   link(rel='modulepreload' href='/static/js/modules/util.js')
   link(rel='modulepreload' href='/static/js/modules/api.js')
   link(rel='modulepreload' href='/static/snowpack/env.js')
   //- Web Module Preloads
   link(rel='modulepreload' href='/web_modules/faunadb.js')
+
+  //- Preconnects and Prefetches
+  link(rel='prefetch' href='/static/media/logo.svg')
+  link(rel='prefetch' href='/static/media/spinner.svg')
+  link(rel='preconnect' href='https://db.fauna.com')
 
   //- Misc.
   link(rel='author' href='humans.txt')
@@ -97,6 +98,4 @@ body
   div#script-container(role='presentation' style='display: none;')
     script(src='/static/js/mainframe.js' type='module')
     script(src='/static/js/svelte_lib.js' type='module')
-    script(src='/static/js/loader.js' type='module')
-
 </html>
