@@ -3,3 +3,21 @@
 //- Material design + Iconify icon mixin.
 mixin mdi(icon='')
   span.iconify-inline(data-icon!='mdi:'+icon)&attributes(attributes)
+
+mixin gi(icon='')
+  span.iconify-inline(data-icon!=icon)&attributes(attributes)
+
+mixin sfi()
+  img.icon-scp(
+    src='/static/media/logo.svg' 
+    alt='SCP Foundation Logo' 
+    role='presentation'
+    width=12)&attributes(attributes)
+
+mixin link(url='')
+  a.link.link-external(href!=url)&attributes(attributes)
+    block
+
+mixin goto(path='')
+  a.link.link-internal(href!=path)&attributes(attributes)
+    block
