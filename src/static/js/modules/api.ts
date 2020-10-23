@@ -409,6 +409,8 @@ export interface Comment {
     /** Date when this comment was last edited. Use `.date()` method to convert to a JS `Date`. */
     dateLastEdited: FaunaDate
   }
+  /** Whether or not the comment has been pinned. */
+  pinned: boolean
   /** May be null, or contain a reference to another Comment that this particular comment is replying to. */
   replyingto: Ref | null
   /** Content of the comment. */
@@ -427,6 +429,8 @@ enum TemplateLangs {
 export interface Subpage {
   /** Rendered form of the content. */
   html: string
+  /** Render flags for the content. */
+  flags: Flags
   /** String value representing what templating language the source of the content is in. */
   templatelang: TemplateLangs
   /** The source template of the content. */
@@ -601,6 +605,7 @@ addEventListener('DOMContentLoaded', () => {
         },
         root: {
           html: '',
+          flags: [],
           templatelang: TemplateLangs.Pug,
           template: ''
         },
