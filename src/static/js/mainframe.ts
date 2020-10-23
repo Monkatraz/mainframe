@@ -39,6 +39,10 @@ export function touchClassHandle(evt: TouchEvent) {
   })
 }
 
+// Goofy thing for making a placeholder img for the logo work, compat. with CSP.
+const emblem = document.querySelector('#logo_emblem') as any
+emblem.onload = emblem.classList.add('loaded')
+
 document.addEventListener('DOMContentLoaded', () => {
   // Touch class
   document.addEventListener('touchstart', touchClassHandle)
