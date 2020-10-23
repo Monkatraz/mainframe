@@ -48,7 +48,7 @@ Create a replacement wiki-like system for the SCP-Wiki.
   * Must support up to 10,000 active users
   * Use only modern web technology and markup
   * Speedy and native-like web experience if possible
-  * Avoid complicated libraries (e.g. React, Vue)
+  * Avoid complicated runtime libraries (e.g. React, Vue)
   * Must support client-side caching to reduce network load
 
 ### Anti-Constraints
@@ -58,7 +58,6 @@ Create a replacement wiki-like system for the SCP-Wiki.
 ### Security and Privacy
   * Must use a restrictive content security policy
   * Use only `HTTPS`
-  * Separation between secret and public data by using two distinctly secured databases
   * No significant monitoring or storage of fingerprint-like user-data
     - If possible, the only confidential data that should be stored specific to users is their email, (securely handled)
       password, and user preferences.
@@ -97,11 +96,9 @@ There are various features Mainframe would need to support if it were to actuall
 ## Basic Architecture
 Mainframe is a static, single-page-application. Mainframe interacts with its remote database using only serverless functions and client-side API calls. This is part of the reason why Mainframe is cheap to run, as it basically _isn't_ whenever nobody is using it.
 
-This lead to the usage of [Netlify](www.netlify.com), and [FaunaDB](www.fauna.com). Netlify is inexpensive if you avoid usage of it's supplemental features, such as Netlify Identity. FaunaDB is just a really well priced database with a really lenient free tier. It also has optional integration with Netlify.
+Mainframe uses [Netlify](www.netlify.com) and [FaunaDB](www.fauna.com). Netlify is inexpensive if you avoid usage of it's supplemental features, such as Netlify Identity. FaunaDB is just a well priced database with a really lenient free tier. Additionally, it provides an extremely rich API and feature-set, especially for serverless/static websites.
 
-In order to actually be functional as a wiki, Mainframe makes heavy use of Netlify Functions (AWS Lambda, basically) and FaunaDB. The Netlify Functions mostly just handle secure tasks that cannot be facilitated purely between the client and FaunaDB. 
-
-FaunaDB itself is a document-based database. It is extremely well-suited for a wiki, although it doesn't do well with binary data. Mainframe is tightly integrated with FaunaDB, with the database API natively using FQL expressions and maximizing usage of FaunaDB's advanced features. 
+In order to actually be functional as a wiki, Mainframe makes heavy use of FaunaDB, with some supplemental usage of Netlify Functions. FaunaDB itself is a document-based database. It is extremely well-suited for a wiki, although it doesn't do well with binary data. Mainframe is tightly integrated with FaunaDB, with the database API natively using FQL expressions and maximizing usage of FaunaDB's advanced features. 
 
 The integration between Mainframe and FaunaDB is to the point that it is near-certain that a guest will never need to invoke a Netlify Function. Nearly all interaction with the site can be expressed as direct client to database API interactions.
 
@@ -112,16 +109,16 @@ Most of Mainframe's assets are either compiled or built. Mainframe is primarily 
   * Stylus + PostCSS
   * Svelte
 
-Some JavaScript is used for development tools, like Snowpack compilers, but the Mainframe codebase (excluding external modules) is written in TypeScript.
+Some JavaScript is used for development tools, like Snowpack compilers, but the Mainframe codebase is written in TypeScript.
 
 Most sources can be found in the `src` folder. Some additional assets can be found in the `public` folder - these assets have no build step and are just directly copied into the build target folder by Snowpack. Certain source files and development tools can be found within the `dev` folder.
 
 ## Used Runtime Libraries
-Mainframe makes heavy runtime use of various JavaScript libraries - but these have all been chosen based on their minimal size and narrow scope. Mainframe does not use Vue, React, or any other runtime virtual DOM library. 
+Mainframe makes heavy runtime use of various JavaScript libraries - but these have all been chosen based on their minimal size and narrow scope. Mainframe does not use Vue, React, or any other runtime virtual DOM library, instead using Svelte.
 
 Here are the main ones:
   * FaunaDB's JS driver for the database API
-  * Svelte (if that counts, considering it creates compiled templates) for reactive components
+  * Svelte for reactive components
   * Tippy.js for accessible popovers and tooltips
   * Anime.js for animations
   * Prism.js for syntax highlighting
@@ -130,12 +127,12 @@ Libraries likely to be added, but not yet:
   * Workbox for PWA support and client-side caching
   * Chart.js for, well, charts
 
-Additionally, Mainframe supports using the Pug template engine client-side for editor previews, if supported.
+Additionally, Mainframe uses the Pug template engine client-side for editor previews.
 
 ## Sanitizing UGC
 In order to sanitize potentially dangerous HTML compiled from Pug templates, Mainframe uses DOMPurify. Mainframe is designed to be extremely paranoid - all UGC Pug templates are compiled inside of sandboxes, with the resultant HTML sanitized by the client/server wishing to use them. This prevents Pug itself from being a security risk and moves all vulnerability to isolated HTML strings. 
 
-To be clear, Pug is likely perfectly safe. It doesn't execute any strings - it carefully parses its input to build compiled templates. However, this doesn't ensure Pug's dependencies are perfectly safe and nor does it perfectly ensure that Pug will not eventually have a vulnerability. And regardless, it's better safe than sorry.
+To be clear, Pug is probably safe. However, Pug's dependencies may or may not be safe and nor is it known whether or not Pug will eventually have a vulnerability. And regardless, it's better safe than sorry.
 
 When updating/creating a page, the procedure is:
   1. Have the client send a serverless function an object containing their identity token and the page update information.

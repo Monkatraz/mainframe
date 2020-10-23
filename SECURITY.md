@@ -1,5 +1,5 @@
 # Security Policy
-This repository (and its deployed website) is not responsible for any confidential user-data. Security vulnerabilities should be reported like normal issues.
+As it currently stands, Mainframe is not being used in a serious context. Security bugs should just be reported like a normal issue. If Mainframe, or a derivation of it, were to be actually used for a wiki of some type, than this security policy will be changed.
 
 ## Reporting a Vulnerability
 Open up a PR or a issue on this repository, and set the title to begin with `SECURITY:`.
