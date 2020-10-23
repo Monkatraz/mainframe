@@ -139,16 +139,10 @@ export function appendScript(src: string): Promise<void> {
     const timeout = setTimeout(reject, APPENDSCRIPT_TIMEOUT_INTERVAL)
     const _resolve = () => { clearTimeout(timeout); resolve() }
 
-    // Wait for the script container to load (just in case)
-    waitFor(() => document.querySelector('#script-container') !== null)
-      .then(() => {
-        const script = document.createElement('script')
-        script.src = src
-        script.onload = _resolve
-        // TypeScript doesn't realize that I've checked for null
-        const container = document.querySelector('#script-container') as Element
-        container.appendChild(script)
-      })
+    const script = document.createElement('script')
+    script.src = src
+    script.onload = _resolve
+    document.head.appendChild(script)
   })
 }
 
@@ -162,14 +156,10 @@ export function appendStylesheet(href: string): Promise<void> {
     const timeout = setTimeout(reject, APPENDSTYLESHEET_TIMEOUT_INTERVAL)
     const _resolve = () => { clearTimeout(timeout); resolve() }
 
-    // Wait for the head to load (just in case), not sure if this is needed
-    waitFor(() => document.head !== null)
-      .then(() => {
-        const stylesheet = document.createElement('link')
-        stylesheet.rel = 'stylesheet'
-        stylesheet.href = href
-        stylesheet.onload = _resolve
-        document.head.appendChild(stylesheet)
-      })
+    const stylesheet = document.createElement('link')
+    stylesheet.rel = 'stylesheet'
+    stylesheet.href = href
+    stylesheet.onload = _resolve
+    document.head.appendChild(stylesheet)
   })
 }
