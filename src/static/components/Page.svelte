@@ -5,13 +5,20 @@
   // Svelte
   import { beforeUpdate, afterUpdate } from 'svelte'
   import { fade } from 'svelte/transition'
-  import { uTip } from '@modules/svelte_lib'
+  import { usAnime, usTip } from '@js/svelte_lib'
   // Components
   import Spinny from './Spinny.svelte'
 
   // Props
   export let path = ''
   export let setHTML = ''
+
+  // Animations
+  const pageFadeIn = usAnime({
+    opacity: [0, 1],
+    duration: 500,
+    easing: 'easeOutQuad'
+  })
 
   // State
   let ready = false
@@ -61,9 +68,9 @@
 
 <template lang="pug">
   +if('ready === true')
-    div.rhythm(transition:fade='{{ delay: 100, duration: 250 }}' role='presentation') 
+    div.rhythm(use:pageFadeIn role='presentation') 
       +if('failed === false')
-        button(use:uTip=`{{ content: 'Tip test'  }}`) Test!
+        button(use:usTip=`{{ content: 'Tip test'  }}`) Test!
         +html('html')
         +else
           h2 Error displaying page

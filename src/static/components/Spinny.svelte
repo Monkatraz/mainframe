@@ -1,13 +1,20 @@
 <script lang='ts'>
+import { tnAnime } from '@js/svelte_lib';
+
   import { fade } from 'svelte/transition'
 
   export let top = '50%'
   export let left = '50%'
   export let width = '120px'
-  export let fadeIn = { duration: 100 } 
-  export let fadeOut = { duration: 100 }
 
   const cssText = `top: ${top}; left: ${left}; width: ${width};`
+
+  const anim = tnAnime({
+    scale: [0.8, 1],
+    opacity: [0, 1],
+    duration: 200,
+    easing: 'easeInOutSine'
+  })
 
 </script>
 
@@ -17,6 +24,7 @@
     position: absolute
     z-index: 99
     transform: translate(-50%, -50%)
+    opacity: 0
     pointer-events: none
 </style>
 
@@ -25,7 +33,6 @@
     src='/static/media/spinner.svg', 
     alt='Loading Indicator',
     style='{cssText}',
-    in:fade='{fadeIn}',
-    out:fade='{fadeOut}'
+    transition:anim
   )
 </template>
