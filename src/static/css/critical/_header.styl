@@ -22,6 +22,15 @@
     background: var(--header-background-color)
     mix-blend-mode: multiply
 
+#logo_emblem:not(.loaded)
+  // Yes, this really is a hilariously tiny PNG version of the logo emblem.
+  // Its 50x50px, and it is about 1.5kb inlined like this.
+  // Just looking at the inlining I bet it could get even smaller, but who cares, it's 1.5kb lol
+  // Main rationale for this is to remove flashes of invisible content, which this does well.
+  --emblem-inline-img: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADIAAAAyCAMAAAAp4XiDAAAAtFBMVEUAAAD////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////oK74hAAAAO3RSTlMA+xvP7ED38UkQA+/VwxMI58u/ogzZtWIGcV5NNxfz3LqwgXVwVSuompWGeWlEIeHHjn1tUTsmrT4xWSZSWvMAAAMoSURBVEjHrVXZYqowEE2AAoKoiFBX3HDfl2p7z///1yUkgWDt8tB5YTLJyZklM5C/kBlK0vkFZGK9KNJY/AJy99TV4vALSLhUVwm0nwDzABd13cd4/i1AC2Csa6rF2TSw+Ibo1TIu9Udje2tYr18A6gEWBYNWXF0LENSfISqeuVWWgLLomsfKZ0TraL2QryCkb/mfME4U9xX3x1UgjJJWbvqwRs4DZE17Un3XkUt1J607eioj3uhEaIMjSqIPxMYUu5JbVV/Q2iZSadwTIFk0mJ7TN4dq2rb4EM+YAvDnMvxbRimqMqcdpVqHQIRBAfMqMlaw2nx3aRQ0/wRJPQZirZxkzQVMnuA9ilcwavLvGKC3x7poJiD2Iy9/EHTLbyn8HumAfmxn+hXATXiTuiA1SRJK3qwoYqFLmgqVnq3EQRN4l9VhkH7eM6Bc82X7eQEvJ+AW4TESKQ2ZtKUuLO4m+5yAUX5qQNEvxgHAr+9Yok/Q5dUFziSXsV7oU8ATA6vOg8JVRmkXx2pKy9vSyx0qJcgQeCOPIqMcZsoL9iWIj8zDtNVNSi2HGKBmbEz5ANUFC+90B6+yLCfWnhTIwD32pezMBIh4Q8PhXpu8VzaAzxyPIS71GOTMFJmYM8+YFpq2LB91ND+7W+PFznrnnZgQMXQQtNOWGJpyTBiATgHvgrVM7mVFgUNR44Q2KyS08jStxaVkJS1pbJw2t/RinZwbcozsq/IplqUJwJB9Xz+sSasxEWOHPv8FdQBQQEyADWPomqIJ3ENfB7ApIy6MuuYZDk9RzAri6IGYsCmtAcBrKTOUeeUWhqXu8FfwUbwshqHy7zAIKIuDreSQETGNPWX888lnVZtN3eWzTyEdRUK50Zni/D8XipR+LTa95ekfttWIuyFFJjRUAaQdrnK9kr7XsvQ763Wn/2BM3JqSSWtA2rOOQ76S3j5NjTstjfH7ygVGg+eAyhjQJ0HZfRvW8q1nGN1niNnB2m58YFY223XWBxH83iPA9tDcs031OnXfR3hWBsV8U0X1Sr6Xl0UMI1pNk2R6ihow7zb5Wdr2JBq6FO4wmvRa5C/kP74QdVcOtPKIAAAAAElFTkSuQmCC')
+  background-image: var(--emblem-inline-img)
+  background-size: cover
+
 #header_logo
   z-index: 1
   color: white
