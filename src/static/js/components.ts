@@ -5,12 +5,13 @@
 
 // Imports
 import { ENV } from '@modules/util'
-import tippy, {
+import {
   Props as TippyProps,
   roundArrow as TippyRoundArrow,
   sticky as TippySticky,
   followCursor as TippyFollowCursor
 } from 'tippy.js'
+import tippy from 'tippy.js'
 import 'tippy.js/dist/tippy.css'
 import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/animations/scale.css'
