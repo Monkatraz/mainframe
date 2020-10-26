@@ -9,6 +9,7 @@
 - [ ] Add CodeMirror editor component
 - [ ] Inline Svelte component register
 - [ ] Better logo icon thingy
+- [ ] Gesture controls
 
 ### General
 - [ ] Add Chart.js
@@ -17,7 +18,6 @@
 - [ ] Better style Prism.js toolbar and language tip
 - [ ] Determine maximum file size of a page
 - [ ] Some sort of script or system for data-backups
-- [ ] Gesture controls
 
 ### Users
 - [ ] Author draft pages that are linkable
