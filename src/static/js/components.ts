@@ -52,9 +52,9 @@ const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
   theme: 'mainframe',
   arrow: TippyRoundArrow,
   animation: 'scale',
-  touch: ['hold', 200],
-  duration: [100, 150],
-  delay: [250, 0],
+  touch: ['hold', 1000],
+  duration: [50, 100],
+  delay: [400, 50],
   followCursor: 'horizontal',
   plugins: [TippyFollowCursor, TippySticky]
 }

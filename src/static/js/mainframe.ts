@@ -2,7 +2,7 @@
  * @author Monkatraz
  */
 // Imports
-import { appendScript, appendStylesheet } from "@modules/util"
+import { appendScript, appendStylesheet, evtlistener } from "@modules/util"
 
 /** Function for handling the `.touch` pseudo-psuedo CSS class.
  *  It runs on every `Document` touch event, and acts much like a pointerevent.
@@ -102,20 +102,13 @@ function onDOMLoaded() {
   }).catch(warnFail)
 }
 
-// Helper function to clean up the event listener spam down there a bit
-function evlistener(target: typeof window | typeof document, events: string[], fn: AnyFn) {
-  events.forEach(event => {
-    target.addEventListener(event, fn)
-  })
-}
-
 // Init. everything
 document.addEventListener('DOMContentLoaded', () => {
   // Touch class
-  evlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
+  evtlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
   // UserClient
-  evlistener(window, ['mousemove'], UserClient.updateMouseCoordinates)
-  evlistener(window, ['scroll'], UserClient.updateScrollRatio)
+  evtlistener(window, ['mousemove'], UserClient.updateMouseCoordinates)
+  evtlistener(window, ['scroll'], UserClient.updateScrollRatio)
   // Load remote
   onDOMLoaded()
 }, { once: true })

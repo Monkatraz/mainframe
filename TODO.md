@@ -9,7 +9,6 @@
 - [ ] Add CodeMirror editor component
 - [ ] Inline Svelte component register
 - [ ] Better logo icon thingy
-- [ ] Gesture controls
 
 ### General
 - [ ] Add Chart.js
@@ -62,3 +61,4 @@
 - [x] Add Anime.js Svelte library
 - [x] Add custom 404 page
 - [x] Tippy component or wrapper library
+- [x] Gesture controls

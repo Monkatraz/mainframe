@@ -103,6 +103,20 @@ export function createAnimQueued<T extends WrappedFn<NoReturnVal>>(fn: T) {
   }
 }
 
+/** Helper function for creating event listeners. */
+export function evtlistener(target: typeof window | typeof document | Element, events: string[], fn: AnyFn, opts: AddEventListenerOptions = {}) {
+  events.forEach(event => {
+    target.addEventListener(event, fn, opts)
+  })
+}
+
+/** Helper function for removing event listeners. */
+export function rmEvtlistener(target: typeof window | typeof document | Element, events: string[], fn: AnyFn, opts: AddEventListenerOptions = {}) {
+  events.forEach(event => {
+    target.removeEventListener(event, fn, opts)
+  })
+}
+
 /** Contains all environment variables. */
 export const ENV = {
   /** API related env. variables. Usually database related. */
