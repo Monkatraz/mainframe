@@ -1,0 +1,22 @@
+@require '_lib'
+
+#content
+  position: relative
+  padding: 2rem 0
+
+#editor-container
+  position: fixed
+  z-index: 90
+  top: 0
+  height: 100vh
+  pointer-events: none
+  overflow: hidden
+  contain: layout
+
+  // Matches #content width programmatically
+  $gp = var(--layout-body-side-gap) 
+  width: var(--layout-body-max-width)
+  max-width: 'calc((100% - (%s / 2)) - (%s * 2) - var(--layout-sidebar-width))' % ($gp $gp)
+
+  +match-media(thin, below)
+    max-width: calc(100% - (var(--layout-body-side-gap) * 2))

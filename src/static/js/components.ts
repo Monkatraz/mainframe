@@ -5,7 +5,7 @@
 
 // Imports
 import { ENV } from '@modules/util'
-import tippy, { Props as TippyProps, roundArrow as TippyRoundArrow } from 'tippy.js'
+import tippy, { Props as TippyProps, roundArrow as TippyRoundArrow, sticky as TippySticky } from 'tippy.js'
 import { followCursor as TippyFollowCursor } from 'tippy.js'
 import 'tippy.js/dist/tippy.css'
 import 'tippy.js/dist/svg-arrow.css'
@@ -21,9 +21,11 @@ import type { SvelteComponent } from 'svelte'
 type LoadComponent = [id: string, comp: typeof SvelteComponent, selector: string, props: PlainObject]
 // Component Imports
 import Page from '@components/Page.svelte'
+import ActionsPanel from '@components/ActionsPanel.svelte'
 // Components list
 const componentsToLoad: LoadComponent[] = [
   ['Page', Page, '#page', { path: ENV.HOMEPAGE }],
+  ['ActionsPanel', ActionsPanel, '#actions-panel', {}]
 ]
 // Exported components list
 export const Components: { [id: string]: SvelteComponent } = {}
@@ -50,17 +52,25 @@ const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
   theme: 'mainframe',
   arrow: TippyRoundArrow,
   animation: 'scale',
-  inertia: true,
   touch: ['hold', 200],
-  duration: 75,
+  duration: [100, 150],
+  delay: [250, 0],
   followCursor: 'horizontal',
-  plugins: [TippyFollowCursor]
+  plugins: [TippyFollowCursor, TippySticky]
 }
 /** Creates a tippy.js instance for the element. */
 export function usTip(elem: Element, opts: Partial<TippyProps> = {}) {
   const finalOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
   const tp = tippy(elem, finalOpts)
-  return { destroy() { tp.destroy() } }
+  return {
+    update(opts: Partial<TippyProps>) {
+      const newOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
+      tp.setProps(newOpts)
+    },
+    destroy() {
+      tp.destroy()
+    }
+  }
 }
 
 // --------
@@ -68,6 +78,15 @@ export function usTip(elem: Element, opts: Partial<TippyProps> = {}) {
 // --------
 
 // TODO: Figure out animejs layering
+
+export function elAnime(elem: Element, opts: AnimeParams) {
+  return () => {
+    anime({
+      targets: elem,
+      ...opts
+    })
+  }
+}
 
 /** Creates a function that will play an animejs animation. Specifically for use with Svelte `use:fn`. */
 export function usAnime(opts: AnimeParams) {
