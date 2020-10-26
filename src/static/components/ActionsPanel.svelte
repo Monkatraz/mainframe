@@ -159,7 +159,7 @@
   // Fade Animation
 
   .actions-panel-container.faded:not(.revealed)
-    +match-media(thin, below)
+    +match-media(thin, up)
       filter: drop-shadow(0 0 10px rgba(black, 0.5)) blur(1px)
       opacity: 0.5
       transform: translate(-50%, 0.5rem)
