@@ -4,6 +4,9 @@
 mixin mdi(icon='')
   span.iconify-inline(data-icon!='mdi:'+icon)&attributes(attributes)
 
+mixin ici(icon='')
+  span.iconify-inline(data-icon!='ic:'+icon)&attributes(attributes)
+
 mixin gi(icon='')
   span.iconify-inline(data-icon!=icon)&attributes(attributes)
 
@@ -13,6 +16,10 @@ mixin sfi()
     alt='SCP Foundation Logo' 
     role='presentation'
     width=12)&attributes(attributes)
+
+mixin button()
+  button(type='button')&attributes(attributes)
+    block
 
 mixin link(url='')
   a.link.link-external(href!=url)&attributes(attributes)
