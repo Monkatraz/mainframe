@@ -272,11 +272,11 @@ match-media(size, inclusivity)
 // The exception is for the 'size' of readable content. 
 // Making things easier to read should be based off screen size.
 has-only-touch()
-  @media (pointer: coarse), (any-hover: none), (hover: none)
+  @media (pointer: coarse)
     {block}
 
 has-only-hover()
-  @media (pointer: fine), (any-hover: hover), (hover: hover)
+  @media (pointer: fine)
     {block}
     
 // +uses-reduced-motion()
