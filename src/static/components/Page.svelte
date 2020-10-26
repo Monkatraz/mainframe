@@ -4,8 +4,7 @@
   import { sleep, waitFor } from '@modules/util'
   // Svelte
   import { beforeUpdate, afterUpdate, tick } from 'svelte'
-  import { fade } from 'svelte/transition'
-  import { usAnime, usTip } from '@js/components'
+  import { usAnime } from '@js/components'
   // Components
   import Spinny from './Spinny.svelte'
 
