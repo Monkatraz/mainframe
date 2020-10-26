@@ -13,17 +13,25 @@ input
 @require 'critical/*'
 
 // Boilerplate
+
 html
-  background: colvar('background-light')
-  overflow: hidden
+  width: 100vw
+  max-width: 100vw
+  height: 100vh
+  max-height: 100vh
 
 body
-  overflow-x: hidden
-  overflow-y: auto
-  min-width: 100vw
-  min-height: 100vh
+  background: colvar('background-light')
+  width: 100vw
   max-width: 100vw
-  max-height: 100vh
+  height: 100%
+
+// Scroll madness
+html, body
+  overflow-x: hidden
+  overflow-y: scroll
+  scroll-behavior: smooth
+  touch-action: manipulation
 
 html, body
   font-size: 1rem  // Used for consistent sizing (shouldn't be messed with)
