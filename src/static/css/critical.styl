@@ -14,24 +14,13 @@ input
 
 // Boilerplate
 
-html
-  width: 100vw
-  max-width: 100vw
-  height: 100vh
-  max-height: 100vh
+html, body
+  scroll-behavior: smooth
+  touch-action: manipulation
 
 body
   background: colvar('background-light')
-  width: 100vw
-  max-width: 100vw
-  height: 100%
 
-// Scroll madness
-html, body
-  overflow-x: hidden
-  overflow-y: scroll
-  scroll-behavior: smooth
-  touch-action: manipulation
 
 html, body
   font-size: 1rem  // Used for consistent sizing (shouldn't be messed with)
@@ -41,8 +30,7 @@ html, body
   color: colvar('text-dark')
 
 // Scrollbars
-// Style only when using a mouse (prefer default mobile scrollbars)
-+has-only-hover()
++match-media(thin, up)
   html
     scrollbar-width: thin
 
@@ -50,7 +38,7 @@ html, body
   // Track
   ::-webkit-scrollbar
     width: 10px
-  
+
   // Handle
   ::-webkit-scrollbar-thumb
       box-shadow: inset 0 0 10px 10px rgba(120, 120, 120, 0.35)
