@@ -159,8 +159,7 @@
   // Fade Animation
 
   .actions-panel-container.faded:not(.revealed)
-    // Make sure we don't hide the bar for touch users
-    +has-only-hover()
+    +match-media(thin, below)
       filter: drop-shadow(0 0 10px rgba(black, 0.5)) blur(1px)
       opacity: 0.5
       transform: translate(-50%, 0.5rem)
