@@ -104,7 +104,7 @@
       background: colvar('background-dark')
       border-radius: 10px 10px 0 0
 
-      +match-media(thin, only)
+      +match-media(thin, below)
         border-radius: 0
 
     .button
@@ -159,7 +159,7 @@
   // Fade Animation
 
   .actions-panel-container.faded:not(.revealed)
-    +match-media(thin, up)
+    +match-media(small, up)
       filter: drop-shadow(0 0 10px rgba(black, 0.5)) blur(1px)
       opacity: 0.5
       transform: translate(-50%, 0.5rem)
