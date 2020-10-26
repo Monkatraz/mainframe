@@ -41,6 +41,30 @@ function touchClassHandle(evt: TouchEvent) {
   })
 }
 
+// UserClient object for getting processed info about the state of the page
+// Like a 0-1 ratio for how scrolled the page is, or 0-1 mouseX and mouseY
+export const UserClient = {
+  // Values
+  mouseX: 0,
+  mouseY: 0,
+  scroll: 0,
+  // Flags
+  isMobile: /Mobi|Android/i.test(navigator.userAgent),
+
+  updateMouseCoordinates(evt: MouseEvent) {
+    const normX = evt.clientX / window.innerWidth
+    const normY = evt.clientY / window.innerHeight
+    UserClient.mouseX = normX
+    UserClient.mouseY = normY
+  },
+
+  updateScrollRatio() {
+    const body = document.body
+    const root = document.documentElement
+    UserClient.scroll = root.scrollTop / (body.scrollHeight - root.clientHeight)
+  }
+}
+
 // Goofy thing for making a placeholder img for the logo work, compat. with CSP.
 const emblem = document.querySelector('#logo_emblem') as any
 emblem.onload = emblem.classList.add('loaded')
@@ -78,12 +102,20 @@ function onDOMLoaded() {
   }).catch(warnFail)
 }
 
+// Helper function to clean up the event listener spam down there a bit
+function evlistener(target: typeof window | typeof document, events: string[], fn: AnyFn) {
+  events.forEach(event => {
+    target.addEventListener(event, fn)
+  })
+}
+
 // Init. everything
 document.addEventListener('DOMContentLoaded', () => {
   // Touch class
-  document.addEventListener('touchstart', touchClassHandle)
-  document.addEventListener('touchend', touchClassHandle)
-  document.addEventListener('touchcancel', touchClassHandle)
+  evlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
+  // UserClient
+  evlistener(window, ['mousemove'], UserClient.updateMouseCoordinates)
+  evlistener(window, ['scroll'], UserClient.updateScrollRatio)
   // Load remote
   onDOMLoaded()
 }, { once: true })
