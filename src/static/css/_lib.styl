@@ -288,10 +288,14 @@ uses-reduced-motion()
 
 // +onHover()
 // Shoves hover stuff in a hover media query
-on-hover()
-  @media (any-hover: hover), (hover: hover) 
-    &:hover:not(:active) 
-      {block}
+on-hover(notWithActive = true)
+  @media (any-hover: hover), (hover: hover)
+    if notWithActive
+      &:hover:not(:active) 
+        {block}
+    else
+      &:hover
+        {block}
 
 // +on-hovertouch()
 // Smart hovering - only 'hovers' if the device can hover, otherwise it works off of only touch events
@@ -336,8 +340,8 @@ label-for-screenreaders(text)
 
 // Resets
 
-resetStyling()
-  +cache('reset-styling')
+reset-styling(useCache = true)
+  resetter()
     margin: 0
     margin-block-end: 0
     margin-block-start: 0
@@ -349,4 +353,9 @@ resetStyling()
     background: none
     color: --col-text
     text-decoration: none
-    font: inherit
+    font: inherit 
+  if useCache
+    +cache('reset-styling')
+      resetter()
+  else
+    resetter()
