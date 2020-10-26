@@ -16,6 +16,32 @@ export function animationFrame(): Promise<number> {
   return new Promise((resolve) => requestAnimationFrame(resolve))
 }
 
+// Credit: https://gist.github.com/beaucharman/e46b8e4d03ef30480d7f4db5a78498ca
+// Personally, I think this is one of the more elegant JS throttle functions.
+/** Returns a 'throttled' variant of the given function. 
+ *  This function will only be able to execute every `limitMS` ms.
+ *  Use to rate-limit functions for performance.
+ *  You can have the first call be immediate by providing the third parameter as `true`. */
+export function throttle<T extends WrappedFn<NoReturnVal>>(fn: T, limitMS: number, immediate = false) {
+  let timeout: number | null = null
+  let initialCall = true
+
+  return function (this: any, ...args: Parameters<T>) {
+    const callNow = immediate && initialCall
+    const next = () => {
+      fn.apply(this, [...args as any])
+      timeout = null
+    }
+    if (callNow) {
+      initialCall = false
+      next()
+    }
+    if (!timeout) {
+      timeout = setTimeout(next, limitMS)
+    }
+  }
+}
+
 /**
  * Waits until the specified function returns `true`.
  * It will poll either every 200ms, or -
