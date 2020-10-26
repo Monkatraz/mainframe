@@ -37,7 +37,7 @@
     easing: 'easeOutElastic(1, 1.5)'
   })
 
-  const opts = { easing: 'easeOutElastic(1.5, 1)', duration: 500 }
+  const opts = { easing: 'easeOutElastic(1.5, 2)', duration: 400 }
   const panelOpen = usAnime({
     bottom: '5rem',
     ...opts
@@ -80,20 +80,18 @@
     --actions-panel-hover-shift: -0.5rem
     --actions-panel-active-shift: -0.75rem
 
-
-  $PANEL-HEIGHT = 5rem
-  $BORDER-HEIGHT = 0.5rem
-  $BUTTON-HEIGHT = 2rem
-  $HOVER-SHIFT = -0.5rem
-  $ACTIVE-SHIFT = -0.75rem
+    +match-media(thin, below)
+      --actions-panel-border-height: 1rem
 
   .actions-panel-container
     position: absolute
     bottom: 0
     left: center
     width: 100%
+    height: calc(var(--actions-panel-border-height) + var(--actions-panel-button-height))
     filter: drop-shadow(0 0 10px rgba(black, 0.5))
     pointer-events: auto
+    overscroll-behavior: contain
 
   +prefix-classes('actions-panel_')
 

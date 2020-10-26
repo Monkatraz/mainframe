@@ -10,6 +10,8 @@ import { tnAnime } from '@js/components';
   const cssText = `top: ${top}; left: ${left}; width: ${width};`
 
   const anim = tnAnime({
+    translateX: ['-50%', '-50%'],
+    translateY: ['-50%', '-50%'],
     scale: [0.8, 1],
     opacity: [0, 1],
     duration: 200,
@@ -22,6 +24,7 @@ import { tnAnime } from '@js/components';
   @require '_lib'
   .spinny
     position: absolute
+    display: block
     z-index: 99
     transform: translate(-50%, -50%)
     opacity: 0

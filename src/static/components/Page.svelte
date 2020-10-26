@@ -107,5 +107,5 @@
     +else
       //- We'll wait a little bit so we don't needlessly show the loading spinner
       +await('sleep(300) then _')
-        Spinny(width='150px' top='150px' left='50%')
+        Spinny(width='150px' top='200px' left='50%')
 </template>

@@ -4,20 +4,18 @@
   position: relative
   padding: 2rem 0
 
-#editor-container
-  position: fixed
-  z-index: 90
-  top: 0
-  height: 100vh
-  pointer-events: none
-  contain: layout
+#page
+  min-height: 100vh
 
-  // Matches #content width programmatically
-  $gp = var(--layout-body-side-gap) 
-  width: var(--layout-body-max-width)
-  max-width: 'calc((100% - (%s / 2)) - (%s * 2) - var(--layout-sidebar-width))' % ($gp $gp)
+#editor-container
+  position: sticky
+  z-index: 90
+  bottom: 0
+  width: 100%
+  pointer-events: none
 
   +match-media(thin, below)
-    left: 0
-    width: 100%
-    max-width: 100%
+    $gp = var(--layout-body-side-gap) 
+    transform: 'translateX(calc(%s * -1))' % $gp
+    width: 100vw
+    max-width: 100vw

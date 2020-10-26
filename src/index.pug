@@ -54,6 +54,7 @@ head
 
   //- Theming, Icons
   - var metaThemeColor = '#850005'
+  meta(name='color-scheme' content='dark light')
   meta(name='theme-color' content=metaThemeColor)
   meta(name='msapplication-TileColor' content=metaThemeColor)
 
@@ -91,10 +92,10 @@ body
 
     main#content(aria-label='Content')
 
+      div#page(role='presentation')
+
       div#editor-container(role='presentation')
         div#actions-panel(role='presentation')
-
-      div#page(role='presentation')
 
     footer#footer
       ul#footer_list
