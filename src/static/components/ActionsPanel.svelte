@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as API from '@modules/api'
-  import { addSwipeGesture } from '@modules/gestures'
+  import { SwipeGesture } from '@modules/gestures'
   import { UserClient } from '@js/mainframe'
   import { usAnime, usTip } from '@js/components'
   import { throttle } from '@js/modules/util'
@@ -27,8 +27,8 @@
 
   // Gestures
   onMount(() => {
-    addSwipeGesture(grip, 'up', handleGrip, { condition: () => !revealed })
-    addSwipeGesture(grip, 'down', handleGrip, { condition: () => revealed })
+    SwipeGesture(grip, 'up', handleGrip, { condition: () => !revealed })
+    SwipeGesture(grip, 'down', handleGrip, { condition: () => revealed })
   })
 
   // Animations
@@ -187,7 +187,7 @@
           transform: translateY(calc(var(--actions-panel-hover-shift) * -0.5))
         .actions-panel_button_arrow
           color: colvar('white')
-          transform: translate(-50%, -35%) scaleY(-1) !important
+          transform: translate(-50%, -40%) scaleY(-1) !important
 
   // Active Animation
 
@@ -199,7 +199,7 @@
 
   .revealed .actions-panel_button:active
     .actions-panel_button_arrow
-      transform: translate(-50%, -30%) scaleY(-1) !important
+      transform: translate(-50%, -35%) scaleY(-1) !important
 
   // Reveal Animation
 

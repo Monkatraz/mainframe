@@ -6,46 +6,26 @@
 import { evtlistener, rmEvtlistener } from '@modules/util'
 
 // General Types
-type SwipeDirection = 'up' | 'down' | 'left' | 'right'
 type Point = [x: number, y: number]
+type SwipeDirection = 'up' | 'down' | 'left' | 'right'
+type SwipeEvent = [sig: SwipeDirection, dist: number]
 
-// SwipeEvent calculation class (doesn't do any event processing, just does the math)
-class SwipeEvent {
-  public coord: [start: Point, end: Point]
-  public state!: [sig: SwipeDirection, dist: number]
+function calcSwipe(start: Point, end: Point): SwipeEvent {
+  const coord = [start, end]
+  // index 0 is vertical diff, index 1 is horizontal diff
+  const diff = [coord[0][1] - coord[1][1], coord[0][0] - coord[1][0]]
+  const diffAbs = [Math.abs(diff[0]), Math.abs(diff[1])]
 
-  constructor (start: Point, end: Point) {
-    this.coord = [start, end]
-    this.update(end)
-  }
+  // 0 is vertical, 1 is horizontal
+  const axis = diffAbs[1] > diffAbs[0] ? 1 : 0
+  // 0 is up / left, 1 is down / right
+  const dir = diff[axis] > 0 ? 0 : 1
 
-  public update(end: Point) {
-    this.coord = [this.coord[0], end]
+  const dirs = ['up', 'down', 'left', 'right']
+  const swipeDir = dirs[(axis * 2) + dir] as SwipeDirection
+  //                      ^ this is either 0 or 2, as axis is either 0 or 1
 
-    // index 0 is vertical diff, index 1 is horizontal diff
-    const diff = [
-      this.coord[0][1] - this.coord[1][1],
-      this.coord[0][0] - this.coord[1][0]
-    ]
-    const diffAbs = [
-      Math.abs(diff[0]),
-      Math.abs(diff[1])
-    ]
-
-    // 0 is vertical, 1 is horizontal
-    let axis = 0
-    if (diffAbs[1] > diffAbs[0]) axis = 1
-
-    // 0 is up / left, 1 is down / right
-    const dir = diff[axis] > 0 ? 0 : 1
-
-    const dirs = ['up', 'down', 'left', 'right']
-    const swipeDir = dirs[(axis * 2) + dir] as SwipeDirection
-    //                      ^ this is either 0 or 2, as axis is either 0 or 1
-
-    this.state = [swipeDir, diffAbs[axis]]
-    return this.state
-  }
+  return [swipeDir, diffAbs[axis]]
 }
 
 // SwipeGesture handler
@@ -65,21 +45,24 @@ const SWIPE_GESTURE_DEFAULT_OPTS = {
   endThreshold: 35,
   timeout: 250
 }
-// TODO: Destructor mechanism
+
 // TODO: Allow for changing to touch events instead (due to 'touch-action')
-export function addSwipeGesture(
+export function SwipeGesture(
   target: HTMLElement,
   dir: SwipeDirection,
   fn: AnyFn,
-  opts: Partial<SwipeGestureOpts> = {}
+  userOpts: Partial<SwipeGestureOpts> = {}
 ) {
-  const finalOpts = { ...SWIPE_GESTURE_DEFAULT_OPTS, ...opts } as SwipeGestureOpts
+  const opts = { ...SWIPE_GESTURE_DEFAULT_OPTS, ...userOpts } as SwipeGestureOpts
 
   target.style.touchAction = 'none'
 
   const evtOpts = { passive: true }
+  const events = ['pointermove', 'pointerup', 'pointercancel']
+
+  let start: Point
   let ID: number
-  let swipe: SwipeEvent
+  let current: SwipeEvent
   let timeout: number
   let timedout: boolean | null
 
@@ -89,37 +72,37 @@ export function addSwipeGesture(
     if (!evt.isPrimary) return
 
     const cleanup = () => {
-      rmEvtlistener(document, ['pointermove', 'pointerup', 'pointercancel'], handler)
+      rmEvtlistener(document, events, handler)
       clearInterval(timeout)
     }
 
     switch (evt.type) {
       case 'pointerdown': {
-        if (!finalOpts.condition()) return
+        if (!opts.condition()) return
         // Assign functions
         // Attach to document so that we don't have to pointer capture
-        evtlistener(document, ['pointermove', 'pointerup', 'pointercancel'], handler, evtOpts)
+        evtlistener(document, events, handler, evtOpts)
         // Starting vars
+        start = [evt.clientX, evt.clientY]
         ID = evt.pointerId
-        swipe = new SwipeEvent([evt.clientX, evt.clientY], [evt.clientX, evt.clientY])
+        current = calcSwipe(start, start)
         timedout = null
         break
       }
 
       case 'pointermove': {
-        const curPoint: Point = [evt.clientX, evt.clientY]
-        const state = swipe.update(curPoint)
+        current = calcSwipe(start, [evt.clientX, evt.clientY])
 
-        if (timedout === null && state[1] > finalOpts.startThreshold) {
+        if (timedout === null && current[1] > opts.startThreshold) {
           timedout = false
           timeout = setTimeout(() => {
             timedout = true
-          }, finalOpts.timeout)
+          }, opts.timeout)
         }
 
-        if (finalOpts.immediate && !timedout) {
+        if (opts.immediate && !timedout) {
           // Correct direction and greater than our threshold?
-          if (state[0] === dir && state[1] > finalOpts.endThreshold) {
+          if (current[0] === dir && current[1] > opts.endThreshold) {
             cleanup()
             fn()
           }
@@ -131,9 +114,8 @@ export function addSwipeGesture(
         cleanup()
         if (timedout) return
 
-        const state = swipe.state
         // Correct direction and greater than our threshold?
-        if (state[0] === dir && state[1] > finalOpts.endThreshold) fn()
+        if (current[0] === dir && current[1] > opts.endThreshold) fn()
         break
       }
 
@@ -145,4 +127,12 @@ export function addSwipeGesture(
   })
 
   target.addEventListener('pointerdown', handler, evtOpts)
+
+  const destroy = () => {
+    rmEvtlistener(document, events, handler)
+    clearInterval(timeout)
+    target.removeEventListener('pointerdown', handler)
+  }
+
+  return { handler, destroy }
 }
