@@ -1,6 +1,6 @@
 <script lang="ts">
   import * as API from '@modules/api'
-  import { swipeGesture } from '@modules/gestures'
+  import { onSwipe } from '@modules/gestures'
   import { UserClient } from '@js/mainframe'
   import { usAnime, usTip } from '@js/components'
   import { throttle } from '@js/modules/util'
@@ -207,7 +207,7 @@
     class:revealed
     class:faded
     use:intro
-    use:swipeGesture=`{{do: handleGrip, direction: revealed ? 'down' : 'up'}}`
+    use:onSwipe=`{{ callback: handleGrip, direction: revealed ? 'down' : 'up' }}`
     bind:this='{grip}')
 
     +button().actions-panel_button(

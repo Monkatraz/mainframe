@@ -5,7 +5,7 @@
 
 // Imports
 import { ENV } from '@modules/util'
-import { SwipeGesture, SwipeGestureOpts } from '@modules/gestures'
+import { onSwipe, onSwipeOpts } from '@modules/gestures'
 import {
   Props as TippyProps,
   roundArrow as TippyRoundArrow,
