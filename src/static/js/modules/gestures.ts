@@ -95,7 +95,7 @@ export function onSwipe(target: HTMLElement, inOpts: Partial<onSwipeOpts> = {}) 
 
     // Init. and start gesture recognition
     if (evt.type === 'pointerdown') {
-      if (!opts.condition) return
+      if (opts.condition && opts.condition()) return
       evtlistener(document, events, handler, { passive: true })
       ID = evt.pointerId
       start = [evt.clientX, evt.clientY]
