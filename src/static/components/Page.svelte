@@ -7,6 +7,7 @@
   import { usAnime } from '@js/components'
   // Components
   import Spinny from './Spinny.svelte'
+  import ActionsPanel from './ActionsPanel.svelte'
 
   // Props
   export let path = ''
@@ -90,7 +91,6 @@
 
 <style lang="stylus">
   @require '_lib'
-
 </style>
 
 <template lang="pug">
@@ -98,6 +98,7 @@
     div.rhythm(use:pageFadeIn role='presentation') 
       +if('failed === false')
         +html('html')
+        ActionsPanel
         +else
           h2 Error displaying page
           hr

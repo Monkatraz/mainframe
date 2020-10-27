@@ -26,25 +26,24 @@
 
   // Animations
   const intro = usAnime({
-    bottom: ['-5rem', '0'],
+    bottom: ['-6rem', '-5rem'],
     easing: 'easeOutElastic(1, 1.5)'
   })
 
   const opts = { easing: 'easeOutElastic(1.5, 2)', duration: 400 }
   const panelOpen = usAnime({
-    bottom: '5rem',
+    bottom: 0,
     ...opts
   })
 
   const panelClose = usAnime({
-    bottom: 0,
+    bottom: '-5rem',
     ...opts
   })
 
   // Unfade if mouse is near (simple Y value check, nothing complex)
   window.addEventListener('mousemove', throttle(() => {
-    if (UserClient.mouseY > 0.9) faded = false
-    else faded = true
+    faded = UserClient.mouseY < 0.9
   }, 100))
 
   // State toggling
@@ -76,13 +75,15 @@
     +match-media(thin, below)
       --actions-panel-border-height: 1rem
 
+    --actions-panel-total-height: calc(var(--actions-panel-border-height) + var(--actions-panel-button-height) + var(--actions-panel-height))
+
   .actions-panel-container
-    position: absolute
+    position: sticky
     z-index: 90
-    bottom: 0
-    left: center
+    bottom: calc(var(--actions-panel-height) * -1)
     width: 100%
-    height: calc(var(--actions-panel-border-height) + var(--actions-panel-button-height))
+    height: var(--actions-panel-total-height)
+    margin-top: calc(var(--actions-panel-total-height) * -1)
     filter: drop-shadow(0 0 10px rgba(black, 0.5))
     pointer-events: auto
     touch-action: none
@@ -92,7 +93,7 @@
     .border
       position: absolute
       z-index: 10
-      bottom: 0
+      top: var(--actions-panel-button-height)
       width: 100%
       height: var(--actions-panel-border-height)
       background: colvar('background-dark')
@@ -104,7 +105,7 @@
     .button
       position: absolute
       z-index: 20
-      bottom:  var(--actions-panel-border-height)
+      top:  0
       left: center
       height: var(--actions-panel-button-height)
       width: 10rem
@@ -125,7 +126,7 @@
 
   .actions-panel
     position: absolute
-    bottom: calc(var(--actions-panel-height) * -1)
+    bottom: 0
     left: center
     width: 100%
     background: colvar('background-dark', lighten 15%, desaturate 5%)
@@ -136,7 +137,7 @@
     height: calc(var(--actions-panel-height) + 1rem)
     margin-bottom: -1rem
 
-    +match-media(thin, only)
+    +match-media(thin, below)
       border: none
 
   // Transitions
@@ -156,7 +157,7 @@
     +match-media(small, up)
       filter: drop-shadow(0 0 10px rgba(black, 0.5)) blur(1px)
       opacity: 0.5
-      transform: translate(-50%, 0.5rem)
+      transform: translateY(0.5rem)
       pointer-events: none
 
   // Hover Animation
@@ -164,7 +165,7 @@
   // Open
   .actions-panel-container:not(.revealed)
     +on-hover()
-      transform: translate(-50%, var(--actions-panel-hover-shift))
+      transform: translateY(var(--actions-panel-hover-shift))
       .actions-panel_button_arrow
         color: colvar('white')
         transform: translate(-50%, -50%) !important

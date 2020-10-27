@@ -1,7 +1,5 @@
 <script lang='ts'>
-import { tnAnime } from '@js/components';
-
-  import { fade } from 'svelte/transition'
+  import { tnAnime } from '@js/components';
 
   export let top = '50%'
   export let left = '50%'

@@ -65,7 +65,7 @@ export const UserClient = {
   }
 }
 
-// Goofy thing for making a placeholder img for the logo work, compat. with CSP.
+// Goofy thing for making a placeholder img for the logo work.
 const emblem = document.querySelector('#logo_emblem') as any
 emblem.onload = emblem.classList.add('loaded')
 

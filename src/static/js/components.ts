@@ -26,11 +26,9 @@ import type { SvelteComponent } from 'svelte'
 type LoadComponent = [id: string, comp: typeof SvelteComponent, selector: string, props: PlainObject]
 // Component Imports
 import Page from '@components/Page.svelte'
-import ActionsPanel from '@components/ActionsPanel.svelte'
 // Components list
 const componentsToLoad: LoadComponent[] = [
-  ['Page', Page, '#page', { path: ENV.HOMEPAGE }],
-  ['ActionsPanel', ActionsPanel, '#actions-panel', {}]
+  ['Page', Page, '#content', { path: ENV.HOMEPAGE }]
 ]
 // Exported components list
 export const Components: { [id: string]: SvelteComponent } = {}

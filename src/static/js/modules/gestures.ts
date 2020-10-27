@@ -2,7 +2,7 @@
  * @file Gesture library, such as swipes and dragging actions.
  * @author Monkatraz
  */
-
+// Imports
 import { evtlistener, rmEvtlistener } from '@modules/util'
 
 /** Represents the valid swipe directions. */
