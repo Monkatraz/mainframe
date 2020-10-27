@@ -54,6 +54,8 @@ declare global {
   /** Matches any valid JSON value. */
   type JSONValue = string | number | boolean | null | JSONObject | JSONArray
 
+  type Point = [x: number, y: number]
+
   // Fixes import.meta.env for Snowpack
   interface ImportMeta {
     env: {

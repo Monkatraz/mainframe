@@ -5,140 +5,102 @@
 
 import { evtlistener, rmEvtlistener } from '@modules/util'
 
-// General Types
-type Point = [x: number, y: number]
-type SwipeDirection = 'up' | 'down' | 'left' | 'right'
-type SwipeEvent = [sig: SwipeDirection, dist: number]
-
-// Constants
+export type SwipeDirection = 'up' | 'down' | 'left' | 'right'
 const SWIPE_DIRECTIONS: SwipeDirection[] = ['up', 'down', 'left', 'right']
 
+type SwipeEvent = [sig: SwipeDirection, dist: number]
 function resolveSwipe([x1, y1]: Point, [x2, y2]: Point): SwipeEvent {
   // index 0 is vertical diff, index 1 is horizontal diff
   const diff = [y1 - y2, x1 - x2]
   const diffAbs = diff.map(Math.abs)
-
   // 0 is vertical, 1 is horizontal
   const axis = diffAbs[1] > diffAbs[0] ? 1 : 0
   // 0 is up / left, 1 is down / right
   const dir = diff[axis] > 0 ? 0 : 1
-
   const swipeDir = SWIPE_DIRECTIONS[(axis * 2) + dir]
   //                      ^ this is either 0 or 2, as axis is either 0 or 1
-
   return [swipeDir, diffAbs[axis]]
 }
 
-// SwipeGesture handler
-
-interface SwipeGestureOpts {
+export interface SwipeGestureOpts {
   condition: () => boolean
-  useTouchEvents: boolean
+  do: () => void
+  direction: SwipeDirection
   setTouchAction: boolean,
   immediate: boolean
   startThreshold: number
   endThreshold: number
   timeout: number
 }
-
-const SWIPE_GESTURE_DEFAULT_OPTS = {
+const SWIPE_GESTURE_DEFAULT_OPTS: SwipeGestureOpts = {
   condition: () => true,
-  useTouchEvents: true,
-  setTouchAction: true,
+  do: () => true,
+  direction: 'up',
+  setTouchAction: false,
   immediate: true,
   startThreshold: 10,
   endThreshold: 35,
   timeout: 250
 }
 
-// TODO: Allow for changing to touch events instead (due to 'touch-action')
-export function SwipeGesture(
-  target: HTMLElement,
-  dir: SwipeDirection,
-  fn: AnyFn,
-  userOpts: Partial<SwipeGestureOpts> = {}
-) {
-  const opts = { ...SWIPE_GESTURE_DEFAULT_OPTS, ...userOpts } as SwipeGestureOpts
-  const evtOpts = { passive: true }
-
-  if (opts.setTouchAction) target.style.touchAction = 'none'
-
-  const events = opts.useTouchEvents
-    ? ['touchstart', 'touchmove', 'touchend', 'touchcancel']
-    : ['pointerdown', 'pointermove', 'pointerup', 'pointercancel']
-
-  let ID: number
-  let start: Point
-  let current: SwipeEvent
-  let timeout: number | undefined
-
-  const setState = (val: boolean) => {
-    if (val) {
-      evtlistener(document, events.slice(1), handler, evtOpts)
-      current = ['up', 0]
-      timeout = undefined
-    }
-    else {
-      rmEvtlistener(document, events.slice(1), handler)
-      clearInterval(timeout)
-    }
+export function swipeGesture(target: HTMLElement, inOpts: Partial<SwipeGestureOpts> = {}) {
+  let opts: SwipeGestureOpts
+  const update = (newOpts: Partial<SwipeGestureOpts>) => {
+    opts = { ...SWIPE_GESTURE_DEFAULT_OPTS, ...newOpts }
+    target.style.touchAction = opts.setTouchAction ? 'none' : ''
+  }
+  const destroy = () => {
+    setState(false)
+    target.removeEventListener('pointerdown', handler)
   }
 
-  const eventFns: ((evt: PointerEvent | TouchEvent) => void)[] = [
-    // Start
-    (evt) => {
+  update(inOpts)
+  const events = ['pointermove', 'pointerup', 'pointercancel']
+  let ID = -1
+  let start: Point
+  let current: SwipeEvent
+  let timeout: number | undefined = undefined
+
+  const setState = (val: boolean) => {
+    clearInterval(timeout)
+    current = ['up', 0]
+    timeout = undefined
+    ID = -1
+    if (val) evtlistener(document, events, handler, { passive: true })
+    else rmEvtlistener(document, events, handler)
+  }
+
+  const eventFns: { [evtType: string]: (evt: PointerEvent) => void } = {
+    'pointerdown': (evt) => {
       if (!opts.condition()) return
       setState(true)
-      if (evt instanceof PointerEvent) {
-        ID = evt.pointerId
-        start = [evt.clientX, evt.clientY]
-      } else {
-        const touch = evt.changedTouches[0]
-        ID = touch.identifier
-        start = [touch.clientX, touch.clientY]
-      }
+      ID = evt.pointerId
+      start = [evt.clientX, evt.clientY]
     },
-    // Move
-    (evt) => {
-      if (evt instanceof PointerEvent) {
-        if (evt.pointerId !== ID) return
-        current = resolveSwipe(start, [evt.clientX, evt.clientY])
-      } else {
-        const touch = [...evt.changedTouches].find((val) => val.identifier === ID)
-        if (!touch) return
-        current = resolveSwipe(start, [touch.clientX, touch.clientY])
-      }
-
+    'pointermove': (evt) => {
+      current = resolveSwipe(start, [evt.clientX, evt.clientY])
       if (!timeout && current[1] > opts.startThreshold) {
         setTimeout(() => { setState(false) }, opts.timeout)
       }
-      if (opts.immediate && current[0] === dir && current[1] > opts.endThreshold) {
+      if (opts.immediate && current[0] === opts.direction && current[1] > opts.endThreshold) {
         setState(false)
-        fn()
+        opts.do()
       }
     },
-    // Up
-    (evt) => {
+    'pointerup': (evt) => {
       setState(false)
-      if (current[0] === dir && current[1] > opts.endThreshold) fn()
+      if (current[0] === opts.direction && current[1] > opts.endThreshold) opts.do()
     },
-    // Cancel
-    (evt) => {
+    'pointercancel': (evt) => {
       setState(false)
     }
-  ]
-
-  const handler = (evt: PointerEvent | TouchEvent) => {
-    const index = events.indexOf(evt.type)
-    if (index !== -1) eventFns[index](evt)
   }
 
-  target.addEventListener(events[0] as 'pointerdown', handler, evtOpts)
-
-  const destroy = () => {
-    setState(false)
-    target.removeEventListener(events[0] as 'pointerdown', handler)
+  const handler = (evt: PointerEvent) => {
+    if (ID !== -1 && ID !== evt.pointerId) return
+    eventFns[evt.type](evt)
   }
-  // TODO: update props func.
-  return { handler, destroy }
+  target.addEventListener('pointerdown', handler, { passive: true })
+
+  return { update, destroy }
 }

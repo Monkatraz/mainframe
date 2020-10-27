@@ -1,10 +1,9 @@
 <script lang="ts">
   import * as API from '@modules/api'
-  import { SwipeGesture } from '@modules/gestures'
+  import { swipeGesture } from '@modules/gestures'
   import { UserClient } from '@js/mainframe'
   import { usAnime, usTip } from '@js/components'
   import { throttle } from '@js/modules/util'
-  import { onMount } from 'svelte';
 
   // Elements
   let grip: HTMLElement
@@ -24,12 +23,6 @@
       return false
     }
   }
-
-  // Gestures
-  onMount(() => {
-    SwipeGesture(grip, 'up', handleGrip, { condition: () => !revealed })
-    SwipeGesture(grip, 'down', handleGrip, { condition: () => revealed })
-  })
 
   // Animations
   const intro = usAnime({
@@ -85,13 +78,14 @@
 
   .actions-panel-container
     position: absolute
+    z-index: 90
     bottom: 0
     left: center
     width: 100%
     height: calc(var(--actions-panel-border-height) + var(--actions-panel-button-height))
     filter: drop-shadow(0 0 10px rgba(black, 0.5))
     pointer-events: auto
-    overscroll-behavior: contain
+    touch-action: none
 
   +prefix-classes('actions-panel_')
 
@@ -213,6 +207,7 @@
     class:revealed
     class:faded
     use:intro
+    use:swipeGesture=`{{do: handleGrip, direction: revealed ? 'down' : 'up'}}`
     bind:this='{grip}')
 
     +button().actions-panel_button(
