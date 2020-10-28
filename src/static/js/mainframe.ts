@@ -61,7 +61,7 @@ export const UserClient = {
   updateScrollRatio() {
     const body = document.body
     const root = document.documentElement
-    UserClient.scroll = root.scrollTop / (body.scrollHeight - root.clientHeight)
+    UserClient.scroll = root.scrollTop / (body.scrollHeight - window.innerHeight)
   }
 }
 

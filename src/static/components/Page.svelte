@@ -1,7 +1,8 @@
 <script lang="ts">
   // Imports
   import * as API from '@modules/api'
-  import { sleep, waitFor } from '@modules/util'
+  import { UserClient } from '@js/mainframe'
+  import { sleep, throttle, waitFor } from '@modules/util'
   // Svelte
   import { beforeUpdate, afterUpdate, tick } from 'svelte'
   import { usAnime } from '@js/components'
@@ -23,14 +24,20 @@
   // Constants
   const localPages = ['404']
 
-
   // State
   let ready = false
   let failed = false
   let error: any = {}
   let html = ''
+  let hideActionsPanel = false
 
   // Misc.
+  // TODO: proper intersection observer
+  document.addEventListener('scroll', throttle(() => {
+    if (UserClient.scroll < 0.9) hideActionsPanel = false
+    else hideActionsPanel = true
+  }, 100))
+
   const errorHandler = API.newErrorHandler({
     '404': () => {
       path = '404'
@@ -98,13 +105,13 @@
     div.rhythm(use:pageFadeIn role='presentation') 
       +if('failed === false')
         +html('html')
-        ActionsPanel
         +else
           h2 Error displaying page
           hr
           pre.code: code.
             ERR: {error.name}: {error.message}
             MSG: {error.description}
+    ActionsPanel(bind:hidden='{hideActionsPanel}')
     +else
       //- We'll wait a little bit so we don't needlessly show the loading spinner
       +await('sleep(300) then _')

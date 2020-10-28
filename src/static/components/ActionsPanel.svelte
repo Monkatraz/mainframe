@@ -4,12 +4,17 @@
   import { UserClient } from '@js/mainframe'
   import { usAnime, usTip } from '@js/components'
   import { throttle } from '@js/modules/util'
+import { beforeUpdate } from 'svelte';
+
+  // Props
+  export let hidden = false
 
   // Elements
   let grip: HTMLElement
 
   // State
   let faded = true
+  let isHidden = false
   let revealed = false
   let toolTipString = 'Show Page Actions'
 
@@ -26,7 +31,12 @@
 
   // Animations
   const intro = usAnime({
-    bottom: ['-6rem', '-5rem'],
+    bottom: ['-8rem', '-5rem'],
+    easing: 'easeOutElastic(1, 1.5)'
+  })
+
+  const hide = usAnime({
+    bottom: '-8rem',
     easing: 'easeOutElastic(1, 1.5)'
   })
 
@@ -39,6 +49,19 @@
   const panelClose = usAnime({
     bottom: '-5rem',
     ...opts
+  })
+
+  // Hide handling
+  beforeUpdate(() => {
+    if (hidden && !isHidden) {
+      isHidden = true
+      revealed = false
+      hide(grip)
+    }
+    if (!hidden && isHidden) {
+      isHidden = false
+      intro(grip)
+    }
   })
 
   // Unfade if mouse is near (simple Y value check, nothing complex)
@@ -87,6 +110,11 @@
     filter: drop-shadow(0 0 10px rgba(black, 0.5))
     pointer-events: auto
     touch-action: none
+
+    &.hidden
+      pointer-events: none
+      user-select: none
+      opacity: 0 !important
 
   +prefix-classes('actions-panel_')
 
@@ -204,7 +232,8 @@
   include ../../_basic-mixins
 
   div.actions-panel-container(
-    aria-expanded='{revealed}' 
+    aria-expanded='{revealed}'
+    class:hidden
     class:revealed
     class:faded
     use:intro
