@@ -4,7 +4,6 @@
   import { UserClient } from '@js/mainframe'
   import { usAnime, usTip } from '@js/components'
   import { throttle } from '@js/modules/util'
-import { beforeUpdate } from 'svelte';
 
   // Props
   export let hidden = false
@@ -52,17 +51,14 @@ import { beforeUpdate } from 'svelte';
   })
 
   // Hide handling
-  beforeUpdate(() => {
-    if (hidden && !isHidden) {
+  $: if (hidden && !isHidden) {
       isHidden = true
       revealed = false
       hide(grip)
-    }
-    if (!hidden && isHidden) {
+    } else if (!hidden && isHidden) {
       isHidden = false
       intro(grip)
     }
-  })
 
   // Unfade if mouse is near (simple Y value check, nothing complex)
   window.addEventListener('mousemove', throttle(() => {
@@ -232,18 +228,18 @@ import { beforeUpdate } from 'svelte';
   include ../../_basic-mixins
 
   div.actions-panel-container(
-    aria-expanded='{revealed}'
+    aria-expanded!='{revealed}'
     class:hidden
     class:revealed
     class:faded
     use:intro
-    use:onSwipe=`{{ callback: handleGrip, direction: revealed ? 'down' : 'up' }}`
-    bind:this='{grip}')
+    use:onSwipe!=`{{ callback: handleGrip, direction: revealed ? 'down' : 'up' }}`
+    bind:this!='{grip}')
 
     +button().actions-panel_button(
-      on:click=`{handleGrip}`
-      on:contextmenu=`{contextmenu}`
-      use:usTip=`{{ content: toolTipString, followCursor: false, sticky: true }}`)
+      on:click!='{handleGrip}'
+      on:contextmenu!='{contextmenu}'
+      use:usTip!='{{ content: toolTipString, followCursor: false, sticky: true }}')
 
       +ici('round-expand-less').actions-panel_button_arrow
 

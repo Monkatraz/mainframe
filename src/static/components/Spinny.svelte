@@ -31,9 +31,9 @@
 
 <template lang='pug'>
   img.spinny(
-    src='/static/media/spinner.svg', 
-    alt='Loading Indicator',
-    style='{cssText}',
+    src='/static/media/spinner.svg'
+    alt='Loading Indicator'
+    style!='{cssText}'
     transition:anim
   )
 </template>
