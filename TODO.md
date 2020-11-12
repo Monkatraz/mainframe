@@ -8,7 +8,6 @@
 - [ ] Generic cache library
 - [ ] Add CodeMirror editor component
 - [ ] Inline Svelte component register
-- [ ] Better logo icon thingy
 - [ ] Add a local test page (dummy data?)
 
 ### General
@@ -63,3 +62,4 @@
 - [x] Add custom 404 page
 - [x] Tippy component or wrapper library
 - [x] Gesture controls
+- [x] Better logo icon thingy
