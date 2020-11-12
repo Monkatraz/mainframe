@@ -6,12 +6,12 @@
   "license": "MIT",
   "private": "true",
   "scripts": {
-    "dev": "npx netlify dev",
-    "dev:snowpack": "npx snowpack dev",
-    "build": "npx run-p build:*",
-    "build:snowpack": "npx snowpack build",
-    "build:lambda": "npx netlify-lambda build ./dev/netlify-functions",
-    "deploy-production": "npx run-s build:snowpack build:lambda \"netlify deploy -p\"",
+    "dev": "netlify dev",
+    "dev:snowpack": "snowpack dev",
+    "build": "run-p build:*",
+    "build:snowpack": "snowpack build",
+    "build:lambda": "netlify-lambda build ./dev/netlify-functions",
+    "deploy-production": "run-s build:snowpack build:lambda \"netlify deploy -p\"",
     "netlify-build": "snowpack build && netlify-lambda build ./dev/netlify-functions",
     "test": "echo \"Mainframe does not currently include a test runner.\""
   },
