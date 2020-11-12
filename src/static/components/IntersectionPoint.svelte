@@ -6,8 +6,6 @@
   export let onExit: AnyFn = () => undefined
   export let opts: IntersectionObserverInit = {}
 
-  console.log(onEnter)
-
   // Elements
   let intersectionElement: HTMLElement
 
