@@ -21,6 +21,7 @@ If you wish to know more about me, or contact me, you can go to [my personal web
 
 ### Some Shoutouts
 This list is not inclusive. It is mostly for some people/projects that cannot be easily credited.
+  * [Dimitar Donovski (u/ArduousIntent)](https://www.reddit.com/user/ArduousIntent) for their excellent SCP logo concept.
   * [grid-kiss](https://github.com/sylvainpolletvillard/postcss-grid-kiss): Converted into a Stylus plugin within the project.
   * [postcss-discard-overridden-props](https://github.com/mcler)
 
