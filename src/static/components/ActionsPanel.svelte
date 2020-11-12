@@ -13,7 +13,6 @@
 
   // State
   let faded = true
-  let isHidden = false
   let revealed = false
   let toolTipString = 'Show Page Actions'
 
@@ -51,14 +50,10 @@
   })
 
   // Hide handling
-  $: if (hidden && !isHidden) {
-      isHidden = true
+  $: if (hidden) {
       revealed = false
       hide(grip)
-    } else if (!hidden && isHidden) {
-      isHidden = false
-      intro(grip)
-    }
+    } else intro(grip)
 
   // Unfade if mouse is near (simple Y value check, nothing complex)
   window.addEventListener('mousemove', throttle(() => {
@@ -111,6 +106,10 @@
       pointer-events: none
       user-select: none
       opacity: 0 !important
+
+    +match-media(thin, below)
+      margin-left: calc(var(--layout-body-side-gap) * -1)
+      width: 100vw
 
   +prefix-classes('actions-panel_')
 
