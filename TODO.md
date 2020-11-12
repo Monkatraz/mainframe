@@ -9,6 +9,7 @@
 - [ ] Add CodeMirror editor component
 - [ ] Inline Svelte component register
 - [ ] Better logo icon thingy
+- [ ] Add a local test page (dummy data?)
 
 ### General
 - [ ] Add Chart.js
