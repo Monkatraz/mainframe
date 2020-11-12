@@ -43,7 +43,7 @@
   async function fetchPage() {
     if (localPages.includes(path)) {
       // Local pages
-      const response = await fetch('/static/pages/${path}.html')
+      const response = await fetch(`/static/pages/${path}.html`)
       if (!response.ok) {
         failed = true
         error = new Error(response.statusText)
@@ -96,7 +96,8 @@
 
     IntersectionPoint(
       onEnter!='{() =>  hideActionsPanel = true}'
-      onExit!='{() => hideActionsPanel = false}')
+      onExit!='{() => hideActionsPanel = false}'
+      opts!='{{rootMargin: "300px"}}')
 
     ActionsPanel(bind:hidden!='{hideActionsPanel}')
 
