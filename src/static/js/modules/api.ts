@@ -10,6 +10,7 @@ const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
 import { ENV, Task, Result } from '@modules/util'
+import { User } from '@js/mainframe'
 
 // -----------
 // NETLIFY
@@ -327,6 +328,8 @@ class Client {
   }
 }
 
+// TODO: Move this state-stuff into mainframe.ts
+
 interface FaunaClients {
   /** Reader client for simply reading pages. Always available, uses a public key. */
   Public: Client
@@ -341,24 +344,6 @@ export const Clients: FaunaClients = {
   Public: new Client(ENV.API.FDB_PUBLIC),
   User: null,
   Admin: null
-}
-
-// -----------
-// USER
-// -----------
-
-export const User = {
-  username: 'Guest',
-  // FaunaDB User Auth
-  auth: {
-    // The amount of sensitive data here should be minimized as much as possible
-    ref: '',
-    token: ''
-  },
-  // LocalStorage preferences
-  preferences: {
-    langs: ['en']
-  }
 }
 
 // -----------

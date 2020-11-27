@@ -2,7 +2,7 @@
  * @author Monkatraz
  */
 // Imports
-import { appendScript, appendStylesheet, evtlistener } from "@modules/util"
+import { ENV, appendScript, appendStylesheet, evtlistener } from "@modules/util"
 
 /** Function for handling the `.touch` pseudo-psuedo CSS class.
  *  It runs on every `Document` touch event, and acts much like a pointerevent.
@@ -41,9 +41,98 @@ function touchClassHandle(evt: TouchEvent) {
   })
 }
 
-// UserClient object for getting processed info about the state of the page
-// Like a 0-1 ratio for how scrolled the page is, or 0-1 mouseX and mouseY
-export const UserClient = {
+// Goofy thing for making a placeholder img for the logo work.
+const emblem = document.querySelector('#logo_emblem') as any
+emblem.onload = emblem.classList.add('loaded')
+
+// Finalize loading content, inject non-critical CSS.
+// Something to note is that for externally loaded scripts (like Iconify or Prism auto-DL languages) -
+// is that their source domains need to be exempted in the CSP. This can be adjusted in `netlify.toml`.
+function finalizeLoad() {
+  // Noncritical CSS
+  appendStylesheet('/static/css/main.css')
+
+  // Iconify
+  appendScript('https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js')
+    .catch(() => { console.warn(`Iconify failed to load.`) })
+
+  // Prism
+  appendScript('/vendor/prism.js').then(() => {
+    // Disable automatically firing
+    window.Prism.manual = true
+    // Divert languages to CDN instead of storing them ourselves
+    window.Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/'
+  }).catch(() => { console.warn(`Prism failed to load.`) })
+}
+
+// ----------------
+//   MEDIA QUERIES
+
+const sizeMap = new Map()
+const sizes: ['narrow', 'thin', 'small', 'normal', 'wide'] = ['narrow', 'thin', 'small', 'normal', 'wide']
+
+// This makes our map associated both ways:
+// 0 = thin, thin = 0.
+sizes.forEach((size: string, i) => {
+  sizeMap.set(size, i)
+  sizeMap.set(i, size)
+})
+
+/** Contains the media queries for the window size breakpoints.
+ *  Narrow is not included as it is the default size if none of the others are valid.
+ */
+const sizeQueries = {
+  thin: window.matchMedia('(min-width: 400px)'),
+  small: window.matchMedia('(min-width: 800px)'),
+  normal: window.matchMedia('(min-width: 1000px)'),
+  wide: window.matchMedia('(min-width: 1400px)')
+}
+
+let curSize = 'thin'
+/** Updates the `curSize` variable with the current window size. */
+function updateSize() {
+  for (let i = 1; i < sizes.length; i++) {
+    if (sizeQueries[sizes[i] as keyof typeof sizeQueries].matches === false) {
+      curSize = sizeMap.get(i - 1)
+      break
+    } else {
+      curSize = sizeMap.get(sizes.length - 1)
+    }
+  }
+  window.dispatchEvent(new Event('MF_MediaSizeChanged'))
+}
+
+// Add our event listeners, so that no polling is needed.
+for (const size in sizeQueries) {
+  sizeQueries[size as keyof typeof sizeQueries].addEventListener('change', updateSize)
+}
+
+/**
+ * Checks if the specified size matches against the inclusivity operator.
+ * For example: matches('narrow', 'only')
+ * This will be true only if we're entirely with the bounds of 'narrow'.
+ */
+export function matchMedia(
+  size: 'narrow' | 'thin' | 'small' | 'normal' | 'wide',
+  inclusivity: 'only' | 'up' | 'below' = 'only') {
+  // Our size map means this function is relatively simple.
+  // Larger sizes have their mapped integer higher than the previous.
+  // We can use this to compare curSize to our specified size.
+  switch (inclusivity) {
+    case 'only':
+      return curSize === size
+    case 'up':
+      return sizeMap.get(curSize) >= sizeMap.get(size)
+    case 'below':
+      return sizeMap.get(curSize) < sizeMap.get(size)
+  }
+}
+
+// ---------
+//   STATE
+
+/** Browser / User-Agent info. Contains contextual information like normalized mouse position values. */
+export const Agent = {
   // Values
   mouseX: 0,
   mouseY: 0,
@@ -54,61 +143,82 @@ export const UserClient = {
   updateMouseCoordinates(evt: MouseEvent) {
     const normX = evt.clientX / window.innerWidth
     const normY = evt.clientY / window.innerHeight
-    UserClient.mouseX = normX
-    UserClient.mouseY = normY
+    Agent.mouseX = normX
+    Agent.mouseY = normY
   },
 
   updateScrollRatio() {
     const body = document.body
     const root = document.documentElement
-    UserClient.scroll = root.scrollTop / (body.scrollHeight - window.innerHeight)
+    Agent.scroll = root.scrollTop / (body.scrollHeight - window.innerHeight)
   }
 }
 
-// Goofy thing for making a placeholder img for the logo work.
-const emblem = document.querySelector('#logo_emblem') as any
-emblem.onload = emblem.classList.add('loaded')
-
-
-// This section is a tad messy.
-// Its job is to load the various plugins and things the site uses.
-// It loads things in a certain order and priority.
-// It's nothing special though - it is mostly just appending scripts and stylesheets.
-// Dynamic imports using `import()` are not used.
-//
-// Something to note is that for externally loaded scripts (like Iconify or Prism auto-DL languages) -
-// is that their source domains need to be exempted in the CSP. This can be adjusted in `netlify.toml`.
-
-// Utility Functions
-function warnFail() {
-  console.warn(`A plugin failed to load.`)
+/** Represents the current user - regardless of if they are logged in or not. */
+export const User = {
+  isLoggedIn: false,
+  username: 'Guest',
+  // FaunaDB User Auth
+  auth: {
+    // The amount of sensitive data here should be minimized as much as possible
+    ref: '',
+    token: ''
+  },
+  // LocalStorage preferences
+  preferences: {
+    langs: ['en']
+  },
+  // TODO: Logging in / out
+  login(email: string, password: string) {
+    User.isLoggedIn = true
+  },
+  logout() {
+    User.isLoggedIn = false
+  }
 }
 
-// DOMContentLoaded
-function onDOMLoaded() {
-  // Noncritical CSS
-  appendStylesheet('/static/css/main.css')
+// ------------
+//  APP LOADER
 
-  // Iconify
-  appendScript('https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js')
-    .catch(warnFail)
+// Component Types
+import type { SvelteComponent } from 'svelte'
+type LoadComponent = [id: string, comp: typeof SvelteComponent, selector: string, props: PlainObject]
+// Component Imports
+import PageComponent from '@components/Page.svelte'
+// Components list
+const componentsToLoad: LoadComponent[] = [
+  ['Page', PageComponent, '#content', {}]
+]
+// Exported components list
+export const Components: { [id: string]: SvelteComponent } = {}
 
-  // Prism
-  appendScript('/vendor/prism.js').then(() => {
-    // Disable automatically firing
-    window.Prism.manual = true
-    // Divert languages to CDN instead of storing them ourselves
-    window.Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/'
-  }).catch(warnFail)
+/** Renders each component in the `components` list. */
+function renderComponents() {
+  componentsToLoad.forEach(([id, comp, selector, props]) => {
+    const component = new comp({
+      target: document.querySelector(selector) as Element,
+      props: props
+    })
+    if (id) Components[id] = component
+  })
 }
+
+// -----
+//  APP
+
+// -- Router
+import page from 'page'
+
+
+page('/', () => { Components['Page'].$set({ path: 'scp/3685' }) })
 
 // Init. everything
 document.addEventListener('DOMContentLoaded', () => {
-  // Touch class
+  finalizeLoad()
+  updateSize()
   evtlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
-  // UserClient
-  evtlistener(window, ['mousemove'], UserClient.updateMouseCoordinates)
-  evtlistener(window, ['scroll'], UserClient.updateScrollRatio)
-  // Load remote
-  onDOMLoaded()
+  evtlistener(window, ['mousemove'], Agent.updateMouseCoordinates)
+  evtlistener(window, ['scroll'], Agent.updateScrollRatio)
+  renderComponents()
+  page()
 }, { once: true })

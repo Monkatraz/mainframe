@@ -2,6 +2,20 @@
  * @file Utility functions and objects.
  * @author Monkatraz
  */
+
+/** Contains all environment variables. */
+export const ENV = {
+  /** API related env. variables. Usually database related. */
+  API: {
+    // Database
+    FDB_PUBLIC: import.meta.env.SNOWPACK_PUBLIC_API_FDB_PUBLIC,
+    FDB_DOMAIN: import.meta.env.SNOWPACK_PUBLIC_API_FDB_DOMAIN,
+    // Serverless functions
+    LAMBDA: import.meta.env.SNOWPACK_PUBLIC_API_LAMBDA
+  },
+  HOMEPAGE: import.meta.env.SNOWPACK_PUBLIC_HOMEPAGE
+}
+
 /**
  * Returns a promise that resolves after the specified number of miliseconds.
  */
@@ -115,19 +129,6 @@ export function rmEvtlistener(target: typeof window | typeof document | Element,
   events.forEach(event => {
     target.removeEventListener(event, fn, opts)
   })
-}
-
-/** Contains all environment variables. */
-export const ENV = {
-  /** API related env. variables. Usually database related. */
-  API: {
-    // Database
-    FDB_PUBLIC: import.meta.env.SNOWPACK_PUBLIC_API_FDB_PUBLIC,
-    FDB_DOMAIN: import.meta.env.SNOWPACK_PUBLIC_API_FDB_DOMAIN,
-    // Serverless functions
-    LAMBDA: import.meta.env.SNOWPACK_PUBLIC_API_LAMBDA
-  },
-  HOMEPAGE: import.meta.env.SNOWPACK_PUBLIC_HOMEPAGE
 }
 
 /** Functional-ish Result class object. It's not quite how Result tends to work - but that's fine here.

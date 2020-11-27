@@ -1,9 +1,9 @@
 <script lang="ts">
   // Imports
-  import * as API from '@modules/api'
+  import * as API from '@js/modules/api'
   import { sleep, throttle, waitFor } from '@modules/util'
   // Svelte
-  import { usAnime } from '@js/components'
+  import { usAnime } from '@js/modules/components'
   // Components
   import Spinny from './Spinny.svelte'
   import IntersectionPoint from './IntersectionPoint.svelte'
@@ -69,8 +69,8 @@
     // After update stuff
     if (!failed) {
       // Highlight code blocks
-      await waitFor(() => typeof window.Prism?.highlightAll === 'function')
-      window.Prism.highlightAll()
+      // waitFor(() => typeof window.Prism?.highlightAll === 'function')
+        // .then(() => window.Prism.highlightAll())
     }
   }
 
@@ -86,20 +86,24 @@
 
   +if("ready === true")
     div.rhythm(use:pageFadeIn role='presentation')
-      +if('failed === false'): +html('html')
+      +if('failed === false')
+        //- Successfully loaded page
+        
+        //- Page content itself
+        +html('html')
+        //- Actions panel
+        IntersectionPoint(
+          onEnter!='{() =>  hideActionsPanel = true}'
+          onExit!='{() => hideActionsPanel = false}'
+          opts!='{{rootMargin: "300px"}}')
+        ActionsPanel(bind:hidden!='{hideActionsPanel}')
+        //- Failed page loading
         +else
           h2 Error displaying page
           hr
           pre.code: code.
             ERR: {error.name}: {error.message}
             MSG: {error.description}
-
-    IntersectionPoint(
-      onEnter!='{() =>  hideActionsPanel = true}'
-      onExit!='{() => hideActionsPanel = false}'
-      opts!='{{rootMargin: "300px"}}')
-
-    ActionsPanel(bind:hidden!='{hideActionsPanel}')
 
     //- We'll wait a little bit so we don't needlessly show the loading spinner
     +else: +await('sleep(300) then _')

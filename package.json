@@ -26,8 +26,10 @@
   ],
   "module": "esnext",
   "dependencies": {
+    "@types/page": "^1.8.0",
     "animejs": "^3.2.1",
     "faunadb": "^3.0.1",
+    "page": "^1.11.6",
     "prismjs": "^1.22.0",
     "pug": "^3.0.0",
     "svelte": "^3.29.7",

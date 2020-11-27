@@ -1,7 +1,6 @@
 # Mainframe
 
 ### In Progress
-- [ ] Page router
 - [ ] Integrate ReCaptcha
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
   - Force passing a ReCaptcha when registering
@@ -9,6 +8,7 @@
 - [ ] Add CodeMirror editor component
 - [ ] Inline Svelte component register
 - [ ] Add a local test page (dummy data?)
+- [ ] Add better page history schema
 
 ### General
 - [ ] Add Chart.js
@@ -17,6 +17,7 @@
 - [ ] Better style Prism.js toolbar and language tip
 - [ ] Determine maximum file size of a page
 - [ ] Some sort of script or system for data-backups
+- [ ] Consider using Shiki instead of Prism
 
 ### Users
 - [ ] Author draft pages that are linkable
@@ -63,3 +64,5 @@
 - [x] Tippy component or wrapper library
 - [x] Gesture controls
 - [x] Better logo icon thingy
+- [x] Page router
+- [x] Global state handler module to isolate components from routing and state

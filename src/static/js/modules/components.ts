@@ -1,10 +1,10 @@
 /**
- * @file Library and loader for Svelte components.
+ * @file Library for Svelte components.
  * @author Monkatraz
  */
 
 // Imports
-import { ENV } from '@modules/util'
+import { ENV } from '@js/mainframe'
 import {
   Props as TippyProps,
   roundArrow as TippyRoundArrow,
@@ -16,35 +16,6 @@ import 'tippy.js/dist/tippy.css'
 import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/animations/scale.css'
 import anime, { AnimeParams } from 'animejs'
-
-// --------
-// LOADER
-// --------
-
-// Component Types
-import type { SvelteComponent } from 'svelte'
-type LoadComponent = [id: string, comp: typeof SvelteComponent, selector: string, props: PlainObject]
-// Component Imports
-import Page from '@components/Page.svelte'
-// Components list
-const componentsToLoad: LoadComponent[] = [
-  ['Page', Page, '#content', { path: ENV.HOMEPAGE }]
-]
-// Exported components list
-export const Components: { [id: string]: SvelteComponent } = {}
-
-/** Renders each component in the `components` list. */
-function renderComponents() {
-  componentsToLoad.forEach(([id, comp, selector, props]) => {
-    const component = new comp({
-      target: document.querySelector(selector) as Element,
-      props: props
-    })
-    if (id) Components[id] = component
-  })
-}
-
-document.addEventListener('DOMContentLoaded', renderComponents, { once: true })
 
 // --------
 // TIPPY

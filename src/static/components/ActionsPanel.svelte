@@ -1,8 +1,8 @@
 <script lang="ts">
-  import * as API from '@modules/api'
+  import * as API from '@js/modules/api'
   import { onSwipe } from '@modules/gestures'
-  import { UserClient } from '@js/mainframe'
-  import { usAnime, usTip } from '@js/components'
+  import { Agent } from '@js/mainframe'
+  import { usAnime, usTip } from '@js/modules/components'
   import { throttle } from '@js/modules/util'
 
   // Props
@@ -18,7 +18,7 @@
 
   // Misc
   const contextmenu = (evt: Event) => {
-    if (UserClient.isMobile) {
+    if (Agent.isMobile) {
       // This is so that when you long press the button, you will instead see the tooltip
       // Otherwise, a long press would bring up the sorta right click context menu on mobile
       evt.preventDefault()
@@ -57,7 +57,7 @@
 
   // Unfade if mouse is near (simple Y value check, nothing complex)
   window.addEventListener('mousemove', throttle(() => {
-    faded = UserClient.mouseY < 0.9
+    faded = Agent.mouseY < 0.9
   }, 100))
 
   // State toggling

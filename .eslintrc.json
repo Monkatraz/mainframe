@@ -44,7 +44,9 @@
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
         /* I just find this lint error annoying. */
-        "@typescript-eslint/no-unused-vars": "off"
+        "@typescript-eslint/no-unused-vars": "off",
+        /* Namespaces still have their uses. */
+        "@typescript-eslint/no-namespace": "off"
       }
     }
   ]
