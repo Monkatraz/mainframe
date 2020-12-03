@@ -85,20 +85,20 @@
 <template lang="pug">
 
   +if("ready === true")
-    div.rhythm(use:pageFadeIn role='presentation')
-      +if('failed === false')
-        //- Successfully loaded page
-        
-        //- Page content itself
+    +if('failed === false')
+      //- Successfully loaded page
+      //- Page content itself
+      div.rhythm(use:pageFadeIn role='presentation')
         +html('html')
-        //- Actions panel
-        IntersectionPoint(
-          onEnter!='{() =>  hideActionsPanel = true}'
-          onExit!='{() => hideActionsPanel = false}'
-          opts!='{{rootMargin: "300px"}}')
-        ActionsPanel(bind:hidden!='{hideActionsPanel}')
-        //- Failed page loading
-        +else
+      //- Actions panel
+      IntersectionPoint(
+        onEnter!='{() =>  hideActionsPanel = true}'
+        onExit!='{() => hideActionsPanel = false}'
+        opts!='{{rootMargin: "300px"}}')
+      ActionsPanel(bind:hidden!='{hideActionsPanel}')
+      //- Failed page loading
+      +else
+        div.rhythm(use:pageFadeIn role='presentation')
           h2 Error displaying page
           hr
           pre.code: code.
