@@ -383,66 +383,41 @@ type Flags = string[]
 export interface Comment {
   /** Reference to the author of the comment. */
   author: Ref
-  /** Language of the comment - chooses the preferred language first, but can be changed. */
-  language: string
   /** General metadata, like current revision and creation date. */
   meta: {
     /** Number of revisions (edits) for this comment Starts at 1. */
     revision: number
-    /** Date when this comment was created. Use `.date()` method to convert to a JS `Date`. */
-    dateCreated: FaunaDate
-    /** Date when this comment was last edited. Use `.date()` method to convert to a JS `Date`. */
-    dateLastEdited: FaunaDate
+    /** Date when this comment was created. */
+    dateCreated: Date
+    /** Date when this comment was last edited. */
+    dateLastEdited: Date
   }
   /** Whether or not the comment has been pinned. */
   pinned: boolean
-  /** May be null, or contain a reference to another Comment that this particular comment is replying to. */
-  replyingto: Ref | null
   /** Content of the comment. */
   content: DocContent
 }
 
 // Page Interface
 
-// Valid template languages
-enum TemplateLangs {
-  Pug = 'pug'
-}
-
 /** `DocContent`s represent the set of objects that actually contain a `Page`'s (or others) consumable content. */
 export interface DocContent {
   /** Rendered form of the content. */
   html: string
-  /** Render flags for the content. */
-  flags: Flags
-  /** String value representing what templating language the source of the content is in. */
-  templatelang: TemplateLangs
   /** The source template of the content. */
   template: string
 }
 
-// TODO: 'type' property types (PageTypeSCP ?)
 /** `View` objects represent a particular language variant of a page. */
 export interface View {
-  /** The specific language this view is relevant for. */
-  language: string
-  /** Users who translated this particular version. Can be empty. */
-  translators: Ref[]
   /** Localized description of the page. */
   desc: {
-    type: [id: string, meta: {}]
     title: string
     subtitle: string
     description: string
   }
   /** Page that loads first (default URL). */
-  root: DocContent
-  /** List of subpages. Field name / key determines the subpath.
-   *  E.g: `articles/mainpath/subpage1`
-   */
-  subpages: {
-    [path: string]: DocContent
-  }
+  data: DocContent
 }
 
 /** Root level object retrieved from the FaunaDB database. Contains everything relevant to a `Page`. */
@@ -578,21 +553,15 @@ addEventListener('DOMContentLoaded', () => {
     },
     locals: {
       'en': {
-        language: 'en',
-        translators: [],
         desc: {
-          type: ['scp', {}],
           title: 'SCP-3685',
           subtitle: 'The Fractured Pile',
           description: ''
         },
-        root: {
+        data: {
           html: '',
-          flags: [],
-          templatelang: TemplateLangs.Pug,
           template: ''
-        },
-        subpages: {}
+        }
       }
     }
   }
