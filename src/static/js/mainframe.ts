@@ -2,7 +2,7 @@
  * @author Monkatraz
  */
 // Imports
-import { ENV, appendScript, appendStylesheet, evtlistener } from "@modules/util"
+import { ENV, toggleClass, appendScript, appendStylesheet, evtlistener } from "@modules/util"
 
 /** Function for handling the `.touch` pseudo-psuedo CSS class.
  *  It runs on every `Document` touch event, and acts much like a pointerevent.
@@ -69,7 +69,7 @@ function finalizeLoad() {
 //   MEDIA QUERIES
 
 const sizeMap = new Map()
-const sizes: ['narrow', 'thin', 'small', 'normal', 'wide'] = ['narrow', 'thin', 'small', 'normal', 'wide']
+const sizes = ['narrow', 'thin', 'small', 'normal', 'wide'] as const
 
 // This makes our map associated both ways:
 // 0 = thin, thin = 0.
@@ -132,6 +132,7 @@ export function matchMedia(
 //   STATE
 
 /** Browser / User-Agent info. Contains contextual information like normalized mouse position values. */
+// TODO: Change this to a namespace
 export const Agent = {
   // Values
   mouseX: 0,
@@ -177,40 +178,16 @@ export const User = {
   }
 }
 
-// ------------
-//  APP LOADER
-
-// Component Types
-import type { SvelteComponent } from 'svelte'
-type LoadComponent = [id: string, comp: typeof SvelteComponent, selector: string, props: PlainObject]
-// Component Imports
-import PageComponent from '@components/Page.svelte'
-// Components list
-const componentsToLoad: LoadComponent[] = [
-  ['Page', PageComponent, '#content', {}]
-]
-// Exported components list
-export const Components: { [id: string]: SvelteComponent } = {}
-
-/** Renders each component in the `components` list. */
-function renderComponents() {
-  componentsToLoad.forEach(([id, comp, selector, props]) => {
-    const component = new comp({
-      target: document.querySelector(selector) as Element,
-      props: props
-    })
-    if (id) Components[id] = component
-  })
-}
-
 // -----
 //  APP
 
+import AppComponent from '@components/App.svelte'
+const App = new AppComponent({ target: document.querySelector('#app') as Element })
+
 // -- Router
 import page from 'page'
-
-
-page('/', () => { Components['Page'].$set({ path: 'scp/3685' }) })
+// -- Router Paths
+// page('/', () => { Components['Page'].$set({ path: 'scp/3685' }) })
 
 // Init. everything
 document.addEventListener('DOMContentLoaded', () => {
@@ -219,6 +196,5 @@ document.addEventListener('DOMContentLoaded', () => {
   evtlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
   evtlistener(window, ['mousemove'], Agent.updateMouseCoordinates)
   evtlistener(window, ['scroll'], Agent.updateScrollRatio)
-  renderComponents()
   page()
 }, { once: true })

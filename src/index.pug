@@ -42,7 +42,6 @@ head
   meta(name='twitter:site' content='@scpwiki')
   meta(name='twitter:creator' content='@monkatraz')
 
-
   //- Dynamic Metadata
     All of this will change depending on the loaded article.
   - var metaTitle = 'SCP MAINFRAME'
@@ -51,7 +50,6 @@ head
   meta(property='og:title' content=metaTitle)
   meta(name="description" content=metaDescription)
   meta(property='og:description' content=metaDescription)
-  
 
   //- Theming, Icons
   - var metaThemeColor = '#850005'
@@ -71,32 +69,24 @@ head
   include _basic-mixins
 
 body
-  //- All nodes which do not have an explicit categorical/semantic or utility function should:
-        * be checked for if they have any reason to exist
-        * have their role set to 'presentation'
-      This will ensure that cosmetic nodes are transparent inside the accessibility tree.
+
+  header#header(aria-label='Page Header')
+    div#header_logo(role='presentation')
+      a#logo_link(href='/' title='Go to home page')
+      img#logo_emblem(
+        src='/static/media/logo.svg'
+        alt='SCP Foundation Logo')
+      h1#logo_title THE MAINFRAME
+      small#logo_slogan Secure, Contain, Protect
+
+  //- App itself - loaded as a Svelte component.
   div#app(role='presentation')
 
-    header#header(aria-label='Page Header')
-      div#header_logo(role='presentation')
-        a#logo_link(href='/' title='Go to home page')
-        img#logo_emblem(
-          src='/static/media/logo.svg'
-          alt='SCP Foundation Logo')
-        h1#logo_title THE MAINFRAME
-        small#logo_slogan Secure, Contain, Protect
-
-    nav#navbar(aria-label='Navigation')
-
-    aside#sidebar(aria-label='Sidebar')
-
-    main#content(aria-label='Content')
-
-    footer#footer
-      ul#footer_list
-        li Powered by #[span#footer_pmf MAINFRAME].
-        li: +link('https://github.com/Monkatraz/mainframe') #[+mdi('github')] Github
-        li: +link('http://www.scpwiki.com/') #[+sfi()] SCP-Wiki
+  footer#footer
+    ul#footer_list
+      li Powered by #[span#footer_pmf MAINFRAME].
+      li: +link('https://github.com/Monkatraz/mainframe') #[+mdi('github')] Github
+      li: +link('http://www.scpwiki.com/') #[+sfi()] SCP-Wiki
 
   div#script-container(role='presentation' style='display: none;')
     script(src='/static/js/mainframe.js' type='module')

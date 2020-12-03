@@ -17,17 +17,20 @@ input
 html, body
   scroll-behavior: smooth
   touch-action: manipulation
+  font-size: 1rem  // Used for consistent sizing (shouldn't be messed with)
+  line-height: 1.5 // Should also not be messed with
 
 body
   background: colvar('background-light')
 
+  // Basic layout
+  $head-h = var(--layout-header-height)
+  $foot-h = var(--layout-footer-height)
+  width: 100%
+  max-width: 100%
+  min-height: 'calc(100vh + %s)' % $foot-h // Footer requires scrolling
 
-html, body
-  font-size: 1rem  // Used for consistent sizing (shouldn't be messed with)
-  line-height: 1.5 // Should also not be messed with
-
-#app
-  color: colvar('text-dark')
+  grid-kiss:"+---------+         ","| #header | $head-h ","+---------+         ","+---------+         ","| #app    | auto    ","+---------+         ","+---------+         ","| #footer | $foot-h ","+---------+         "
 
 // Scrollbars
 +match-media(thin, up)

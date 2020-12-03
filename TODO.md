@@ -9,6 +9,7 @@
 - [ ] Inline Svelte component register
 - [ ] Add a local test page (dummy data?)
 - [ ] Add better page history schema
+- [ ] App load animation
 
 ### General
 - [ ] Add Chart.js
