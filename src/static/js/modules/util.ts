@@ -144,6 +144,16 @@ export function Task<R>(promise: Promise<R>) {
     .catch((err: Error) => new Result(false, err))
 }
 
+/** Shorthand function for toggling the class on an element specified by its ID. */
+export function toggleClass(id: string, token: string, state?: boolean) {
+  const elem = document.getElementById(id)
+  if (elem) {
+    console.log('asdf')
+    if (state !== undefined) elem.classList.toggle(token, state)
+    else elem.classList.toggle(token)
+  }
+}
+
 const APPENDSCRIPT_TIMEOUT_INTERVAL = 10000
 /** Async. loads scripts from relative path / URL.
  *  Promise resolves once the script has fully loaded.
