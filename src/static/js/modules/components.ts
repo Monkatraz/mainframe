@@ -4,7 +4,7 @@
  */
 
 // Imports
-import { ENV } from '@js/mainframe'
+import { ENV } from '@modules/util'
 import {
   Props as TippyProps,
   roundArrow as TippyRoundArrow,

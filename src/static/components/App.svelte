@@ -1,8 +1,22 @@
 <script>
-  // Svelte
-  import { usAnime } from '@js/modules/components'
+  // Imports
+  import { sleep } from '@modules/util'
+  import { usAnime } from '@modules/components'
   // Components
   import Page from '@components/Page.svelte'
+
+  // Animations
+  const sideBarReveal = usAnime({
+    translateX: ['-100%', '0%'],
+    duration: 400,
+    easing: 'easeOutElastic(3, 2)',
+    delay: 50
+  })
+  const navBarReveal = usAnime({
+    scaleY: [0, 1],
+    duration: 200,
+    easing: 'easeOutElastic(2, 1.25)'
+  })
 </script>
 
 <style lang='stylus'>
@@ -33,6 +47,7 @@
 
   :global(#app)
     color: colvar('text-dark')
+    background-size: 100% 5vh
 
   // Shorthands
   // Makes the grid-kiss declaration more compact and visually understandable.
@@ -44,6 +59,7 @@
   $rg = minmax(var(--layout-body-side-gap), 1fr)
 
   .container
+    position: relative
     min-height: calc(100vh - var(--layout-header-height))
     grid-kiss:"+--------------------------------------------+         ",
               "| .navbar                                    | $nav-h  ",
@@ -82,30 +98,38 @@
                 "+---+ +------------------+ +---+         ",
                 "|$gp| |      $body-w     | |$gp|         "
 
+
   .navbar
     position: relative
     z-index: 80
     background: colvar('gray')
     box-shadow: 0 3px 5px rgba(0,0,0,0.5)
+    transform-origin: top
 
     +match-media(thin, below)
       position: sticky
       top: 0
 
   .sidebar
+    position: relative
     background: colvar('accent')
+    // Buffer overlap on the top
+    border-top: solid 1rem colvar('accent')
+    margin-top: -1rem
 
   .content
+    position: relative
     padding: 2rem 0
 
 </style>
 
 <template lang='pug'>
   div.container(role='presentation')
-    nav.navbar(aria-label='Navigation')
+    nav.navbar(use:navBarReveal aria-label='Navigation')
 
-    aside.sidebar(aria-label='Sidebar')
+    aside.sidebar(use:sideBarReveal aria-label='Sidebar')
 
     main.content(aria-label='Content')
       Page(path='scp/3685')
+
 </template>

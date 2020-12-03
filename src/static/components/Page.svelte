@@ -15,9 +15,17 @@
 
   // Animations
   const pageFadeIn = usAnime({
-    opacity: [0, 1],
-    duration: 500,
-    easing: 'easeOutQuad'
+    opacity: {
+      value: [0, 1],
+      duration: 300,
+      easing: 'easeOutQuad',
+      delay: 50
+    },
+    translateY: {
+      value: ['-4rem', '0rem'],
+      duration: 800,
+      easing: 'easeOutElastic(2, 2)'
+    },
   })
 
   // Constants
@@ -107,6 +115,6 @@
 
     //- We'll wait a little bit so we don't needlessly show the loading spinner
     +else: +await('sleep(300) then _')
-        Spinny(width='150px' top='200px' left='50%')
+      Spinny(width='150px' top='200px' left='50%')
 
 </template>

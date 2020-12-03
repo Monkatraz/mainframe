@@ -69,7 +69,6 @@ head
   include _basic-mixins
 
 body
-
   header#header(aria-label='Page Header')
     div#header_logo(role='presentation')
       a#logo_link(href='/' title='Go to home page')
@@ -82,6 +81,7 @@ body
   //- App itself - loaded as a Svelte component.
   div#app(role='presentation')
 
+  //- Set the footer to display none and override it with !important for better page loading visuals
   footer#footer
     ul#footer_list
       li Powered by #[span#footer_pmf MAINFRAME].

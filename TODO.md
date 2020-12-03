@@ -6,10 +6,8 @@
   - Force passing a ReCaptcha when registering
 - [ ] Generic cache library
 - [ ] Add CodeMirror editor component
-- [ ] Inline Svelte component register
 - [ ] Add a local test page (dummy data?)
 - [ ] Add better page history schema
-- [ ] App load animation
 
 ### General
 - [ ] Add Chart.js
@@ -67,3 +65,4 @@
 - [x] Better logo icon thingy
 - [x] Page router
 - [x] Global state handler module to isolate components from routing and state
+- [x] App load animation

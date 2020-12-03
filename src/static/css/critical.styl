@@ -21,8 +21,6 @@ html, body
   line-height: 1.5 // Should also not be messed with
 
 body
-  background: colvar('background-light')
-
   // Basic layout
   $head-h = var(--layout-header-height)
   $foot-h = var(--layout-footer-height)
@@ -30,7 +28,14 @@ body
   max-width: 100%
   min-height: 'calc(100vh + %s)' % $foot-h // Footer requires scrolling
 
+  // Stylus bug makes the multi-line thing break so this is just a work-around
   grid-kiss:"+---------+         ","| #header | $head-h ","+---------+         ","+---------+         ","| #app    | auto    ","+---------+         ","+---------+         ","| #footer | $foot-h ","+---------+         "
+
+#app
+  background: linear-gradient(180deg, colvar(background-dim) 0%, colvar(background-light) 100%)
+  background-repeat: no-repeat
+  background-size: 100% 20vh
+  transition: background 1s
 
 // Scrollbars
 +match-media(thin, up)
