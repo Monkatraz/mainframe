@@ -32,7 +32,6 @@ Create a replacement wiki-like system for the SCP-Wiki.
   * Navigate to user generated pages 
     - A slick, clean editor 
     - Page sources use an HTML templating language
-    - Supports subpages and language options
     - Search support
   * Users can create accounts and can use mild personalization features
     - Author pages
@@ -50,8 +49,6 @@ Create a replacement wiki-like system for the SCP-Wiki.
   * Must support up to 10,000 active users
   * Use only modern web technology and markup
   * Speedy and native-like web experience if possible
-  * Avoid complicated runtime libraries (e.g. React, Vue)
-  * Must support client-side caching to reduce network load
 
 ### Anti-Constraints
   * Explicit lack of IE11 support
@@ -116,7 +113,7 @@ Some JavaScript is used for development tools, like Snowpack compilers, but the 
 Most sources can be found in the `src` folder. Some additional assets can be found in the `public` folder - these assets have no build step and are just directly copied into the build target folder by Snowpack. Certain source files and development tools can be found within the `dev` folder.
 
 ## Used Runtime Libraries
-Mainframe makes heavy runtime use of various JavaScript libraries - but these have all been chosen based on their minimal size and narrow scope. Mainframe does not use Vue, React, or any other runtime virtual DOM library, instead using Svelte.
+Mainframe makes heavy runtime use of various JavaScript libraries - but these have all been chosen based on their minimal size and narrow scope. Mainframe does not use Vue, React, or any other runtime virtual DOM library, and instead uses Svelte.
 
 Here are the main ones:
   * FaunaDB's JS driver for the database API
