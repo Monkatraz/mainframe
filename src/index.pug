@@ -11,6 +11,11 @@ head
   //- Style Preloads
   link(rel='preload' href='/static/css/critical.css' as='style')
   link(rel='preload' href='/static/css/main.css' as='style')
+  //- Font Preloads
+  //- We don't preload every font, but Nunito and Inter are the basic fonts of the website.
+  link(rel='preload' href='/static/fonts/Nunito-Regular.woff2' as='font' type='font/woff2' crossorigin)
+  link(rel='preload' href='/static/fonts/variable/Inter-VariableFont.woff2' as='font' type='font/woff2' crossorigin)
+  //- Preloading JS is not needed as the Snowpack build step automatically generates preloads for JS.
 
   //- Preconnects and Prefetches
   link(rel='prefetch' href='/static/media/logo.svg')
@@ -23,6 +28,7 @@ head
   //- Opengraph Static
   meta(property='og:url' content='https://www.scp-mainframe.app')
   meta(property='og:type' content='website')
+  //- TODO: make a proper meta_header image
   meta(property='og:image' content='/static/media/meta_header.png')
 
   //- Twitter Static
