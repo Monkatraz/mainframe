@@ -38,6 +38,7 @@
       {
         "minifyCSS": false,
         "minifyHTML": false,
+        "preloadModules": true,
         "target": "es2018"
       }
     ]
