@@ -13,11 +13,14 @@ head
   link(rel='preload' href='/static/css/main.css' as='style')
   //- Font Preloads
   //- We don't preload every font, but Nunito and Inter are the basic fonts of the website.
-  link(rel='preload' href='/static/fonts/Nunito-Regular.woff2' as='font' type='font/woff2' crossorigin)
-  link(rel='preload' href='/static/fonts/variable/Inter-VariableFont.woff2' as='font' type='font/woff2' crossorigin)
+  //- link(rel='preload' href='/static/fonts/Nunito-Regular.woff2' as='font' type='font/woff2' crossorigin)
+  //- link(rel='preload' href='/static/fonts/variable/Inter-VariableFont.woff2' as='font' type='font/woff2' crossorigin)
   //- Preloading JS is not needed as the Snowpack build step automatically generates preloads for JS.
 
   //- Preconnects and Prefetches
+  //- We don't prefetch every font, but Nunito and Inter are the basic fonts of the website.
+  link(rel='prefetch' href='/static/fonts/Nunito-Regular.woff2')
+  link(rel='prefetch' href='/static/fonts/variable/Inter-VariableFont.woff2')
   link(rel='prefetch' href='/static/media/logo.svg')
   link(rel='prefetch' href='/static/media/spinner.svg')
   link(rel='preconnect' href='https://db.fauna.com')
