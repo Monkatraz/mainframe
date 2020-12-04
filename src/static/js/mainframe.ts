@@ -182,12 +182,14 @@ export const User = {
 //  APP
 
 import AppComponent from '@components/App.svelte'
-const App = new AppComponent({ target: document.querySelector('#app') as Element })
+const App = new AppComponent({ target: document.querySelector('#app') as HTMLElement })
 
 // -- Router
 import page from 'page'
 // -- Router Paths
 // page('/', () => { Components['Page'].$set({ path: 'scp/3685' }) })
+// Finalize the router setup
+page()
 
 // Init. everything
 document.addEventListener('DOMContentLoaded', () => {
@@ -196,5 +198,4 @@ document.addEventListener('DOMContentLoaded', () => {
   evtlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
   evtlistener(window, ['mousemove'], Agent.updateMouseCoordinates)
   evtlistener(window, ['scroll'], Agent.updateScrollRatio)
-  page()
 }, { once: true })
