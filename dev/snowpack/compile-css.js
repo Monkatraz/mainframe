@@ -1,4 +1,5 @@
 const fs = require('fs').promises
+const path = require('path')
 const postcss = require('postcss')
 const stylus = require('stylus')
 
@@ -75,6 +76,12 @@ module.exports = function (snowpackConfig, pluginOptions) {
     resolve: {
       input: ['.styl'],
       output: ['.css']
+    },
+    onChange ({ filePath }) {
+      // Reload the main CSS if we change a partial
+      if (/\\_.*\.styl$/.test(filePath)) {
+        this.markChanged(path.normalize(path.normalize(path.dirname(filePath) + '/../main.styl')))
+      }
     },
     async load ({ filePath = '' }) {
       // Don't load partials
