@@ -148,7 +148,6 @@ export function Task<R>(promise: Promise<R>) {
 export function toggleClass(id: string, token: string, state?: boolean) {
   const elem = document.getElementById(id)
   if (elem) {
-    console.log('asdf')
     if (state !== undefined) elem.classList.toggle(token, state)
     else elem.classList.toggle(token)
   }
