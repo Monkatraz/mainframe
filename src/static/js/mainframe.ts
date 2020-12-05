@@ -41,9 +41,6 @@ function touchClassHandle(evt: TouchEvent) {
   })
 }
 
-// Goofy thing for making a placeholder img for the logo work.
-const emblem = document.querySelector('#logo_emblem') as any
-emblem.onload = emblem.classList.add('loaded')
 
 // Finalize loading content, inject non-critical CSS.
 // Something to note is that for externally loaded scripts (like Iconify or Prism auto-DL languages) -
@@ -196,4 +193,7 @@ document.addEventListener('DOMContentLoaded', () => {
   evtlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
   evtlistener(window, ['mousemove'], Agent.updateMouseCoordinates)
   evtlistener(window, ['scroll'], Agent.updateScrollRatio)
+  // Goofy thing for making a placeholder img for the logo work.
+  const emblem = document.querySelector('#logo_emblem') as HTMLElement
+  emblem.onload = () => emblem.classList.add('loaded')
 }, { once: true })
