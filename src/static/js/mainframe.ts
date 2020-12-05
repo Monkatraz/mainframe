@@ -41,11 +41,9 @@ function touchClassHandle(evt: TouchEvent) {
   })
 }
 
-
-// Finalize loading content, inject non-critical CSS.
 // Something to note is that for externally loaded scripts (like Iconify or Prism auto-DL languages) -
 // is that their source domains need to be exempted in the CSP. This can be adjusted in `netlify.toml`.
-function finalizeLoad() {
+function loadVendorScripts() {
   // TODO: Find a cleaner way to load these (Skypack? Async Defer?)
   // Iconify
   appendScript('https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js')
@@ -186,14 +184,21 @@ import page from 'page'
 // Finalize the router setup
 page()
 
-// Init. everything
-document.addEventListener('DOMContentLoaded', () => {
-  finalizeLoad()
+// -----------
+//  LOAD/INIT
+
+function finalizeLoading() {
+  loadVendorScripts()
   updateSize()
   evtlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
   evtlistener(window, ['mousemove'], Agent.updateMouseCoordinates)
   evtlistener(window, ['scroll'], Agent.updateScrollRatio)
   // Goofy thing for making a placeholder img for the logo work.
-  const emblem = document.querySelector('#logo_emblem') as HTMLElement
-  emblem.onload = () => emblem.classList.add('loaded')
-}, { once: true })
+  const emblem = document.querySelector('#logo_emblem') as HTMLImageElement
+  if (emblem.complete) emblem.classList.add('loaded')
+  else emblem.onload = () => emblem.classList.add('loaded')
+}
+
+if (document.readyState === 'loading')
+  document.addEventListener('DOMContentLoaded', finalizeLoading, { once: true })
+else finalizeLoading()
