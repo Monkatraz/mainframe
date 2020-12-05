@@ -2,7 +2,7 @@
  * @author Monkatraz
  */
 // Imports
-import { ENV, toggleClass, appendScript, appendStylesheet, evtlistener } from "@modules/util"
+import { appendScript, evtlistener } from "@modules/util"
 
 /** Function for handling the `.touch` pseudo-psuedo CSS class.
  *  It runs on every `Document` touch event, and acts much like a pointerevent.
@@ -49,9 +49,7 @@ emblem.onload = emblem.classList.add('loaded')
 // Something to note is that for externally loaded scripts (like Iconify or Prism auto-DL languages) -
 // is that their source domains need to be exempted in the CSP. This can be adjusted in `netlify.toml`.
 function finalizeLoad() {
-  // Noncritical CSS
-  appendStylesheet('/static/css/main.css')
-
+  // TODO: Find a cleaner way to load these (Skypack? Async Defer?)
   // Iconify
   appendScript('https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js')
     .catch(() => { console.warn(`Iconify failed to load.`) })

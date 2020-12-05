@@ -1,17 +1,48 @@
 @charset 'UTF-8'
-
+// NPM CSS
+@import 'tippy.js/dist/tippy.css'
+@import 'tippy.js/dist/svg-arrow.css'
+@import 'tippy.js/animations/scale.css'
+// PostCSS normalize and reset
+@import 'sanitize.css'
 // Library and Variables
 @require '_lib'
+@require '_colors'
 // Modules
-@require 'noncritical/*'
+@require 'components/*'
+@require 'layout/*'
+@require 'pages/*'
+@require 'typography/*'
 
-// Boilerplate / Generic Styling
+// Additional Resets
+
+html
+  cursor: auto
+input
+  font: inherit
 
 button
   reset-styling()
   cursor: pointer
 
-// Misc.
+// Boilerplate / Generic Styling
+
+html, body
+  scroll-behavior: smooth
+  touch-action: manipulation
+  font-size: 1rem  // Used for consistent sizing (shouldn't be messed with)
+  line-height: 1.5 // Should also not be messed with
+
+body
+  // Basic layout
+  $head-h = var(--layout-header-height)
+  $foot-h = var(--layout-footer-height)
+  width: 100%
+  max-width: 100%
+  min-height: 'calc(100vh + %s)' % $foot-h // Footer requires scrolling
+
+  // Stylus bug makes the multi-line thing break so this is just a work-around
+  grid-kiss:"+---------+         ","| #header | $head-h ","+---------+         ","+---------+         ","| #app    | auto    ","+---------+         ","+---------+         ","| #footer | $foot-h ","+---------+         "
 
 // Meaningful HTML Tags
 // TODO: add black box <del> tag
@@ -26,3 +57,38 @@ s
   label-for-screenreaders('stricken text')
 ins
   label-for-screenreaders('newly inserted text')
+
+// Misc.
+
+#app
+  background: linear-gradient(180deg, colvar(background-dim) 0%, colvar(background-light) 100%)
+  background-repeat: no-repeat
+  background-size: 100% 20vh
+  transition: background 1s
+
+// Scrollbars
++match-media(thin, up)
+  html
+    scrollbar-width: thin
+
+  // This webkit scrollbar matches Firefox's thin scrollbar fairly closely
+  // Track
+  ::-webkit-scrollbar
+    width: 10px
+
+  // Handle
+  ::-webkit-scrollbar-thumb
+      box-shadow: inset 0 0 10px 10px rgba(120, 120, 120, 0.35)
+      border: 2px solid transparent
+      border-radius: 5px
+
+  ::-webkit-scrollbar-thumb:hover
+    box-shadow: inset 0 0 10px 10px rgba(120, 120, 120, 0.5)
+
+  ::-webkit-scrollbar-thumb:active
+    box-shadow: inset 0 0 10px 10px rgba(80, 80, 80, 0.5)
+
+  // Horizontal Handle
+  ::-webkit-scrollbar-thumb:horizontal
+      border: 5px solid transparent
+      border-radius: 10px

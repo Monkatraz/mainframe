@@ -8,11 +8,8 @@ head
     However, it could be quite well-suited for it.
   //- link(rel='manifest' href='/site.webmanifest')
 
-  //- Style Preloads
-  link(rel='preload' href='/static/css/critical.css' as='style')
+  //- Preloads, Preconnects, and Prefetches
   link(rel='preload' href='/static/css/main.css' as='style')
-
-  //- Preconnects and Prefetches
   //- We don't prefetch every font file, but we make sure that the basic fonts can display.
   link(rel='prefetch' href='/static/fonts/variable/Rubik-VariableFont.woff2')
   link(rel='prefetch' href='/static/fonts/variable/Inter-VariableFont.woff2')
@@ -20,6 +17,7 @@ head
   link(rel='prefetch' href='/static/fonts/variable/Vollkorn-VariableFont.woff2')
   link(rel='prefetch' href='/static/media/logo.svg')
   link(rel='prefetch' href='/static/media/spinner.svg')
+  //- Preconnecting to FDB lets us load our home page a lot faster.
   link(rel='preconnect' href='https://db.fauna.com')
 
   //- Misc.
@@ -58,8 +56,9 @@ head
   link(rel='apple-touch-icon' sizes='180x180' href='/apple-touch-icon.png')
   link(rel='mask-icon' href='/safari-pinned-tab.svg' color=metaThemeColor)
 
-  //- Critical Stylesheet
-  link(rel='stylesheet', href='/static/css/critical.css')
+  //- Finalize assets
+  link(rel='stylesheet', href='/static/css/main.css')
+  script(src='/static/js/mainframe.js' type='module')
 
   //- Pug Mixins
   include _basic-mixins
@@ -84,6 +83,4 @@ body
       li: +link('https://github.com/Monkatraz/mainframe') #[+mdi('github')] Github
       li: +link('http://www.scpwiki.com/') #[+sfi()] SCP-Wiki
 
-  div#script-container(role='presentation' style='display: none;')
-    script(src='/static/js/mainframe.js' type='module')
 </html>

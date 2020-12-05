@@ -11,7 +11,7 @@ rhythm-set-text-bounds(auto = true)
   lh = s('(1em * var(--rhythm-baseline))')
   fh-relative = 'calc((%s - 1rem * var(--font-cap)) *  -0.5)' % lh
   fh-actual = 'calc((%s - 1em * var(--font-cap)) * -0.5)' % lh
-  
+
   margin-top: fh-relative unless auto
   margin-top: fh-actual if auto
   margin-bottom: fh-relative unless auto
@@ -46,7 +46,7 @@ rhythm-gutter(top, bottom = top)
   // Default Rhythm Settings
   --rhythm-baseline: 1.5
   --rhythm-reference-font-size: 1rem
-  
+
   // Auto-calculated Vars (don't change these)
   --rhythm-baseline-row: calc(var(--rhythm-baseline) / 2)
   --rhythm-baseline-unit: calc(var(--rhythm-reference-font-size) * var(--rhythm-baseline))
@@ -93,7 +93,7 @@ rhythm-gutter(top, bottom = top)
 
   > br
     content: "" // Bizarre CSS quirk fix for Chrome
-  
+
   > hr
     margin-top: calc(var(--rhythm-baseline-unit-row) * -2)
     // Visually moves HR back down into a centered position

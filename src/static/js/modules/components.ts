@@ -12,10 +12,7 @@ import {
   followCursor as TippyFollowCursor
 } from 'tippy.js'
 import tippy from 'tippy.js'
-// TODO: Uncomment when Snowpack fixes dev proxy css bug
-//import 'tippy.js/dist/tippy.css'
-//import 'tippy.js/dist/svg-arrow.css'
-//import 'tippy.js/animations/scale.css'
+// Styles for tippy.js are imported in 'css/components/_tippy.styl`.
 import anime, { AnimeParams } from 'animejs'
 
 // --------
