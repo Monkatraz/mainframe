@@ -28,65 +28,65 @@ calc-op(op, vars...)
 // Color
 
 // colvar('color')
-// colvar('color' brightness)
-
-// colvar('color', (lighten 20%), (mix 'othercolor' 50%))
+// colvar('color', lighten 20%, mix 'othercolor' 50%)
 
 colvar(name, functions...)
+  // Return combined (simple) hsla variable if no functions are used
+  unless functions
+    return 'var(--colvar-%s-hsla)' % unquote(name)
+
+  // Functions are used, so we need to use the more verbose variables
   hue        = colvar-component(name, 'h')
   saturation = colvar-component(name, 's')
   lightness  = colvar-component(name, 'l')
   alpha      = colvar-component(name, 'a')
-  unless functions
-    return 'hsla(%s, %s, %s, %s)' % (hue saturation lightness alpha)
 
-  if functions
-    for keys in functions
-      parameters = clone(keys)
-      function = shift(parameters)
+  for keys in functions
+    parameters = clone(keys)
+    function = shift(parameters)
 
-      if function is lighten
-        val = parameters[0]
-        if unit(val) is '%'
-          lightness = calc-op('+', lightness, val)
-        else if unit(val) is ''
-          lightness = calc-op('*', lightness, val)
+    if function is lighten
+      val = parameters[0]
+      if unit(val) is '%'
+        lightness = calc-op('+', lightness, val)
+      else if unit(val) is ''
+        lightness = calc-op('*', lightness, val)
 
-      if function is darken
-        val = parameters[0]
-        if unit(val) is '%'
-          lightness = calc-op('-', lightness, val)
-        else if unit(val) is ''
-          lightness = calc-op('/', lightness, val)
+    if function is darken
+      val = parameters[0]
+      if unit(val) is '%'
+        lightness = calc-op('-', lightness, val)
+      else if unit(val) is ''
+        lightness = calc-op('/', lightness, val)
 
-      if function is saturate
-        val = parameters[0]
-        if unit(val) is '%'
-          saturation = calc-op('+', saturation, val)
-        else if unit(val) is ''
-          saturation = calc-op('*', saturation, val)
+    if function is saturate
+      val = parameters[0]
+      if unit(val) is '%'
+        saturation = calc-op('+', saturation, val)
+      else if unit(val) is ''
+        saturation = calc-op('*', saturation, val)
 
-      if function is desaturate
-        val = parameters[0]
-        if unit(val) is '%'
-          saturation = calc-op('-', saturation, val)
-        else if unit(val) is ''
-          saturation = calc-op('/', saturation, val)
+    if function is desaturate
+      val = parameters[0]
+      if unit(val) is '%'
+        saturation = calc-op('-', saturation, val)
+      else if unit(val) is ''
+        saturation = calc-op('/', saturation, val)
 
-      if function is opacity or function is alpha
-        alpha = parameters[0]
+    if function is opacity or function is alpha
+      alpha = parameters[0]
 
-      if function is mix
-        othercolor = colvar-shred(parameters[0])
-        mix = 0.5
-        mix = parameters[1] if parameters[1]
+    if function is mix
+      othercolor = colvar-shred(parameters[0])
+      mix = 0.5
+      mix = parameters[1] if parameters[1]
 
-        hue        = calc-mix(hue, othercolor[0], mix)
-        saturation = calc-mix(saturation, othercolor[1], mix)
-        lightness  = calc-mix(lightness, othercolor[2], mix)
-        alpha      = calc-mix(alpha, othercolor[3], mix)
+      hue        = calc-mix(hue, othercolor[0], mix)
+      saturation = calc-mix(saturation, othercolor[1], mix)
+      lightness  = calc-mix(lightness, othercolor[2], mix)
+      alpha      = calc-mix(alpha, othercolor[3], mix)
 
-    return 'hsla(%s, %s, %s, %s)' % (hue saturation lightness alpha)
+  return 'hsla(%s, %s, %s, %s)' % (hue saturation lightness alpha)
 
 
 colvar-set(name, val)
@@ -95,14 +95,17 @@ colvar-set(name, val)
     --colvar-{name}-s: saturation(val)
     --colvar-{name}-l: lightness(val)
     --colvar-{name}-a: alpha(val)
+    // Combined variable for when functions aren't used to adjust the color
+    --colvar-{name}-hsla: 'hsla(%s, %s, %s, %s)' % (hue(val) saturation(val) lightness(val) alpha(val))
   else
     error('Expected a colvar name string and a HSL/HSLA value | ' + (name) + ' | ' + (val))
 
 colvar-component(name, type)
   name = unquote(name)
-  
+
   unless type is a 'string'
     type = type + ''
+
   component = ''
   if type is 'h' or type is 'hue'
     component = h
@@ -198,7 +201,7 @@ grid-kiss()
 
   list = grid-kiss-list(arguments)
 
-  props = 'align-content', 'justify-content', 
+  props = 'align-content', 'justify-content',
           'grid-template-rows', 'grid-template-columns', 'grid-template-areas'
   propvals = list[0]
   for val, i in propvals
@@ -212,7 +215,7 @@ grid-kiss()
         unless i is 0
           prop = props[i]
           add-property(prop, val) if val
-          
+
   zones = list[1]
   if zones
     if length(slice(zones[1], 0, 1)) isnt 1
@@ -229,7 +232,7 @@ select-headings(prefix = '', suffix = '')
   headings = ()
   for num in (1..6)
     push(headings, prefix + 'h' + num + suffix)
-    
+
   return join(', ', headings)
 
 // This lets select tags from: a list of strings, a string that is a list, or a pure list
