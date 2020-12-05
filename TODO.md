@@ -13,7 +13,6 @@
 - [ ] Add Chart.js
 - [ ] Add DOMPurify
 - [ ] Add Workbox
-- [ ] Better style Prism.js toolbar and language tip
 - [ ] Determine maximum file size of a page
 - [ ] Some sort of script or system for data-backups
 - [ ] Consider using Shiki instead of Prism

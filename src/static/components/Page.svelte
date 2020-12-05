@@ -77,8 +77,8 @@
     // After update stuff
     if (!failed) {
       // Highlight code blocks
-      // waitFor(() => typeof window.Prism?.highlightAll === 'function')
-        // .then(() => window.Prism.highlightAll())
+      waitFor(() => typeof window.Prism?.highlightAll === 'function')
+        .then(() => window.Prism.highlightAll())
     }
   }
 
