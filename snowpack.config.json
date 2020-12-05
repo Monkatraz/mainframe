@@ -15,7 +15,8 @@
   "devOptions": {
     "out": "./build/",
     "fallback": "index.pug",
-    "open": "none"
+    "open": "none",
+    "output": "stream"
   },
   "buildOptions": {
     "clean": true,
@@ -38,6 +39,7 @@
       {
         "minifyCSS": false,
         "minifyHTML": false,
+        "preloadCSS": true,
         "preloadModules": true,
         "target": "es2018"
       }
