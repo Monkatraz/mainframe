@@ -3,21 +3,16 @@ doctype html
 head
   //- Functionality
   meta(charset='utf-8')
+  base(href='/')
   meta(name='viewport', content='width=device-width,initial-scale=1')
   //- This site is not optimized for PWA usage at the moment.
-    However, it could be quite well-suited for it.
+      However, it could be quite well-suited for it.
   //- link(rel='manifest' href='/site.webmanifest')
 
   //- Preloads, Preconnects, and Prefetches
   link(rel='preload' href='/static/css/main.css' as='style')
-  //- We don't prefetch every font file, but we make sure that the basic fonts can display.
-  link(rel='prefetch' href='/static/fonts/variable/Rubik-VariableFont.woff2')
-  link(rel='prefetch' href='/static/fonts/variable/Inter-VariableFont.woff2')
-  link(rel='prefetch' href='/static/fonts/variable/FiraCode-VF.woff2')
-  link(rel='prefetch' href='/static/fonts/variable/Vollkorn-VariableFont.woff2')
-  link(rel='prefetch' href='/static/media/logo.svg')
-  link(rel='prefetch' href='/static/media/spinner.svg')
-  //- Preconnecting to FDB lets us load our home page a lot faster.
+  //- Additional preloads are compiled by Snowpack.
+  //- Preconnecting to FDB lets us load our home page faster.
   link(rel='preconnect' href='https://db.fauna.com')
 
   //- Misc.
@@ -82,5 +77,4 @@ body
       li Powered by #[span#footer_pmf MAINFRAME].
       li: +link('https://github.com/Monkatraz/mainframe') #[+mdi('github')] Github
       li: +link('http://www.scpwiki.com/') #[+sfi()] SCP-Wiki
-
 </html>

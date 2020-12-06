@@ -1,13 +1,17 @@
 {
   "mount": {
-    "public": "/",
-    "src": "/"
+    "src": "/",
+    "public": {
+      "url": "/",
+      "static": true,
+      "resolve": false
+    }
   },
   "installOptions": {
     "polyfillNode": true,
     "installTypes": true,
     "treeshake": true,
-    "sourceMaps": false,
+    "sourceMaps": true,
     "packageLookupFields": [
       "svelte"
     ]
@@ -21,7 +25,7 @@
   "buildOptions": {
     "clean": true,
     "metaDir": "static/snowpack",
-    "sourceMaps": false
+    "sourceMaps": true
   },
   "alias": {
     "@js": "./src/static/js",
@@ -29,20 +33,17 @@
     "@components": "./src/static/components",
     "@vendor": "./src/vendor"
   },
+  "experiments": {
+    "optimize": {
+      "preload": true,
+      "minify": true,
+      "target": "es2020"
+    }
+  },
   "plugins": [
     "@snowpack/plugin-dotenv",
     "@snowpack/plugin-svelte",
     "./dev/snowpack/compile-css.js",
-    "./dev/snowpack/compile-html.js",
-    [
-      "@snowpack/plugin-optimize",
-      {
-        "minifyCSS": false,
-        "minifyHTML": false,
-        "preloadCSS": true,
-        "preloadModules": true,
-        "target": "es2018"
-      }
-    ]
+    "./dev/snowpack/compile-html.js"
   ]
 }
