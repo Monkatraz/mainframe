@@ -51,7 +51,7 @@ const stylusRender = function (str = '', path = '') {
       .set('sourcemap', {
         comment: false,
         inline: true,
-        basePath: '/../src/static/css/'
+        basePath: 'src/static/css'
       })
       .render((err, css) => {
         if (err) reject(err)
@@ -97,13 +97,15 @@ module.exports = function (snowpackConfig, pluginOptions) {
         // Compile PostCSS
         const result = await postCSSRender(outStylus, {
           from: filePath,
+          to: filePath,
           map: {
             inline: false,
-            annotation: false
+            annotation: false,
+            from: ''
           }
         })
 
-        return { '.css': result.css }
+        return { '.css': { code: result.css, map: result.map } }
       } catch (err) {
         console.error(err)
         if (err.message) console.error(err.message)
