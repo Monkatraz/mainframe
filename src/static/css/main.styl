@@ -14,18 +14,7 @@
 @require 'pages/*'
 @require 'typography/*'
 
-// Additional Resets
-
-html
-  cursor: auto
-input
-  font: inherit
-
-button
-  reset-styling()
-  cursor: pointer
-
-// Boilerplate / Generic Styling
+// Boilerplate
 
 html, body
   scroll-behavior: smooth
@@ -43,52 +32,3 @@ body
 
   // Stylus bug makes the multi-line thing break so this is just a work-around
   grid-kiss:"+---------+         ","| #header | $head-h ","+---------+         ","+---------+         ","| #app    | auto    ","+---------+         ","+---------+         ","| #footer | $foot-h ","+---------+         "
-
-// Meaningful HTML Tags
-// TODO: add black box <del> tag
-// TODO: add ins green underline or something of the sort
-// TODO: add <u> tag
-
-mark
-  background: colvar('highlight')
-  color: colvar('black')
-  label-for-screenreaders('highlighted text')
-s
-  label-for-screenreaders('stricken text')
-ins
-  label-for-screenreaders('newly inserted text')
-
-// Misc.
-
-#app
-  background: linear-gradient(180deg, colvar(background-dim) 0%, colvar(background-light) 100%)
-  background-repeat: no-repeat
-  background-size: 100% 20vh
-  transition: background 1s
-
-// Scrollbars
-+match-media(thin, up)
-  html
-    scrollbar-width: thin
-
-  // This webkit scrollbar matches Firefox's thin scrollbar fairly closely
-  // Track
-  ::-webkit-scrollbar
-    width: 10px
-
-  // Handle
-  ::-webkit-scrollbar-thumb
-      box-shadow: inset 0 0 10px 10px rgba(120, 120, 120, 0.35)
-      border: 2px solid transparent
-      border-radius: 5px
-
-  ::-webkit-scrollbar-thumb:hover
-    box-shadow: inset 0 0 10px 10px rgba(120, 120, 120, 0.5)
-
-  ::-webkit-scrollbar-thumb:active
-    box-shadow: inset 0 0 10px 10px rgba(80, 80, 80, 0.5)
-
-  // Horizontal Handle
-  ::-webkit-scrollbar-thumb:horizontal
-      border: 5px solid transparent
-      border-radius: 10px

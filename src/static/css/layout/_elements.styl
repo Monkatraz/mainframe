@@ -1,0 +1,58 @@
+@require '_lib'
+
+// Selectors
+$sel-content = 'main, article, section'
+$sel-headings = 'h1, h2, h3, h4, h5, h6'
+$sel-code-blocks = 'pre > code'
+$sel-code-inline = 'code, var, samp, samp > kbd'
+$sel-quotes = 'blockquote, q'
+
+// Additional Resets
+html
+  cursor: auto
+input
+  font: inherit
+button
+  reset-styling()
+  cursor: pointer
+
+// Meaningful HTML Tags
+// TODO: add black box <del> tag
+// TODO: add ins green underline or something of the sort
+// TODO: add <u> tag
+
+mark
+  background: colvar('highlight')
+  color: colvar('black')
+  label-for-screenreaders('highlighted text')
+s
+  label-for-screenreaders('stricken text')
+ins
+  label-for-screenreaders('newly inserted text')
+
+// Font sizes
+{$sel-content}
+  font-set('sans', true)
+  font-size: calc(1rem * var(--font-content-size))
+
+  +match-media(wide, only)
+    font-size: calc(1.05rem * var(--font-content-size))
+
+  +match-media(thin, only)
+    font-size: calc(0.95rem * var(--font-content-size))
+
+  +match-media(narrow, only)
+    font-size: calc(0.9rem * var(--font-content-size))
+
+{$sel-code-inline}, {$sel-code-blocks}
+  font-set('mono')
+
+{$sel-headings}
+  font-set('display')
+
+// Orderly Heading Sizes
+for $num in (0..5)
+  h{$num + 1}
+    $sizes = 2.25rem, 2rem, 1.75rem, 1.5rem, 1.25rem, 1rem
+    $size = $sizes[$num]
+    font-size: $size

@@ -47,7 +47,6 @@
 
   :global(#app)
     color: colvar('text-dark')
-    background-size: 100% 5vh
 
   // Shorthands
   // Makes the grid-kiss declaration more compact and visually understandable.
