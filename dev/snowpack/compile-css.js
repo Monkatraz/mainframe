@@ -46,7 +46,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
     onChange ({ filePath }) {
       // Reload the main CSS if we change a partial
       if (/\\_.*\.styl$/.test(filePath)) {
-        this.markChanged(path.normalize(path.normalize(path.dirname(filePath) + '/../main.styl')))
+        this.markChanged(path.normalize(path.dirname(filePath) + '/../main.styl'))
       }
     },
     async load ({ filePath = '' }) {
