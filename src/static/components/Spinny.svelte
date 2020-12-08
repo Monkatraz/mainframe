@@ -29,7 +29,7 @@
     pointer-events: none
 </style>
 
-<img src="/static/media/spinner.svg" alt="Page Loading Symbol"
+<img class=spinny src="/static/media/spinner.svg" alt="Page Loading Symbol"
   style={cssText}
   transition:anim
 >
