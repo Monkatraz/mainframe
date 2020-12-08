@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- Functionality -->
+  <meta charset="utf-8">
+  <base href="/">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <!--
+    This site is not optimized for PWA usage at the moment.
+    However, it could be quite well-suited for it.
+  -->
+  <!-- link(rel='manifest' href='/site.webmanifest') -->
+
+  <!-- Preloads, Preconnects, and Prefetches-->
+  <link rel="preload" href="/static/css/main.css" as="style">
+  <!-- Further preloads are added by Snowpack on build. -->
+  <link rel="preconnect" href="https://db.fauna.com">
+
+  <!-- Misc. -->
+  <link rel="author" href="humans.txt">
+
+  <!-- Opengraph Static -->
+  <meta property="og:url" content="https://www.scp-mainframe.app">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/static/media/meta_header.png">
+  <!--
+    Twitter Static
+    If this site were to be used officially, 'twitter:creator' would be removed.
+  -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:site" content="@scpwiki">
+  <meta name="twitter:creator" content="@monkatraz">
+  <!--
+    Dynamic Metadata
+    All of this will change depending on the loaded article.
+  -->
+  <title>SCP MAINFRAME</title>
+  <meta property="og:title" content="SCP MAINFRAME">
+  <meta name="description" content="An (unofficial) experimental SCP Wiki replacement design concept.">
+  <meta property="og:description" content="An (unofficial) experimental SCP Wiki replacement design concept.">
+
+  <!-- Theming, Icons -->
+  <meta name="color-scheme" content="dark light">
+  <meta name="theme-color" content="#850005">
+  <meta name="msapplication-TileColor" content="#850005">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+  <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#850005">
+
+  <!-- Finalize, and load CSS -->
+  <link rel="stylesheet" href="/static/css/main.css">
+
+</head>
+
+<body>
+  <header id="header" aria-label="Page Header">
+    <div id="header_logo" role="presentation">
+      <a id="logo_link" href="/" title="Go to home page"></a>
+      <img id="logo_emblem" src="/static/media/logo.svg" alt="SCP Foundation Logo">
+      <h1 id="logo_title">THE MAINFRAME</h1>
+      <small id="logo_slogan">Secure, Contain, Protect</small>
+    </div>
+  </header>
+
+  <!-- App itself - loaded as a Svelte component. -->
+  <div id="app" role="presentation"></div>
+
+  <footer id="footer">
+    <ul id="footer_list">
+      <li>Powered by <span id="footer_pmf">MAINFRAME</span>.</li>
+      <li>
+        <a class="link link-external" href="https://github.com/Monkatraz/mainframe">
+          <span class="iconify-inline" data-icon="mdi:github"></span> Github
+        </a>
+      </li>
+      <li>
+        <a class="link link-external" href="http://www.scpwiki.com/">
+          <img src="/static/media/logo.svg" alt="SCP Foundation Logo" role="presentation" width="12"> SCP-Wiki
+        </a>
+      </li>
+    </ul>
+  </footer>
+
+  <!-- Init. base module -->
+  <script async="" src="/static/js/mainframe.js" type="module"></script>
+</body>
+
+</html>

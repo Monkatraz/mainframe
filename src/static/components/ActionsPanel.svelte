@@ -223,27 +223,20 @@
 
 </style>
 
-<template lang="pug">
-  include ../../_basic-mixins
+<div class=actions-panel-container
+  aria-expanded={revealed}
+  class:hidden class:revealed class:faded
+  use:intro
+  use:onSwipe={{callback: handleGrip, direction: revealed ? 'down' : 'up'}}
+  bind:this={grip}>
 
-  div.actions-panel-container(
-    aria-expanded!='{revealed}'
-    class:hidden
-    class:revealed
-    class:faded
-    use:intro
-    use:onSwipe!=`{{ callback: handleGrip, direction: revealed ? 'down' : 'up' }}`
-    bind:this!='{grip}')
+  <button type=button class=actions-panel_button
+    on:click={handleGrip}
+    on:contextmenu={contextmenu}
+    use:usTip={{content: toolTipString, followCursor: false, sticky: true}}>
+    <span class="iconify-inline actions-panel_button_arrow" data-icon=ic:round-expand-less></span>
+  </button>
 
-    +button().actions-panel_button(
-      on:click!='{handleGrip}'
-      on:contextmenu!='{contextmenu}'
-      use:usTip!='{{ content: toolTipString, followCursor: false, sticky: true }}')
-
-      +ici('round-expand-less').actions-panel_button_arrow
-
-    div.actions-panel_border
-
-    div.actions-panel
-
-</template>
+  <div class=actions-panel_border/>
+  <div class=actions-panel/>
+</div>

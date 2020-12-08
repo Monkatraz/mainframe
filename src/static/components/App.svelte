@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   // Imports
   import { sleep } from '@modules/util'
   import { usAnime } from '@modules/components'
@@ -19,7 +19,7 @@
   })
 </script>
 
-<style lang='stylus'>
+<style lang="stylus">
   @require '_lib'
 
   :global(:root)
@@ -122,13 +122,10 @@
 
 </style>
 
-<template lang='pug'>
-  div.container(role='presentation')
-    nav.navbar(use:navBarReveal aria-label='Navigation')
-
-    aside.sidebar(use:sideBarReveal aria-label='Sidebar')
-
-    main.content(aria-label='Content')
-      Page(path='scp/3685')
-
-</template>
+<div class="container" role="presentation">
+  <nav class="navbar" use:navBarReveal aria-label="Navigation"/>
+  <aside class="sidebar" use:sideBarReveal aria-label="Sidebar"/>
+  <main class="content" aria-label="Content">
+    <Page path="scp/3685"/>
+  </main>
+</div>

@@ -43,7 +43,6 @@
   "plugins": [
     "@snowpack/plugin-dotenv",
     "@snowpack/plugin-svelte",
-    "./dev/snowpack/compile-css.js",
-    "./dev/snowpack/compile-html.js"
+    "./dev/snowpack/compile-css.js"
   ]
 }

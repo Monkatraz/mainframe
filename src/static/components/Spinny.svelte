@@ -29,11 +29,7 @@
     pointer-events: none
 </style>
 
-<template lang='pug'>
-  img.spinny(
-    src='/static/media/spinner.svg'
-    alt='Loading Indicator'
-    style!='{cssText}'
-    transition:anim
-  )
-</template>
+<img src="/static/media/spinner.svg" alt="Page Loading Symbol"
+  style={cssText}
+  transition:anim
+>

@@ -31,7 +31,7 @@ This list is not inclusive. It is mostly for some people/projects that cannot be
 Create a replacement wiki-like system for the SCP-Wiki.
   * Navigate to user generated pages 
     - A slick, clean editor 
-    - Page sources use an HTML templating language
+    - Page sources use Markdown
     - Search support
   * Users can create accounts and can use mild personalization features
     - Author pages
@@ -104,7 +104,7 @@ The integration between Mainframe and FaunaDB is to the point that it is near-ce
 ## Assets
 Most of Mainframe's assets are either compiled or built. Mainframe is primarily written in:
   * TypeScript
-  * Pug
+  * HTML
   * Stylus + PostCSS
   * Svelte
 
@@ -127,38 +127,6 @@ Libraries likely to be added, but not yet:
   * Chart.js for, well, charts
 
 Additionally, Mainframe uses the Pug template engine client-side for editor previews.
-
-## Sanitizing UGC
-In order to sanitize potentially dangerous HTML compiled from Pug templates, Mainframe uses DOMPurify. Mainframe is designed to be extremely paranoid - all UGC Pug templates are compiled inside of sandboxes, with the resultant HTML sanitized by the client/server wishing to use them. This prevents Pug itself from being a security risk and moves all vulnerability to isolated HTML strings. 
-
-To be clear, Pug is probably safe. However, Pug's dependencies may or may not be safe and nor is it known whether or not Pug will eventually have a vulnerability. And regardless, it's better safe than sorry.
-
-When updating/creating a page, the procedure is:
-  1. Have the client send a serverless function an object containing their identity token and the page update information.
-  2. Verify the identity of the client and request reauthorization if required. During this step, the identity of the client will be checked against the document they are attempting to update.
-  3. Validate the object body.
-  4. Process safe fields, like page descriptions. If only non-Pug fields were updated, skip to step 7.
-  5. Create a sandbox environment and render the page's new Pug template.
-  6. Sanitize the resultant HTML.
-  7. Adjust revision data as needed.
-  8. Update the remote document with the new data.
-  9. Return a success response to the client.
-
-When previewing pages on the client using the editor, the procedure is:
-  1. Create a random string to serve as a password for future `postMessage` interactions. This helps to prevent random `iframe` elements from sending post messages.
-  2. Create an invisible / off-screen `iframe` element with the `sandbox` attribute.
-  3. Create a web-worker instance inside of the `iframe` window. Store the `iframe` element and the web-worker for reuse.
-  4. Create the needed `postMessage` event listeners on the main window.
-  5. Send the Pug template to the web-worker for rendering.
-  6. Return the resultant (but still unsafe) HTML to the main window.
-  7. Validate the `postMessage` as being from the correct source.
-  8. Sanitize the HTML on the client.
-  9. Destroy the `postMessage` event listeners on the main window. 
-  10. If no error was thrown on any step of this process, display the preview.
-
-Note that this procedure is only used if the client is able to load the Pug rendering library without errors. Otherwise, the client will send the Pug template to a serverless function in order to generate the preview.
-
-If you are wondering why the editor preview is so jailed and paranoid: It is to prevent a gullible or simply misled user from copy pasting Pug code that is ultimately malicious. Also, the result presents a more accurate representation of how your page will be seen by other users when served sanitized from the database.
 
 -----
 

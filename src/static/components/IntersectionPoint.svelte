@@ -29,6 +29,4 @@
     width: 100%
 </style>
 
-<template lang="pug">
-  div.intersection-point(bind:this!="{intersectionElement}" role='presentation')
-</template>
+<div class=intersection-point bind:this={intersectionElement} role=presentation/>

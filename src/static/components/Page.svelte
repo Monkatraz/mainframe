@@ -90,31 +90,27 @@
   $: if (setHTML) html = setHTML
 </script>
 
-<template lang="pug">
+{#if ready && !failed}
+  <div class=rhythm use:pageFadeIn role=presentation>
+    {@html html}
+  </div>
+  <IntersectionPoint
+    onEnter={() => hideActionsPanel = true}
+    onExit={() => hideActionsPanel = false}
+    opts={{rootMargin: '300px'}}/>
+  <ActionsPanel bind:hidden={hideActionsPanel}/>
 
-  +if("ready === true")
-    +if('failed === false')
-      //- Successfully loaded page
-      //- Page content itself
-      div.rhythm(use:pageFadeIn role='presentation')
-        +html('html')
-      //- Actions panel
-      IntersectionPoint(
-        onEnter!='{() =>  hideActionsPanel = true}'
-        onExit!='{() => hideActionsPanel = false}'
-        opts!='{{rootMargin: "300px"}}')
-      ActionsPanel(bind:hidden!='{hideActionsPanel}')
-      //- Failed page loading
-      +else
-        div.rhythm(use:pageFadeIn role='presentation')
-          h2 Error displaying page
-          hr
-          pre.code: code.
-            ERR: {error.name}: {error.message}
-            MSG: {error.description}
+  {:else if ready && failed}
+  <div class=rhythm>
+    <h2>Error Displaying Page</h2>
+    <hr>
+    <pre class=code><code>
+      ERR: {error.name}: {error.message}
+      MSG: {error.description}
+    </code></pre>
+  </div>
 
-    //- We'll wait a little bit so we don't needlessly show the loading spinner
-    +else: +await('sleep(300) then _')
-      Spinny(width='150px' top='200px' left='50%')
-
-</template>
+  {:else} {#await sleep(300) then _}
+    <Spinny width=150px top=200px left=50%/>
+  {/await}
+{/if}

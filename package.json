@@ -29,7 +29,6 @@
     "faunadb": "^3.0.1",
     "page": "^1.11.6",
     "prismjs": "^1.22.0",
-    "pug": "^3.0.0",
     "svelte": "^3.31.0",
     "svelte-preprocess": "^4.6.1",
     "svelte-select": "^3.14.1",
@@ -38,7 +37,6 @@
   "devDependencies": {
     "@babel/preset-typescript": "^7.12.7",
     "@snowpack/plugin-dotenv": "^2.0.5",
-    "@snowpack/plugin-optimize": "^0.2.10",
     "@snowpack/plugin-svelte": "^3.3.1",
     "@tsconfig/svelte": "^1.0.10",
     "@types/animejs": "^3.1.2",
