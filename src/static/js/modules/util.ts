@@ -50,9 +50,7 @@ export function throttle<T extends WrappedFn<NoReturnVal>>(fn: T, limitMS: numbe
       initialCall = false
       next()
     }
-    if (!timeout) {
-      timeout = setTimeout(next, limitMS)
-    }
+    if (!timeout) timeout = setTimeout(next, limitMS)
   }
 }
 
@@ -67,9 +65,9 @@ export async function waitFor(
   conditionFn: () => Promisable<boolean>,
   asyncTimerFn?: () => Promise<void>
 ) {
-  if (typeof asyncTimerFn !== 'function') {
+  if (typeof asyncTimerFn !== 'function')
     asyncTimerFn = () => sleep(100)
-  }
+
   while ((await conditionFn()) === false) {
     await asyncTimerFn()
     continue
