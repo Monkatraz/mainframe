@@ -1,21 +1,17 @@
 # Mainframe
 
 ### In Progress
+- [ ] Add CodeMirror editor component
+- [ ] Switch to Shiki and implement it in Marked
+
+### General
 - [ ] Integrate ReCaptcha
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
   - Force passing a ReCaptcha when registering
 - [ ] Generic cache library
-- [ ] Add CodeMirror editor component
-- [ ] Add a local test page (dummy data?)
 - [ ] Add better page history schema
-
-### General
-- [ ] Add Chart.js
-- [ ] Add DOMPurify
-- [ ] Add Workbox
-- [ ] Determine maximum file size of a page
+- [ ] Add a local test page (dummy data?)
 - [ ] Some sort of script or system for data-backups
-- [ ] Consider using Shiki instead of Prism
 
 ### Users
 - [ ] Author draft pages that are linkable
@@ -65,3 +61,5 @@
 - [x] Page router
 - [x] Global state handler module to isolate components from routing and state
 - [x] App load animation
+- [x] Add Marked
+- [x] Add DOMPurify
