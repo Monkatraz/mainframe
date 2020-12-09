@@ -177,13 +177,6 @@ export const User = {
 import AppComponent from '@components/App.svelte'
 const App = new AppComponent({ target: document.querySelector('#app') as HTMLElement })
 
-// -- Router
-import page from 'page'
-// -- Router Paths
-// page('/', () => { Components['Page'].$set({ path: 'scp/3685' }) })
-// Finalize the router setup
-page()
-
 // -----------
 //  LOAD/INIT
 

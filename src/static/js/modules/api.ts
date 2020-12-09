@@ -19,7 +19,7 @@ import { User } from '@js/mainframe'
 /** Invokes the Netlify Function specified by the `fn` parameter.
  *  As it returns a `Result`, use `Result.ok` to determine if the invokation succeeded or failed.
  */
-export async function invokeLambda(fn: string, payload?: any, init?: RequestInit) {
+export async function invokeLambda<T = JSONObject>(fn: string, payload?: any, init?: RequestInit) {
   const url = ENV.API.LAMBDA + fn
   const method = payload ? 'POST' : 'GET'
   const forcedInit: RequestInit = {
@@ -41,7 +41,7 @@ export async function invokeLambda(fn: string, payload?: any, init?: RequestInit
   if (!fetchTask.ok) return fetchTask
   const response = fetchTask.body
   // Return the response itself
-  return new Result(response.ok, await response.json() as JSONObject)
+  return new Result(response.ok, await response.json() as T)
 }
 
 // -----------
@@ -101,24 +101,9 @@ export type QueryPermissionError = QueryUnauthorized | QueryMethodNotAllowed | Q
 /** Error thrown by FaunaDB when the endpoint had some sort of query agnostic error. */
 export type QueryEndpointError = QueryInternalError | QueryUnavailable
 
-// Simple error handler thingy
-type ErrorHandlers = {
-  [errorName: string]: () => void
-  default: () => void
-}
-export type errorHandler = (error: Error | number | string) => void
-/** Returns an `errorHandler` function, for matching error names to functions. */
-export function newErrorHandler(errors: ErrorHandlers): errorHandler {
-  return (err: Error | number | string) => {
-    if (typeof err === 'number') err = err.toString()
-    if (err instanceof Error) err = err.name
-    // Execute matched error function if it exists
-    if (typeof errors[err] === 'function') { return errors[err]() }
-    // Otherwise, execute the default handler
-    return errors.default()
-  }
-}
-
+/** Gets the status code of any error, defaulting to 400.
+ *  Has special handling for `FaunaHTTPError`s.
+ */
 export function getStatusCode(err: Error) {
   if (err instanceof FDBErrors.FaunaHTTPError) {
     const code = err.requestResult.statusCode
@@ -162,7 +147,7 @@ export const qe = {
   Fields(obj: Expr) {
     // Reduces `[id, value]` pair to just `id`
     const lambda = q.Lambda(((keyvalue) => q.Select(0, keyvalue)))
-    return qe.IfMap(q.Abort('Invalid object provided to Fields query!'), [
+    return qe.IfMap(q.Abort('400'), [
       [q.IsObject(obj), q.Map(q.ToArray(obj), lambda)],
       [q.IsArray(obj), obj]
     ])
@@ -180,17 +165,38 @@ export const qe = {
     return q.Match(qindex)
   },
 
-  /** Shorthand function for getting a reference to a `Page` object, using a path as the search term. */
-  PageFind(path: string) {
-    return qe.Search('pages_by_path', path)
+  /** Shorthand function that returns the most-likely-to-be-correct-language for a user once given a page. */
+  PageLang(obj: Expr) {
+    return q.Let(
+      {
+        'langs': qe.Fields(q.Select('locals', obj)),
+        'intersect': q.Intersection(User.preferences.langs, q.Var('langs')),
+        'lang': q.If(q.Not(q.IsEmpty(q.Var('intersect'))),
+          q.Select(0, q.Var('intersect')),
+          q.Select(0, q.Var('langs'))
+        )
+      },
+      q.Var('lang')
+    )
   },
 
-  /** Shorthand function for retrieving a `Page` object, using a path as the search term. */
-  PageData(path: string) {
-    return qe.Data(qe.PageFind(path))
+  /** Filters an input FDB-side obj. using arrays of key names. */
+  Filter(obj: Expr, filter: (string | [string, (string | Expr)[] | Expr])[]) {
+    const filterObj: { [K: string]: Expr } = {}
+    filter.forEach((key) => {
+      // [key, Expr | []] format
+      if (key instanceof Array) {
+        if (key[1] instanceof Array) filterObj[key[0]] = q.Select(key[1], q.Var('fdobj'))
+        else filterObj[key[0]] = key[1] // Don't select, just use the FDB Expr
+      }
+      // Key list format
+      else filterObj[key] = q.Select(key, q.Var('fdobj'))
+    })
+    return q.Let({ 'fdobj': obj }, filterObj)
   }
 }
 
+// TODO: Consider deleting this
 /** Response object from `Client.queryLazy`. Contains both Promisables and FQL expression fields.
  *
  *  @example field = await LazyDocument.field
@@ -356,8 +362,8 @@ export interface Social {
    *  This document cannot actually be read - but this reference serves as the canonical ID for this user.
    *  Additionally, the actual ID of the `Ref` (not the collection) serves as the URL path for the user. */
   user: Ref
-  /** A page (actually a `Subpage` object) specific to the user. Only they can edit it. */
-  authorpage: DocContent
+  /** A page (basically a markdown template) specific to the user. Only they can edit it. */
+  authorpage: string
   /** The nickname for this user. They can change it at any time. */
   nickname: string
   /** A very short description for the user.
@@ -392,32 +398,20 @@ export interface Comment {
     /** Date when this comment was last edited. */
     dateLastEdited: Date
   }
-  /** Whether or not the comment has been pinned. */
-  pinned: boolean
-  /** Content of the comment. */
-  content: DocContent
-}
-
-// Page Interface
-
-/** `DocContent`s represent the set of objects that actually contain a `Page`'s (or others) consumable content. */
-export interface DocContent {
-  /** Rendered form of the content. */
-  html: string
-  /** The source template of the content. */
-  template: string
+  /** Markdown content of the comment. Must be rendered in order to view. */
+  content: string
 }
 
 /** `View` objects represent a particular language variant of a page. */
 export interface View {
-  /** Localized description of the page. */
-  desc: {
-    title: string
-    subtitle: string
-    description: string
-  }
-  /** Page that loads first (default URL). */
-  data: DocContent
+  /** Page title. */
+  title: string
+  /** Page subtitle. */
+  subtitle: string
+  /** Short page description. */
+  description: string
+  /** Markdown page template. Must be rendered to be viewed. */
+  template: string
 }
 
 /** Root level object retrieved from the FaunaDB database. Contains everything relevant to a `Page`. */
@@ -426,7 +420,7 @@ export interface Page {
   path: string
   /** Version number, used for backwards compatibility handling (if needed) */
   version: number
-  /** Metadata - contains things like `Authors`, the current `revision`, etc. */
+  /** Metadata - contains things like the current `revision`, edit dates, etc. */
   meta: {
     /** Set of users who authored this page and have edit permissions. */
     authors: Ref[]
@@ -457,114 +451,79 @@ export interface Page {
   }
 }
 
-export class PageHandler {
-  public lang!: string
-  public targetReady: Promise<boolean>
-  public targetValue!: DataValue
-  public dataReady: Promise<boolean>
-  public data!: Lazyify<Page> & LazyDocument<Page>
-  constructor (public path = '', public target = 'html') {
-    this.targetReady = (async () => {
-      const response = await this.init()
-      if (response.ok) {
-        this.targetValue = response.body[0]
-        this.lang = response.body[1]
-      } else {
-        throw response.body
-      }
-      return true
-    })()
-    this.dataReady = (async () => {
-      // TODO: handle exceptions here
-      const response = await Clients.Public.queryLazy<Page>(qe.PageData(this.path))
-      if (response.ok) this.data = response.body
-      return true
-    })()
+export interface LocalizedPage {
+  /** URL path, starting from root. Is always unique. */
+  path: string
+  /** Version number, used for backwards compatibility handling (if needed) */
+  version: number
+  /** Metadata - contains things like authors, current `revision`, edit dates, etc. */
+  meta: {
+    /** Set of users who authored this page and have edit permissions. */
+    authors: Ref[]
+    /** Number of revisions (edits) for this page. Starts at 1. */
+    revision: number
+    /** Date when this page was created. */
+    dateCreated: Date
+    /** Date when this page was last edited. */
+    dateLastEdited: Date
+    /** A list of strings containing meta-contextual labels for a page.
+     *  E.g. a flag like 'cc_validated' could be present within this list.
+     */
+    flags: Flags[]
+    /** List of strings describing the contents of the article. */
+    tags: Tags[]
   }
+  /** Page title. */
+  title: string
+  /** Page subtitle. */
+  subtitle: string
+  /** Short page description. */
+  description: string
+  /** Markdown page template. Must be rendered to be viewed. */
+  template: string
+}
 
-  private createLangExprBinding(expr: Expr | Expr[]) {
-    return q.Let(
-      {
-        'path': qe.Search('pages_by_path', this.path),
-        'data': qe.Data(q.Var('path')),
-        'langs': qe.Fields(q.Select('locals', q.Var('data'))),
-        'intersect': q.Intersection(User.preferences.langs, q.Var('langs')),
-        'lang': q.If(
-          q.Not(q.IsEmpty(q.Var('intersect'))),
-          q.Select(0, q.Var('intersect')),
-          q.Select(0, q.Var('langs'))
-        )
-      },
-      expr
+export async function getLocalizedPage(path: string, lang: Expr = qe.PageLang(q.Var('data'))) {
+  const expr = q.Let(
+    // Create reused variables
+    { 'data': qe.Data(qe.Search('pages_by_path', path)), 'lang': lang },
+    // Filter our database page object and get only what we need from it
+    q.Merge(
+      qe.Filter(q.Var('data'), [
+        'path', 'version', 'meta',
+      ]),
+      // Descend into our desired local and merge back what we need
+      qe.Filter(q.Select(['locals', q.Var('lang')], q.Var('data')), [
+        'title', 'subtitle', 'description', 'template'
+      ])
     )
-  }
+  )
+  return await Clients.Public.query<LocalizedPage>(expr)
+}
 
-  private async init() {
-    // The processing of the page like this on FaunaDB's end massively improves latency
-    // The basic gist is:
-    //  1. Check if the page path exists, if not, abort with boolean false
-    //  2. Create a bunch of variables that build off each other
-    //    - These variables ultimately conclude with 'lang'
-    //    - 'lang' is a string that denotes which field in the `Page`'s `locals` field we need to use
-    //    - It compares against the users preferred languages and picks the first one
-    //    - If none of the languages available match the users, it just uses the first one in `locals`
-    //  3. Dig through the object and select whatever `target` we want (e.g. 'html')
-    //  4. Put the target expression and the determined language in a tuple/array
-    //  5. Tada
-    // This is a single request - which literally saves seconds.
-    // If it was not done this way, the client would have to process this info and that would take forever
-
-    //  Create our target expression
-    let targetExpr: Expr = {}
-    switch (this.target) {
-      case 'html': {
-        targetExpr = q.Select('html', q.Select('root', q.Select(q.Var('lang'), q.Select('locals', q.Var('data')))))
-      }
+const pageTemplate: Page = {
+  path: '/scp/6842',
+  version: 1,
+  meta: {
+    authors: [],
+    revision: 1,
+    dateCreated: new Date,
+    dateLastEdited: new Date,
+    flags: [],
+    tags: []
+  },
+  social: {
+    ratings: [],
+    comments: []
+  },
+  locals: {
+    'en': {
+      title: 'SCP-6842',
+      subtitle: 'Something Else Entirely',
+      description: 'Very interesting description!',
+      template: '# Markdown here I guess'
     }
-    // Create our executor expression
-    const expr = q.If(
-      q.Exists(qe.Search('pages_by_path', this.path)),
-      this.createLangExprBinding([targetExpr, q.Var('lang')]),
-      q.Abort('404')
-    )
-    // Execute and check if it failed
-    const response = await Clients.Public.query<[DataValue, string]>(expr)
-    if (!response.ok) return new Result(false, response.body)
-
-    return new Result(true, response.body)
   }
 }
 
-addEventListener('DOMContentLoaded', () => {
-  const pageTemplate: Page = {
-    path: 'scp/3685',
-    version: 1,
-    meta: {
-      authors: [],
-      revision: 1,
-      dateCreated: new Date,
-      dateLastEdited: new Date,
-      flags: [],
-      tags: []
-    },
-    social: {
-      ratings: [],
-      comments: []
-    },
-    locals: {
-      'en': {
-        desc: {
-          title: 'SCP-3685',
-          subtitle: 'The Fractured Pile',
-          description: ''
-        },
-        data: {
-          html: '',
-          template: ''
-        }
-      }
-    }
-  }
-
-  // invokeLambda('page-update', pageTemplate).then(console.log)
-})
+// invokeLambda('page-update', pageTemplate).then(console.log)

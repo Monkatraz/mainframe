@@ -185,3 +185,11 @@ export function appendStylesheet(href: string): Promise<void> {
     document.head.appendChild(stylesheet)
   })
 }
+
+import marked from 'marked'
+import DOMPurify from 'dompurify'
+
+/** Safely renders a given markdown string. */
+export function renderMarkdown(md: string) {
+  return DOMPurify.sanitize(marked(md))
+}

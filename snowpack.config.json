@@ -18,7 +18,7 @@
   },
   "devOptions": {
     "out": "./build/",
-    "fallback": "index.pug",
+    "fallback": "index.html",
     "open": "none",
     "output": "stream"
   },

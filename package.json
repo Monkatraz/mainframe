@@ -26,7 +26,9 @@
   "module": "esnext",
   "dependencies": {
     "animejs": "^3.2.1",
+    "dompurify": "^2.2.3",
     "faunadb": "^3.0.1",
+    "marked": "^1.2.5",
     "page": "^1.11.6",
     "prismjs": "^1.22.0",
     "svelte": "^3.31.0",
@@ -41,6 +43,8 @@
     "@tsconfig/svelte": "^1.0.10",
     "@types/animejs": "^3.1.2",
     "@types/aws-lambda": "^8.10.64",
+    "@types/dompurify": "^2.0.4",
+    "@types/marked": "^1.2.1",
     "@types/node": "^14.14.10",
     "@types/page": "^1.11.0",
     "@types/prismjs": "^1.16.2",

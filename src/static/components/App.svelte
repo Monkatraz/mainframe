@@ -1,11 +1,23 @@
 <script lang="ts">
   // Imports
-  import { sleep } from '@modules/util'
+  import * as API from '@js/modules/api'
+  import { ENV, sleep, renderMarkdown, waitFor } from '@modules/util'
   import { usAnime } from '@modules/components'
+  import router from 'page'
   // Components
-  import Page from '@components/Page.svelte'
+  import Spinny from './Spinny.svelte'
+  import IntersectionPoint from './IntersectionPoint.svelte'
+  import ActionsPanel from './ActionsPanel.svelte'
 
-  // Animations
+  // -- STATE
+  let path = ''
+  let mode: 'LOADING' | 'VIEW' | 'EDIT' | 'ERROR' | '404' = 'LOADING'
+  let page: API.LocalizedPage
+  let html: string
+  let error: any
+  let hideActionsPanel = false
+
+  // -- ANIMATIONS
   const sideBarReveal = usAnime({
     translateX: ['-100%', '0%'],
     duration: 400,
@@ -17,6 +29,47 @@
     duration: 200,
     easing: 'easeOutElastic(2, 1.25)'
   })
+  const pageReveal = usAnime({
+    opacity: {
+      value: [0, 1],
+      duration: 400,
+      easing: 'easeOutQuad',
+      delay: 50
+    },
+    translateY: {
+      value: ['-4rem', '0rem'],
+      duration: 800,
+      easing: 'easeOutElastic(2, 2)'
+    },
+  })
+
+  // -- ROUTER
+  router('/', () => path = '404') // Home page
+  router('/404', () => path = '404')
+  router('*', (ctx) => loadPath(ctx.pathname) )
+  router()
+
+  async function loadPath(path: string) {
+    try {
+      // Begin loading page, jump to `catch (err)` below if it fails
+      mode = 'LOADING'
+      const response = await API.getLocalizedPage(path)
+      if (!response.ok) throw response.body
+      // Page loaded successfully
+      page = response.body
+      html = renderMarkdown(page.template)
+      mode = 'VIEW'
+      // After page chores
+      // Highlight code blocks
+      // TODO: pass Prism or Shiki to Marked instead of doing it like this
+      waitFor(() => typeof window.Prism?.highlightAll === 'function')
+        .then(() => window.Prism.highlightAll())
+    } catch (err) {
+      error = err
+      if (API.getStatusCode(err) === 404) mode = '404'
+      else mode = 'ERROR'
+    }
+  }
 </script>
 
 <style lang="stylus">
@@ -120,12 +173,72 @@
     position: relative
     padding: 2rem 0
 
+  // 404 / page not found
+  .pgnf
+    text-align: center
+
+  .pgnf-blackbox
+    background: black
+    border-radius: 10px
+    padding: 2rem 0
+    shadow-elevation(8px)
+
+  .pgnf-header, .pgnf-text
+    terminal-text()
+    font-set('mono')
+
+  .pgnf-header
+    font-size: 5rem
+
 </style>
 
-<div class="container" role="presentation">
-  <nav class="navbar" use:navBarReveal aria-label="Navigation"/>
-  <aside class="sidebar" use:sideBarReveal aria-label="Sidebar"/>
-  <main class="content" aria-label="Content">
-    <Page path="scp/3685"/>
-  </main>
-</div>
+{#if mode !== 'EDIT'}
+  <div class="container" role="presentation">
+    <nav class="navbar" use:navBarReveal aria-label="Navigation"/>
+    <aside class="sidebar" use:sideBarReveal aria-label="Sidebar"/>
+    <main class="content" aria-label="Content">
+      {#if mode === 'VIEW'}
+        <!-- Page successfully loaded -->
+        <div class=rhythm use:pageReveal role=presentation>
+          {@html html}
+        </div>
+        <!-- Actions Panel -->
+        <IntersectionPoint
+          onEnter={() => hideActionsPanel = true}
+          onExit={() => hideActionsPanel = false}
+          opts={{rootMargin: '300px'}}/>
+        <ActionsPanel bind:hidden={hideActionsPanel}/>
+
+        <!-- Every other mode folllows -->
+
+        <!-- Page still loading -->
+        {:else if mode === 'LOADING'}
+        <!-- Wait a moment before loading so that we don't instantly and needlessly display a spinner -->
+        {#await sleep(300) then _}
+          <Spinny width=150px top=200px left=50%/>
+        {/await}
+
+        <!-- Page not found / 404 error-->
+        {:else if mode === '404'}
+        <div class="pgnf rhythm" use:pageReveal>
+          <div class="pgnf-blackbox rhythm">
+            <h1 class=pgnf-header>404</h1>
+            <h2 class=pgnf-text>PAGE NOT FOUND</h2>
+          </div><br />
+          <h5>The requested page either does not exist or was not found.</h5>
+        </div>
+
+        <!-- Page display error -->
+        {:else if mode === 'ERROR'}
+        <div class=rhythm use:pageReveal>
+          <h2>Error Displaying Page</h2>
+          <hr>
+          <pre class=code><code>
+            ERR: {error.name}: {error.message}
+            MSG: {error.description}
+          </code></pre>
+        </div>
+      {/if}
+    </main>
+  </div>
+{/if}
