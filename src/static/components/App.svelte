@@ -11,7 +11,7 @@
   import ActionsPanel from './ActionsPanel.svelte'
 
   // -- STATE
-  let path = ''
+  let path = ENV.HOMEPAGE
   let mode: 'LOADING' | 'VIEW' | 'EDIT' | 'ERROR' | '404' = 'LOADING'
   let page: API.LocalizedPage
   let html: string
@@ -45,10 +45,10 @@
   })
 
   // -- ROUTER
-  router('/', () => path = '404') // Home page
-  router('/404', () => path = '404')
-  router('*', (ctx) => loadPath(ctx.pathname) )
-  router()
+  router('/', () => loadPath(ENV.HOMEPAGE)) // Home page
+  router('/404', () => mode = '404') // Directly asking for 404
+  router('*', (ctx) => loadPath(ctx.pathname) ) // Everything else
+  router() // Start router
 
   async function loadPath(path: string) {
     try {
