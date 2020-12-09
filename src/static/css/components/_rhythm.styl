@@ -68,14 +68,14 @@ rhythm-gutter(top, bottom = top)
   $block-tags = 'div, pre, main, article, section, hgroup'
   $break-tags = 'br, hr'
   $figure-tags = 'img, figure, div.code-toolbar'
-  $text-tags = 'p, span, small'
+  $text-tags = 'p, span, small, ol, ul, blockquote'
   $display-tags = 'h1, h2, h3, h4, h5, h6'
 
   // Tag selections based off of relationships or proximity.
   $headings-to-text = select-headings('> ', ' + p')
   $headings-to-hr = select-headings('> ', ' + hr')
 
-  // Reset every tag and make sure it has no margins 
+  // Reset every tag and make sure it has no margins
   +select-listed('> ', 'rhythm-tags', $block-tags, $break-tags, $figure-tags, $text-tags, $display-tags)
     margin: 0
     margin-block-end: 0
@@ -87,7 +87,8 @@ rhythm-gutter(top, bottom = top)
     width: 100%
     line-height: inherit // Fixes the line-height being overridden
     rhythm-set-text-bounds()
-    padding: 0
+    padding-top: 0
+    padding-bottom: 0
     padding-block-start: 0
     padding-block-end: 0
 
