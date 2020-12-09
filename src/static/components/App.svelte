@@ -16,7 +16,7 @@
   let page: API.LocalizedPage
   let html: string
   let error: any
-  let hideActionsPanel = false
+  let hideActionsPanel = true
 
   // -- ANIMATIONS
   const sideBarReveal = usAnime({
@@ -174,6 +174,9 @@
     position: relative
     padding: 2rem 0
 
+  .html-container
+    min-height: 100%
+
   // 404 / page not found
   .pgnf
     text-align: center
@@ -200,7 +203,7 @@
     <main class="content" aria-label="Content">
       {#if mode === 'VIEW'}
         <!-- Page successfully loaded -->
-        <div class=rhythm use:pageReveal role=presentation>
+        <div class="rhythm html-container" use:pageReveal role=presentation>
           {@html html}
         </div>
         <!-- Actions Panel -->

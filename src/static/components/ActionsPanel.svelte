@@ -5,7 +5,7 @@
   import { throttle } from '@js/modules/util'
 
   // Props
-  export let hidden = false
+  export let hidden = true
 
   // Elements
   let grip: HTMLElement
