@@ -11,7 +11,6 @@
   import ActionsPanel from './ActionsPanel.svelte'
 
   // -- STATE
-  let path = ENV.HOMEPAGE
   let mode: 'LOADING' | 'VIEW' | 'EDIT' | 'ERROR' | '404' = 'LOADING'
   let page: API.LocalizedPage
   let html: string
