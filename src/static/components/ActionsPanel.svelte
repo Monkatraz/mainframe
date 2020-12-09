@@ -1,7 +1,6 @@
 <script lang="ts">
-  import * as API from '@js/modules/api'
   import { onSwipe } from '@modules/gestures'
-  import { Agent } from '@js/mainframe'
+  import { Agent } from '@modules/state'
   import { usAnime, usTip } from '@js/modules/components'
   import { throttle } from '@js/modules/util'
 

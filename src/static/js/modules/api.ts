@@ -9,12 +9,11 @@ import FaunaDB, { Expr, values as v, errors as e } from 'faunadb'
 const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
-import { ENV, Task, Result } from '@modules/util'
-import { User } from '@js/mainframe'
+import { ENV, User } from '@modules/state'
+import { Task, Result } from '@modules/util'
 
-// -----------
-// NETLIFY
-// -----------
+// ---------
+//  NETLIFY
 
 /** Invokes the Netlify Function specified by the `fn` parameter.
  *  As it returns a `Result`, use `Result.ok` to determine if the invokation succeeded or failed.
@@ -44,9 +43,8 @@ export async function invokeLambda<T = JSONObject>(fn: string, payload?: any, in
   return new Result(response.ok, await response.json() as T)
 }
 
-// -----------
-// FAUNADB
-// -----------
+// ---------
+//  FAUNADB
 
 // Values
 /** Database variant of the JS `Date` class. Use the `date()` method to convert a `FaunaDate` into a JS `Date`.
@@ -352,9 +350,8 @@ export const Clients: FaunaClients = {
   Admin: null
 }
 
-// -----------
-// SOCIAL
-// -----------
+// --------
+//  SOCIAL
 
 
 export interface Social {
@@ -373,9 +370,8 @@ export interface Social {
   bio: string
 }
 
-// -----------
-// PAGES
-// -----------
+// -------
+//  PAGES
 
 // Types
 /** Tuple representing a user rating on a page. */
@@ -451,6 +447,7 @@ export interface Page {
   }
 }
 
+/** Minimal form of a `Page` object, localized to a language and with no `social` data included. */
 export interface LocalizedPage {
   /** URL path, starting from root. Is always unique. */
   path: string
@@ -473,6 +470,8 @@ export interface LocalizedPage {
     /** List of strings describing the contents of the article. */
     tags: Tags[]
   }
+  /** Language that this particular localized page is in. */
+  lang: string
   /** Page title. */
   title: string
   /** Page subtitle. */
@@ -490,7 +489,7 @@ export async function getLocalizedPage(path: string, lang: Expr = qe.PageLang(q.
     // Filter our database page object and get only what we need from it
     q.Merge(
       qe.Filter(q.Var('data'), [
-        'path', 'version', 'meta',
+        'path', 'version', 'meta', ['lang', q.Var('lang')]
       ]),
       // Descend into our desired local and merge back what we need
       qe.Filter(q.Select(['locals', q.Var('lang')], q.Var('data')), [

@@ -6,15 +6,14 @@
   <meta charset="utf-8">
   <base href="/">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <!--
-    This site is not optimized for PWA usage at the moment.
-    However, it could be quite well-suited for it.
-  -->
+  <!-- This site is not optimized for PWA usage at the moment.
+       However, it could be quite well-suited for it. -->
   <!-- link(rel='manifest' href='/site.webmanifest') -->
 
   <!-- Preloads, Preconnects, and Prefetches-->
   <link rel="preload" href="/static/css/main.css" as="style">
   <!-- Further preloads are added by Snowpack on build. -->
+  <!-- This preconnect allows us to connect to our page database just a tiny bit faster. -->
   <link rel="preconnect" href="https://db.fauna.com">
 
   <!-- Misc. -->
@@ -24,17 +23,13 @@
   <meta property="og:url" content="https://www.scp-mainframe.app">
   <meta property="og:type" content="website">
   <meta property="og:image" content="/static/media/meta_header.png">
-  <!--
-    Twitter Static
-    If this site were to be used officially, 'twitter:creator' would be removed.
-  -->
+  <!-- Twitter Static
+       If this site were to be used officially, 'twitter:creator' would be removed. -->
   <meta name="twitter:card" content="summary">
   <meta name="twitter:site" content="@scpwiki">
   <meta name="twitter:creator" content="@monkatraz">
-  <!--
-    Dynamic Metadata
-    All of this will change depending on the loaded article.
-  -->
+  <!-- Dynamic Metadata
+       All of this will change depending on the loaded article. -->
   <title>SCP MAINFRAME</title>
   <meta property="og:title" content="SCP MAINFRAME">
   <meta name="description" content="An (unofficial) experimental SCP Wiki replacement design concept.">
@@ -49,7 +44,7 @@
   <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
   <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#850005">
 
-  <!-- Finalize, and load CSS -->
+  <!-- Bundled CSS. -->
   <link rel="stylesheet" href="/static/css/main.css">
 
 </head>
@@ -70,19 +65,21 @@
   <footer id="footer">
     <ul id="footer_list">
       <li>Powered by <span id="footer_pmf">MAINFRAME</span>.</li>
-      <!-- Link to source Github -->
+      <!-- Link to source Github. -->
       <li><a class="link link-external" href="https://github.com/Monkatraz/mainframe">
           <span class="iconify-inline" data-icon="mdi:github"></span> Github
         </a></li>
-      <!-- Link to original wiki -->
+      <!-- Link to original wiki. -->
       <li><a class="link link-external" href="http://www.scpwiki.com/">
           <img src="/static/media/logo.svg" alt="SCP Foundation Logo" role="presentation" width="12"> SCP-Wiki
         </a></li>
     </ul>
   </footer>
 
-  <!-- Init. base module -->
-  <script async="" src="/static/js/mainframe.js" type="module"></script>
+  <!-- Init. modules and vendor scripts. 
+       Vendor scripts will require that their domain be exempted in the CSP. -->
+  <script async src="/static/js/mainframe.js" type="module"></script>
+  <script async src="https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js"></script>
 </body>
 
 </html>

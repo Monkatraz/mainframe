@@ -44,11 +44,7 @@ function touchClassHandle(evt: TouchEvent) {
 // Something to note is that for externally loaded scripts (like Iconify or Prism auto-DL languages) -
 // is that their source domains need to be exempted in the CSP. This can be adjusted in `netlify.toml`.
 function loadVendorScripts() {
-  // TODO: Find a cleaner way to load these (Skypack? Async Defer?)
-  // Iconify
-  appendScript('https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js')
-    .catch(() => { console.warn(`Iconify failed to load.`) })
-
+  // TODO: Replace this with Shiki
   // Prism
   appendScript('/vendor/prism.js').then(() => {
     // Disable automatically firing
@@ -56,119 +52,6 @@ function loadVendorScripts() {
     // Divert languages to CDN instead of storing them ourselves
     window.Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/'
   }).catch(() => { console.warn(`Prism failed to load.`) })
-}
-
-// ----------------
-//   MEDIA QUERIES
-
-const sizeMap = new Map()
-const sizes = ['narrow', 'thin', 'small', 'normal', 'wide'] as const
-
-// This makes our map associated both ways:
-// 0 = thin, thin = 0.
-sizes.forEach((size: string, i) => {
-  sizeMap.set(size, i)
-  sizeMap.set(i, size)
-})
-
-/** Contains the media queries for the window size breakpoints.
- *  Narrow is not included as it is the default size if none of the others are valid.
- */
-const sizeQueries = {
-  thin: window.matchMedia('(min-width: 400px)'),
-  small: window.matchMedia('(min-width: 800px)'),
-  normal: window.matchMedia('(min-width: 1000px)'),
-  wide: window.matchMedia('(min-width: 1400px)')
-}
-
-let curSize = 'thin'
-/** Updates the `curSize` variable with the current window size. */
-function updateSize() {
-  for (let i = 1; i < sizes.length; i++) {
-    if (sizeQueries[sizes[i] as keyof typeof sizeQueries].matches === false) {
-      curSize = sizeMap.get(i - 1)
-      break
-    } else {
-      curSize = sizeMap.get(sizes.length - 1)
-    }
-  }
-  window.dispatchEvent(new Event('MF_MediaSizeChanged'))
-}
-
-// Add our event listeners, so that no polling is needed.
-for (const size in sizeQueries) {
-  sizeQueries[size as keyof typeof sizeQueries].addEventListener('change', updateSize)
-}
-
-/**
- * Checks if the specified size matches against the inclusivity operator.
- * For example: matches('narrow', 'only')
- * This will be true only if we're entirely with the bounds of 'narrow'.
- */
-export function matchMedia(
-  size: 'narrow' | 'thin' | 'small' | 'normal' | 'wide',
-  inclusivity: 'only' | 'up' | 'below' = 'only') {
-  // Our size map means this function is relatively simple.
-  // Larger sizes have their mapped integer higher than the previous.
-  // We can use this to compare curSize to our specified size.
-  switch (inclusivity) {
-    case 'only':
-      return curSize === size
-    case 'up':
-      return sizeMap.get(curSize) >= sizeMap.get(size)
-    case 'below':
-      return sizeMap.get(curSize) < sizeMap.get(size)
-  }
-}
-
-// ---------
-//   STATE
-
-/** Browser / User-Agent info. Contains contextual information like normalized mouse position values. */
-// TODO: Change this to a namespace
-export const Agent = {
-  // Values
-  mouseX: 0,
-  mouseY: 0,
-  scroll: 0,
-  // Flags
-  isMobile: /Mobi|Android/i.test(navigator.userAgent),
-
-  updateMouseCoordinates(evt: MouseEvent) {
-    const normX = evt.clientX / window.innerWidth
-    const normY = evt.clientY / window.innerHeight
-    Agent.mouseX = normX
-    Agent.mouseY = normY
-  },
-
-  updateScrollRatio() {
-    const body = document.body
-    const root = document.documentElement
-    Agent.scroll = root.scrollTop / (body.scrollHeight - window.innerHeight)
-  }
-}
-
-/** Represents the current user - regardless of if they are logged in or not. */
-export const User = {
-  isLoggedIn: false,
-  username: 'Guest',
-  // FaunaDB User Auth
-  auth: {
-    // The amount of sensitive data here should be minimized as much as possible
-    ref: '',
-    token: ''
-  },
-  // LocalStorage preferences
-  preferences: {
-    langs: ['en']
-  },
-  // TODO: Logging in / out
-  login(email: string, password: string) {
-    User.isLoggedIn = true
-  },
-  logout() {
-    User.isLoggedIn = false
-  }
 }
 
 // -----
@@ -182,10 +65,7 @@ const App = new AppComponent({ target: document.querySelector('#app') as HTMLEle
 
 function finalizeLoading() {
   loadVendorScripts()
-  updateSize()
   evtlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
-  evtlistener(window, ['mousemove'], Agent.updateMouseCoordinates)
-  evtlistener(window, ['scroll'], Agent.updateScrollRatio)
   // Goofy thing for making a placeholder img for the logo work.
   const emblem = document.querySelector('#logo_emblem') as HTMLImageElement
   if (emblem.complete) emblem.classList.add('loaded')

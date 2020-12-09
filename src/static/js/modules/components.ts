@@ -3,8 +3,8 @@
  * @author Monkatraz
  */
 
-// Imports
-import { ENV } from '@modules/util'
+// -- Imports
+// Tippy
 import {
   Props as TippyProps,
   roundArrow as TippyRoundArrow,
@@ -15,11 +15,11 @@ import tippy from 'tippy.js'
 import 'tippy.js/dist/tippy.css'
 import 'tippy.js/dist/svg-arrow.css'
 import 'tippy.js/animations/scale.css'
+// Anime
 import anime, { AnimeParams } from 'animejs'
 
-// --------
-// TIPPY
-// --------
+// -------
+//  TIPPY
 
 const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
   ignoreAttributes: true,
@@ -47,9 +47,8 @@ export function usTip(elem: Element, opts: Partial<TippyProps> = {}) {
   }
 }
 
-// --------
-// ANIM
-// --------
+// ------
+//  ANIM
 
 // TODO: Figure out animejs layering
 

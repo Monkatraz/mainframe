@@ -3,19 +3,6 @@
  * @author Monkatraz
  */
 
-/** Contains all environment variables. */
-export const ENV = {
-  /** API related env. variables. Usually database related. */
-  API: {
-    // Database
-    FDB_PUBLIC: import.meta.env.SNOWPACK_PUBLIC_API_FDB_PUBLIC,
-    FDB_DOMAIN: import.meta.env.SNOWPACK_PUBLIC_API_FDB_DOMAIN,
-    // Serverless functions
-    LAMBDA: import.meta.env.SNOWPACK_PUBLIC_API_LAMBDA
-  },
-  HOMEPAGE: import.meta.env.SNOWPACK_PUBLIC_HOMEPAGE
-}
-
 /**
  * Returns a promise that resolves after the specified number of miliseconds.
  */
@@ -186,10 +173,78 @@ export function appendStylesheet(href: string): Promise<void> {
   })
 }
 
+// ----------
+//  MARKDOWN
+
 import marked from 'marked'
 import DOMPurify from 'dompurify'
 
 /** Safely renders a given markdown string. */
 export function renderMarkdown(md: string) {
   return DOMPurify.sanitize(marked(md))
+}
+
+// ---------------
+//  MEDIA QUERIES
+
+const sizeMap = new Map()
+const sizes = ['narrow', 'thin', 'small', 'normal', 'wide'] as const
+
+// This makes our map associated both ways:
+// 0 = thin, thin = 0.
+sizes.forEach((size: string, i) => {
+  sizeMap.set(size, i)
+  sizeMap.set(i, size)
+})
+
+/** Contains the media queries for the window size breakpoints.
+ *  Narrow is not included as it is the default size if none of the others are valid.
+ */
+const sizeQueries = {
+  thin: window.matchMedia('(min-width: 400px)'),
+  small: window.matchMedia('(min-width: 800px)'),
+  normal: window.matchMedia('(min-width: 1000px)'),
+  wide: window.matchMedia('(min-width: 1400px)')
+}
+
+let curSize = 'thin'
+/** Updates the `curSize` variable with the current window size. */
+function updateSize() {
+  for (let i = 1; i < sizes.length; i++) {
+    if (sizeQueries[sizes[i] as keyof typeof sizeQueries].matches === false) {
+      curSize = sizeMap.get(i - 1)
+      break
+    } else {
+      curSize = sizeMap.get(sizes.length - 1)
+    }
+  }
+  window.dispatchEvent(new Event('MF_MediaSizeChanged'))
+}
+// Init. our `curSize` variable.
+updateSize()
+
+// Add our event listeners, so that no polling is needed.
+for (const size in sizeQueries) {
+  sizeQueries[size as keyof typeof sizeQueries].addEventListener('change', updateSize)
+}
+
+/**
+ * Checks if the specified size matches against the inclusivity operator.
+ * For example: matches('narrow', 'only')
+ * This will be true only if we're entirely with the bounds of 'narrow'.
+ */
+export function matchMedia(
+  size: 'narrow' | 'thin' | 'small' | 'normal' | 'wide',
+  inclusivity: 'only' | 'up' | 'below' = 'only') {
+  // Our size map means this function is relatively simple.
+  // Larger sizes have their mapped integer higher than the previous.
+  // We can use this to compare curSize to our specified size.
+  switch (inclusivity) {
+    case 'only':
+      return curSize === size
+    case 'up':
+      return sizeMap.get(curSize) >= sizeMap.get(size)
+    case 'below':
+      return sizeMap.get(curSize) < sizeMap.get(size)
+  }
 }

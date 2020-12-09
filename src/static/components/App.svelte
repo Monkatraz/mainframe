@@ -1,7 +1,8 @@
 <script lang="ts">
   // Imports
   import * as API from '@js/modules/api'
-  import { ENV, sleep, renderMarkdown, waitFor } from '@modules/util'
+  import { ENV } from '@modules/state'
+  import { sleep, renderMarkdown, waitFor } from '@modules/util'
   import { usAnime } from '@modules/components'
   import router from 'page'
   // Components
