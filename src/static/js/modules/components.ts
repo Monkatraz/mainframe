@@ -12,7 +12,9 @@ import {
   followCursor as TippyFollowCursor
 } from 'tippy.js'
 import tippy from 'tippy.js'
-// Styles for tippy.js are imported in 'css/components/_tippy.styl`.
+import 'tippy.js/dist/tippy.css'
+import 'tippy.js/dist/svg-arrow.css'
+import 'tippy.js/animations/scale.css'
 import anime, { AnimeParams } from 'animejs'
 
 // --------
