@@ -46,8 +46,20 @@
   // -- ROUTER
   router('/', () => loadPath(ENV.HOMEPAGE)) // Home page
   router('/404', () => mode = '404') // Directly asking for 404
-  router('*', (ctx) => loadPath(ctx.pathname) ) // Everything else
+  router('/mdtest', loadTestPage)
+  router((ctx) => loadPath(ctx.pathname)) // Everything else
   router() // Start router
+
+  async function loadTestPage() {
+    mode = 'LOADING'
+    const response = await fetch('/static/misc/md-test.md')
+    html = renderMarkdown(await response.text())
+    mode = 'VIEW'
+    // Chores
+    // Highlight code blocks
+    waitFor(() => typeof window.Prism?.highlightAll === 'function')
+      .then(() => window.Prism.highlightAll())
+  }
 
   async function loadPath(path: string) {
     try {
@@ -61,7 +73,7 @@
       mode = 'VIEW'
       // After page chores
       // Highlight code blocks
-      waitFor(() => window.Prism as any)
+      waitFor(() => typeof window.Prism?.highlightAll === 'function')
         .then(() => window.Prism.highlightAll())
     } catch (err) {
       error = err
