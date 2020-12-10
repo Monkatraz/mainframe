@@ -61,8 +61,7 @@
       mode = 'VIEW'
       // After page chores
       // Highlight code blocks
-      // TODO: pass Prism or Shiki to Marked instead of doing it like this
-      waitFor(() => typeof window.Prism?.highlightAll === 'function')
+      waitFor(() => window.Prism as any)
         .then(() => window.Prism.highlightAll())
     } catch (err) {
       error = err

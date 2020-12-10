@@ -2,7 +2,6 @@
 
 ### In Progress
 - [ ] Add CodeMirror editor component
-- [ ] Switch to Shiki and implement it in Marked
 
 ### General
 - [ ] Integrate ReCaptcha
