@@ -3,7 +3,8 @@
   import * as API from '@js/modules/api'
   import { ENV } from '@modules/state'
   import { sleep, renderMarkdown, waitFor } from '@modules/util'
-  import { usAnime } from '@modules/components'
+  import { usAnime, tnAnime } from '@modules/components'
+  import { fade } from 'svelte/transition'
   import router from 'page'
   // Components
   import Spinny from './Spinny.svelte'
@@ -32,7 +33,7 @@
   const pageReveal = usAnime({
     opacity: {
       value: [0, 1],
-      duration: 400,
+      duration: 300,
       easing: 'easeOutQuad',
       delay: 50
     },
@@ -44,11 +45,15 @@
   })
 
   // -- ROUTER
-  router('/', () => loadPath(ENV.HOMEPAGE)) // Home page
+  // Test pages
   router('/404', () => mode = '404') // Directly asking for 404
-  router('/mdtest', loadTestPage)
+  router('/test/load', () => mode = 'LOADING') // Loading symbol test page
+  router('/test/md', loadTestPage) // Markdown test page
+  // Proper pages
+  router('/', () => loadPath(ENV.HOMEPAGE)) // Home page
   router((ctx) => loadPath(ctx.pathname)) // Everything else
-  router() // Start router
+  // Start router
+  router()
 
   async function loadTestPage() {
     mode = 'LOADING'
@@ -210,15 +215,17 @@
     <main class="content" aria-label="Content">
       {#if mode === 'VIEW'}
         <!-- Page successfully loaded -->
-        <div class=rhythm use:pageReveal role=presentation>
-          {@html html}
-        </div>
-        <!-- Actions Panel -->
-        <IntersectionPoint
+        {#key html}
+          <div class=rhythm use:pageReveal out:fade={{duration: 50}} role=presentation>
+            {@html html}
+          </div>
+          <!-- Actions Panel -->
+          <IntersectionPoint
           onEnter={() => hideActionsPanel = true}
           onExit={() => hideActionsPanel = false}
           opts={{rootMargin: '300px'}}/>
-        <ActionsPanel bind:hidden={hideActionsPanel}/>
+          <ActionsPanel bind:hidden={hideActionsPanel}/>
+        {/key}
 
         <!-- Every other mode folllows -->
 
