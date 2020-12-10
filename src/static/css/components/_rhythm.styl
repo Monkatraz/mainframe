@@ -19,7 +19,7 @@ rhythm-set-text-bounds(auto = true)
 
 
 // Adds gutter(s) on the top and/or bottom using baseline row multiples
-rhythm-gutter(top, bottom = top)
+rhythm-gutter(top, bottom = top, margin-type = 0)
   for edge in (top bottom)
     if edge isnt false
       type = var(--rhythm-baseline-unit-row)
@@ -27,13 +27,25 @@ rhythm-gutter(top, bottom = top)
       name = 'top'
       name = 'bottom' if edge is bottom
 
-      unless edge is 0
-        if edge isnt 1
-          padding-{name}: 'calc(%s * %s)' % (type edge)
-        else
-          padding-{name}: type
-      if edge is 0
-        padding-{name}: 0
+      // Use Padding
+      if margin-type is 0
+        unless edge is 0
+          if edge isnt 1
+            padding-{name}: 'calc(%s * %s)' % (type edge)
+          else
+            padding-{name}: type
+        if edge is 0
+          padding-{name}: 0
+
+      // Use Margins
+      if margin-type is 1
+        unless edge is 0
+          if edge isnt 1
+            margin-{name}: 'calc(%s * %s)' % (type edge)
+          else
+            margin-{name}: type
+        if edge is 0
+          margin-{name}: 0
 
 // The 'rhythm grid' constructed here is not a dynamic vertical rhythm grid replacement.
 // At least, not a perfect one.
@@ -65,10 +77,10 @@ rhythm-gutter(top, bottom = top)
   // These tags are 'top-level' tags. 
   // They're intended to be used with the grid.
   // Anything else should probably be put inside a div.
-  $block-tags = 'div, pre, main, article, section, hgroup'
+  $block-tags = 'div main, article, section, hgroup'
   $break-tags = 'br, hr'
-  $figure-tags = 'img, figure, div.code-toolbar'
-  $text-tags = 'p, span, small, ol, ul, blockquote'
+  $figure-tags = 'img, figure, table, pre'
+  $text-tags = 'a, p, span, small, ol, ul, blockquote'
   $display-tags = 'h1, h2, h3, h4, h5, h6'
 
   // Tag selections based off of relationships or proximity.
@@ -101,11 +113,16 @@ rhythm-gutter(top, bottom = top)
     position: relative
     top: calc(var(--rhythm-baseline-unit-row) * 1.5)
 
+  // Text gutters
   +select-listed('> ', 'rhythm-text-gutters', $text-tags)
     rhythm-gutter(1,1)
 
   +select-listed('> ', 'rhythm-heading-gutters', $display-tags)
-    rhythm-gutter(1,1)
+    rhythm-gutter(1.5,1)
 
   +select-listed('', 'rhythm-headings-to-text', $headings-to-text)
     rhythm-gutter(0,false)
+
+  // Figure gutters
+  +select-listed('> ', 'rhythm-figure-gutters', $figure-tags)
+    rhythm-gutter(1,1,1)
