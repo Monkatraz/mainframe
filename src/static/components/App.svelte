@@ -215,7 +215,7 @@
     <main class="content" aria-label="Content">
       {#if mode === 'VIEW'}
         <!-- Page successfully loaded -->
-        {#key html}
+        {#key mode}
           <div class=rhythm use:pageReveal out:fade={{duration: 50}} role=presentation>
             {@html html}
           </div>
