@@ -30,7 +30,6 @@
     "faunadb": "^3.0.1",
     "marked": "^1.2.5",
     "page": "^1.11.6",
-    "prismjs": "^1.22.0",
     "svelte": "^3.31.0",
     "svelte-preprocess": "^4.6.1",
     "svelte-select": "^3.14.1",

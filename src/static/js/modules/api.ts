@@ -555,7 +555,29 @@ Ready to start writing?  Either start changing stuff on the left or
 [clear everything](/demo/?text=) with a simple click.
 
 [Marked]: https://github.com/markedjs/marked/
-[Markdown]: http://daringfireball.net/projects/markdown/`
+[Markdown]: http://daringfireball.net/projects/markdown/
+
+\`\`\`ts
+  /** Eagerly loads the rest of the LazyDocument. */
+  public async _eagerLoad() {
+    // Just plain get the whole object
+    const response = await this._client.query<DataObject>(this._requestExpr)
+    if (response.ok === false) throw new Error('Error retrieving document.')
+    // Set every field to its actual value
+    this._fields.forEach((field) => {
+      this._setField(field, response.body[field] as DataValue)
+    })
+    return this
+  }
+
+  /** Returns the requested field as another LazyDocument.
+   *  The requested field _must_ be an object for this to work. LazyDocument requires key-value pairs. */
+  public async _getLazy<K extends string & keyof T>(field: K): Promise<Lazyify<T[K]> & LazyDocument<T[K]>> {
+    const lazydoc = await new LazyDocument<T[K]>(q.Select(field, this._requestExpr), this._client)._start()
+    this._setField(field, lazydoc)
+    return lazydoc as Lazyify<T[K]> & typeof lazydoc
+  }
+\`\`\``
     }
   }
 }
