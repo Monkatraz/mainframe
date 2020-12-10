@@ -213,50 +213,50 @@
     <nav class="navbar" use:navBarReveal aria-label="Navigation"/>
     <aside class="sidebar" use:sideBarReveal aria-label="Sidebar"/>
     <main class="content" aria-label="Content">
-      {#if mode === 'VIEW'}
-        <!-- Page successfully loaded -->
-        {#key mode}
-          <div class=rhythm use:pageReveal out:fade={{duration: 50}} role=presentation>
-            {@html html}
+      {#key mode}
+        {#if mode === 'VIEW'}
+          <!-- Page successfully loaded -->
+            <div class=rhythm use:pageReveal out:fade={{duration: 50}} role=presentation>
+              {@html html}
+            </div>
+            <!-- Actions Panel -->
+            <IntersectionPoint
+            onEnter={() => hideActionsPanel = true}
+            onExit={() => hideActionsPanel = false}
+            opts={{rootMargin: '300px'}}/>
+            <ActionsPanel bind:hidden={hideActionsPanel}/>
+
+          <!-- Every other mode folllows -->
+
+          <!-- Page still loading -->
+          {:else if mode === 'LOADING'}
+          <!-- Wait a moment before loading so that we don't instantly and needlessly display a spinner -->
+          {#await sleep(300) then _}
+            <Spinny width=150px top=200px left=50%/>
+          {/await}
+
+          <!-- Page not found / 404 error-->
+          {:else if mode === '404'}
+          <div class="pgnf rhythm" use:pageReveal out:fade={{duration: 50}}>
+            <div class="pgnf-blackbox rhythm">
+              <h1 class=pgnf-header>404</h1>
+              <h2 class=pgnf-text>PAGE NOT FOUND</h2>
+            </div><br />
+            <h5>The requested page either does not exist or was not found.</h5>
           </div>
-          <!-- Actions Panel -->
-          <IntersectionPoint
-          onEnter={() => hideActionsPanel = true}
-          onExit={() => hideActionsPanel = false}
-          opts={{rootMargin: '300px'}}/>
-          <ActionsPanel bind:hidden={hideActionsPanel}/>
-        {/key}
 
-        <!-- Every other mode folllows -->
-
-        <!-- Page still loading -->
-        {:else if mode === 'LOADING'}
-        <!-- Wait a moment before loading so that we don't instantly and needlessly display a spinner -->
-        {#await sleep(300) then _}
-          <Spinny width=150px top=200px left=50%/>
-        {/await}
-
-        <!-- Page not found / 404 error-->
-        {:else if mode === '404'}
-        <div class="pgnf rhythm" use:pageReveal>
-          <div class="pgnf-blackbox rhythm">
-            <h1 class=pgnf-header>404</h1>
-            <h2 class=pgnf-text>PAGE NOT FOUND</h2>
-          </div><br />
-          <h5>The requested page either does not exist or was not found.</h5>
-        </div>
-
-        <!-- Page display error -->
-        {:else if mode === 'ERROR'}
-        <div class=rhythm use:pageReveal>
-          <h2>Error Displaying Page</h2>
-          <hr>
-          <pre class=code><code>
-            ERR: {error.name}: {error.message}
-            MSG: {error.description}
-          </code></pre>
-        </div>
-      {/if}
+          <!-- Page display error -->
+          {:else if mode === 'ERROR'}
+          <div class=rhythm use:pageReveal out:fade={{duration: 50}}>
+            <h2>Error Displaying Page</h2>
+            <hr>
+            <pre class=code><code>
+              ERR: {error.name}: {error.message}
+              MSG: {error.description}
+            </code></pre>
+          </div>
+        {/if}
+      {/key}
     </main>
   </div>
 {/if}
