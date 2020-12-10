@@ -44,7 +44,6 @@ function touchClassHandle(evt: TouchEvent) {
 // Something to note is that for externally loaded scripts (like Iconify or Prism auto-DL languages) -
 // is that their source domains need to be exempted in the CSP. This can be adjusted in `netlify.toml`.
 function loadVendorScripts() {
-  // TODO: Replace this with Shiki
   // Prism
   appendScript('/vendor/prism.js').then(() => {
     // Disable automatically firing
