@@ -7,10 +7,12 @@ module.exports = {
     postcss: {
       plugins: require('./dev/snowpack/postcss-plugins/plugins')
     },
-    stylus: { paths: ['./src/static/css/', './dev/snowpack/stylus-plugins/'] }
+    stylus: {
+      paths: ['./src/static/css/', './dev/snowpack/stylus-plugins/'],
+      sourcemap: true
+    }
   }),
   compilerOptions: {
-    // Due to Svelte components not being bundled, it's more effective to inline the CSS here.
     css: false
   }
 };

@@ -11,7 +11,7 @@
     "importsNotUsedAsValues": "error",
     "isolatedModules": true,
     "noEmit": true,
-    "sourceMap": false,
+    "sourceMap": true,
     // Linting
     "strict": true,
     "skipLibCheck": true,
@@ -19,9 +19,6 @@
     // Paths
     "baseUrl": "./",
     "paths": {
-      "*": [
-        "web_modules/.types/*"
-      ],
       "@js/*": [
         "./src/static/js/*"
       ],

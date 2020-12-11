@@ -3,28 +3,28 @@ const path = require('path')
 const postcss = require('postcss')
 const stylus = require('stylus')
 
-// @ts-ignore
-const postcssRenderer = postcss([require('postcss-normalize'), ...require('./postcss-plugins/plugins')])
-
-const stylusPaths = ['./src/static/css/', './dev/snowpack/stylus-plugins/']
-
 // Renderers
-const stylusRender = function (str = '', path = '') {
+const stylusPaths = ['./src/static/css/', './dev/snowpack/stylus-plugins/']
+const stylusRender = function (str = '', filePath = '') {
   return new Promise((resolve, reject) => {
-    stylus(str)
-      .set('filename', path)
+    const renderer = stylus(str)
+      .set('filename', './src/static/css/' + path.basename(filePath))
       .set('paths', stylusPaths)
       .set('sourcemap', {
         comment: false,
         inline: true,
-        basePath: 'src/static/css'
+        basePath: './src/static/css'
       })
-      .render((err, css) => {
-        if (err) reject(err)
-        resolve(css)
-      })
+    renderer.render((err, css) => {
+      if (err) reject(err)
+      // @ts-ignore
+      resolve([css, renderer.sourcemap])
+    })
   })
 }
+
+// @ts-ignore
+const postcssRenderer = postcss([require('postcss-normalize'), ...require('./postcss-plugins/plugins')])
 const postCSSRender = function (str = '', options = {}) {
   return new Promise((resolve, reject) => {
     postcssRenderer
@@ -53,30 +53,26 @@ module.exports = function (snowpackConfig, pluginOptions) {
       // Don't load partials
       if (/\\_.*\.styl$/.test(filePath)) return {}
 
-      try {
-        // Get our file
-        const src = await fs.readFile(filePath, { encoding: 'utf-8' })
+      // Get our file
+      const src = await fs.readFile(filePath, { encoding: 'utf-8' })
 
-        // Compile Stylus
-        const outStylus = await stylusRender(src, filePath)
+      // Compile Stylus
+      const [outStylus, stylusMap] = await stylusRender(src, filePath)
 
-        // Compile PostCSS
-        const result = await postCSSRender(outStylus, {
-          from: filePath,
-          to: filePath,
-          map: {
-            inline: false,
-            annotation: false,
-            from: ''
-          }
-        })
+      // Compile PostCSS
+      const result = await postCSSRender(outStylus, {
+        from: filePath.replace(/\.styl$/, '.css'),
+        to: filePath.replace(/\.styl$/, '.css'),
+        map: {
+          inline: false,
+          annotation: false,
+          prev: stylusMap,
+          sourcesContent: true
+        }
+      })
 
-        return { '.css': { code: result.css, map: result.map } }
-      } catch (err) {
-        console.error(err)
-        if (err.message) console.error(err.message)
-        return {}
-      }
+      return { '.css': { code: result.css, map: result.map } }
+      // return { '.css': { code: outStylus, map: stylusMap } }
     }
   }
 }

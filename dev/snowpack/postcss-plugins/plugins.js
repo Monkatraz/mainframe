@@ -10,7 +10,6 @@ const postcssPlugins = [
     sort: require('sort-css-media-queries').desktopFirst
   }),
   require('postcss-combine-duplicated-selectors')(),
-  require('postcss-join-transitions')(),
   require('postcss-discard-duplicates')(),
   require('./discardoverriddenprops')(),
   require('autoprefixer')(),

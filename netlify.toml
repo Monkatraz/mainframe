@@ -1,6 +1,6 @@
 [dev]
 framework = "#custom"
-command = "npx run-s dev:*"
+command = "npm run dev:snowpack"
 targetPort = 8080
 port = 8000
 publish = "build"

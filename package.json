@@ -8,10 +8,7 @@
   "scripts": {
     "dev": "netlify dev",
     "dev:snowpack": "snowpack dev",
-    "build": "run-p build:*",
-    "build:snowpack": "snowpack build",
-    "build:lambda": "netlify-lambda build ./dev/netlify-functions",
-    "deploy-production": "run-s build:snowpack build:lambda \"netlify deploy -p\"",
+    "build": "snowpack build & netlify-lambda build ./dev/netlify-functions",
     "netlify-build": "snowpack build && netlify-lambda build ./dev/netlify-functions",
     "test": "echo \"Mainframe does not currently include a test runner.\""
   },
@@ -30,9 +27,6 @@
     "faunadb": "^3.0.1",
     "marked": "^1.2.5",
     "page": "^1.11.6",
-    "svelte": "^3.31.0",
-    "svelte-preprocess": "^4.6.1",
-    "svelte-select": "^3.14.1",
     "tippy.js": "^6.2.7"
   },
   "devDependencies": {
@@ -53,17 +47,17 @@
     "cssnano-preset-advanced": "^4.0.7",
     "encoding": "^0.1.13",
     "netlify-lambda": "^2.0.1",
-    "npm-run-all": "^4.1.5",
     "postcss": "^8.1.14",
     "postcss-center": "^1.1.0",
     "postcss-combine-duplicated-selectors": "^10.0.2",
     "postcss-discard-duplicates": "^4.0.2",
     "postcss-easing-gradients": "^3.0.1",
-    "postcss-join-transitions": "^1.1.0",
     "postcss-normalize": "^9.0.0",
     "snowpack": "^2.18.1",
     "sort-css-media-queries": "^1.5.2",
     "stylus": "^0.54.8",
+    "svelte": "^3.31.0",
+    "svelte-preprocess": "^4.6.1",
     "typescript": "^4.1.2"
   },
   "optionalDependencies": {
