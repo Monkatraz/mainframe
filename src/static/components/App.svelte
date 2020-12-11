@@ -2,9 +2,10 @@
   // Imports
   import * as API from '@js/modules/api'
   import { ENV } from '@modules/state'
-  import { sleep, renderMarkdown, waitFor } from '@modules/util'
+  import { sleep, waitFor } from '@modules/util'
   import { usAnime, tnAnime } from '@modules/components'
   import { fade } from 'svelte/transition'
+  import renderMarkdown from '@modules/markdown'
   import router from 'page'
   // Components
   import Spinny from './Spinny.svelte'
@@ -77,6 +78,7 @@
       html = renderMarkdown(page.template)
       mode = 'VIEW'
       // After page chores
+      // TODO: set title
       // Highlight code blocks
       waitFor(() => typeof window.Prism?.highlightAll === 'function')
         .then(() => window.Prism.highlightAll())

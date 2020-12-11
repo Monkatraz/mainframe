@@ -12,6 +12,12 @@
 
 ***
 
+# <a name="Custom Syntax"></a>Custom Syntax
+***
+- Superscript: ^123^ H^2^0 10^20^
+- Subscript: X~1~ X~2~ Y~1~ Y~2~
+- Strikethrough: ~~this was a mistake~~
+
 # <a name="Headings"></a>Headings
 ***
 
