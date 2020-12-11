@@ -60,9 +60,10 @@ module.exports = function (snowpackConfig, pluginOptions) {
       const [outStylus, stylusMap] = await stylusRender(src, filePath)
 
       // Compile PostCSS
+      const outputName = filePath.replace(/\.styl$/, '.css')
       const result = await postCSSRender(outStylus, {
-        from: filePath.replace(/\.styl$/, '.css'),
-        to: filePath.replace(/\.styl$/, '.css'),
+        from: outputName,
+        to: outputName,
         map: {
           inline: false,
           annotation: false,
