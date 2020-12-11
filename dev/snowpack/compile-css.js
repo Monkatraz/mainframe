@@ -8,12 +8,12 @@ const stylusPaths = ['./src/static/css/', './dev/snowpack/stylus-plugins/']
 const stylusRender = function (str = '', filePath = '') {
   return new Promise((resolve, reject) => {
     const renderer = stylus(str)
-      .set('filename', './src/static/css/' + path.basename(filePath))
+      .set('filename', 'src/static/css/' + path.basename(filePath))
       .set('paths', stylusPaths)
       .set('sourcemap', {
         comment: false,
         inline: true,
-        basePath: './src/static/css'
+        basePath: 'src/static/css'
       })
     renderer.render((err, css) => {
       if (err) reject(err)
