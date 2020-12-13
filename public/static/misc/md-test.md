@@ -14,9 +14,18 @@
 
 # <a name="Custom Syntax"></a>Custom Syntax
 ***
-- Superscript: ^123^ H^2^0 10^20^
+- Superscript: ^123^ H^2^0 10^20^ 10^10^10^10^^^
 - Subscript: X~1~ X~2~ Y~1~ Y~2~
 - Strikethrough: ~~this was a mistake~~
+- Insert: ++this was added++
+- Delete: --this has been deleted--
+- Mark: ==this has been marked==
+- Math: $c = \pm\sqrt{a^2 + b^2}$
+
+# <a name="Tests"></a>Tests
+***
+- Nested custom syntax: 10^10~20~^
+	- ==test ~~one~~ two==
 
 # <a name="Headings"></a>Headings
 ***
