@@ -37,7 +37,7 @@ export function throttle<T extends WrappedFn<NoReturnVal>>(fn: T, limitMS: numbe
       initialCall = false
       next()
     }
-    if (!timeout) timeout = setTimeout(next, limitMS)
+    if (!timeout) timeout = setTimeout(next, limitMS) as unknown as number
   }
 }
 
