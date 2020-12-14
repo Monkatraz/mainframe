@@ -99,6 +99,119 @@ export type QueryPermissionError = QueryUnauthorized | QueryMethodNotAllowed | Q
 /** Error thrown by FaunaDB when the endpoint had some sort of query agnostic error. */
 export type QueryEndpointError = QueryInternalError | QueryUnavailable
 
+// --------
+//  SOCIAL
+
+export interface Social {
+  /** A reference to the user's actual User document.
+   *  This document cannot actually be read - but this reference serves as the canonical ID for this user.
+   *  Additionally, the actual ID of the `Ref` (not the collection) serves as the URL path for the user. */
+  user: Ref
+  /** A page (a markdown template) specific to the user. Only they can edit it. */
+  authorpage: string
+  /** The nickname for this user. They can change it at any time. */
+  nickname: string
+  /** A very short description for the user.
+   *  It is intended for info like pronouns, as it is always displayed with the user. Optional. */
+  tagline: string
+  /** A more formal, and longer, description for the user. Optional. */
+  bio: string
+}
+
+/** `Comment` objects represent single comments created by users. */
+export interface Comment {
+  /** Reference to the author of the comment. */
+  author: Ref
+  /** General metadata, like current revision and creation date. */
+  meta: {
+    /** Number of revisions (edits) for this comment Starts at 1. */
+    revision: number
+    /** Date when this comment was created. */
+    dateCreated: Date
+    /** Date when this comment was last edited. */
+    dateLastEdited: Date
+  }
+  /** Markdown content of the comment. Must be rendered in order to view. */
+  content: string
+}
+
+// -------
+//  PAGES
+
+/** Tuple representing a user rating on a page. */
+type Rating = [Ref, 1 | -1 | 0]
+/** A list of page tags. */
+type Tags = string[]
+
+/** `View` objects represent a particular language variant of a page. */
+export interface View {
+  /** Page title. */
+  title: string
+  /** Page subtitle. */
+  subtitle: string
+  /** Short page description. */
+  description: string
+  /** Markdown page template. Must be rendered to be viewed. */
+  template: string
+}
+
+/** Root level object retrieved from the FaunaDB database. Contains everything relevant to a `Page`. */
+export interface Page {
+  /** URL path, starting from root. Is always unique. */
+  path: string
+  /** Version number, used for backwards compatibility handling (if needed) */
+  version: number
+  /** Metadata - contains things like the current `revision`, edit dates, etc. */
+  meta: {
+    /** Set of users who authored this page and have edit permissions. */
+    authors: Ref[]
+    /** Number of revisions (edits) for this page. Starts at 1. */
+    revision: number
+    /** Date when this page was created. */
+    dateCreated: Date
+    /** Date when this page was last edited. */
+    dateLastEdited: Date
+    /** A list of strings containing meta-contextual labels for a page.
+     *  E.g. a flag like 'cc_validated' could be present within this list.
+     */
+    flags: string[]
+    /** List of strings describing the contents of the article. */
+    tags: Tags[]
+  }
+  social: {
+    /** A list of `Rating` objects representing how users have voted on this page. */
+    ratings: Rating[]
+    /** A list of 'Comment' objects, storing how users commented on this page. */
+    comments: string[]
+  }
+  /** Dictionary-like object (e.g `en: {}`) listing all versions of this page.
+   *  Fields denote which language the `View` is for.
+   */
+  locals: {
+    [lang: string]: View
+  }
+}
+
+/** Minimal form of a `Page` object, localized to a language and with no `social` data included. */
+export interface LocalizedPage {
+  /** URL path, starting from root. Is always unique. */
+  path: string
+  /** Version number, used for backwards compatibility handling (if needed) */
+  version: number
+  /** Metadata - contains things like authors, current `revision`, edit dates, etc. */
+  meta: Page['meta']
+  /** Language that this particular localized page is in. */
+  lang: string
+  /** Page title. */
+  title: string
+  /** Page subtitle. */
+  subtitle: string
+  /** Short page description. */
+  description: string
+  /** Markdown page template. Must be rendered to be viewed. */
+  template: string
+}
+
 /** Gets the status code of any error, defaulting to 400.
  *  Has special handling for `FaunaHTTPError`s.
  */
@@ -346,138 +459,6 @@ export const Clients: FaunaClients = {
   Public: new Client(ENV.API.FDB_PUBLIC),
   User: null,
   Admin: null
-}
-
-// --------
-//  SOCIAL
-
-
-export interface Social {
-  /** A reference to the user's actual User document.
-   *  This document cannot actually be read - but this reference serves as the canonical ID for this user.
-   *  Additionally, the actual ID of the `Ref` (not the collection) serves as the URL path for the user. */
-  user: Ref
-  /** A page (basically a markdown template) specific to the user. Only they can edit it. */
-  authorpage: string
-  /** The nickname for this user. They can change it at any time. */
-  nickname: string
-  /** A very short description for the user.
-   *  It is intended for info like pronouns, as it is always displayed with the user. Optional. */
-  tagline: string
-  /** A more formal, and longer, description for the user. Optional. */
-  bio: string
-}
-
-// -------
-//  PAGES
-
-// Types
-/** Tuple representing a user rating on a page. */
-type Rating = [Ref, 1 | -1 | 0]
-/** A list of page tags. */
-type Tags = string[]
-/** A list of page flags. */
-type Flags = string[]
-
-/** `Comment` objects represent single comments stored within a `Page` object. */
-export interface Comment {
-  /** Reference to the author of the comment. */
-  author: Ref
-  /** General metadata, like current revision and creation date. */
-  meta: {
-    /** Number of revisions (edits) for this comment Starts at 1. */
-    revision: number
-    /** Date when this comment was created. */
-    dateCreated: Date
-    /** Date when this comment was last edited. */
-    dateLastEdited: Date
-  }
-  /** Markdown content of the comment. Must be rendered in order to view. */
-  content: string
-}
-
-/** `View` objects represent a particular language variant of a page. */
-export interface View {
-  /** Page title. */
-  title: string
-  /** Page subtitle. */
-  subtitle: string
-  /** Short page description. */
-  description: string
-  /** Markdown page template. Must be rendered to be viewed. */
-  template: string
-}
-
-/** Root level object retrieved from the FaunaDB database. Contains everything relevant to a `Page`. */
-export interface Page {
-  /** URL path, starting from root. Is always unique. */
-  path: string
-  /** Version number, used for backwards compatibility handling (if needed) */
-  version: number
-  /** Metadata - contains things like the current `revision`, edit dates, etc. */
-  meta: {
-    /** Set of users who authored this page and have edit permissions. */
-    authors: Ref[]
-    /** Number of revisions (edits) for this page. Starts at 1. */
-    revision: number
-    /** Date when this page was created. */
-    dateCreated: Date
-    /** Date when this page was last edited. */
-    dateLastEdited: Date
-    /** A list of strings containing meta-contextual labels for a page.
-     *  E.g. a flag like 'cc_validated' could be present within this list.
-     */
-    flags: Flags[]
-    /** List of strings describing the contents of the article. */
-    tags: Tags[]
-  }
-  social: {
-    /** A list of `Rating` objects representing how users have voted on this page. */
-    ratings: Rating[]
-    /** A list of 'Comment' objects, storing how users commented on this page. */
-    comments: string[]
-  }
-  /** Dictionary-like object (e.g `en: {}`) listing all versions of this page.
-   *  Fields denote which language the `View` is for.
-   */
-  locals: {
-    [lang: string]: View
-  }
-}
-
-/** Minimal form of a `Page` object, localized to a language and with no `social` data included. */
-export interface LocalizedPage {
-  /** URL path, starting from root. Is always unique. */
-  path: string
-  /** Version number, used for backwards compatibility handling (if needed) */
-  version: number
-  /** Metadata - contains things like authors, current `revision`, edit dates, etc. */
-  meta: {
-    /** Set of users who authored this page and have edit permissions. */
-    authors: Ref[]
-    /** Number of revisions (edits) for this page. Starts at 1. */
-    revision: number
-    /** Date when this page was created. */
-    dateCreated: Date
-    /** Date when this page was last edited. */
-    dateLastEdited: Date
-    /** A list of strings containing meta-contextual labels for a page.
-     *  E.g. a flag like 'cc_validated' could be present within this list.
-     */
-    flags: Flags[]
-    /** List of strings describing the contents of the article. */
-    tags: Tags[]
-  }
-  /** Language that this particular localized page is in. */
-  lang: string
-  /** Page title. */
-  title: string
-  /** Page subtitle. */
-  subtitle: string
-  /** Short page description. */
-  description: string
-  /** Markdown page template. Must be rendered to be viewed. */
-  template: string
 }
 
 /** Dictionary of premade expressions relating to `Page` objects.

@@ -12,18 +12,7 @@ const postcssPlugins = [
   require('postcss-combine-duplicated-selectors')(),
   require('postcss-discard-duplicates')(),
   require('./discardoverriddenprops')(),
-  require('autoprefixer')(),
-  require('cssnano')({
-    preset: [
-      'advanced',
-      {
-        normalizeWhitespace: false, // Makes reading output 10x easier
-        autoprefixer: false, // Wouldn't change anything
-        discardUnused: false, // Breaks fonts
-        mergeRules: false // Already done previously but also causes issues if left on
-      }
-    ]
-  })
+  require('autoprefixer')()
 ]
 
 // And now we turn them back on

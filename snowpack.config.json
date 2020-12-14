@@ -17,7 +17,6 @@
   },
   "devOptions": {
     "out": "./build/",
-    "fallback": "index.html",
     "open": "none",
     "output": "stream"
   },
@@ -33,6 +32,13 @@
     "@vendor": "./public/vendor"
   },
   "experiments": {
+    "routes": [
+      {
+        "src": ".*",
+        "dest": "/index.html",
+        "match": "routes"
+      }
+    ],
     "optimize": {
       "preload": true,
       "minify": true,

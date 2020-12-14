@@ -1,5 +1,4 @@
 {
-  "extends": "@tsconfig/svelte/tsconfig.json",
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
@@ -12,11 +11,9 @@
     "isolatedModules": true,
     "noEmit": true,
     "sourceMap": true,
-    // Linting
     "strict": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    // Paths
     "baseUrl": "./",
     "paths": {
       "@js/*": [
@@ -32,6 +29,9 @@
         "./src/static/components/*"
       ]
     }
+  },
+  "typeAcquisition": {
+    "enable": true
   },
   "include": [
     "./src",

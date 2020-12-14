@@ -95,11 +95,9 @@ There are various features Mainframe would need to support if it were to actuall
 ## Basic Architecture
 Mainframe is a static, single-page-application. Mainframe interacts with its remote database using only serverless functions and client-side API calls. This is part of the reason why Mainframe is cheap to run, as it basically _isn't_ whenever nobody is using it.
 
-Mainframe uses [Netlify](www.netlify.com) and [FaunaDB](www.fauna.com). Netlify is inexpensive if you avoid usage of it's supplemental features, such as Netlify Identity. FaunaDB is just a well priced database with a really lenient free tier. Additionally, it provides an extremely rich API and feature-set, especially for serverless/static websites.
+In order to actually be functional as a wiki, Mainframe makes heavy use of FaunaDB. FaunaDB itself is a document-based database. It is extremely well-suited for a wiki, although it doesn't do well with binary data. Mainframe is tightly integrated with FaunaDB, with the database API natively using FQL expressions and maximizing usage of FaunaDB's advanced features. 
 
-In order to actually be functional as a wiki, Mainframe makes heavy use of FaunaDB, with some supplemental usage of Netlify Functions. FaunaDB itself is a document-based database. It is extremely well-suited for a wiki, although it doesn't do well with binary data. Mainframe is tightly integrated with FaunaDB, with the database API natively using FQL expressions and maximizing usage of FaunaDB's advanced features. 
-
-The integration between Mainframe and FaunaDB is to the point that it is near-certain that a guest will never need to invoke a Netlify Function. Nearly all interaction with the site can be expressed as direct client to database API interactions.
+The integration between Mainframe and FaunaDB is to the point that it is near-certain that a guest will never need to invoke a serverless function. Nearly all interaction with the site can be expressed as direct client to database API interactions.
 
 ## Assets
 Most of Mainframe's assets are either compiled or built. Mainframe is primarily written in:
@@ -115,6 +113,8 @@ Most sources can be found in the `src` folder. Some additional assets can be fou
 ## Used Runtime Libraries
 Mainframe makes heavy runtime use of various JavaScript libraries - but these have all been chosen based on their minimal size and narrow scope. Mainframe does not use Vue, React, or any other runtime virtual DOM library, and instead uses Svelte.
 
+\- todo: update -
+
 Here are the main ones:
   * FaunaDB's JS driver for the database API
   * Svelte for reactive components
@@ -126,14 +126,12 @@ Libraries likely to be added, but not yet:
   * Workbox for PWA support and client-side caching
   * Chart.js for, well, charts
 
-Additionally, Mainframe uses the Pug template engine client-side for editor previews.
-
 -----
 
 ## Development & Tools
 Assets wise, Mainframe is really simple to build. Mainframe uses [Snowpack](www.snowpack.dev/) for both development and production asset building. The toolchain is very automatic and requires little knowledge of how it internally works.
 
-However, actually hosting the site can be a challenge. Mainframe is tightly bound to both [Netlify](www.netlify.com) and [FaunaDB](www.fauna.com) - attempting to host using other services will require a lot of work.
+However, actually hosting the site can be a challenge, and there is not currently a procedure to do so.
 
 ### Dependencies
 Mainframe has a fair number of dependencies. All of them can be found in the `package.json` and installed using NPM.

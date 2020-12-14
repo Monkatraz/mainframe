@@ -1,3 +1,4 @@
+// TODO: convert to Vercel logic, if needed (can probably just client -> fauna now)
 // Imports
 import FaunaDB from 'faunadb'
 const q = FaunaDB.query

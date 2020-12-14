@@ -2,6 +2,9 @@
 
 ### In Progress
 - [ ] Add CodeJar+Prism editor component and Markdown lang.
+- [ ] Switch to Vercel due to even better pricing and FOSS ideals
+- [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
+``` Content-Security-Policy = "script-src 'self' https://cdnjs.cloudflare.com https://code.iconify.design; child-src 'self'; object-src 'none';" ```
 
 ### General
 - [ ] Integrate ReCaptcha
@@ -62,3 +65,6 @@
 - [x] Add DOMPurify
 - [x] Add a local test page (dummy data?)
 - [x] Navbar
+- [x] Make netlify-cli not required to run the dev server
+- [x] Remove CSSNano and depend on ESBuild to optimize CSS
+- [x] Nuke Netlify

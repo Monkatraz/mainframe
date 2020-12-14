@@ -24,7 +24,7 @@ const stylusRender = function (str = '', filePath = '') {
 }
 
 // @ts-ignore
-const postcssRenderer = postcss([require('postcss-normalize'), ...require('./postcss-plugins/plugins')])
+const postcssRenderer = postcss(require('./postcss-plugins/plugins'))
 const postCSSRender = function (str = '', options = {}) {
   return new Promise((resolve, reject) => {
     postcssRenderer

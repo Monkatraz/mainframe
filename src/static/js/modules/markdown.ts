@@ -107,6 +107,8 @@ interface InlineSyntaxOpts {
   close?: RenderRule
 }
 
+// Yes, parsers are extremely messy and this is a catch-all function.
+// But you can't argue with the results: it's stupid easy to add new syntax.
 function inlineSyntax(optsIn: InlineSyntaxOpts) {
   const name =
     optsIn.tag ? optsIn.tag :

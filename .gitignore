@@ -9,6 +9,3 @@ node_modules
 # Build folders
 /.build/
 /build/
-/netlify-functions/
-# Local Netlify folder
-/.netlify/
