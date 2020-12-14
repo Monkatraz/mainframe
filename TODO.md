@@ -27,6 +27,32 @@
 - [ ] Rating component
 - [ ] Comments / Discussion Tab Component Thingy
 
+### Random Ideas
+- Dark mode
+- Automatic repository pages
+- Notifications for users (new replies to their comments etc.)
+- Table of contents to left of article when room is available
+- Widget that lets you embed a page into a div on a page
+	- this could be useful for the home page, which may have many 'widgets'.
+- Make a snowpack plugin for proxy.js files
+
+#### Editor
+- Rolling and resizable editor panel
+- Validations list to the side
+- Path type restrictions
+	- "scp/scp-3685" is illegal (must be a 4 digit number)
+	- Lock out certain number ranges
+
+#### Page Router
+- Vivaldi like loading bar
+- Top right fixed spinner for page route changes
+	
+#### Keyboard Arrow Key Utility Grid Function Thingy
+- List of arrays
+- Elements or flow characters
+		- Use characters like '<' and the like to denote how a downwards / upwards key press navigates to
+- Wrap elements in a div that binds their flow axis in some particular direction?
+
 ### Done
 - [x] Create private database
 - [x] FaunaDB basic API
