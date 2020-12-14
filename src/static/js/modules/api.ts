@@ -332,8 +332,6 @@ class Client {
   }
 }
 
-// TODO: Move this state-stuff into mainframe.ts
-
 interface FaunaClients {
   /** Reader client for simply reading pages. Always available, uses a public key. */
   Public: Client
@@ -482,23 +480,30 @@ export interface LocalizedPage {
   template: string
 }
 
-export async function getLocalizedPage(path: string, lang: Expr = qe.PageLang(q.Var('data'))) {
-  const expr = q.Let(
-    // Create reused variables
-    { 'data': qe.Data(qe.Search('pages_by_path', path)), 'lang': lang },
-    // Filter our database page object and get only what we need from it
-    q.Merge(
-      qe.Filter(q.Var('data'), [
-        'path', 'version', 'meta', ['lang', q.Var('lang')]
-      ]),
-      // Descend into our desired local and merge back what we need
-      qe.Filter(q.Select(['locals', q.Var('lang')], q.Var('data')), [
-        'title', 'subtitle', 'description', 'template'
-      ])
-    )
+/** Dictionary of premade expressions relating to `Page` objects.
+ *  This object is here so that its query expressions, which are the same every time, aren't pointlessly remade.
+ */
+const pageExprs = {
+  filterLocalized: q.Merge(
+    qe.Filter(q.Var('data'), [
+      'path', 'version', 'meta', ['lang', q.Var('lang')]
+    ]),
+    qe.Filter(q.Select(['locals', q.Var('lang')], q.Var('data')), [
+      'title', 'subtitle', 'description', 'template'
+    ])
   )
-  return await Clients.Public.query<LocalizedPage>(expr)
 }
+
+/** Smart Page API handler function. */
+export function withPage(path: string, lang: Expr = qe.PageLang(q.Var('data'))) {
+  const vars = { 'data': qe.Data(qe.Search('pages_by_path', path)), 'lang': lang }
+  return {
+    /** Returns (async) a localized form of the page requested. */
+    requestLocalized: () => Clients.Public.query<LocalizedPage>(
+      q.Let(vars, pageExprs.filterLocalized))
+  }
+}
+
 
 const pageTemplate: Page = {
   path: '/scp/6842',
@@ -520,42 +525,98 @@ const pageTemplate: Page = {
       title: 'SCP-6842',
       subtitle: 'Something Else Entirely',
       description: 'Very interesting description!',
-      template: `Marked - Markdown Parser
-========================
+      template: `# Mainframe
+## An unofficial proof-of-concept for the [SCP-Wiki](www.scpwiki.com).
 
-[Marked] lets you convert [Markdown] into HTML.  Markdown is a simple text format whose goal is to be very easy to read and write, even when not converted to HTML.  This demo page will let you type anything you like and see how it gets converted.  Live.  No more waiting around.
+[![Netlify Status](https://api.netlify.com/api/v1/badges/78e6519c-b9ab-440a-9a77-ef79694eac65/deploy-status)](https://app.netlify.com/sites/scp-mainframe/deploys)
 
-How To Use The Demo
--------------------
+Mainframe is a personal attempt to create an affordable, modern replacement for the SCP-Wiki website.
 
-1. Type in stuff on the left.
-2. See the live updates on the right.
+Right off the bat, Mainframe is:
+  * A _clean slate_. No considerations for legacy content were considered.
+  * A modern site, using modern features. There is no IE11 support and there never will be.
+  * An upgrade. Mainframe has a lot of things going for it compared to the old wiki. It's almost hard to call it a wiki
+    \\- it's entirely geared for just displaying pages and handling users.
+  * High performance. Mainframe is heavily optimized for first-load times and smooth runtime performance.
+  * Actually good mobile support, with touchscreen gestures.
+  * Really accessible. A lot of work was put into a11y - although there is some limitations. (Must have JS, and unfortunately no Opera Mini support)
+  * Finally, and absolutely most importantly: _cheap as hell._ Mainframe attempts to do literally everything as cheaply as possible. A SCP Wiki replacement has to support at least 10,000 active users.
 
-That's it.  Pretty simple.  There's also a drop-down option in the upper right to switch between various views:
+There is a lot of technical implementation details I could talk about, but that's for later. This project is a huge learning experience and I hope the work I have done here can be put to use.
 
-- **Preview:**  A live display of the generated HTML as it would render in a browser.
-- **HTML Source:**  The generated HTML before your browser makes it pretty.
-- **Lexer Data:**  What [marked] uses internally, in case you like gory stuff like this.
-- **Quick Reference:**  A brief run-down of how to format things using markdown.
+If you wish to know more about me, or contact me, you can go to [my personal website.](www.monkasite.com) If you're simply just curious and wish to ask a few questions, my DMs on Discord are open. \\[Monkatraz#7929\\]
 
-Why Markdown?
--------------
+### Some Shoutouts
+This list is not inclusive. It is mostly for some people/projects that cannot be easily credited.
+  * [Dimitar Donovski (u/ArduousIntent)](https://www.reddit.com/user/ArduousIntent) for their excellent SCP logo concept.
+  * [grid-kiss](https://github.com/sylvainpolletvillard/postcss-grid-kiss): Converted into a Stylus plugin within the project.
+  * [postcss-discard-overridden-props](https://github.com/mcler)
 
-It's easy.  It's not overly bloated, unlike HTML.  Also, as the creator of [markdown] says,
+----
+## Parameters
+### Target
+Create a replacement wiki-like system for the SCP-Wiki.
+  * Navigate to user generated pages 
+    - A slick, clean editor 
+    - Page sources use Markdown
+    - Search support
+  * Users can create accounts and can use mild personalization features
+    - Author pages
+    - Display names can be changed at any time
+    - Admin roles and tools
+    - User preferences (e.g. language)
+  * Pages have social features designed for the SCP community
+    - Ratings
+    - Discussion / Comments
+      - Pinned comments
+  * Accessible and semantic design, aka full a11y support
 
-> The overriding design goal for Markdown's
-> formatting syntax is to make it as readable
-> as possible. The idea is that a
-> Markdown-formatted document should be
-> publishable as-is, as plain text, without
-> looking like it's been marked up with tags
-> or formatting instructions.
+### Constraints
+  * Must be absurdly cheap to operate
+  * Must support up to 10,000 active users
+  * Use only modern web technology and markup
+  * Speedy and native-like web experience if possible
 
-Ready to start writing?  Either start changing stuff on the left or
-[clear everything](/demo/?text=) with a simple click.
+### Anti-Constraints
+  * Explicit lack of IE11 support
+  * ESNext codebase, compiled down using a transpiler only if needed
 
-[Marked]: https://github.com/markedjs/marked/
-[Markdown]: http://daringfireball.net/projects/markdown/
+### Security and Privacy
+  * Must use a restrictive content security policy
+  * Use only \`HTTPS\`
+  * No significant monitoring or storage of fingerprint-like user-data
+    - If possible, the only confidential data that should be stored specific to users is their email, (securely handled)
+      password, and user preferences.
+  * Use only opt-in personalization
+  * Prevent mass scraping of the public database
+
+### Not Doing
+  * Advertisement slots
+    - Why? Because I hate ads, and this is meant to be cheap. It shouldn't need ads if it can be cheap enough to be self-hosted by the community through donations. 
+  * Replacement for the forums
+    - Forum hosting would likely require custom software and complete server hosting. It would likely be much more
+      cost-effective to just use public services like Discord, IRC, etc.
+  * Legacy database migration and to-native conversion
+
+### Non-MVP Targets
+There are various features Mainframe would need to support if it were to actually be used.
+  * Complete multi-lingual support, with verification that RTL and LTR text works correctly
+  * Email service, e.g. account verification or password resets
+  * Legacy content renderer
+  * Pass a security audit
+  * Potentially have a test suite for the codebase
+  * Solution for storing binary data such as images
+  * Bootstrap script for setting up database instances either locally or on a development remote
+
+### Unknowns
+  * Would admins be limited to a language?
+  * How would non-English wikis work?
+    - Separate repositories?
+  * What inexpensive service could be used to store binary data?
+    - Incredibly aggressive image compression and resizing?
+    - S3 bucket?
+    - Use FaunaDB again but store binaries in string buffers?
+      - Permanent links would be difficult with this solution.
 
 \`\`\`ts
   /** Eagerly loads the rest of the LazyDocument. */

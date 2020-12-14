@@ -26,7 +26,7 @@
         "./src/static/js/modules/*"
       ],
       "@vendor/*": [
-        "./src/vendor/*"
+        "./public/vendor/*"
       ],
       "@components/*": [
         "./src/static/components/*"

@@ -20,7 +20,17 @@
 - Insert: ++this was added++
 - Delete: --this has been deleted--
 - Mark: ==this has been marked==
-- Math: $c = \pm\sqrt{a^2 + b^2}$
+- Italic: /this has been italicized/ without using `<em>`
+- Span: [lots [of _cool things_] in here]
+- Math: $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$
+
+##### Math
+$\begin{aligned}
+\int_0^1\frac{x^4(1-x)^4}{1+x^2}\,dx &=\frac{22}{7}-\pi\\ \\
+\int_{-\infty}^\infty e^{-x^2}\,dx &=\sqrt{\pi}
+\end{aligned}$
+
+$f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi$
 
 # <a name="Tests"></a>Tests
 ***

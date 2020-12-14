@@ -2,7 +2,7 @@
  * @author Monkatraz
  */
 // Imports
-import { appendScript, evtlistener } from "@modules/util"
+import { evtlistener } from "@modules/util"
 
 /** Function for handling the `.touch` pseudo-psuedo CSS class.
  *  It runs on every `Document` touch event, and acts much like a pointerevent.
@@ -41,18 +41,6 @@ function touchClassHandle(evt: TouchEvent) {
   })
 }
 
-// Something to note is that for externally loaded scripts (like Iconify or Prism auto-DL languages) -
-// is that their source domains need to be exempted in the CSP. This can be adjusted in `netlify.toml`.
-function loadVendorScripts() {
-  // Prism
-  appendScript('/vendor/prism.js').then(() => {
-    // Disable automatically firing
-    window.Prism.manual = true
-    // Divert languages to CDN instead of storing them ourselves
-    window.Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/'
-  }).catch(() => { console.warn(`Prism failed to load.`) })
-}
-
 // -----
 //  APP
 
@@ -63,7 +51,6 @@ const App = new AppComponent({ target: document.querySelector('#app') as HTMLEle
 //  LOAD/INIT
 
 function finalizeLoading() {
-  loadVendorScripts()
   evtlistener(document, ['touchstart', 'touchend', 'touchcancel'], touchClassHandle)
   // Goofy thing for making a placeholder img for the logo work.
   const emblem = document.querySelector('#logo_emblem') as HTMLImageElement

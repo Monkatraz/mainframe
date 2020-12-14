@@ -3,9 +3,9 @@
   import * as API from '@js/modules/api'
   import { ENV } from '@modules/state'
   import { sleep, waitFor } from '@modules/util'
-  import { usAnime, tnAnime } from '@modules/components'
+  import { usAnime, load } from '@modules/components'
   import { fade } from 'svelte/transition'
-  import renderMarkdown from '@modules/markdown'
+  import { generateRenderer, Prism } from '@modules/markdown'
   import router from 'page'
   // Components
   import Spinny from './Spinny.svelte'
@@ -45,6 +45,9 @@
     },
   })
 
+  // -- MISC
+  const renderMarkdown = generateRenderer()
+
   // -- ROUTER
   // Test pages
   router('/404', () => mode = '404') // Directly asking for 404
@@ -61,27 +64,18 @@
     const response = await fetch('/static/misc/md-test.md')
     html = renderMarkdown(await response.text())
     mode = 'VIEW'
-    // Chores
-    // Highlight code blocks
-    waitFor(() => typeof window.Prism?.highlightAll === 'function')
-      .then(() => window.Prism.highlightAll())
   }
 
   async function loadPath(path: string) {
     try {
       // Begin loading page, jump to `catch (err)` below if it fails
       mode = 'LOADING'
-      const response = await API.getLocalizedPage(path)
+      const response = await API.withPage(path).requestLocalized()
       if (!response.ok) throw response.body
       // Page loaded successfully
       page = response.body
       html = renderMarkdown(page.template)
       mode = 'VIEW'
-      // After page chores
-      // TODO: set title
-      // Highlight code blocks
-      waitFor(() => typeof window.Prism?.highlightAll === 'function')
-        .then(() => window.Prism.highlightAll())
     } catch (err) {
       error = err
       if (API.getStatusCode(err) === 404) mode = '404'
@@ -211,14 +205,17 @@
 </style>
 
 {#if mode !== 'EDIT'}
-  <div class="container" role="presentation">
-    <nav class="navbar" use:navBarReveal aria-label="Navigation"/>
-    <aside class="sidebar" use:sideBarReveal aria-label="Sidebar"/>
-    <main class="content" aria-label="Content">
+  <div class=container role=presentation>
+    <nav class=navbar use:navBarReveal aria-label=Navigation/>
+    <aside class=sidebar use:sideBarReveal aria-label=Sidebar/>
+    <main class=content aria-label=Content>
       {#key mode}
         {#if mode === 'VIEW'}
           <!-- Page successfully loaded -->
-            <div class=rhythm use:pageReveal out:fade={{duration: 50}} role=presentation>
+            <div class=rhythm
+              use:pageReveal out:fade={{duration: 50}} role=presentation
+              use:load={Prism.highlightAllUnder}
+              >
               {@html html}
             </div>
             <!-- Actions Panel -->

@@ -18,6 +18,11 @@ import 'tippy.js/animations/scale.css'
 // Anime
 import anime, { AnimeParams } from 'animejs'
 
+/** Runs the provided function as soon as the attached element is created. */
+export function load(elem: Element, fn: (arg: Element) => void) {
+  fn(elem)
+}
+
 // -------
 //  TIPPY
 

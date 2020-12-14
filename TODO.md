@@ -1,7 +1,7 @@
 # Mainframe
 
 ### In Progress
-- [ ] Add CodeMirror editor component
+- [ ] Add CodeJar+Prism editor component and Markdown lang.
 
 ### General
 - [ ] Integrate ReCaptcha
@@ -9,7 +9,6 @@
   - Force passing a ReCaptcha when registering
 - [ ] Generic cache library
 - [ ] Add better page history schema
-- [ ] Add a local test page (dummy data?)
 - [ ] Some sort of script or system for data-backups
 
 ### Users
@@ -20,7 +19,6 @@
 - [ ] Login component
 - [ ] Licensing Widget
 - [ ] Humans.txt button
-- [ ] Navbar
 - [ ] Navbar dropdowns
 - [ ] Search bar component
 - [ ] Rating component
@@ -60,5 +58,7 @@
 - [x] Page router
 - [x] Global state handler module to isolate components from routing and state
 - [x] App load animation
-- [x] Add Marked
+- [x] Add markdown-it
 - [x] Add DOMPurify
+- [x] Add a local test page (dummy data?)
+- [x] Navbar

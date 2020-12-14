@@ -837,13 +837,9 @@
       & > .tag
         position absolute
         right 0
-  &.leqno
-    & > .katex
-      & > .katex-html
-        & > .tag
-          left 0
-          right auto
-  &.fleqn
-    & > .katex
+  &.leqno > .katex > .katex-html > .tag
+    left 0
+    right auto
+  &.fleqn > .katex
       text-align left
       padding-left 2em

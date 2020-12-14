@@ -30,7 +30,7 @@
     "@js": "./src/static/js",
     "@modules": "./src/static/js/modules",
     "@components": "./src/static/components",
-    "@vendor": "./src/vendor"
+    "@vendor": "./public/vendor"
   },
   "experiments": {
     "optimize": {
