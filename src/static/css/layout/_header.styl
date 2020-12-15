@@ -86,7 +86,11 @@
 // Header Styling
 :root
   $bg-terminaleffect = repeating-linear-gradient(0deg, rgba(black,0.1) 0, rgba(black,0.1) 2px, transparent 0, transparent 4px)
-  $bg-luminosity = linear-gradient(180deg, black, ease-in, white)
+  b(n1, n2 = n1)
+    col = n1 * 2.55
+    return (rgb(col,col,col) unit(n2, '%'))
+  $bg-list = b(0,0),b(15,10),b(25,25),b(40,35),b(50,45),b(60,55),b(70,65),b(80,75),b(100)
+  $bg-luminosity = 'linear-gradient(180deg, %s)' % unquote(join(',', $bg-list))
   --header-background: $bg-terminaleffect, $bg-luminosity
   --header-background-color: colvar('accent')
 

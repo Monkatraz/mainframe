@@ -36,6 +36,11 @@ $f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi$
 ***
 - Nested custom syntax: 10^10~20~^
 	- ==test ~~one~~ two==
+- Links:
+	- This is a [external link.](//google.com)
+	- This is a [internal link.](/)
+	- This is a [link with descenders: typography](//google.com) 
+		-	[typography](//google.com)
 
 # <a name="Headings"></a>Headings
 ***

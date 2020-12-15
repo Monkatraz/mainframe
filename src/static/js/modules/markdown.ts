@@ -15,39 +15,51 @@ Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/lib
 import type { RenderRule } from 'markdown-it/lib/renderer'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
 
-// TODO: Consider creating a function for building a renderer as you render so that it can return custom callbacks
 // TODO: Generic (block -> tag) handler
 // TODO: Generic (lineSymbol -> tag) handler
-// TODO: ([key]: value) handler
-// TODO: use key values for variables?
-//       %scp SCP-3685
-//       using my %scp% var
-// TODO: Custom containers implementation
-// TODO: User-space components (likely its own data schema)
-// TODO: Implement markdown-it-attrs or simply import it
-// TODO: Wikilinks (may need to register a tippy generically to a class somehow)
-//       [[rel_link|display]] [[/displayed_local_link]]
-// TODO: Think about using front-matter as a page hook system when rendering
-// TODO: Way to set fonts
-// TODO: Span attrs
-// TODO: Markdown Svelte component that can handle async post-processing
-// TODO: Tags: abbr, def/deflist, u, b
 // TODO: Components: collapsibles, figures, footnotes
+// ? expose render internals through callback
+// ? front-matter as a page hook system when rendering
+// ? Markdown Svelte component that can handle async post-processing
+
+// TODO: Tags: abbr, def/deflist, u (errors), b?
+// simple mappings:
+// ^  -> <sup>
+// ~  -> <sub>
+// ~~ -> <s>
+// ++ -> <ins>
+// -- -> <del>
+// == -> <mark>
+// /  -> <i>
+
+// ? set font
+
+// ? [DATA EXPUNGED] auto detect
+
+// wikilinks
+// [[Link]](relative.page) | [[Link]](/static.page)
+// could potentially just convert links into wikilinks automatically
+
+// vars | preserves ![] and [] link syntax assc.
+// [title]: my title
+// to use: @[title] <- (inserts the var)
+
+// cmp -> <tag> or cmp() fn.
+// [:cmp attrs: inline component]
+// :::cmp attrs
+//  block
+// :::
+
+// ? user-made components
+// can likely use @[] vars for this
+// editor may be able to auto-suggest (with a hover or something) parameters
+// requires component signature and schema
+
+// math | uses Katex
+// $tex-expression$
 
 // -- INIT. EXTENSIONS
 
-// New Syntax (compared to CommonMark):
-// - Tag Mappings:
-//    ^  -> <sup>
-//    ~  -> <sub>
-//    ~~ -> <s>
-//    ++ -> <ins>
-//    -- -> <del>
-//    == -> <mark>
-//    /  -> <i>
-//    [] -> <span>
-// - Other:
-//    $[tex-expression]$ -> Katex Math
 const newSyntax = [
   inlineSyntax({ delimiter: '^', tag: 'sup' }),
   inlineSyntax({ delimiter: '~', tag: 'sub' }),
@@ -134,6 +146,7 @@ function inlineSyntax(optsIn: InlineSyntaxOpts) {
         // check end delimiter
         let pos = start + lenLeft
         let level = 1
+        // TODO: functionalize this with delimiter / pair mode
         while (pos < max) {
           if (state.src.substr(pos, lenLeft) === pairLeft) level++
           else if (state.src.substr(pos, lenRight) === pairRight) level--

@@ -9,39 +9,7 @@ import FaunaDB, { Expr, values as v, errors as e } from 'faunadb'
 const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
-import { ENV, User } from '@modules/state'
-import { Task, Result } from '@modules/util'
-
-// ---------
-//  NETLIFY
-
-/** Invokes the Netlify Function specified by the `fn` parameter.
- *  As it returns a `Result`, use `Result.ok` to determine if the invokation succeeded or failed.
- */
-export async function invokeLambda<T = JSONObject>(fn: string, payload?: any, init?: RequestInit) {
-  const url = ENV.API.LAMBDA + fn
-  const method = payload ? 'POST' : 'GET'
-  const forcedInit: RequestInit = {
-    method: method,
-    cache: 'no-cache',
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  }
-  // Construct init object
-  let finalInit = init ? init : {}
-  finalInit = Object.assign(finalInit, forcedInit)
-  // Add `body` field if we have a payload
-  if (method === 'POST') finalInit = Object.assign(finalInit, { body: JSON.stringify(payload) })
-
-  // Execute invokation
-  const fetchTask = await Task(fetch(url, finalInit))
-  // Check if the `fetch` function itself errored
-  if (!fetchTask.ok) return fetchTask
-  const response = fetchTask.body
-  // Return the response itself
-  return new Result(response.ok, await response.json() as T)
-}
+import { ENV } from '@modules/util'
 
 // ---------
 //  FAUNADB
@@ -155,12 +123,12 @@ export interface View {
   template: string
 }
 
+// TODO: convert Ratings[] into { up: Ref[], meh: Ref[], down: Ref[] }
+// TODO: Move `social` into its own document
 /** Root level object retrieved from the FaunaDB database. Contains everything relevant to a `Page`. */
 export interface Page {
   /** URL path, starting from root. Is always unique. */
   path: string
-  /** Version number, used for backwards compatibility handling (if needed) */
-  version: number
   /** Metadata - contains things like the current `revision`, edit dates, etc. */
   meta: {
     /** Set of users who authored this page and have edit permissions. */
@@ -268,11 +236,11 @@ export const qe = {
    * 
    *  Shorthand for `q.Match(q.Index(index))`.
    */
-  Search(index: Expr | string, terms?: string | string[]) {
+  Search(index: Expr | string, ...terms: Expr[]) {
     // Use simple index string if specified
     const qindex = typeof index === 'string' ? q.Index(index) : index
     // Use terms if provided
-    if (terms) return q.Match(qindex, terms)
+    if (terms) return q.Match(qindex, ...terms)
     return q.Match(qindex)
   },
 
@@ -307,188 +275,103 @@ export const qe = {
   }
 }
 
-// TODO: Consider deleting this
-/** Response object from `Client.queryLazy`. Contains both Promisables and FQL expression fields.
- *
- *  @example field = await LazyDocument.field
- */
-class LazyDocument<T> {
-  // Database values
-  private _requestExpr: Expr
-  private _client: Client
-  public _fields: string[] = []
-  constructor (requestExpr: Expr, client: Client = Clients.Public) {
-    this._requestExpr = requestExpr
-    this._client = client
-  }
-
-  private _setField(field: string, val: any) {
-    const opts: PlainObject = { configurable: true, enumerable: true }
-    if (typeof val === 'function') opts['get'] = val
-    if (typeof val !== 'function') opts['value'] = val
-    Object.defineProperty(this, field, opts)
-  }
-
-  /** Queries the FaunaDB database for this field of the document or returns an already retrieved response.
-   *  Errors must be caught manually - these getters do not return a `QueryResponse` object.
-   */
-  private _getter(field: string) {
-    return new Promise((resolve) => {
-      this._client.query(q.Select(field, this._requestExpr)).then((response) => {
-        if (response.ok === false) throw new Error('Error reading lazy field of document.')
-        // Memoize/cache the function and return the query response body
-        this._setField(field, response.body)
-        resolve(response.body)
-      })
-    })
-  }
-
-  public async _start() {
-    // Check if the FQL expr returns an object
-    const isObjResponse = await this._client.query(q.IsObject(this._requestExpr))
-    if (isObjResponse.ok === false) throw new Error('Error retrieving document.')
-    if (isObjResponse.body === false) throw new Error('Invalid FaunaDB object.')
-
-    // Get fields of requested document
-    const response = await this._client.query<string[]>(qe.Fields(this._requestExpr))
-    if (response.ok === false) throw new Error('Error retrieving document.')
-    this._fields = response.body
-
-    // Set field promise getters for each field
-    response.body.forEach((field) => {
-      this._setField(field, () => this._getter(field))
-    })
-    return this
-  }
-
-  /** Eagerly loads the rest of the `LazyDocument`. */
-  public async _eagerLoad() {
-    // Just plain get the whole object
-    const response = await this._client.query<DataObject>(this._requestExpr)
-    if (response.ok === false) throw new Error('Error retrieving document.')
-    // Set every field to its actual value
-    this._fields.forEach((field) => {
-      this._setField(field, response.body[field] as DataValue)
-    })
-    return this
-  }
-
-  /** Returns the requested field as another `LazyDocument`.
-   *  The requested field _must_ be an object for this to work. `LazyDocument` requires key-value pairs. */
-  public async _getLazy<K extends string & keyof T>(field: K): Promise<Lazyify<T[K]> & LazyDocument<T[K]>> {
-    const lazydoc = await new LazyDocument<T[K]>(q.Select(field, this._requestExpr), this._client)._start()
-    this._setField(field, lazydoc)
-    return lazydoc as Lazyify<T[K]> & typeof lazydoc
-  }
-
-  public async _query<T = DataValue>(fn: (curRequestExpr: Expr) => Expr) {
-    const response = await this._client.query<T>(fn(this._requestExpr))
-    if (response.ok === false) throw new Error('Error retrieving field.')
-    return response.body
-  }
-
-  public async _getFields(field: string) {
-    const response = await this._client.query<string[]>(qe.Fields(q.Select(field, this._requestExpr)))
-    if (response.ok === false) throw new Error('Error retrieving document.')
-    return response.body
-  }
-}
-
 class Client {
   private client!: FaunaDB.Client
+  public query!: FaunaDB.Client['query']
+  public paginate!: FaunaDB.Client['paginate']
   constructor (key: string) {
     if (key === '') return
-    // The types for FaunaDB clients is slightly outdated.
-    // queryTimeout _does_ exist on the Client options object, but not in the type.
     this.client = new FaunaDB.Client({
       secret: key,
       domain: ENV.API.FDB_DOMAIN,
       scheme: 'https'
-    } as any)
+    })
+    this.query = this.client.query.bind(this.client)
+    this.paginate = this.client.paginate.bind(this.client)
   }
-
-  /**
-   * Wrapper for `FaunaDB.Client.query()`. Includes safe error handling.
-   * To use, check the `Result.ok` boolean first. If true, the query was successful.
-   * The result of the query will be found in the `Result.body` object.
-   * Provide a type parameter to this function so that TS explictly knows the response body type.
-   * @example Clients.Reader.query(...).then(result => { result.ok ? foo(result.body) : ohno() }
-   */
-  public query<T = DataValue>(expr: Expr) {
-    return Task<T>(new Promise((resolve, reject) => {
-      this.client.query(expr)
-        .then((result) => { resolve(result as unknown as T) })
-        .catch((err: QueryException) => {
-          console.warn(err)
-          reject(err)
-        })
-    }))
-  }
-
-  /** Returns a lazy loading variant of the requested object. 
-   *  Accessors (`obj.prop`) need to be used with `await` or `.then(val => {})`.
-   *  Once a property has been accessed, it will be cached and won't query the database again.
-   *  @example field = await LazyDocument.field
-   */
-  public queryLazy<T = PlainObject>(expr: Expr) {
-    return Task<Lazyify<T> & LazyDocument<T>>(new Promise((resolve, reject) => {
-      new LazyDocument<T>(expr, this)._start().then((result) => { resolve(result as Lazyify<T> & LazyDocument<T>) })
-        .catch(reject)
-    }))
-  }
-
-  /**
-   * Wrapper for `FaunaDB.Client.paginate()` Use as normal - meaning errors must be caught manually.
-   */
-  public paginate(expr: Expr, params?: PlainObject, options?: FaunaDB.QueryOptions): FaunaDB.PageHelper {
-    return this.client.paginate(expr)
+  public invoke<T = DataValue>(fn: string, ...payload: any[]) {
+    if (payload?.length) return this.query<T>(q.Call(q.Function(fn), ...payload))
+    else return this.query<T>(q.Call(q.Function(fn)))
   }
 }
 
-interface FaunaClients {
-  /** Reader client for simply reading pages. Always available, uses a public key. */
-  Public: Client
-  /** Client created upon a successful login attempt. */
-  User: Client | null
-  /** Short-lived admin client created upon a successful admin authorization action. (sudo-mode) */
-  Admin: Client | null
+type ModeGuest = { loggedIn: false, client: Client }
+type ModeUser = {
+  loggedIn: true, client: Client
+  id: Ref, token: string, social: Social
 }
+/** Represents the current user. */
+const User = {
+  // type wizardy that allows for `User.loggedIn` type narrowing without nested objects being needed
+  ...{ loggedIn: false, client: new Client(ENV.API.FDB_PUBLIC) } as (ModeUser | ModeGuest),
 
-// Init Clients
-export const Clients: FaunaClients = {
-  Public: new Client(ENV.API.FDB_PUBLIC),
-  User: null,
-  Admin: null
-}
-
-/** Dictionary of premade expressions relating to `Page` objects.
- *  This object is here so that its query expressions, which are the same every time, aren't pointlessly remade.
- */
-const pageExprs = {
-  filterLocalized: q.Merge(
-    qe.Filter(q.Var('data'), [
-      'path', 'version', 'meta', ['lang', q.Var('lang')]
-    ]),
-    qe.Filter(q.Select(['locals', q.Var('lang')], q.Var('data')), [
-      'title', 'subtitle', 'description', 'template'
-    ])
-  )
+  preferences: {
+    langs: ['en']
+  },
+  /** Creates an account registration event. Does not sign the guest in. */
+  async guestRegister(email: string, password: string) {
+    if (User.loggedIn) throw new Error()
+    await User.client.invoke<Ref>('guest_register', email, password)
+  },
+  /** Signs an unsigned guest in using the provided credentials. */
+  async login(email: string, password: string) {
+    if (User.loggedIn) throw new Error()
+    const res = await User.client
+      .invoke<{ instance: Ref, secret: string }>('guest_login', email, password)
+    // Assigns is used here for cleanliness and also because type wizardy
+    Object.assign(User, {
+      loggedIn: true,
+      id: res.instance, token: res.secret,
+      social: await User.client.invoke<Social>('socials_of', res.instance),
+      client: new Client(res.secret)
+    })
+  },
+  /** Signs out a signed in user. Nullifies all tokens. */
+  async logout() {
+    if (!User.loggedIn) throw new Error()
+    await User.client.query(q.Logout(true))
+    Object.assign(User,
+      { loggedIn: false, client: new Client(ENV.API.FDB_PUBLIC) },
+      { id: undefined, token: undefined, social: undefined }) // clear out mem. of old values
+  }
 }
 
 /** Smart Page API handler function. */
-export function withPage(path: string, lang: Expr = qe.PageLang(q.Var('data'))) {
-  const vars = { 'data': qe.Data(qe.Search('pages_by_path', path)), 'lang': lang }
+export function withPage(path: string, lang: string | Expr = qe.PageLang(q.Var('data'))) {
+  const vars = { 'data': qe.Data(qe.Search('pages_by_path', path as Expr)), 'lang': lang }
+  const local = q.Select(['locals', q.Var('lang')], q.Var('data'))
+  const ql = (expr: Expr) => q.Let(vars, expr)
   return {
-    /** Returns (async) a localized form of the page requested. */
-    requestLocalized: () => Clients.Public.query<LocalizedPage>(
-      q.Let(vars, pageExprs.filterLocalized))
+    /** Requests the entirety of the page. */
+    request: () => User.client.query<Page>(vars.data),
+    /** Requests the localized form of the page. */
+    requestLocalized: () => User.client.query<LocalizedPage>(ql(q.Merge(
+      qe.Filter(q.Var('data'), [
+        'path', 'meta', ['lang', q.Var('lang')]
+      ]),
+      qe.Filter(local, [
+        'title', 'subtitle', 'description', 'template'
+      ])))),
+    /** Requests just the `social` record. */
+    requestSocial: () => User.client.query<Page['social']>(ql(q.Select('social', q.Var('data')))),
+    /** Requests the `title`, `subtitle`, and `description` fields. */
+    requestDescription: () => User.client.query<Omit<View, 'template'>>(ql(qe.Filter(local, [
+      'title', 'subtitle', 'description'
+    ])))
+    // field
+    // ratings
+    // comments
+    // langs
+    // meta?
+    // template?
+    // upvote
+    // mehvote
+    // downvote
   }
 }
 
-
 const pageTemplate: Page = {
   path: '/scp/6842',
-  version: 1,
   meta: {
     authors: [],
     revision: 1,

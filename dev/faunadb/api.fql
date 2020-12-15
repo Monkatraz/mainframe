@@ -1,13 +1,48 @@
 # This file doesn't actually do anything by itself.
 # It simply contains all the FQL server-side query calls needed to set up the auth system.
 
-# Index for finding a user by their email address. Used mainly for logging in.
+# Index for finding a user by their email address. Used for logging in.
 CreateIndex({
   name: "users_by_email",
   unique: true,
   serialized: true,
   source: "users",
   terms: [ { field: ["data", "email"] } ],
+})
+
+# Index for finding pages by their path.
+CreateIndex({
+  name: "pages_by_path",
+  unique: true,
+  serialized: true,
+  source: Collection("pages"),
+  terms: [{ field: ["data", "path"] }],
+  values: [
+    { field: ["ref"] },
+    { field: ["data", "path"] }
+  ]
+})
+
+# fn: (Ref[]) => Social[] // same order
+# fn: (Ref) => Social // overload
+CreateFunction({
+  name: "socials_of",
+  body: Query(Lambda(
+    "user_refs",
+    If(IsArray(Var("user_refs")),
+      Map(Var("user_refs"), Lambda("user_ref",
+        If(Exists(Var("user_ref")),
+          Select("data", Get(Select(["data", "social"], Get(Var("user_ref"))))),
+          null
+        ))
+      ),
+      If(Exists(Var("user_refs")),
+        Select("data", Get(Select(["data", "social"], Get(Var("user_refs"))))),
+        null
+      )
+    )
+  )),
+  role: "server"
 })
 
 # FaunaDB function to validate email addresses.
@@ -97,13 +132,13 @@ CreateFunction({
   role: "server"
 })
 
-# Login function. 
+# Login function.
 # The actual login function is unavailable to users, so they must go through this function.
 # Tokens created through this function expire after a day.
 CreateFunction({
   name: "guest_login",
   body: Query(Lambda(
-    ["email", "password"], 
+    ["email", "password"],
     Login(
       Match(Index("users_by_email"), Var("email")),
       {

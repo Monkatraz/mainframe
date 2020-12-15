@@ -22,7 +22,7 @@ calc-op(op, vars...)
   if length(vars) < 2
     return vars[0]
 
-  str = 'calc(%s)' % unquote(join(op, vars))
+  str = 'calc(%s)' % unquote(join(' ' + op + ' ', vars))
   return str
 
 // Color

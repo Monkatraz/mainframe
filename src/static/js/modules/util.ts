@@ -3,6 +3,39 @@
  * @author Monkatraz
  */
 
+/** Contains all environment variables. */
+export const ENV = {
+  /** API related env. variables. Usually database related. */
+  API: {
+    // Database
+    FDB_PUBLIC: import.meta.env.SNOWPACK_PUBLIC_API_FDB_PUBLIC,
+    FDB_DOMAIN: import.meta.env.SNOWPACK_PUBLIC_API_FDB_DOMAIN,
+    // Serverless functions
+    LAMBDA: import.meta.env.SNOWPACK_PUBLIC_API_LAMBDA
+  },
+  HOMEPAGE: import.meta.env.SNOWPACK_PUBLIC_HOMEPAGE
+}
+
+/** Browser / User-Agent info. Contains contextual information like normalized mouse position values. */
+export namespace Agent {
+  // State
+  export let mouseX = 0
+  export let mouseY = 0
+  export let scroll = 0
+  // Flags
+  export const isMobile = /Mobi|Android/i.test(navigator.userAgent)
+
+  // Set up our listeners
+  window.addEventListener('mousemove', (evt) => {
+    mouseX = evt.clientX / window.innerWidth
+    mouseY = evt.clientY / window.innerHeight
+  })
+
+  window.addEventListener('scroll', () => {
+    scroll = document.documentElement.scrollTop / (document.body.scrollHeight - window.innerHeight)
+  })
+}
+
 /**
  * Returns a promise that resolves after the specified number of miliseconds.
  */
@@ -113,63 +146,6 @@ export function evtlistener(target: typeof window | typeof document | Element, e
 export function rmEvtlistener(target: typeof window | typeof document | Element, events: string[], fn: AnyFn, opts: AddEventListenerOptions = {}) {
   events.forEach(event => {
     target.removeEventListener(event, fn, opts)
-  })
-}
-
-/** Functional-ish Result class object. It's not quite how Result tends to work - but that's fine here.
- *  You can check the `Result.ok` field to determine if the operation was successful or not. 
- *  If it wasn't, the `Result.body` field will contain the Error object. */
-export class Result<B extends boolean, R = Data> {
-  constructor (public ok: B, public body: B extends true ? R : Error) { }
-}
-
-/** Creates a Task like object that returns a `Result` object from a Promise. */
-export function Task<R>(promise: Promise<R>) {
-  return promise.then((body: R) => new Result(true, body))
-    .catch((err: Error) => new Result(false, err))
-}
-
-/** Shorthand function for toggling the class on an element specified by its ID. */
-export function toggleClass(id: string, token: string, state?: boolean) {
-  const elem = document.getElementById(id)
-  if (elem) {
-    if (state !== undefined) elem.classList.toggle(token, state)
-    else elem.classList.toggle(token)
-  }
-}
-
-const APPENDSCRIPT_TIMEOUT_INTERVAL = 10000
-/** Async. loads scripts from relative path / URL.
- *  Promise resolves once the script has fully loaded.
- *  If it takes too long to download the script, the promise will reject.
- */
-export function appendScript(src: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(reject, APPENDSCRIPT_TIMEOUT_INTERVAL)
-    const _resolve = () => { clearTimeout(timeout); resolve() }
-
-    const script = document.createElement('script')
-    script.src = src
-    script.onload = _resolve
-    document.head.appendChild(script)
-  })
-}
-
-const APPENDSTYLESHEET_TIMEOUT_INTERVAL = 10000
-/** Async. loads stylesheets from relative path / URL.
- *  Promise resolves once the stylesheet has fully loaded.
- *  If it takes too long to download the stylesheet, the promise will reject.
- */
-export function appendStylesheet(href: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(reject, APPENDSTYLESHEET_TIMEOUT_INTERVAL)
-    const _resolve = () => { clearTimeout(timeout); resolve() }
-
-    const stylesheet = document.createElement('link')
-    stylesheet.rel = 'stylesheet'
-    stylesheet.href = href
-    stylesheet.onload = _resolve
-    document.head.appendChild(stylesheet)
   })
 }
 

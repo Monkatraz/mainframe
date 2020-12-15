@@ -18,7 +18,7 @@
   "devOptions": {
     "out": "./build/",
     "open": "none",
-    "output": "dashboard"
+    "output": "stream"
   },
   "buildOptions": {
     "clean": true,

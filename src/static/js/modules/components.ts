@@ -55,8 +55,6 @@ export function usTip(elem: Element, opts: Partial<TippyProps> = {}) {
 // ------
 //  ANIM
 
-// TODO: Figure out animejs layering
-
 export function elAnime(elem: Element, opts: AnimeParams) {
   return () => {
     anime({

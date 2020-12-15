@@ -4,14 +4,11 @@ console.warn = () => { }
 
 const postcssPlugins = [
   require('postcss-center')(),
-  require('postcss-easing-gradients')(),
   require('./optimizenestedids')(),
   require('css-mquery-packer')({
     sort: require('sort-css-media-queries').desktopFirst
   }),
-  require('postcss-combine-duplicated-selectors')(),
-  require('postcss-discard-duplicates')(),
-  require('./discardoverriddenprops')(),
+  require('postcss-combine-duplicated-selectors')({ removeDuplicatedValues: true }),
   require('autoprefixer')()
 ]
 

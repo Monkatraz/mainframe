@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onSwipe } from '@modules/gestures'
-  import { Agent } from '@modules/state'
+  import { Agent } from '@modules/util'
   import { usAnime, usTip } from '@js/modules/components'
   import { throttle } from '@js/modules/util'
 

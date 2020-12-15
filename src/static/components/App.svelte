@@ -1,8 +1,7 @@
 <script lang="ts">
   // Imports
   import * as API from '@js/modules/api'
-  import { ENV } from '@modules/state'
-  import { sleep, waitFor } from '@modules/util'
+  import { ENV, sleep } from '@modules/util'
   import { usAnime, load } from '@modules/components'
   import { fade } from 'svelte/transition'
   import { generateRenderer, Prism } from '@modules/markdown'
@@ -22,13 +21,13 @@
   // -- ANIMATIONS
   const sideBarReveal = usAnime({
     translateX: ['-100%', '0%'],
-    duration: 400,
+    duration: 500,
     easing: 'easeOutElastic(3, 2)',
     delay: 50
   })
   const navBarReveal = usAnime({
     scaleY: [0, 1],
-    duration: 200,
+    duration: 300,
     easing: 'easeOutElastic(2, 1.25)'
   })
   const pageReveal = usAnime({
@@ -68,12 +67,8 @@
 
   async function loadPath(path: string) {
     try {
-      // Begin loading page, jump to `catch (err)` below if it fails
       mode = 'LOADING'
-      const response = await API.withPage(path).requestLocalized()
-      if (!response.ok) throw response.body
-      // Page loaded successfully
-      page = response.body
+      const page = await API.withPage(path).requestLocalized()
       html = renderMarkdown(page.template)
       mode = 'VIEW'
     } catch (err) {

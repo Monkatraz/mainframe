@@ -18,20 +18,87 @@ button
 img
   max-width: 100%
 
+// Misc.
 
-// Meaningful HTML Tags
+.icon-scp
+  width: 1em
+  height: 1em
+  fill: currentColor
+
+.tippy-box[data-theme~='mainframe']
+  $bg = colvar('background-dark', lighten 5%, desaturate 10%)
+
+  filter: drop-shadow(0 0 5px rgba(black, 0.4))
+  background-color: $bg
+  color: colvar('text-light')
+
+  font-set('display', false)
+  font-size: 1rem
+  font-weight: 400
+
+  .tippy-svg-arrow
+    color: $bg
+
+// TODO: ::selection
 // TODO: Blockquote, li, ul, ol
-// TODO: add black box <del> tag
-// TODO: add ins green underline or something of the sort
 // TODO: style <i> tags differently from <em>
 // TODO: add <u> tag (error tag)
 
+a[href]
+  transition: color 0.05s, text-decoration-color 0.1s
+  text-decoration: currentColor underline 0.1em
+  text-decoration-skip-ink: none
+  text-underline-offset: 0.075em
+
+// Styles external links.
+a[href*='//']:not([href*='scp-mainframe.com']):not([href*='localhost'])
+  color: colvar('link-ext')
+  text-decoration-color: colvar('link-ext', opacity 0.5)
+  +on-hover()
+    color: colvar('link-ext', darken 10%)
+    text-decoration-color: currentColor
+
+// Styles internal links.
+a[href^="/"], a[href^=".."], a[href^="#"], a[href*='scp-mainframe.com'], a[href*='localhost']
+  color: colvar('link-int')
+  text-decoration-color: transparent
+  text-decoration-thickness: 0.05em
+  +on-hover()
+    color: colvar('link-int', darken 10%)
+    text-decoration-color: currentColor
+
+// Diagetically inserted text.
+ins
+  text-decoration: underline colvar('text-inserted') 0.125em
+  text-decoration-skip-ink: none
+  background: colvar('text-inserted', opacity 0.25)
+
+// Diagetically deleted text.
+del
+  color: transparent
+  background: colvar('black')
+  text-decoration: none
+  border-radius: 0.2em
+  &::selection
+    color: transparent
+    background: none
+
+// Diagetically struck-out text.
+s
+  text-decoration: line-through 0.15em
+
+// Diagetically highlighted text.
 mark
-  background: colvar('highlight')
+  background: colvar('text-highlight')
   color: colvar('black')
+
+// Makes tags more semantic and meaningful for screen-readers.
+mark
   label-for-screenreaders('highlighted text')
 s
   label-for-screenreaders('stricken text')
+s
+  label-for-screenreaders('deleted text')
 ins
   label-for-screenreaders('newly inserted text')
 
