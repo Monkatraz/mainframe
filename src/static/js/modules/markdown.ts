@@ -36,6 +36,10 @@ import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
 
 // ? [DATA EXPUNGED] auto detect
 
+// ? details -> summary collapsible
+
+// ? <style> tags
+
 // wikilinks
 // [[Link]](relative.page) | [[Link]](/static.page)
 // could potentially just convert links into wikilinks automatically

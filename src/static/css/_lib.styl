@@ -33,7 +33,7 @@ calc-op(op, vars...)
 colvar(name, functions...)
   // Return combined (simple) hsla variable if no functions are used
   unless functions
-    return 'var(--colvar-%s-hsla)' % unquote(name)
+    return 'var(--cvhsla-%s)' % unquote(name)
 
   // Functions are used, so we need to use the more verbose variables
   hue        = colvar-component(name, 'h')
@@ -90,15 +90,17 @@ colvar(name, functions...)
 
 
 colvar-set(name, val)
-  if name and type(val) is 'hsla'
-    --colvar-{name}-h: hue(val)
-    --colvar-{name}-s: saturation(val)
-    --colvar-{name}-l: lightness(val)
-    --colvar-{name}-a: alpha(val)
-    // Combined variable for when functions aren't used to adjust the color
-    --colvar-{name}-hsla: 'hsla(%s, %s, %s, %s)' % (hue(val) saturation(val) lightness(val) alpha(val))
-  else
-    error('Expected a colvar name string and a HSL/HSLA value | ' + (name) + ' | ' + (val))
+  name = unquote(name)
+  hue        = round(hue(val),2)
+  saturation = round(saturation(val),2)
+  lightness  = round(lightness(val),2)
+  alpha      = round(alpha(val),2)
+  --cvh-{name}: hue
+  --cvs-{name}: saturation
+  --cvl-{name}: lightness
+  --cva-{name}: alpha
+  // Combined variable for when functions aren't used to adjust the color
+  --cvhsla-{name}: 'hsla(%s, %s, %s, %s)' % (hue saturation lightness alpha)
 
 colvar-component(name, type)
   name = unquote(name)
@@ -116,7 +118,7 @@ colvar-component(name, type)
   if type is 'a' or type is 'alpha'
     component = a
 
-  return 'var(--colvar-%s-%s)' % (name component)
+  return 'var(--cv%s-%s)' % (component name)
 
 colvar-shred(identifier)
   if type(identifier) is 'hsla'
@@ -126,10 +128,10 @@ colvar-shred(identifier)
     alpha      = alpha(identifier)
     return (hue saturation lightness alpha)
   else if identifier
-    hue        = 'var(--colvar-%s-h)' % identifier
-    saturation = 'var(--colvar-%s-s)' % identifier
-    lightness  = 'var(--colvar-%s-l)' % identifier
-    alpha      = 'var(--colvar-%s-a)' % identifier
+    hue        = 'var(--cvh-%s)' % identifier
+    saturation = 'var(--cvs-%s)' % identifier
+    lightness  = 'var(--cvl-%s)' % identifier
+    alpha      = 'var(--cva-%s)' % identifier
     return (hue saturation lightness alpha)
 
 // Property Functions
