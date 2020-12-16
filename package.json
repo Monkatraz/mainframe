@@ -21,7 +21,7 @@
   "module": "esnext",
   "dependencies": {
     "animejs": "^3.2.1",
-    "dompurify": "^2.2.3",
+    "dompurify": "^2.2.4",
     "faunadb": "^4.0.0",
     "katex": "^0.12.0",
     "markdown-it": "^12.0.3",
