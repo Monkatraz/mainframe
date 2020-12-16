@@ -32,8 +32,6 @@
 - Automatic repository pages (maybe a Markdown syntax for interfacing with the database)
 - Notifications for users (new replies to their comments etc.)
 - Table of contents to left of article when room is available
-- Widget that lets you embed a page into a div on a page
-	- this could be useful for the home page, which may have many 'widgets'.
 - Make a snowpack plugin for proxy.js files
 - Signify how the user voted on the article when they comment
 

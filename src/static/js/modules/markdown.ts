@@ -58,6 +58,9 @@ import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
 // can likely use @[] vars for this
 // editor may be able to auto-suggest (with a hover or something) parameters
 // requires component signature and schema
+// obj {} kv inputs
+// use an import stanza
+// @import 'url' as name
 
 // math | uses Katex
 // $tex-expression$

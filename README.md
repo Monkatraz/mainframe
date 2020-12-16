@@ -21,8 +21,6 @@ If you wish to know more about me, or contact me, you can go to [my personal web
 This list is not inclusive. It is mostly for some people/projects that cannot be easily credited.
   * [Dimitar Donovski (u/ArduousIntent)](https://www.reddit.com/user/ArduousIntent) for their excellent SCP logo concept.
   * [grid-kiss](https://github.com/sylvainpolletvillard/postcss-grid-kiss): Converted into a Stylus plugin within the project.
-  * [postcss-discard-overridden-props](https://github.com/mcler)
-
 ----
 ## Parameters
 ### Target
@@ -93,7 +91,7 @@ There are various features Mainframe would need to support if it were to actuall
 ## Basic Architecture
 Mainframe is a static, single-page-application. Mainframe interacts with its remote database using only serverless functions and client-side API calls. This is part of the reason why Mainframe is cheap to run, as it basically _isn't_ whenever nobody is using it.
 
-In order to actually be functional as a wiki, Mainframe makes heavy use of FaunaDB. FaunaDB itself is a document-based database. It is extremely well-suited for a wiki, although it doesn't do well with binary data. Mainframe is tightly integrated with FaunaDB, with the database API natively using FQL expressions and maximizing usage of FaunaDB's advanced features. 
+In order to actually be functional as a wiki, Mainframe makes heavy use of FaunaDB. FaunaDB itself is a document-based database. It is extremely well-suited for a wiki, although it doesn't do well with binary data. Mainframe is tightly integrated with FaunaDB, with the database API natively using FQL expressions and maximizing usage of FaunaDB's advanced features.
 
 The integration between Mainframe and FaunaDB is to the point that it is near-certain that a guest will never need to invoke a serverless function. Nearly all interaction with the site can be expressed as direct client to database API interactions.
 
@@ -104,25 +102,12 @@ Most of Mainframe's assets are either compiled or built. Mainframe is primarily 
   * Stylus + PostCSS
   * Svelte
 
-Some JavaScript is used for development tools, like Snowpack compilers, but the Mainframe codebase is written in TypeScript.
+Some JavaScript is used for development tools, like the Stylus Snowpack compiler, but the Mainframe codebase is written in TypeScript.
 
 Most sources can be found in the `src` folder. Some additional assets can be found in the `public` folder - these assets have no build step and are just directly copied into the build target folder by Snowpack. Certain source files and development tools can be found within the `dev` folder.
 
 ## Used Runtime Libraries
 Mainframe makes heavy runtime use of various JavaScript libraries - but these have all been chosen based on their minimal size and narrow scope. Mainframe does not use Vue, React, or any other runtime virtual DOM library, and instead uses Svelte.
-
-\- todo: update -
-
-Here are the main ones:
-  * FaunaDB's JS driver for the database API
-  * Svelte for reactive components
-  * Tippy.js for accessible popovers and tooltips
-  * Anime.js for animations
-  * Prism.js for syntax highlighting
-
-Libraries likely to be added, but not yet:
-  * Workbox for PWA support and client-side caching
-  * Chart.js for, well, charts
 
 -----
 
