@@ -6,7 +6,6 @@
 // Corrects the height of text tags by adjusting their margins.
 // Lines are centered within their line-height, which is usually larger than the font itself.
 // This causes overpadding at the top and bottom of text nodes.
-// The --font-cap variable is retrieved using JS, but it is usually around 0.75.
 rhythm-set-text-bounds(auto = true)
   lh = s('(1em * var(--rhythm-baseline))')
   fh-relative = 'calc((%s - 1rem * var(--font-cap)) *  -0.5)' % lh
@@ -17,18 +16,16 @@ rhythm-set-text-bounds(auto = true)
   margin-bottom: fh-relative unless auto
   margin-bottom: fh-actual if auto
 
-
 // Adds gutter(s) on the top and/or bottom using baseline row multiples
-rhythm-gutter(top, bottom = top, margin-type = 0)
+rhythm-gutter(top, bottom = top, margin-type = 'padding')
   for edge in (top bottom)
     if edge isnt false
       type = var(--rhythm-baseline-unit-row)
-      type = var(--rhythm-baseline-row) if unit(edge) is 'em'
+      type = var(--rhythm-baseline-row) if unit(edge) is 'em' or if unit(edge) is 'rem'
       name = 'top'
       name = 'bottom' if edge is bottom
 
-      // Use Padding
-      if margin-type is 0
+      if margin-type is 'padding'
         unless edge is 0
           if edge isnt 1
             padding-{name}: 'calc(%s * %s)' % (type edge)
@@ -37,8 +34,7 @@ rhythm-gutter(top, bottom = top, margin-type = 0)
         if edge is 0
           padding-{name}: 0
 
-      // Use Margins
-      if margin-type is 1
+      if margin-type is 'margin'
         unless edge is 0
           if edge isnt 1
             margin-{name}: 'calc(%s * %s)' % (type edge)
@@ -53,10 +49,11 @@ rhythm-gutter(top, bottom = top, margin-type = 0)
 // Instead, this grid attempts to preserve /even spacing/ between objects - especially text baselines.
 // Overlaying a perfectly uniform row-size grid /will/ show that the rhythm grid does not match.
 // I think this is fine.
+// TODO: change this to be specifically about Markdown content
 .rhythm
   // Default Rhythm Settings
   --rhythm-baseline: 1.5
-  --rhythm-reference-font-size: 1rem
+  --rhythm-reference-font-size: calc(1rem * var(--font-content-size))
 
   // Auto-calculated Vars (don't change these)
   --rhythm-baseline-row: calc(var(--rhythm-baseline) / 2)
@@ -65,63 +62,50 @@ rhythm-gutter(top, bottom = top, margin-type = 0)
 
   // Setup
   position: relative
-  display: grid
-  grid-template-rows: repeat(auto-fill, minmax(var(--rhythm-baseline-unit), auto))
-  grid-template-columns: 100%
-  // Divide by 2 again because top + bottom = 2rows otherwise
-  grid-row-gap: calc(var(--rhythm-baseline-unit) / 2 )
-  row-gap: calc(var(--rhythm-baseline-unit) / 2 )
+  display: flex
+  flex-direction: column
+  row-gap: var(--rhythm-baseline-unit)
   line-height: var(--rhythm-baseline)
 
-  // These tags are 'top-level' tags. 
+  // These tags are 'top-level' tags.
   // They're intended to be used with the grid.
   // Anything else should probably be put inside a div.
-  $block-tags = 'div main, article, section, hgroup, blockquote'
-  $break-tags = 'br, hr'
-  $figure-tags = 'img, figure, table, pre'
-  $text-tags = 'a, p, span, small, ol, ul'
-  $display-tags = 'h1, h2, h3, h4, h5, h6'
-
-  // Tag selections based off of relationships or proximity.
-  $headings-to-text = select-headings('> ', ' + p')
-  $headings-to-hr = select-headings('> ', ' + hr')
-
-  // Reset every tag and make sure it has no margins
-  +select-listed('> ', 'rhythm-tags', $block-tags, $break-tags, $figure-tags, $text-tags, $display-tags)
-    margin: 0
-    margin-block-end: 0
-    margin-block-start: 0
-
-  // Line-height correction, reset text padding
-  +select-listed('> ', 'rhythm-text-correction', $text-tags, $display-tags)
-    position: relative
-    width: 100%
-    line-height: inherit // Fixes the line-height being overridden
-    rhythm-set-text-bounds()
-    padding-top: 0
-    padding-bottom: 0
-    padding-block-start: 0
-    padding-block-end: 0
+  $block-tags = 'div, main, article, section, hgroup, blockquote'
+  $break-tags = 'br, hr, .heading'
+  $figure-tags = 'img, figure, table, pre, ol, ul'
+  $text-tags = 'a, p, span, small'
 
   > br
     content: "" // Bizarre CSS quirk fix for Chrome
 
-  > hr
-    margin-top: calc(var(--rhythm-baseline-unit-row) * -2)
-    // Visually moves HR back down into a centered position
+  // Line-height correction, reset text padding
+  +select-listed('> ', $text-tags, '.heading')
     position: relative
-    top: calc(var(--rhythm-baseline-unit-row) * 1.5)
+    width: 100%
+    line-height: inherit // Fixes the line-height being overridden
+    rhythm-set-text-bounds()
 
-  // Text gutters
-  +select-listed('> ', 'rhythm-text-gutters', $text-tags)
-    rhythm-gutter(1,1)
+    + .heading, + hr + .heading
+      padding-top: var(--rhythm-baseline-unit-row)
 
-  +select-listed('> ', 'rhythm-heading-gutters', $display-tags)
-    rhythm-gutter(1.5,1)
 
-  +select-listed('', 'rhythm-headings-to-text', $headings-to-text)
-    rhythm-gutter(0,false)
+  .heading
+    // Shifts <hr>s up when in front of a heading
+    + hr
+      position: relative
+      width: 100%
+      margin-top: calc(var(--rhythm-baseline-unit) * -0.75)
+      top: calc(var(--rhythm-baseline-unit-row) * 0.25)
 
-  // Figure gutters
-  +select-listed('> ', 'rhythm-figure-gutters', $figure-tags)
-    rhythm-gutter(1,1,1)
+  // // Text gutters
+  // +select-listed('> ', $text-tags, $display-tags)
+  //   rhythm-gutter(1, 1, 'padding')
+
+  // // Corrects gutters for figures that are isolated inside a <p> tag.
+  // +select-listed('> p > ', $figure-tags)
+  //   &:only-child
+  //     rhythm-gutter(0, 1, 'margin')
+
+  // +select-listed('> ', $figure-tags)
+  //   rhythm-gutter(0, 1, 'margin')
+

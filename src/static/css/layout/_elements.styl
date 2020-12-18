@@ -1,13 +1,18 @@
 @require '_lib'
 
-// Selectors
-$sel-content = 'main, article, section'
-$sel-headings = 'h1, h2, h3, h4, h5, h6'
-$sel-code-blocks = 'pre > code'
-$sel-code-inline = 'code, var, samp, samp > kbd'
-$sel-quotes = 'blockquote, q'
-
-// Additional Resets
+// - RESETS
+*
+  margin: 0
+  margin-inline-start: 0
+  margin-inline-end: 0
+  margin-block-end: 0
+  margin-block-start: 0
+  padding: 0
+  padding-inline-start: 0
+  padding-inline-end: 0
+  padding-block-start: 0
+  padding-block-end: 0
+  border: 0
 html
   cursor: auto
 input
@@ -18,7 +23,107 @@ button
 img
   max-width: 100%
 
-// Misc.
+// - CORE
+
+// TODO: Blockquote, li, ul, ol
+// TODO: style <i> tags differently from <em>
+// TODO: add <u> tag (error tag)
+
+::selection
+  color: colvar('text-light')
+  background-color: colvar('text-select')
+
+body
+  color: colvar('text-dark')
+
+// Orderly Heading Sizes
+for $num in (0..5)
+  h{$num + 1}
+    $sizes = 2.25rem, 2rem, 1.75rem, 1.5rem, 1.25rem, 1rem
+    $size = $sizes[$num]
+    font-size: 'calc(%s * var(--font-content-size))' % $size
+
+hr
+  display: block
+  height: 0.125rem
+  background: colvar('background-dim')
+
+ul, ol
+  padding-left: 1rem
+
+// Prevents <sub> and <sup> elements from affecting line-height.
+sub, sup
+  font-size: 75%
+  line-height: 0
+
+// Styles underlines globally.
+u, {$sel-text}
+  text-decoration-skip-ink: none
+  text-underline-offset: 0.075em
+
+// -- LINKS
+
+a[href]
+  transition: color 0.05s, text-decoration-color 0.1s
+  text-decoration: currentColor underline 0.1em
+
+// Styles external links.
+a[href*='//']:not([href*='scp-mainframe.com']):not([href*='localhost'])
+  color: colvar('link-ext')
+  text-decoration-color: colvar('link-ext', opacity 0.5)
+  +on-hover()
+    color: colvar('link-ext', darken 10%)
+    text-decoration-color: currentColor
+
+// Styles internal links.
+a[href^="/"], a[href^=".."], a[href^="#"], a[href*='scp-mainframe.com'], a[href*='localhost']
+  color: colvar('link-int')
+  text-decoration-color: transparent
+  text-decoration-thickness: 0.05em
+  +on-hover()
+    color: colvar('link-int', darken 10%)
+    text-decoration-color: currentColor
+
+// -- DIAGETIC ELEMENTS
+
+// Inserted text.
+ins
+  text-decoration: underline colvar('text-inserted') 0.125em
+  text-decoration-skip-ink: none
+  background: colvar('text-inserted', opacity 0.25)
+
+// Deleted text.
+del
+  color: transparent
+  background: colvar('black')
+  text-decoration: none
+  border-radius: 0.2em
+  &::selection
+    color: transparent
+    background: none
+
+// Struck-out text.
+s
+  text-decoration: line-through 0.15em
+
+// Highlighted text.
+mark
+  background: colvar('text-highlight')
+  color: colvar('black')
+
+// -- A11Y
+
+// Makes tags more semantic and meaningful for screen-readers.
+mark
+  label-for-screenreaders('highlighted text')
+s
+  label-for-screenreaders('stricken text')
+s
+  label-for-screenreaders('deleted text')
+ins
+  label-for-screenreaders('newly inserted text')
+
+// -- COMPONENTS
 
 .icon-scp
   width: 1em
@@ -38,97 +143,3 @@ img
 
   .tippy-svg-arrow
     color: $bg
-
-::selection
-  color: colvar('text-light')
-  background-color: colvar('text-select')
-
-// TODO: Blockquote, li, ul, ol
-// TODO: style <i> tags differently from <em>
-// TODO: add <u> tag (error tag)
-
-a[href]
-  transition: color 0.05s, text-decoration-color 0.1s
-  text-decoration: currentColor underline 0.1em
-  text-decoration-skip-ink: none
-  text-underline-offset: 0.075em
-
-// Styles external links.
-a[href*='//']:not([href*='scp-mainframe.com']):not([href*='localhost'])
-  color: colvar('link-ext')
-  text-decoration-color: colvar('link-ext', opacity 0.5)
-  +on-hover()
-    color: colvar('link-ext', darken 10%)
-    text-decoration-color: currentColor
-
-// Styles internal links.
-a[href^="/"], a[href^=".."], a[href^="#"], a[href*='scp-mainframe.com'], a[href*='localhost']
-  color: colvar('link-int')
-  text-decoration-color: transparent
-  text-decoration-thickness: 0.05em
-  +on-hover()
-    color: colvar('link-int', darken 10%)
-    text-decoration-color: currentColor
-
-// Diagetically inserted text.
-ins
-  text-decoration: underline colvar('text-inserted') 0.125em
-  text-decoration-skip-ink: none
-  background: colvar('text-inserted', opacity 0.25)
-
-// Diagetically deleted text.
-del
-  color: transparent
-  background: colvar('black')
-  text-decoration: none
-  border-radius: 0.2em
-  &::selection
-    color: transparent
-    background: none
-
-// Diagetically struck-out text.
-s
-  text-decoration: line-through 0.15em
-
-// Diagetically highlighted text.
-mark
-  background: colvar('text-highlight')
-  color: colvar('black')
-
-// Makes tags more semantic and meaningful for screen-readers.
-mark
-  label-for-screenreaders('highlighted text')
-s
-  label-for-screenreaders('stricken text')
-s
-  label-for-screenreaders('deleted text')
-ins
-  label-for-screenreaders('newly inserted text')
-
-// Font sizes
-// TODO: text size may be too large by default
-{$sel-content}
-  font-set('sans', true)
-  font-size: calc(1rem * var(--font-content-size))
-
-  +match-media(wide, only)
-    font-size: calc(1.05rem * var(--font-content-size))
-
-  +match-media(thin, only)
-    font-size: calc(0.95rem * var(--font-content-size))
-
-  +match-media(narrow, only)
-    font-size: calc(0.9rem * var(--font-content-size))
-
-{$sel-code-inline}, {$sel-code-blocks}
-  font-set('mono')
-
-{$sel-headings}
-  font-set('display')
-
-// Orderly Heading Sizes
-for $num in (0..5)
-  h{$num + 1}
-    $sizes = 2.25rem, 2rem, 1.75rem, 1.5rem, 1.25rem, 1rem
-    $size = $sizes[$num]
-    font-size: $size

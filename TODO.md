@@ -5,7 +5,6 @@
 - [ ] Switch to Vercel due to even better pricing and FOSS ideals
 - [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
 - [ ] Get rid of PostCSS-center (update header)
-``` Content-Security-Policy = "script-src 'self' https://cdnjs.cloudflare.com https://code.iconify.design; child-src 'self'; object-src 'none';" ```
 
 ### General
 - [ ] Integrate ReCaptcha
@@ -27,6 +26,7 @@
 - [ ] Search bar component
 - [ ] Rating component
 - [ ] Comments / Discussion Tab Component Thingy
+- [ ] Top of page button
 
 ### Random Ideas
 - Automatic repository pages (maybe a Markdown syntax for interfacing with the database)
@@ -34,6 +34,7 @@
 - Table of contents to left of article when room is available
 - Make a snowpack plugin for proxy.js files
 - Signify how the user voted on the article when they comment
+- Some sort of "alert" component that pops up and then fades programmatically
 
 #### Editor
 - Split pane editor panel

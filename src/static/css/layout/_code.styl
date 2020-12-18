@@ -32,14 +32,17 @@ pre[class*=language-], pre.code
 
 
 :not(pre)
-  > code[class*=language-], > code.code
+  > code
     display: inline-block
-    padding: 0.1em 0.25em
-    border-radius: 0.2em
-    background: #282C34
-    color: #ABB2BF
     font-size: 0.9em
     white-space: normal
+    padding: 0.1em 0.25em
+    border-radius: 0.2em
+    background: colvar('background-dim')
+  > code[class*=language-], > code.code
+    background: #282C34
+    color: #ABB2BF
+
 
 // #ABB2BF
 // #5C6370

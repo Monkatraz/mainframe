@@ -3,24 +3,24 @@
 :root
   // FONT PARAMETERS
   // Parameters used for sizing of fonts inside of content, like the article body.
-  --font-content-size: 1
+  --font-content-size: 0.875
 
   // FONT FAMILY VARIABLES
   // Utility Fonts
 
-  // --font-system-x (by itself) attempts to use whatever the relevant default font for your system is. 
+  // --font-system-x (by itself) attempts to use whatever the relevant default font for your system is.
   // This tries to avoid using fairly ancient fallback fonts, or 'web-safe fonts', like Arial.
   // Instead, this just uses the CSS default rather than force a web-safe font.
   // Native emoji fonts are always included at the end to hopefully allow rendering of most emoji.
-  // This will always be imperfect. 
+  // This will always be imperfect.
   // For example: Noto is notorious for being on many systems and overriding the correct font.
   // Also, the order of the fonts does not signify what my preferences for operating systems is.
 
   --font-system-default: emoji,
-                        'Apple Color Emoji',
-                        'Segoe UI Emoji', 'Segoe UI Symbol',
-                        'Noto Emoji',
-                        system-ui, sans-serif;
+                         'Apple Color Emoji',
+                         'Segoe UI Emoji', 'Segoe UI Symbol',
+                         'Noto Emoji',
+                         system-ui, sans-serif;
 
   --font-system-sans: ui-sans-serif,
                       -apple-system,
@@ -32,12 +32,12 @@
                       var(--font-system-default);
 
   --font-system-rounded: ui-rounded,
-                        var(--font-system-sans);
+                         var(--font-system-sans);
 
   --font-system-serif: ui-serif,
-                      'Noto Serif',
-                      'Times New Roman',
-                      var(--font-system-default);
+                       'Noto Serif',
+                       'Times New Roman',
+                       var(--font-system-default);
 
   --font-system-mono: ui-monospace,
                       'SFMono-Regular', 'Menlo',
@@ -55,10 +55,10 @@
   // --font-mono is meant for code or console output text. It can be used stylistically, however.
   // ----
 
-  --font-sans:    'Rubik',    var(--font-system-sans)
-  --font-display: 'Inter',     var(--font-system-rounded)
-  --font-serif:   'Vollkorn',  var(--font-system-serif)
-  --font-mono:    'Fira Code', var(--font-system-mono)
+  --font-sans:    'Public Sans', var(--font-system-sans)
+  --font-display: 'Inter',       var(--font-system-rounded)
+  --font-serif:   'Vollkorn',    var(--font-system-serif)
+  --font-mono:    'Fira Code',   var(--font-system-mono)
 
   // Correction factors for fonts.
   --font-sans-cap:        0.75
@@ -82,6 +82,33 @@ html, body
   font-family: var(--font-sans)
   --font-cap: var(--font-sans-cap)
 
+$sel-content = 'main, article, section'
+$sel-text = 'a, p, span, small, ol, ul'
+$sel-headings = 'h1, h2, h3, h4, h5, h6'
+$sel-code-blocks = 'pre > code'
+$sel-code-inline = ':not(pre) > code, var, samp, samp > kbd'
+$sel-quotes = 'blockquote, q'
+
+{$sel-content}
+  font-set('sans', true)
+  font-size: calc(1rem * var(--font-content-size))
+
+  +match-media(wide, only)
+    font-size: calc(1.075rem * var(--font-content-size))
+
+  +match-media(thin, only)
+    font-size: calc(1rem * var(--font-content-size))
+
+  +match-media(narrow, only)
+    font-size: calc(0.9375rem * var(--font-content-size))
+
+{$sel-code-inline}, {$sel-code-blocks}
+  font-set('mono')
+
+{$sel-headings}
+  font-set('display')
+  font-weight: 460
+
 // Set Classes
 .fs-sans
   font-set('sans')
@@ -100,13 +127,3 @@ html, body
 
 .fs-cursive
   font-set('cursive')
-
-// Weight Classes
-.fw-light
-  font-weight: lighter !important
-
-.fw-normal
-  font-weight: normal !important
-
-.fw-bold
-  font-weight: bolder !important

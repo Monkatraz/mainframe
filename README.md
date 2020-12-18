@@ -143,7 +143,8 @@ Running locally is slightly more complex. In order to function correctly, Mainfr
 \- todo: contributing -
 
 ## Deploying
-As Mainframe is hosted on Netlify, any changes made to the `master` branch in this repository will automatically cause the site to be deployed.
+
+\- todo: deploying -
 
 ## License
 MIT.

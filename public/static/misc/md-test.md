@@ -1,28 +1,45 @@
 # <a name="top"></a>Markdown Test Page
 ***
 
-* [Headings](#Headings)
-* [Paragraphs](#Paragraphs)
-* [Blockquotes](#Blockquotes)
-* [Lists](#Lists)
-* [Horizontal rule](#Horizontal)
-* [Table](#Table)
-* [Code](#Code)
-* [Inline elements](#Inline)
-
+## <a name="Syntax"></a> Syntax
 ***
+##### Inline Formatting:
+| | | |
+| :--: | :-- | :-- |
+| `/.../` | Italics | /This is italicized, without using `<em>`./
+| `//...//` | Emphasis | //This is actually emphasis.//
+| `*...*` | Bold | *This is just bolded text.*
+| `**...**` | Strong | **This is very important, strong text.**
+| `__...__` | Underline | __This is underlined, not emphasized.__
+| `^...^` | Superscript | 10^10^ Some^tiny text.^
+| `~...~` | Subscript | X~1~, X~2~, Some~more tiny text.~
+| `--...--` | Strikethrough | --This text was a mistake.--
+| `++...++` | Insert | ++This text was added.++
+| `==...==`| Mark | ==This text is important for some reason, and thus highlighted.==
+| `$...$` | Math (TeX) | $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$.
 
-# <a name="Custom Syntax"></a>Custom Syntax
-***
-- Superscript: ^123^ H^2^0 10^20^ 10^10^10^10^^^
-- Subscript: X~1~ X~2~ Y~1~ Y~2~
-- Strikethrough: ~~this was a mistake~~
-- Insert: ++this was added++
-- Delete: --this has been deleted--
-- Mark: ==this has been marked==
-- Italic: /this has been italicized/ without using `<em>`
-- Span: [lots [of _cool things_] in here]
-- Math: $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$
+##### Special:
+| | | |
+| :--: | :-- | :-- |
+| `@@...@@`| Escaped | @@//This text is __escaped__, and **will only be rendered as plain text.**//@@
+
+###### Inline Spans
+`[:font family 100-900|bold(er)|light(er)|normal (n)em: text]`
+-	[:font sans: Here is the sans font.]
+-	[:font display: Here is the display font.]
+- [:font serif: Here is the serif font.]
+- [:font mono: Here is the mono font.]
+- [:font handwriting: Here is the handwriting font.]
+- [:font cursive: Here is the cursive font.]
+- [:font 100: 100] [:font 200: 200] [:font 300: 300] [:font 400: 400] [:font 500: 500] [:font 600: 600] [:font 700: 700] [:font 800: 800] [:font 900: 900]
+- [:font bold: Bold.] [:font light: Light.]
+- [:font bolder: Bolder.] [:font lighter: Lighter.]
+- [:font 1em: 1em] [:font 1.5em: 1.5em]  [:font 2em: 2em] [:font 2.5em: 2.5em] [:font 3em: 3em]
+- [:font handwriting bold 1.25em: Mixed font style text.]
+
+`[:class class1 class2: content]`
+- [:class fs-serif: Setting font class manually.]
+- [:class fs-mono token function: Multiple classes.]
 
 ##### Math
 $\begin{aligned}
@@ -32,17 +49,40 @@ $\begin{aligned}
 
 $f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi$
 
-# <a name="Tests"></a>Tests
+## Tests
 ***
-- Nested custom syntax: 10^10~20~^
-	- ==test ~~one~~ two==
+
+[var]: not a link
+
+- Module: [:module [class]: cool: inline] `[:module [class]: cool: inline]`
+	-	[:module: inline]
+- Nested syntax: 10^10~20~^
+	- ==test ~~one~~ two== ~~one~two~three~~
+		
+### Styling Tests
 - Links:
-	- This is a [external link.](//google.com)
-	- This is a [internal link.](/)
+	- This is an [external link.](//google.com)
+	- This is an [internal link.](/)
 	- This is a [link with descenders: typography](//google.com) 
 		-	[typography](//google.com)
 
-# <a name="Headings"></a>Headings
+##### SPECIAL CONTAINMENT PROCEDURES
+***
+Current containment of SCP-XXXX is __severely deficient__. It is crucial that extensive measures are implemented swiftly in order to mitigate the immediate risk of containment failure. Loss of containment for any physically measurable interval of time will instigate an instantaneous expansion event. This will result in an /XK-Class End-of-the-World scenario/.
+
+The aforementioned containment insufficiency is due to significant power and cooling constraints being suffered by the "Apophis" Confinement Cluster, the device that is currently containing SCP-XXXX. Throttling of the cluster is causing it to operate considerably below its 6000 gigatonne rating, which is preventing the stable and safe containment of SCP-XXXX. In order to achieve stability, the continuous power and cooling capacity made available to the "Apophis" Confinement Cluster must be increased.
+
+##### DESCRIPTION
+***
+SCP-XXXX is a spacetime anomaly located within the obliterated core of the Chernobyl Power Plant's No. 4 reactor, in Pripyat, Ukraine. It is naturally propagating anomaly, and is attempting to radiate out of the reactor core. It is prevented from doing so by a confinement singularity. SCP-XXXX has a widespread influence on reality, being directly responsible for a long series of anomalous phenomena that has been occurring within the Chernobyl exclusion zone since 1986.
+
+SCP-XXXX has a small region of influence, and within this region induces radical alterations of the observed behavior of ordinary natural phenomena. This particular characteristic is an arguably natural phenomena, an expected result from the observed loss of metastability of multiple physical fields, or a 'true vacuum', within the anomaly. It is generally concluded that the Higgs, electromagnetic, and at least one unknown particle have decayed from metastability into a more stable ground state. 
+
+It is unknown whether or not the true vacuum state was caused by an separate anomalous mechanism or if it is the anomaly itself. Regardless, SCP-XXXX mostly behaves as a pure spacetime anomaly, which complicates containment. Spacetime anomalies are mostly unaffected by local reality stabilization containment schemes. The only known containment method is confinement into an event horizon formed by an artifical singularity.
+
+In a hypothetical, but not improbable, scenario, the containment system for SCP-XXXX could fail. If it failed, the boundary of SCP-XXXX would instantly begin expansion at the speed of light, encompassing the Earth within less than a second. The potential energy of any matter entering the boundary would rapidly drop, causing the dispersion of an enormous amount of energy, effectively atomizing the matter. SCP-XXXX would annihilate most of the solar system within hours, and boundaries expansion would continue for the life-time of the universe. As is likely evident, it is improbable that any life on Earth could survive this event.
+
+# Headings
 ***
 
 # Heading one
@@ -72,7 +112,7 @@ Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor 
 
 [[Top]](#top)
 
-# <a name="Paragraphs"></a>Paragraphs
+# Paragraphs
 ***
 
 Incididunt ex adipisicing ea ullamco consectetur in voluptate proident fugiat tempor deserunt reprehenderit ullamco id dolore laborum. Do laboris laboris minim incididunt qui consectetur exercitation adipisicing dolore et magna consequat magna anim sunt. Officia fugiat Lorem sunt pariatur incididunt Lorem reprehenderit proident irure. Dolore ipsum aliqua mollit ad officia fugiat sit eu aliquip cupidatat ipsum duis laborum laborum fugiat esse. Voluptate anim ex dolore deserunt ea ex eiusmod irure. Occaecat excepteur aliqua exercitation aliquip dolor esse eu eu.
@@ -83,7 +123,7 @@ Officia irure in non voluptate adipisicing sit amet tempor duis dolore deserunt 
 
 [[Top]](#top)
 
-# <a name="Blockquotes"></a>Blockquotes
+# Blockquotes
 ***
 
 Ad nisi laborum aute cupidatat magna deserunt eu id laboris id. Aliquip nulla cupidatat sint ex Lorem mollit laborum dolor amet est ut esse aute. Nostrud ex consequat id incididunt proident ipsum minim duis aliqua ut ex et ad quis. Laborum sint esse cillum anim nulla cillum consectetur aliqua sit. Nisi excepteur cillum labore amet excepteur commodo enim occaecat consequat ipsum proident exercitation duis id in.
@@ -102,7 +142,7 @@ Adipisicing voluptate ipsum culpa voluptate id aute laboris labore esse fugiat v
 
 [[Top]](#top)
 
-# <a name="Lists"></a>Lists
+# Lists
 ***
 
 ### Ordered List
@@ -131,7 +171,7 @@ Adipisicing voluptate ipsum culpa voluptate id aute laboris labore esse fugiat v
 
 [[Top]](#top)
 
-# <a name="Horizontal"></a>Horizontal rule
+# Horizontal rule
 ***
 
 In dolore velit aliquip labore mollit minim tempor veniam eu veniam ad in sint aliquip mollit mollit. Ex occaecat non deserunt elit laborum sunt tempor sint consequat culpa culpa qui sit. Irure ad commodo eu voluptate mollit cillum cupidatat veniam proident amet minim reprehenderit.
@@ -142,7 +182,7 @@ In laboris eiusmod reprehenderit aliquip sit proident occaecat. Non sit labore a
 
 [[Top]](#top)
 
-# <a name="Table"></a>Table
+# Table
 ***
 
 Duis sunt ut pariatur reprehenderit mollit mollit magna dolore in pariatur nulla commodo sit dolor ad fugiat. Laboris amet ea occaecat duis eu enim exercitation deserunt ea laborum occaecat reprehenderit. Et incididunt dolor commodo consequat mollit nisi proident non pariatur in et incididunt id. Eu ut et Lorem ea ex magna minim ipsum ipsum do.
@@ -159,7 +199,7 @@ Minim id consequat adipisicing cupidatat laborum culpa veniam non consectetur et
 
 [[Top]](#top)
 
-# <a name="Code"></a>Code
+# Code
 ***
 
 ## Inline code
@@ -189,32 +229,32 @@ func main() {
 ```
 
 ```ts
-  /** Eagerly loads the rest of the LazyDocument. */
-  public async _eagerLoad() {
-    // Just plain get the whole object
-    const response = await this._client.query<DataObject>(this._requestExpr)
-    if (response.ok === false) throw new Error('Error retrieving document.')
-    // Set every field to its actual value
-    this._fields.forEach((field) => {
-      this._setField(field, response.body[field] as DataValue)
-    })
-    return this
-  }
+/** Eagerly loads the rest of the LazyDocument. */
+public async _eagerLoad() {
+	// Just plain get the whole object
+	const response = await this._client.query<DataObject>(this._requestExpr)
+	if (response.ok === false) throw new Error('Error retrieving document.')
+	// Set every field to its actual value
+	this._fields.forEach((field) => {
+		this._setField(field, response.body[field] as DataValue)
+	})
+	return this
+}
 
-  /** Returns the requested field as another LazyDocument.
-   *  The requested field _must_ be an object for this to work. LazyDocument requires key-value pairs. */
-  public async _getLazy<K extends string & keyof T>(field: K): Promise<Lazyify<T[K]> & LazyDocument<T[K]>> {
-    const lazydoc = await new LazyDocument<T[K]>(q.Select(field, this._requestExpr), this._client)._start()
-    this._setField(field, lazydoc)
-    return lazydoc as Lazyify<T[K]> & typeof lazydoc
-  }
+/** Returns the requested field as another LazyDocument.
+ *  The requested field _must_ be an object for this to work. LazyDocument requires key-value pairs. */
+public async _getLazy<K extends string & keyof T>(field: K): Promise<Lazyify<T[K]> & LazyDocument<T[K]>> {
+	const lazydoc = await new LazyDocument<T[K]>(q.Select(field, this._requestExpr), this._client)._start()
+	this._setField(field, lazydoc)
+	return lazydoc as Lazyify<T[K]> & typeof lazydoc
+}
 ```
 
 Ex amet id ex aliquip id do laborum excepteur exercitation elit sint commodo occaecat nostrud est. Nostrud pariatur esse veniam laborum non sint magna sit laboris minim in id. Aliqua pariatur pariatur excepteur adipisicing irure culpa consequat commodo et ex id ad.
 
 [[Top]](#top)
 
-# <a name="Inline"></a>Inline elements
+# Inline elements
 ***
 
 Sint ea anim ipsum ad commodo cupidatat do **exercitation** incididunt et minim ad labore sunt. Minim deserunt labore laboris velit nulla incididunt ipsum nulla. Ullamco ad laborum ea qui et anim in laboris exercitation tempor sit officia laborum reprehenderit culpa velit quis. **Consequat commodo** reprehenderit duis [irure](#!) esse esse exercitation minim enim Lorem dolore duis irure. Nisi Lorem reprehenderit ea amet excepteur dolor excepteur magna labore proident voluptate ipsum. Reprehenderit ex esse deserunt aliqua ea officia mollit Lorem nulla magna enim. Et ad ipsum labore enim ipsum **cupidatat consequat**. Commodo non ea cupidatat magna deserunt dolore ipsum velit nulla elit veniam nulla eiusmod proident officia.

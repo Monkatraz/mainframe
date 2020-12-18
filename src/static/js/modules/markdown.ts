@@ -14,88 +14,185 @@ Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/lib
 // Used for md-it extensions
 import type { RenderRule } from 'markdown-it/lib/renderer'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
+import type Token from 'markdown-it/lib/token'
+
+// ! Before you dig into the depths of this file, read this:
+// I want two things to be noted:
+//  1. Mainframe /differs from the fundamental syntax of the Commonmark spec in some ways./
+//    The most glaring difference is the handling of *, _, **, __.
+//    This is done because, well, it could be done, and because I think the syntax I came up with is /better./
+//    And regardless, at least in all the ways that matter, I think it's still Markdown.
+//  2. This library is really messy, and it's "intentional".
+//    Parsers are really messy, and this is basically a library for quickly generating one.
+//    Markdown syntax can now be easily modified, or in this case, massively extended.
+//    It's not like I'm over-complicating things either. 
+//    The standard markdown-it plugins have a lot of boilerplate that this library avoids.
+//
+// If the syntax's differences from Markdown were too contentious, they can easily be reverted.
 
 // TODO: Generic (block -> tag) handler
 // TODO: Generic (lineSymbol -> tag) handler
-// TODO: Components: collapsibles, figures, footnotes
-// ? expose render internals through callback
-// ? front-matter as a page hook system when rendering
-// ? Markdown Svelte component that can handle async post-processing
+// TODO: Post-tokenize rule (use md.core.ruler.push and state.tokens)
+// TODO: autoconvert wiki links
+// TODO: compare Wikidot typography replacements vs markdown-it
+// TODO: criticmarkup?
+// TODO: Basic grid markup that isn't tables
+// TODO: Built-in ACS module
 
-// TODO: Tags: abbr, def/deflist, u (errors), b?
-// simple mappings:
+// ?:::collapsible [label-closed] [label-opened] -> block -> :::
+//  uses <details> and <summary>
+// ? figure, imgcaption, tabview, ACS, chartjs?, mermaid?, tooltips
+// ? citations
+// ? *[]: | abbr def. | find alternative syntax?
+// ? text alignment: ':--', ':--:', '--:' (matches tables)
+// ? dl -> ...(dt -> dd) -> dl | term -> \t~ definition
+
+// ? yaml/json/kv front matter
+// set render flags?
+// themes?
+
+// basic inline:
+// /  -> <i>
+//\// -> <em>
+//\*  -> <b>
+//\** -> <strong>
+// __ -> <u>
 // ^  -> <sup>
 // ~  -> <sub>
-// ~~ -> <s>
+// ? /\^\d[\d,]*\b/ | x^1 only
+// ? /\~\d[\d,]*\b/ | x~1 only
+// -- -> <s>
 // ++ -> <ins>
-// -- -> <del>
+// ? -- -> <del> | maybe ??
 // == -> <mark>
-// /  -> <i>
 
-// ? set font
+// advanced inline:
+// $tex-expression$ -> Katex powered tex expressions
+// ? ^[inline footnote]
+// @@ -> (escaping)
 
-// ? [DATA EXPUNGED] auto detect
+// inline formatting elements:
+// ? #color col|...#
+// ? #font family weight mul|...#
+// ? #class ...classes|...]
+// ? #style css|...#
+// ? #<tag> attrs|...#
 
-// ? details -> summary collapsible
+// basic blocks
+// ? comments | <!--is unruly--> | // is meh
+// ? easy line break
+// ? nestable MD tags
+// ? $$$ -> tex-expression-block -> $$$
 
-// ? <style> tags
+// preprocessor:
+// ? [myvar]: my variables value | to use: @[myvar] <- (inserts "my variables value")
 
-// wikilinks
-// [[Link]](relative.page) | [[Link]](/static.page)
-// could potentially just convert links into wikilinks automatically
+// ? variable conditionals
+// protected keywords: if|unless|elif|else, is|isnt|and|or|defined
+// cond: @[var] -> (is|isnt) -> (defined|val)
+// conj: and|or
+// conds: cond ?> ...(conj -> cond)
+// op: if|unless|elif|else : if|unless conds ?> ...elif conds ?> else
+// condEval(string) fn, split by /\b(and|or)\b/
+// inline:
+//  [#if|unless conds# inline] ?> ...[#elif cond# inline] ?> [#else# inline]
+// block:
+//  #if|unless cond -> block ?> ...#elif cond -> block ?> #else -> block -> #end
 
-// vars | preserves ![] and [] link syntax assc.
-// [title]: my title
-// to use: @[title] <- (inserts the var)
-
-// cmp -> <tag> or cmp() fn.
-// [:cmp attrs: inline component]
-// :::cmp attrs
-//  block
-// :::
-
-// ? user-made components
-// can likely use @[] vars for this
+// ? user-made modules
 // editor may be able to auto-suggest (with a hover or something) parameters
-// requires component signature and schema
-// obj {} kv inputs
-// use an import stanza
-// @import 'url' as name
+// introduce a plugin "context" and merge imports into it
+// [:cmp attrs?: inline]
+// :::cmp attrs? -> block -> :::
+// @module | @module is a private form of @export
+// @export [:cmp attrsdef?: -> block -> ]
+// @export :::cmp attrsdef? -> block -> :::
+// introduces implicit vars: @[block]
+// @import ...target from (path)
+// chain: /@import\s/, { module: /\w+/, delimit: /,\s*/, repeat: true }, /\sfrom\s/, /\(/, 'path', /\)/
 
-// math | uses Katex
-// $tex-expression$
+// ? maybe
+// auto-link 'SCP-num' tokens
+// [DATA EXPUNGED] auto detect?
+// [ ] -> <input type=checkbox disabled>
+// [x] -> <input type=checkbox disabled checked>
+
 
 // -- INIT. EXTENSIONS
 
-const newSyntax = [
-  inlineSyntax({ delimiter: '^', tag: 'sup' }),
-  inlineSyntax({ delimiter: '~', tag: 'sub' }),
-  inlineSyntax({ delimiter: '~~', tag: 's' }),
-  inlineSyntax({ delimiter: '++', tag: 'ins' }),
-  inlineSyntax({ delimiter: '--', tag: 'del' }),
-  inlineSyntax({ delimiter: '==', tag: 'mark' }),
-  inlineSyntax({ delimiter: '/', tag: 'i' }),
-  inlineSyntax({ delimiter: ['[', ']'], tag: 'span', after: 'image' }),
-  inlineSyntax({
-    delimiter: '$', strict: true,
-    render: (str) => katex.renderToString(str, {
-      throwOnError: false
-    })
-  })
+const symbolTagMappings = [
+  ['/', 'i'],
+  ['//', 'em'],
+  ['*', 'b'],
+  ['**', 'strong'],
+  ['__', 'u'],
+  ['--', 's'],
+  ['^', 'sup'],
+  ['~', 'sub'],
+  ['++', 'ins'],
+  // ['--', 'del'],
+  ['==', 'mark']
 ]
 
-export function generateRenderer() {
-  const md = new MarkdownIt({ html: true, linkify: true, typographer: true })
-  // We disable strikethrough as we use our better parser for it.
-  md.disable('strikethrough')
-  // Adds all of our syntax at once.
-  newSyntax.map(md.use, md)
-  // This bit of code replaces the original text token with a slightly less efficient one.
+// { attrs: /.*?(?<!])(?=:)/ },
+const syntaxChains = {
+  // ? attrsdef: ![param] (defined default parameter) | ...([param]: default (defined) | [name] (undefined))
+  keyvals: syntaxChain('keyvals',
+    [/\s*\[/, 'key', /]:?\s*/, { val: /./, repeat: true, optional: true }], { loop: true }),
+  spans: syntaxChain('inline-span',
+    [
+      /\[:/, { type: /.+?(?=\s|:)/ }, /\s*/,
+      { param: /./, repeat: true, delimit: /\s/ }, /:\s*/,
+      'nest', { close: /]/, tag: '/span' }
+    ], {
+    after: 'image',
+    parse: {
+      'type': (state, name, content, idx, tokens) => {
+        const token = state.push(name, 'span', 1)
+        switch (content) {
+          case 'font': {
+            let family = '', weight = '', size = ''
+            for (const param of tokens) if (param[0] === 'param') {
+              if (param[3].endsWith('em')) size = param[3]
+              else if (/^(\d{3}|bolder|lighter|bold|light)$/.test(param[3])) weight = param[3]
+              else family = param[3]
+            }
+            token.attrSet('style', objStyle({ 'font-weight': weight, 'font-size': size }))
+            if (family) token.attrJoin('class', 'fs-' + family)
+            break
+          }
+          // This is a repeated pattern, so this wacky syntax makes this a bit more concise.
+          default: for (const param of tokens) if (param[0] === 'param')
+            if (content === 'class') token.attrJoin('class', param[3])
+            else if (content === 'color') token.attrSet('style', 'color: ' + param[3])
+        }
+      }
+    }
+  })
+}
+
+function mapKeyVals(str: string) {
+  const { passed, tokens } = syntaxChains.keyvals.parse(str, 0)
+  const keyvals = new Map<string, string>()
+  if (passed) tokens.forEach((token, idx) => {
+    if (token[0] === 'ident') keyvals.set(token[3], '')
+    else if (token[0] === 'val') keyvals.set(tokens[idx - 1][3], token[3])
+  })
+  return keyvals
+}
+
+const TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~/]/
+const synExt = [
+  ...symbolTagMappings.map((arr) => syntaxInline({ symb: arr[0], tag: arr[1] })),
+  syntaxInline({ symb: '$', render: (str) => katex.renderToString(str, { throwOnError: false }) }),
+  syntaxInline({ symb: '@@', render: (str) => str }),
+  syntaxChains.spans.plugin,
+  onEachToken('heading_open', (token) => { token.attrJoin('class', 'heading') }),
+  // This parser replaces the original text token with a slightly less efficient one.
   // However, this function allows you to extend what is considered a terminator character to the parser.
   // The source of this function actually comes from markdown-it, it's just commented out.
-  // New Terminators: '/'
-  const TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~/]/
-  md.inline.ruler.at('text', (state, silent) => {
+  // As an example of why this matters, /italics/ wouldn't work without this.
+  (md: MarkdownIt) => md.inline.ruler.at('text', (state, silent) => {
     const pos = state.pos
     const idx = state.src.slice(pos).search(TERMINATOR_RE)
     // first char is terminator -> empty text
@@ -109,149 +206,29 @@ export function generateRenderer() {
     if (!silent) state.pending += state.src.slice(pos, pos + idx)
     state.pos += idx
     return true
-  })
+  }),
+  // Disables the syntax that we replaced.
+  (md: MarkdownIt) => md.disable('strikethrough').disable('emphasis')
+]
+
+export function generateRenderer() {
+  const md = new MarkdownIt({ html: true, linkify: true, typographer: true })
+  synExt.map(md.use, md)
   return (raw: string) => DOMPurify.sanitize(md.render(raw))
 }
 
 // -- EXTENSION FUNCTIONS
 
-interface InlineSyntaxOpts {
-  delimiter: string | [string, string]
-  strict?: boolean
-  tag?: string
-  name?: string
-  after?: string
-  render?: (str: string) => string
-  open?: RenderRule
-  close?: RenderRule
+/** Escapes a string for use as a regexp match. */
+function escapeRegExp(str: string) {
+  return str.replace(/[.*+\-?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
 }
 
-// Yes, parsers are extremely messy and this is a catch-all function.
-// But you can't argue with the results: it's stupid easy to add new syntax.
-function inlineSyntax(optsIn: InlineSyntaxOpts) {
-  const name =
-    optsIn.tag ? optsIn.tag :
-      typeof optsIn.delimiter === 'string' ? optsIn.delimiter :
-        optsIn.delimiter[0] + optsIn.delimiter[1]
-  const opts = { name, strict: false, tag: 'div', after: 'emphasis', ...optsIn }
-
-  // TODO: more cleanup and commenting
-  const useSingleToken = opts.render !== undefined
-  return (md: MarkdownIt) => {
-    if (opts.delimiter instanceof Array) {
-      // Bracketed delimiters
-      md.inline.ruler.after(opts.after, opts.name, (state, silent) => {
-        if (silent) return false
-        const start = state.pos
-        const max = state.posMax
-        const [pairLeft, pairRight] = opts.delimiter as [string, string]
-        const lenLeft = pairLeft.length
-        const lenRight = pairRight.length
-        // check start delimiter
-        if (start + lenLeft > max) return false
-        if (state.src.substr(start, lenLeft) !== pairLeft) return false
-        // check end delimiter
-        let pos = start + lenLeft
-        let level = 1
-        // TODO: functionalize this with delimiter / pair mode
-        while (pos < max) {
-          if (state.src.substr(pos, lenLeft) === pairLeft) level++
-          else if (state.src.substr(pos, lenRight) === pairRight) level--
-          if (level === 0) break
-          pos++
-        }
-        if (pos === max) return false
-        // matched!
-        if (useSingleToken) state.push(opts.name, opts.tag, 0)
-          .markup = state.src.substr(start + lenLeft, pos - start - 1)
-        else {
-          state.push(opts.name + '_open', opts.tag, 1)
-            .markup = pairLeft
-          inlineTokenize(state, start + lenLeft, pos)
-          state.push(opts.name + '_close', opts.tag, -1)
-        }
-        state.pos += lenRight
-        return true
-      })
-    } else if (typeof opts.delimiter === 'string') {
-      // Non-bracketed delimiters
-      let out = ''
-      for (const char of opts.delimiter) out += '0' + char.charCodeAt(0)
-      const marker = parseInt(out)
-      md.inline.ruler.after(opts.after, opts.name, (state, silent) => {
-        if (silent) return false
-        const start = state.pos
-        const max = state.posMax
-        const len = opts.delimiter.length
-        if (start + len > max) return false
-
-        if (useSingleToken) {
-          // check start delimiter
-          if (state.src.substr(start, len) !== opts.delimiter) return false
-          // check if delimiter is not valid
-          const { left, right } = flanking(state, start, opts.delimiter, opts.strict)
-          if (!left && !right) return false
-          // check end delimiter
-          let pos = start + len
-          while (pos < max) {
-            if (state.src.substr(pos, len) === opts.delimiter) {
-              const { left, right } = flanking(state, start, opts.delimiter, opts.strict)
-              if (!left && !right) continue
-              break
-            }
-            pos++
-          }
-          if (pos === max) return false
-          // matched!
-          state.push(opts.name, opts.tag, 0)
-            .markup = state.src.substr(start + len, pos - start - 1)
-          state.pos = pos + len
-          return true
-
-        } else {
-          // check for consecutive delimiters
-          const count = numDelimiters(state, start, opts.delimiter as string)
-          if (count === 0) return false
-          // get substr of all delimiters together and check flanking run on them
-          const total = state.src.substr(start, len * count)
-          const { left, right } = flanking(state, start, total, opts.strict)
-          if (!left && !right) return false
-          // matched!
-          for (let i = 0; i < count; i++) {
-            state.push('text', '', 0).content = opts.delimiter as string
-            state.delimiters.push({
-              marker: marker,
-              length: count,
-              jump: i,
-              token: state.tokens.length - 1,
-              end: -1,
-              open: left,
-              close: right
-            })
-          }
-          state.pos += len * count
-          return true
-        }
-      })
-      if (!useSingleToken) md.inline.ruler2.after('emphasis', opts.name, (state) => {
-        convertDelimiters(opts, marker, state, state.delimiters)
-        // Not sure what this code is actually for, but it's in the standard markdown-it plugins.
-        if (state.tokens_meta) for (const token of state.tokens_meta) {
-          if (token?.delimiters) convertDelimiters(opts, marker, state, token.delimiters)
-        }
-        return true
-      })
-    }
-
-    if (opts.render) md.renderer.rules[name] = (tokens, idx) => { return (opts.render as any)(tokens[idx].markup) }
-    else {
-      if (opts.open) md.renderer.rules[name + '_open'] = opts.open
-      if (opts.close) md.renderer.rules[name + '_close'] = opts.close
-    }
-  }
+function objStyle(obj: { [prop: string]: string }) {
+  const props = []
+  for (const prop in obj) if (obj[prop]) props.push(`${prop}: ${obj[prop]}`)
+  return props.join(';')
 }
-
-// const UNESCAPE_RE = /\\([ \\!"#$%&'()*+,./:;<=>?@[\]^_`{|}~-])/g
 
 function inlineTokenize(state: StateInline, start: number, end: number) {
   const max = state.posMax
@@ -290,30 +267,241 @@ function flanking(state: StateInline, start: number, delimiter: string, strict: 
   return { left, right }
 }
 
-function numDelimiters(state: StateInline, start: number, delimiter: string) {
-  const len = delimiter.length
-  let count = 0
-  while (state.src.substr(start + (len * count), len) === delimiter && (start + (len * count)) < state.posMax)
-    count++
-  return count
+function chainEsc(symb: ChainSymbol) {
+  return typeof symb === 'string' ? RegExp(escapeRegExp(symb)) : symb
+}
+function chainTag(tag: string): [string, -1 | 0 | 1] {
+  let nesting: -1 | 0 | 1 = 1
+  if (tag.startsWith('/')) nesting = -1
+  else if (tag.endsWith('/')) nesting = 0
+  return [tag.replace('/', ''), nesting]
 }
 
-const convertDelimiters =
-  (opts: InlineSyntaxOpts, marker: number, state: StateInline, delimiters: StateInline.Delimiter[]) => {
-    for (const startDelimiter of delimiters) {
-      if (startDelimiter.marker !== marker) continue
-      if (startDelimiter.end === -1) continue
-      const endDelimiter = delimiters[startDelimiter.end]
-      const startToken = state.tokens[startDelimiter.token]
-      startToken.type = opts.name + '_open'
-      startToken.nesting = 1
-      const endToken = state.tokens[endDelimiter.token]
-      endToken.type = opts.name + '_close'
-      endToken.nesting = -1
-      for (const token of [startToken, endToken]) {
-        token.tag = opts.tag as string
-        token.markup = opts.delimiter as string
-        token.content = ''
+// TODO: delimiter nesting
+// TODO: flanking, strict
+// TODO: render func.
+type ChainSymbol = RegExp | string
+type ChainSyntax = ChainSymbol | { [name: string]: any }
+  & { repeat?: true, optional?: true, delimit?: RegExp, tag?: string }
+type ChainSyntaxIR = [symbol: RegExp, name: string, repeat?: true, optional?: true, delimit?: RegExp, tag?: string]
+interface ChainOpts {
+  loop?: boolean
+  after?: string,
+  parse?: {
+    [K: string]:
+    (state: StateInline, name: string, content: string, idx: number, tokens: ChainSyntaxToken[]) => void
+  },
+  render?: { [K: string]: RenderRule }
+}
+type ChainSyntaxToken = [string, number, number, string, string]
+function syntaxChain(name: string, chain: ChainSyntax[], opts?: ChainOpts) {
+  // Process the input chain and cast it into a simpler (or just faster) intermediate representation
+  const types: string[] = []
+  const syntaxIR: ChainSyntaxIR[] = []
+  for (const syntax of chain) {
+    // 'token' -> { 'token': /./, repeat: true }
+    // /regexp/ -> { then: /regexp/ }
+    // { ignore: symbol } -> { then: /regexp/, optional: true }
+    // { token: symbol }
+    if (typeof syntax === 'string') syntaxIR.push([/./, syntax, true])
+    else if (syntax instanceof RegExp) syntaxIR.push([syntax, 'then'])
+    else if ('ignore' in syntax) syntaxIR.push(
+      [chainEsc(syntax.ignore), 'then', syntax.repeat, true, syntax.delimit, syntax.tag])
+    else {
+      let name = ''
+      for (const prop in syntax) {
+        if (['repeat', 'optional', 'delimit', 'tag'].includes(prop) === false) name = prop
       }
+      types.push(name)
+      syntaxIR.push(
+        [chainEsc(syntax[name]), name, syntax.repeat, syntax.optional, syntax.delimit, syntax.tag])
     }
   }
+  const parse = (str: string, start: number) => {
+    const tokens: [string, number, number, string, string][] = []
+    let curSyntaxIdx = 0
+    let repeating = false
+    let pos = start
+    const breakOut = (passed: boolean) => { return { passed, pos, tokens } }
+    while (pos < str.length) {
+      const curSyntax = syntaxIR[curSyntaxIdx]
+      const isLastSyntax = curSyntaxIdx === syntaxIR.length - 1
+      // skip position on delimiter
+      if (curSyntax[4]) {
+        const match = str.substr(pos).match(curSyntax[4])
+        if (match && match.index === 0) {
+          repeating = false
+          pos += match[0].length
+          if (pos >= str.length && isLastSyntax) return breakOut(true)
+          continue
+        }
+      }
+      const match = str.substr(pos).match(curSyntax[0])
+      if (match && match.index === 0) {
+        const startPos = pos
+        pos += match[0].length
+        // check first syntax if we're looping
+        if (opts?.loop && isLastSyntax && pos < str.length) {
+          const match = str.substr(startPos).match(syntaxIR[0][0])
+          if (match && match.index === 0) {
+            repeating = false, pos = startPos, curSyntaxIdx = 0
+            continue
+          }
+        }
+        if (repeating) {
+          // check next syntax and bail if it matches
+          if (!isLastSyntax) {
+            const match = str.substr(startPos).match(syntaxIR[curSyntaxIdx + 1][0])
+            if (match && match.index === 0) {
+              repeating = false, pos = startPos, curSyntaxIdx++
+              continue
+            }
+          }
+          // stick our match on the end of the last one (repeating)
+          if (curSyntax[1] !== 'then') {
+            const lastToken = tokens[tokens.length - 1]
+            lastToken[2] += match[0].length // end pos
+            lastToken[3] += match[0] // contents
+          }
+          // return on EOS
+          if (pos >= str.length && isLastSyntax) return breakOut(true)
+          continue
+        }
+        // matched new syntax
+        if (!repeating && curSyntax[1] !== 'then')
+          tokens.push([curSyntax[1], startPos, pos, match[0], curSyntax[5] ?? ''])
+        if (curSyntax[2]) repeating = true
+        else if (isLastSyntax) return breakOut(true)
+        else curSyntaxIdx++
+      } else {
+        // if this match was optional:
+        if (repeating || curSyntax[3]) {
+          if (isLastSyntax) return breakOut(true)
+          repeating = false, curSyntaxIdx++
+          continue
+        }
+        return breakOut(false)
+      }
+    }
+    // overran EOS
+    return breakOut(false)
+  }
+  const plugin = (md: MarkdownIt) => {
+    md.inline.ruler.after(opts?.after ?? 'emphasis', name, (state, silent) => {
+      if (silent) return false
+      const start = state.pos
+      const { passed, pos: parseEnd, tokens } = parse(state.src, start)
+      if (!passed) return false
+
+      let idx = 0
+      for (const syntaxToken of tokens) {
+        const [type, posStart, posEnd, contents] = syntaxToken
+        if (type === 'nest') inlineTokenize(state, posStart, posEnd)
+        else if (type === 'text') state.push('text', '', 0).content = contents
+        else if (opts?.parse && type in opts.parse)
+          opts.parse[type].bind(md)(state, name + '_' + type, contents, idx, tokens)
+        else if (syntaxToken[4]) {
+          const [tag, nesting] = chainTag(syntaxToken[4])
+          state.push(name + '_' + type, tag, nesting)
+            .markup = contents
+        }
+        idx++
+      }
+
+      state.pos = parseEnd
+      return true
+    })
+  }
+  return { parse, plugin, types }
+}
+
+function syntaxInline(opts: { symb: string, tag?: string, render?: (contents: string) => string }) {
+  return (md: MarkdownIt) => {
+    if (!opts.tag) opts.tag = ''
+    const type = opts.symb + (opts.tag !== '' ? opts.tag : '_synExt')
+    const marker = parseInt(opts.symb.split('')
+      .reduce((acc: string, cur: string) => acc + '0' + cur.charCodeAt(0), ''))
+    md.inline.ruler.after('emphasis', type, (state, silent) => {
+      if (silent) return false
+      const start = state.pos
+      const max = state.posMax
+      const len = opts.symb.length
+      if (start + len > max) return false
+      // check for consecutive delimiters (parsed as one delimiter, but tokenized as multiple)
+      let count = 0
+      while (state.src.substr(start + (len * count), len) === opts.symb && (start + (len * count)) < max)
+        count++
+      if (!count) return false
+      const { left, right } = flanking(state, start, state.src.substr(start, len * count), false)
+      if (!left && !right) return false
+      // we only care about the end delimiter if we're using a render function
+      // if we're not, we just want to tokenize the delimiters themselves
+      if (opts.render) {
+        // check end delimiter
+        let pos = start + (len * count)
+        for (; pos < max; pos++)
+          if (state.src.substr(pos, len) === opts.symb) {
+            const { left, right } = flanking(state, start, opts.symb, false)
+            if (!left && !right) continue
+            break
+          }
+        if (pos === max) return false
+        // end delimiter matched!
+        state.push(type, opts.tag as string, 0)
+          .markup = state.src.substr(start + len, pos - start - len)
+        state.pos = pos + len
+      } else {
+        for (let i = 0; i < count; i++) {
+          state.push('text', '', 0).content = opts.symb
+          state.delimiters.push({
+            marker: marker,
+            length: count,
+            jump: i,
+            token: state.tokens.length - 1,
+            end: -1,
+            open: left,
+            close: right
+          })
+        }
+        state.pos += len * count
+      }
+      return true
+    })
+    if (!opts.render) {
+      const convertDelimiters = (state: StateInline) => {
+        for (const startDelimiter of state.delimiters) {
+          if (startDelimiter.marker !== marker || startDelimiter.end === -1) continue
+          const tokens = [
+            state.tokens[startDelimiter.token],
+            state.tokens[state.delimiters[startDelimiter.end].token]]
+          tokens.forEach((token, idx) => {
+            token.type = type + (idx ? '_close' : '_open')
+            token.nesting = idx ? -1 : 1
+            token.tag = opts.tag as string
+            token.markup = opts.symb
+            token.content = ''
+          })
+        }
+      }
+      md.inline.ruler2.after('emphasis', type, (state) => {
+        convertDelimiters(state)
+        // Not sure what this code is actually for, but it's in the standard markdown-it plugins.
+        if (state.tokens_meta) for (const token of state.tokens_meta)
+          if (token?.delimiters) convertDelimiters(state)
+        return true
+      })
+    }
+    else md.renderer.rules[type] = (tokens, idx) => (opts.render as any)(tokens[idx].markup)
+  }
+}
+
+function onEachToken(onToken: string, fn: (token: Token) => void) {
+  return (md: MarkdownIt) => {
+    md.core.ruler.push(onToken + '_post_tokenized', (state) => {
+      state.tokens
+        .filter(token => token.type === onToken)
+        .forEach(token => fn(token))
+      return true
+    })
+  }
+}

@@ -141,10 +141,7 @@ font-set(font, useCache = true)
   font-setter()
     --font-cap: unquote('var(--font-' + font + '-cap)')
     font-family: unquote('var(--font-' + font + ')')
-    if font is 'display' or font is display
-      font-weight: 500
-    else if font is 'mono' or font is mono
-      font-weight: 500
+    if font is 'mono' or font is mono
       letter-spacing: -0.05em
       word-spacing: -0.05em
       overflow-wrap: break-word
@@ -239,20 +236,13 @@ select-headings(prefix = '', suffix = '')
 
 // This lets select tags from: a list of strings, a string that is a list, or a pure list
 // The prefix lets you use a combinator (say '> ') on your tags.
-// You can tell the function to cache the result by providing a unique string. 
-// Otherwise pass a boolean false if you don't want the result cached.
-select-listed(prefix = '', useCache = false, selectors...)
+select-listed(prefix = '', selectors...)
   // We'll convert anything provided to a string for safety
   // This lets you provide the selectors in either args = '1, 2, 3' or args = 1, 2, 3
-  $selector = replace(' ', '', join(',', selectors))
-
-  for $tag in split(',',$selector)
-    {prefix + $tag}
-      if useCache is a 'string' and useCache isnt ''
-        +cache(useCache)
-          {block}
-      else
-        {block}
+  selector = join(', ', selectors)
+  & {prefix}
+    {selector}
+      {block}
 
 // Media Functions
 
