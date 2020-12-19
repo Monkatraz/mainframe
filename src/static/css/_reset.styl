@@ -42,6 +42,7 @@ table
   border-collapse: collapse
   border-color: inherit
   text-indent: 0
+  border-spacing: 0
 button, [type="button" i], [type="reset" i], [type="submit" i]
   reset-styling()
   cursor: pointer
@@ -80,3 +81,5 @@ dialog:not([open])
   display: none
 summary
   display: list-item
+br
+  content: "" // Bizarre CSS quirk fix for Chrome

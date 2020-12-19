@@ -16,40 +16,14 @@ rhythm-set-text-bounds(auto = true)
   margin-bottom: fh-relative unless auto
   margin-bottom: fh-actual if auto
 
-// Adds gutter(s) on the top and/or bottom using baseline row multiples
-rhythm-gutter(top, bottom = top, margin-type = 'padding')
-  for edge in (top bottom)
-    if edge isnt false
-      type = var(--rhythm-baseline-unit-row)
-      type = var(--rhythm-baseline-row) if unit(edge) is 'em' or if unit(edge) is 'rem'
-      name = 'top'
-      name = 'bottom' if edge is bottom
+$nest-tags = 'div, article, section, blockquote'
+$block-tags = 'p, h1, h2, h3, h4, h5, h6'
+$text-tags = 'a, p, span, small, h1, h2, h3, h4, h5, h6'
+$figure-tags = 'img, figure, table, pre, ol, ul, hgroup'
+$break-tags = 'br, hr'
+$section-tags = 'h1, h2, h3, h4, h5, h6'
+$heading-tags = 'h1, h2, h3, h4, h5, h6'
 
-      if margin-type is 'padding'
-        unless edge is 0
-          if edge isnt 1
-            padding-{name}: 'calc(%s * %s)' % (type edge)
-          else
-            padding-{name}: type
-        if edge is 0
-          padding-{name}: 0
-
-      if margin-type is 'margin'
-        unless edge is 0
-          if edge isnt 1
-            margin-{name}: 'calc(%s * %s)' % (type edge)
-          else
-            margin-{name}: type
-        if edge is 0
-          margin-{name}: 0
-
-// The 'rhythm grid' constructed here is not a dynamic vertical rhythm grid replacement.
-// At least, not a perfect one.
-// A simple CSS Grid-based vertical rhythm grid would require changes to CSS itself.
-// Instead, this grid attempts to preserve /even spacing/ between objects - especially text baselines.
-// Overlaying a perfectly uniform row-size grid /will/ show that the rhythm grid does not match.
-// I think this is fine.
-// TODO: change this to be specifically about Markdown content
 .rhythm
   // Default Rhythm Settings
   --rhythm-baseline: 1.5
@@ -60,52 +34,27 @@ rhythm-gutter(top, bottom = top, margin-type = 'padding')
   --rhythm-baseline-unit: calc(var(--rhythm-reference-font-size) * var(--rhythm-baseline))
   --rhythm-baseline-unit-row: calc(var(--rhythm-baseline-unit) / 2)
 
-  // Setup
-  position: relative
-  display: flex
-  flex-direction: column
-  row-gap: var(--rhythm-baseline-unit)
-  line-height: var(--rhythm-baseline)
-
-  // These tags are 'top-level' tags.
-  // They're intended to be used with the grid.
-  // Anything else should probably be put inside a div.
-  $block-tags = 'div, main, article, section, hgroup, blockquote'
-  $break-tags = 'br, hr, .heading'
-  $figure-tags = 'img, figure, table, pre, ol, ul'
-  $text-tags = 'a, p, span, small'
-
-  > br
-    content: "" // Bizarre CSS quirk fix for Chrome
-
-  // Line-height correction, reset text padding
-  +select-listed('> ', $text-tags, '.heading')
+  &, {$nest-tags}
     position: relative
-    width: 100%
-    line-height: inherit // Fixes the line-height being overridden
-    rhythm-set-text-bounds()
+    display: flex
+    flex-direction: column
+    row-gap: var(--rhythm-baseline-unit)
+    line-height: var(--rhythm-baseline)
 
-    + .heading, + hr + .heading
-      padding-top: var(--rhythm-baseline-unit-row)
-
-
-  .heading
-    // Shifts <hr>s up when in front of a heading
-    + hr
+    // Line-height correction
+    +select-listed('>', $block-tags)
       position: relative
       width: 100%
-      margin-top: calc(var(--rhythm-baseline-unit) * -0.75)
-      top: calc(var(--rhythm-baseline-unit-row) * 0.25)
+      line-height: inherit
+      rhythm-set-text-bounds()
 
-  // // Text gutters
-  // +select-listed('> ', $text-tags, $display-tags)
-  //   rhythm-gutter(1, 1, 'padding')
+    +select-listed('>', $section-tags)
+      padding-top: var(--rhythm-baseline-unit-row)
 
-  // // Corrects gutters for figures that are isolated inside a <p> tag.
-  // +select-listed('> p > ', $figure-tags)
-  //   &:only-child
-  //     rhythm-gutter(0, 1, 'margin')
-
-  // +select-listed('> ', $figure-tags)
-  //   rhythm-gutter(0, 1, 'margin')
-
+    // Shifts <hr>s up when in front of a heading
+    +select-listed('>', $heading-tags)
+      + hr
+        position: relative
+        width: 100%
+        margin-top: calc(var(--rhythm-baseline-unit) * -0.75)
+        top: calc(var(--rhythm-baseline-unit-row) * 0.25)

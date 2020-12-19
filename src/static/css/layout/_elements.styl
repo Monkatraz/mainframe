@@ -4,6 +4,8 @@
 // TODO: style <i> tags differently from <em>
 // TODO: add <u> tag (error tag)
 
+$text-tags = 'a, p, span, small, h1, h2, h3, h4, h5, h6'
+
 ::selection
   color: colvar('text-light')
   background-color: colvar('text-select')
@@ -35,9 +37,10 @@ sub, sup
   line-height: 0
 
 // Styles underlines globally.
-u, {$sel-text}
+u, {$text-tags}
   text-decoration-skip-ink: none
   text-underline-offset: 0.075em
+  text-decoration-thickness: 0.05em
 
 // Struck-out text.
 s
@@ -47,6 +50,11 @@ s
 mark
   background: colvar('text-highlight')
   color: colvar('black')
+
+table
+  width: 100%
+  margin-left: auto
+  margin-right: auto
 
 // -- LINKS
 
@@ -66,7 +74,6 @@ a[href*='//']:not([href*='scp-mainframe.com']):not([href*='localhost'])
 a[href^="/"], a[href^=".."], a[href^="#"], a[href*='scp-mainframe.com'], a[href*='localhost']
   color: colvar('link-int')
   text-decoration-color: transparent
-  text-decoration-thickness: 0.05em
   +on-hover()
     color: colvar('link-int', darken 10%)
     text-decoration-color: currentColor

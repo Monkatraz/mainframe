@@ -51,6 +51,7 @@
   // Test pages
   router('/404', () => mode = '404') // Directly asking for 404
   router('/test/load', () => mode = 'LOADING') // Loading symbol test page
+  router('/test/error', () => mode = 'ERROR') // Loading symbol test page
   router('/test/md', loadTestPage) // Markdown test page
   // Proper pages
   router('/', () => loadPath(ENV.HOMEPAGE)) // Home page
@@ -187,7 +188,8 @@
   .pgnf-blackbox
     background: black
     border-radius: 10px
-    padding: 2rem 0
+    padding-top: 1rem
+    padding-bottom: 2rem
     shadow-elevation(8px)
 
   .pgnf-header, .pgnf-text
@@ -195,7 +197,10 @@
     font-set('mono')
 
   .pgnf-header
-    font-size: 5rem
+    font-size: 5em
+
+  .pgnf-text
+    font-size: 2.5em
 
 </style>
 
@@ -203,7 +208,7 @@
   <div class=container role=presentation>
     <nav class=navbar use:navBarReveal aria-label=Navigation/>
     <aside class=sidebar use:sideBarReveal aria-label=Sidebar/>
-    <main class=content aria-label=Content>
+    <main class="content" aria-label=Content>
       {#key mode}
         {#if mode === 'VIEW'}
           <!-- Page successfully loaded -->
@@ -232,11 +237,11 @@
           <!-- Page not found / 404 error-->
           {:else if mode === '404'}
           <div class="pgnf rhythm" use:pageReveal out:fade={{duration: 50}}>
-            <div class="pgnf-blackbox rhythm">
+            <div class=pgnf-blackbox>
               <h1 class=pgnf-header>404</h1>
-              <h2 class=pgnf-text>PAGE NOT FOUND</h2>
+              <span class=pgnf-text>PAGE NOT FOUND</span>
             </div><br />
-            <h5>The requested page either does not exist or was not found.</h5>
+            <h4>The requested page either does not exist or was not found.</h4>
           </div>
 
           <!-- Page display error -->
@@ -245,8 +250,8 @@
             <h2>Error Displaying Page</h2>
             <hr>
             <pre class=code><code>
-              ERR: {error.name}: {error.message}
-              MSG: {error.description}
+              ERR: {error?.name}: {error?.message}
+              MSG: {error?.description}
             </code></pre>
           </div>
         {/if}
