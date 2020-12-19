@@ -56,8 +56,8 @@
   // ----
 
   --font-sans:    'Public Sans', var(--font-system-sans)
-  --font-display: 'Inter',       var(--font-system-rounded)
-  --font-serif:   'Vollkorn',    var(--font-system-serif)
+  --font-display: 'Exo 2',       var(--font-system-rounded)
+  --font-serif:   'Bitter',      var(--font-system-serif)
   --font-mono:    'Fira Code',   var(--font-system-mono)
 
   // Correction factors for fonts.
@@ -108,6 +108,12 @@ $sel-quotes = 'blockquote, q'
 {$sel-headings}
   font-set('display')
   font-weight: 460
+
+b, strong
+  font-weight: bolder
+
+small
+  font-size: 0.8em
 
 // Set Classes
 .fs-sans

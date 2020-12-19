@@ -25,19 +25,18 @@ import type Token from 'markdown-it/lib/token'
 //  2. This library is really messy, and it's "intentional".
 //    Parsers are really messy, and this is basically a library for quickly generating one.
 //    Markdown syntax can now be easily modified, or in this case, massively extended.
-//    It's not like I'm over-complicating things either. 
+//    It's not like I'm over-complicating things either.
 //    The standard markdown-it plugins have a lot of boilerplate that this library avoids.
 //
 // If the syntax's differences from Markdown were too contentious, they can easily be reverted.
 
 // TODO: Generic (block -> tag) handler
 // TODO: Generic (lineSymbol -> tag) handler
-// TODO: Post-tokenize rule (use md.core.ruler.push and state.tokens)
 // TODO: autoconvert wiki links
 // TODO: compare Wikidot typography replacements vs markdown-it
-// TODO: criticmarkup?
 // TODO: Basic grid markup that isn't tables
 // TODO: Built-in ACS module
+// TODO: Put this renderer in a worker
 
 // ?:::collapsible [label-closed] [label-opened] -> block -> :::
 //  uses <details> and <summary>
@@ -51,6 +50,10 @@ import type Token from 'markdown-it/lib/token'
 // set render flags?
 // themes?
 
+// available symbols:
+// inline: ++ | _ | ~~ | % | ,, | {  }
+// block: ::: | :-- :--: --: | = | < | >
+
 // basic inline:
 // /  -> <i>
 //\// -> <em>
@@ -62,8 +65,6 @@ import type Token from 'markdown-it/lib/token'
 // ? /\^\d[\d,]*\b/ | x^1 only
 // ? /\~\d[\d,]*\b/ | x~1 only
 // -- -> <s>
-// ++ -> <ins>
-// ? -- -> <del> | maybe ??
 // == -> <mark>
 
 // advanced inline:
@@ -71,16 +72,23 @@ import type Token from 'markdown-it/lib/token'
 // ? ^[inline footnote]
 // @@ -> (escaping)
 
+// criticmarkup
+// {++ ++} -> ins
+// {-- --} -> del
+// ? {~~ ~> ~~} -> ?
+// ? {>> <<} -> ?
+// ? {== ==}{>> <<} -> ?
+
 // inline formatting elements:
-// ? #color col|...#
-// ? #font family weight mul|...#
-// ? #class ...classes|...]
+// #color col|...#
+// #font family weight mul|...#
+// #class ...classes|...]
 // ? #style css|...#
 // ? #<tag> attrs|...#
 
 // basic blocks
-// ? comments | <!--is unruly--> | // is meh
-// ? easy line break
+// ? comments | <!--is unruly-->
+// ? easy line break | ___
 // ? nestable MD tags
 // ? $$$ -> tex-expression-block -> $$$
 
@@ -120,30 +128,26 @@ import type Token from 'markdown-it/lib/token'
 
 // -- INIT. EXTENSIONS
 
-const symbolTagMappings = [
-  ['/', 'i'],
-  ['//', 'em'],
-  ['*', 'b'],
-  ['**', 'strong'],
-  ['__', 'u'],
-  ['--', 's'],
-  ['^', 'sup'],
-  ['~', 'sub'],
-  ['++', 'ins'],
-  // ['--', 'del'],
-  ['==', 'mark']
-]
+// ? attrsdef: ![param] (defined default parameter) | ...([param]: default (defined) | [name] (undefined))
+const parseKeyVals = syntaxChain('keyvals',
+  [/\s*\[/, 'key', /]:?\s*/, { val: /./, repeat: true, optional: true }], { loop: true }).parse
+function mapKeyVals(str: string) {
+  const { passed, tokens } = parseKeyVals(str, 0)
+  const keyvals = new Map<string, string>()
+  if (passed) tokens.forEach((token, idx) => {
+    if (token[0] === 'ident') keyvals.set(token[3], '')
+    else if (token[0] === 'val') keyvals.set(tokens[idx - 1][3], token[3])
+  })
+  return keyvals
+}
 
 // { attrs: /.*?(?<!])(?=:)/ },
 const syntaxChains = {
-  // ? attrsdef: ![param] (defined default parameter) | ...([param]: default (defined) | [name] (undefined))
-  keyvals: syntaxChain('keyvals',
-    [/\s*\[/, 'key', /]:?\s*/, { val: /./, repeat: true, optional: true }], { loop: true }),
   spans: syntaxChain('inline-span',
     [
-      /\[:/, { type: /.+?(?=\s|:)/ }, /\s*/,
-      { param: /./, repeat: true, delimit: /\s/ }, /:\s*/,
-      'nest', { close: /]/, tag: '/span' }
+      /#/, { type: /.+?(?=\s|\|)/ }, /\s*/,
+      { param: /./, repeat: true, delimit: /\s/ }, /\|\s*/,
+      'nest', { close: /#/, tag: '/span' }
     ], {
     after: 'image',
     parse: {
@@ -162,32 +166,44 @@ const syntaxChains = {
             break
           }
           // This is a repeated pattern, so this wacky syntax makes this a bit more concise.
-          default: for (const param of tokens) if (param[0] === 'param')
-            if (content === 'class') token.attrJoin('class', param[3])
-            else if (content === 'color') token.attrSet('style', 'color: ' + param[3])
+          default: for (const param of tokens) if (param[0] === 'param') switch (content) {
+            case 'class': token.attrJoin('class', param[3]); break
+            case 'color': token.attrSet('style', 'color: ' + param[3]); break
+          }
         }
       }
     }
   })
 }
 
-function mapKeyVals(str: string) {
-  const { passed, tokens } = syntaxChains.keyvals.parse(str, 0)
-  const keyvals = new Map<string, string>()
-  if (passed) tokens.forEach((token, idx) => {
-    if (token[0] === 'ident') keyvals.set(token[3], '')
-    else if (token[0] === 'val') keyvals.set(tokens[idx - 1][3], token[3])
-  })
-  return keyvals
-}
-
 const TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~/]/
 const synExt = [
-  ...symbolTagMappings.map((arr) => syntaxInline({ symb: arr[0], tag: arr[1] })),
-  syntaxInline({ symb: '$', render: (str) => katex.renderToString(str, { throwOnError: false }) }),
-  syntaxInline({ symb: '@@', render: (str) => str }),
+  // e.g. '**' -> <strong> mappings
+  ...[
+    ['/', 'i'], ['//', 'em'],
+    ['*', 'b'], ['**', 'strong'],
+    ['__', 'u'],
+    ['--', 's'],
+    ['^', 'sup'], ['~', 'sub'],
+    ['==', 'mark']
+  ].map((arr) => syntaxSymbol({ symb: arr[0], tag: arr[1] })),
+
+  // CriticMarkup
+  syntaxBrackets({ symb: ['{++', '++}'], tag: 'ins' }),
+  syntaxBrackets({ symb: ['{--', '--}'], tag: 'del' }),
+
+  // Katex
+  syntaxSymbol({ symb: '$', render: (str) => katex.renderToString(str, { throwOnError: false }) }),
+
+  // Inline Elements | #elem param param|text#
   syntaxChains.spans.plugin,
+
+  // Escaping text
+  syntaxSymbol({ symb: '@@', render: (str) => str }),
+
+  // Post render operations
   onEachToken('heading_open', (token) => { token.attrJoin('class', 'heading') }),
+
   // This parser replaces the original text token with a slightly less efficient one.
   // However, this function allows you to extend what is considered a terminator character to the parser.
   // The source of this function actually comes from markdown-it, it's just commented out.
@@ -207,6 +223,7 @@ const synExt = [
     state.pos += idx
     return true
   }),
+
   // Disables the syntax that we replaced.
   (md: MarkdownIt) => md.disable('strikethrough').disable('emphasis')
 ]
@@ -217,7 +234,7 @@ export function generateRenderer() {
   return (raw: string) => DOMPurify.sanitize(md.render(raw))
 }
 
-// -- EXTENSION FUNCTIONS
+// -- UTILITY FUNCTIONS
 
 /** Escapes a string for use as a regexp match. */
 function escapeRegExp(str: string) {
@@ -266,6 +283,8 @@ function flanking(state: StateInline, start: number, delimiter: string, strict: 
 
   return { left, right }
 }
+
+// -- PARSER/PLUGIN FUNCTIONS
 
 function chainEsc(symb: ChainSymbol) {
   return typeof symb === 'string' ? RegExp(escapeRegExp(symb)) : symb
@@ -324,11 +343,12 @@ function syntaxChain(name: string, chain: ChainSyntax[], opts?: ChainOpts) {
     let pos = start
     const breakOut = (passed: boolean) => { return { passed, pos, tokens } }
     while (pos < str.length) {
-      const curSyntax = syntaxIR[curSyntaxIdx]
+      const [matchSymbol, typeName, isRepeatable, isOptional, delimit, tag] = syntaxIR[curSyntaxIdx]
       const isLastSyntax = curSyntaxIdx === syntaxIR.length - 1
+
       // skip position on delimiter
-      if (curSyntax[4]) {
-        const match = str.substr(pos).match(curSyntax[4])
+      if (delimit) {
+        const match = str.substr(pos).match(delimit)
         if (match && match.index === 0) {
           repeating = false
           pos += match[0].length
@@ -336,18 +356,21 @@ function syntaxChain(name: string, chain: ChainSyntax[], opts?: ChainOpts) {
           continue
         }
       }
-      const match = str.substr(pos).match(curSyntax[0])
+      // start match
+      const match = str.substr(pos).match(matchSymbol)
       if (match && match.index === 0) {
         const startPos = pos
         pos += match[0].length
-        // check first syntax if we're looping
-        if (opts?.loop && isLastSyntax && pos < str.length) {
+
+        // check first syntax if we're ready to loop
+        if (opts?.loop && isLastSyntax) {
           const match = str.substr(startPos).match(syntaxIR[0][0])
           if (match && match.index === 0) {
             repeating = false, pos = startPos, curSyntaxIdx = 0
             continue
           }
         }
+
         if (repeating) {
           // check next syntax and bail if it matches
           if (!isLastSyntax) {
@@ -358,28 +381,30 @@ function syntaxChain(name: string, chain: ChainSyntax[], opts?: ChainOpts) {
             }
           }
           // stick our match on the end of the last one (repeating)
-          if (curSyntax[1] !== 'then') {
+          if (typeName !== 'then') {
             const lastToken = tokens[tokens.length - 1]
             lastToken[2] += match[0].length // end pos
             lastToken[3] += match[0] // contents
           }
-          // return on EOS
-          if (pos >= str.length && isLastSyntax) return breakOut(true)
           continue
         }
+
         // matched new syntax
-        if (!repeating && curSyntax[1] !== 'then')
-          tokens.push([curSyntax[1], startPos, pos, match[0], curSyntax[5] ?? ''])
-        if (curSyntax[2]) repeating = true
+        if (!repeating && typeName !== 'then')
+          tokens.push([typeName, startPos, pos, match[0], tag ?? ''])
+
+        if (isRepeatable) repeating = true
         else if (isLastSyntax) return breakOut(true)
         else curSyntaxIdx++
+
       } else {
         // if this match was optional:
-        if (repeating || curSyntax[3]) {
+        if (repeating || isOptional) {
           if (isLastSyntax) return breakOut(true)
           repeating = false, curSyntaxIdx++
           continue
         }
+        // failed to match
         return breakOut(false)
       }
     }
@@ -395,14 +420,14 @@ function syntaxChain(name: string, chain: ChainSyntax[], opts?: ChainOpts) {
 
       let idx = 0
       for (const syntaxToken of tokens) {
-        const [type, posStart, posEnd, contents] = syntaxToken
+        const [type, posStart, posEnd, contents, tag] = syntaxToken
         if (type === 'nest') inlineTokenize(state, posStart, posEnd)
         else if (type === 'text') state.push('text', '', 0).content = contents
         else if (opts?.parse && type in opts.parse)
           opts.parse[type].bind(md)(state, name + '_' + type, contents, idx, tokens)
-        else if (syntaxToken[4]) {
-          const [tag, nesting] = chainTag(syntaxToken[4])
-          state.push(name + '_' + type, tag, nesting)
+        else if (tag) {
+          const [tagType, nesting] = chainTag(tag)
+          state.push(name + '_' + type, tagType, nesting)
             .markup = contents
         }
         idx++
@@ -415,10 +440,11 @@ function syntaxChain(name: string, chain: ChainSyntax[], opts?: ChainOpts) {
   return { parse, plugin, types }
 }
 
-function syntaxInline(opts: { symb: string, tag?: string, render?: (contents: string) => string }) {
+function syntaxSymbol(opts: { symb: string, tag?: string, render?: (contents: string) => string }) {
   return (md: MarkdownIt) => {
     if (!opts.tag) opts.tag = ''
     const type = opts.symb + (opts.tag !== '' ? opts.tag : '_synExt')
+    // Generates a unique number from the input symbol (used by md delimiters)
     const marker = parseInt(opts.symb.split('')
       .reduce((acc: string, cur: string) => acc + '0' + cur.charCodeAt(0), ''))
     md.inline.ruler.after('emphasis', type, (state, silent) => {
@@ -448,9 +474,10 @@ function syntaxInline(opts: { symb: string, tag?: string, render?: (contents: st
         if (pos === max) return false
         // end delimiter matched!
         state.push(type, opts.tag as string, 0)
-          .markup = state.src.substr(start + len, pos - start - len)
+          .markup = state.src.substr(start + len, pos - (start + len))
         state.pos = pos + len
       } else {
+        // push every delimiter we found (e.g. '****' -> '**', '**')
         for (let i = 0; i < count; i++) {
           state.push('text', '', 0).content = opts.symb
           state.delimiters.push({
@@ -492,6 +519,43 @@ function syntaxInline(opts: { symb: string, tag?: string, render?: (contents: st
       })
     }
     else md.renderer.rules[type] = (tokens, idx) => (opts.render as any)(tokens[idx].markup)
+  }
+}
+
+function syntaxBrackets(opts: { symb: [string, string], tag?: string, render?: (contents: string) => string }) {
+  return (md: MarkdownIt) => {
+    if (!opts.tag) opts.tag = ''
+    const type = opts.symb[0] + opts.symb[1] + (opts.tag !== '' ? opts.tag : '_synExt')
+    md.inline.ruler.after('emphasis', type, (state, silent) => {
+      if (silent) return false
+      const start = state.pos
+      const max = state.posMax
+      const [symbLeft, symbRight] = opts.symb
+      const [lenLeft, lenRight] = [symbLeft.length, symbRight.length]
+      const posStart = start + lenLeft
+      if (posStart > max) return false
+      if (state.src.substr(start, lenLeft) !== symbLeft) return false
+      // check end delimiter
+      let pos = posStart
+      let nesting = 1
+      for (; pos < max; pos++) {
+        if (state.src.substr(pos, lenLeft) === symbLeft) nesting++
+        else if (state.src.substr(pos, lenRight) === symbRight) nesting--
+        if (nesting === 0) break
+      }
+      if (pos === max) return false
+      // end delimiter matched!
+      if (opts.render) state.push(type, opts.tag as string, 0)
+        .markup = state.src.substr(posStart, pos - posStart)
+      else {
+        state.push(type, opts.tag as string, 1)
+        inlineTokenize(state, posStart, pos)
+        state.push(type, opts.tag as string, -1)
+      }
+      state.pos = pos + lenRight
+      return true
+    })
+    if (opts.render) md.renderer.rules[type] = (tokens, idx) => (opts.render as any)(tokens[idx].markup)
   }
 }
 

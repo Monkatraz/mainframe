@@ -1,30 +1,5 @@
 @require '_lib'
 
-// - RESETS
-*
-  margin: 0
-  margin-inline-start: 0
-  margin-inline-end: 0
-  margin-block-end: 0
-  margin-block-start: 0
-  padding: 0
-  padding-inline-start: 0
-  padding-inline-end: 0
-  padding-block-start: 0
-  padding-block-end: 0
-  border: 0
-html
-  cursor: auto
-input
-  font: inherit
-button
-  reset-styling()
-  cursor: pointer
-img
-  max-width: 100%
-
-// - CORE
-
 // TODO: Blockquote, li, ul, ol
 // TODO: style <i> tags differently from <em>
 // TODO: add <u> tag (error tag)
@@ -34,6 +9,7 @@ img
   background-color: colvar('text-select')
 
 body
+  background: colvar('background-light')
   color: colvar('text-dark')
 
 // Orderly Heading Sizes
@@ -43,11 +19,13 @@ for $num in (0..5)
     $size = $sizes[$num]
     font-size: 'calc(%s * var(--font-content-size))' % $size
 
+// Horizontal rules.
 hr
   display: block
   height: 0.125rem
   background: colvar('background-dim')
 
+// Indents lists.
 ul, ol
   padding-left: 1rem
 
@@ -60,6 +38,15 @@ sub, sup
 u, {$sel-text}
   text-decoration-skip-ink: none
   text-underline-offset: 0.075em
+
+// Struck-out text.
+s
+  text-decoration: line-through 0.15em
+
+// Highlighted text.
+mark
+  background: colvar('text-highlight')
+  color: colvar('black')
 
 // -- LINKS
 
@@ -84,32 +71,19 @@ a[href^="/"], a[href^=".."], a[href^="#"], a[href*='scp-mainframe.com'], a[href*
     color: colvar('link-int', darken 10%)
     text-decoration-color: currentColor
 
-// -- DIAGETIC ELEMENTS
+// -- CRITICAL ELEMENTS
 
-// Inserted text.
+// Inserted text. {++ ++}
 ins
-  text-decoration: underline colvar('text-inserted') 0.125em
+  background: colvar('critic-inserted', opacity 0.25)
+  text-decoration: underline colvar('critic-inserted') 0.125em
   text-decoration-skip-ink: none
-  background: colvar('text-inserted', opacity 0.25)
 
-// Deleted text.
+// Deleted text. {-- --}
 del
-  color: transparent
-  background: colvar('black')
-  text-decoration: none
-  border-radius: 0.2em
-  &::selection
-    color: transparent
-    background: none
-
-// Struck-out text.
-s
-  text-decoration: line-through 0.15em
-
-// Highlighted text.
-mark
-  background: colvar('text-highlight')
-  color: colvar('black')
+  background: colvar('critic-deleted', opacity 0.25)
+  text-decoration: underline colvar('critic-deleted') 0.125em
+  text-decoration-skip-ink: none
 
 // -- A11Y
 
@@ -121,7 +95,31 @@ s
 s
   label-for-screenreaders('deleted text')
 ins
-  label-for-screenreaders('newly inserted text')
+  label-for-screenreaders('inserted text')
+
+// Change the cursor on busy elements.
+[aria-busy="true" i]
+  cursor: progress
+
+// Change the cursor on control elements.
+[aria-controls]
+  cursor: pointer
+
+// Change the cursor on disabled, not-editable, or otherwise inoperable elements.
+[aria-disabled="true" i], [disabled]
+  cursor: not-allowed
+
+// Change the display on visually hidden accessible elements.
+[aria-hidden="false" i][hidden]
+  display: initial
+
+[aria-hidden="false" i][hidden]:not(:focus)
+  clip: rect(0, 0, 0, 0)
+  position: absolute
+
+// Prevent VoiceOver from ignoring list semantics in Safari.
+nav li::before
+  content: "\200B"
 
 // -- COMPONENTS
 

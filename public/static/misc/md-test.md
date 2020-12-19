@@ -1,7 +1,7 @@
-# <a name="top"></a>Markdown Test Page
+# Markdown Test Page
 ***
 
-## <a name="Syntax"></a> Syntax
+## Syntax
 ***
 ##### Inline Formatting:
 | | | |
@@ -14,32 +14,35 @@
 | `^...^` | Superscript | 10^10^ Some^tiny text.^
 | `~...~` | Subscript | X~1~, X~2~, Some~more tiny text.~
 | `--...--` | Strikethrough | --This text was a mistake.--
-| `++...++` | Insert | ++This text was added.++
 | `==...==`| Mark | ==This text is important for some reason, and thus highlighted.==
-| `$...$` | Math (TeX) | $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$.
+
+##### Critical Markup:
+| | | |
+| :--: | :-- | :-- |
+| `{++...++}` | Addition | {++You should add this text.++}
+| `{--...--}` | Deletion | {--You should delete this text.--}
 
 ##### Special:
 | | | |
 | :--: | :-- | :-- |
+| `$...$` | Math (TeX) | $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$.
 | `@@...@@`| Escaped | @@//This text is __escaped__, and **will only be rendered as plain text.**//@@
 
 ###### Inline Spans
-`[:font family 100-900|bold(er)|light(er)|normal (n)em: text]`
--	[:font sans: Here is the sans font.]
--	[:font display: Here is the display font.]
-- [:font serif: Here is the serif font.]
-- [:font mono: Here is the mono font.]
-- [:font handwriting: Here is the handwriting font.]
-- [:font cursive: Here is the cursive font.]
-- [:font 100: 100] [:font 200: 200] [:font 300: 300] [:font 400: 400] [:font 500: 500] [:font 600: 600] [:font 700: 700] [:font 800: 800] [:font 900: 900]
-- [:font bold: Bold.] [:font light: Light.]
-- [:font bolder: Bolder.] [:font lighter: Lighter.]
-- [:font 1em: 1em] [:font 1.5em: 1.5em]  [:font 2em: 2em] [:font 2.5em: 2.5em] [:font 3em: 3em]
-- [:font handwriting bold 1.25em: Mixed font style text.]
+-	#font sans|Here is the sans font.#
+-	#font display|Here is the display font.#
+- #font serif|Here is the serif font.#
+- #font mono|Here is the mono font.#
+- #font handwriting|Here is the handwriting font.#
+- #font cursive|Here is the cursive font.#
+- #font 100|100# #font 200|200# #font 300|300# #font 400|400# #font 500|500# #font 600|600# #font 700|700# #font 800|800# #font 900|900#
+- #font bold|Bold.# #font light|Light.#
+- #font bolder|Bolder.# #font lighter|Lighter.#
+- #font 1em|1em# #font 1.5em|1.5em# #font 2em|2em# #font 2.5em|2.5em# #font 3em|3em#
+- #font handwriting bold 1.25em|Mixed font style text.#
 
-`[:class class1 class2: content]`
-- [:class fs-serif: Setting font class manually.]
-- [:class fs-mono token function: Multiple classes.]
+- #class fs-serif|Setting font class manually.#
+- #class fs-mono token function|Multiple classes.#
 
 ##### Math
 $\begin{aligned}
@@ -51,15 +54,11 @@ $f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi$
 
 ## Tests
 ***
-
-[var]: not a link
-
-- Module: [:module [class]: cool: inline] `[:module [class]: cool: inline]`
-	-	[:module: inline]
 - Nested syntax: 10^10~20~^
 	- ==test ~~one~~ two== ~~one~two~three~~
+- Nested brackets: {++ ins1 {++ ins2 ++} {-- del --} ++}
 		
-### Styling Tests
+#### Styling Tests
 - Links:
 	- This is an [external link.](//google.com)
 	- This is an [internal link.](/)
