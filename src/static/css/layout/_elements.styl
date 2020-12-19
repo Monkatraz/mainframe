@@ -134,17 +134,3 @@ nav li::before
   width: 1em
   height: 1em
   fill: currentColor
-
-.tippy-box[data-theme~='mainframe']
-  $bg = colvar('background-dark', lighten 5%, desaturate 10%)
-
-  filter: drop-shadow(0 0 5px rgba(black, 0.4))
-  background-color: $bg
-  color: colvar('text-light')
-
-  font-set('display', false)
-  font-size: 1rem
-  font-weight: 400
-
-  .tippy-svg-arrow
-    color: $bg

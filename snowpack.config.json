@@ -16,7 +16,6 @@
     ]
   },
   "devOptions": {
-    "out": "./build/",
     "open": "none",
     "output": "stream"
   },
@@ -40,8 +39,9 @@
       }
     ],
     "optimize": {
-      "preload": true,
+      "bundle": true,
       "minify": true,
+      "manifest": true,
       "target": "es2020"
     }
   },

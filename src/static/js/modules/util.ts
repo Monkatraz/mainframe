@@ -103,7 +103,7 @@ export async function waitFor(
 export function createLock<T extends WrappedPromiseFn<any>>(fn: T) {
   let locked: boolean
   return async (...args: Parameters<T>) => {
-    waitFor(() => locked === false)
+    if (locked) await waitFor(() => locked === false)
     locked = true
     // Makes sure that the return type shown is correct
     type resultType = ReturnType<T> extends PromiseLike<infer U> ? U : ReturnType<T>

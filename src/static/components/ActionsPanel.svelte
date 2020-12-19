@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onSwipe } from '@modules/gestures'
   import { Agent } from '@modules/util'
-  import { usAnime, usTip } from '@js/modules/components'
+  import { usAnime } from '@js/modules/components'
   import { throttle } from '@js/modules/util'
 
   // Props
@@ -231,8 +231,7 @@
 
   <button type=button class=actions-panel_button
     on:click={handleGrip}
-    on:contextmenu={contextmenu}
-    use:usTip={{content: toolTipString, followCursor: false, sticky: true}}>
+    on:contextmenu={contextmenu}>
     <span class="iconify-inline actions-panel_button_arrow" data-icon=ic:round-expand-less></span>
   </button>
 

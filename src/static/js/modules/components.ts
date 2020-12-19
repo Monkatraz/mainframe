@@ -3,19 +3,7 @@
  * @author Monkatraz
  */
 
-// -- Imports
-// Tippy
-import {
-  Props as TippyProps,
-  roundArrow as TippyRoundArrow,
-  sticky as TippySticky,
-  followCursor as TippyFollowCursor
-} from 'tippy.js'
-import tippy from 'tippy.js'
-import 'tippy.js/dist/tippy.css'
-import 'tippy.js/dist/svg-arrow.css'
-import 'tippy.js/animations/scale.css'
-// Anime
+// Imports
 import anime, { AnimeParams } from 'animejs'
 
 /** Runs the provided function as soon as the attached element is created. */
@@ -24,36 +12,7 @@ export function load(elem: Element, fn: (arg: Element) => void) {
 }
 
 // -------
-//  TIPPY
-
-const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
-  ignoreAttributes: true,
-  theme: 'mainframe',
-  arrow: TippyRoundArrow,
-  animation: 'scale',
-  touch: ['hold', 600],
-  duration: [50, 100],
-  delay: [400, 50],
-  followCursor: 'horizontal',
-  plugins: [TippyFollowCursor, TippySticky]
-}
-/** Creates a tippy.js instance for the element. */
-export function usTip(elem: Element, opts: Partial<TippyProps> = {}) {
-  const finalOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
-  const tp = tippy(elem, finalOpts)
-  return {
-    update(opts: Partial<TippyProps>) {
-      const newOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
-      tp.setProps(newOpts)
-    },
-    destroy() {
-      tp.destroy()
-    }
-  }
-}
-
-// ------
-//  ANIM
+//  ANIME
 
 export function elAnime(elem: Element, opts: AnimeParams) {
   return () => {

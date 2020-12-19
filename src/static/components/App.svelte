@@ -1,22 +1,15 @@
 <script lang="ts">
   // Imports
   import * as API from '@js/modules/api'
-  import { ENV, sleep } from '@modules/util'
-  import { usAnime, load } from '@modules/components'
+  import { ENV } from '@modules/util'
+  import { usAnime } from '@modules/components'
+  import { renderPage} from '@modules/markdown'
+  import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
-  import { generateRenderer, Prism } from '@modules/markdown'
-  import router from 'page'
-  // Components
-  import Spinny from './Spinny.svelte'
-  import IntersectionPoint from './IntersectionPoint.svelte'
-  import ActionsPanel from './ActionsPanel.svelte'
+  import Page from './Page.svelte'
 
-  // -- STATE
-  let mode: 'LOADING' | 'VIEW' | 'EDIT' | 'ERROR' | '404' = 'LOADING'
-  let page: API.LocalizedPage
-  let html: string
-  let error: any
-  let hideActionsPanel = true
+  // TODO: make a separate 404 page so that its indexed correctly
+  // TODO: set page metadata
 
   // -- ANIMATIONS
   const sideBarReveal = usAnime({
@@ -30,54 +23,7 @@
     duration: 300,
     easing: 'easeOutElastic(2, 1.25)'
   })
-  const pageReveal = usAnime({
-    opacity: {
-      value: [0, 1],
-      duration: 300,
-      easing: 'easeOutQuad',
-      delay: 50
-    },
-    translateY: {
-      value: ['-4rem', '0rem'],
-      duration: 800,
-      easing: 'easeOutElastic(2, 2)'
-    },
-  })
 
-  // -- MISC
-  const renderMarkdown = generateRenderer()
-
-  // -- ROUTER
-  // Test pages
-  router('/404', () => mode = '404') // Directly asking for 404
-  router('/test/load', () => mode = 'LOADING') // Loading symbol test page
-  router('/test/error', () => mode = 'ERROR') // Loading symbol test page
-  router('/test/md', loadTestPage) // Markdown test page
-  // Proper pages
-  router('/', () => loadPath(ENV.HOMEPAGE)) // Home page
-  router((ctx) => loadPath(ctx.pathname)) // Everything else
-  // Start router
-  router()
-
-  async function loadTestPage() {
-    mode = 'LOADING'
-    const response = await fetch('/static/misc/md-test.md')
-    html = renderMarkdown(await response.text())
-    mode = 'VIEW'
-  }
-
-  async function loadPath(path: string) {
-    try {
-      mode = 'LOADING'
-      const page = await API.withPage(path).requestLocalized()
-      html = renderMarkdown(page.template)
-      mode = 'VIEW'
-    } catch (err) {
-      error = err
-      if (API.getStatusCode(err) === 404) mode = '404'
-      else mode = 'ERROR'
-    }
-  }
 </script>
 
 <style lang="stylus">
@@ -204,58 +150,38 @@
 
 </style>
 
-{#if mode !== 'EDIT'}
+<!-- Non editor paths (basically we have two apps, one is edit, one isn't) -->
+<Route>
   <div class=container role=presentation>
     <nav class=navbar use:navBarReveal aria-label=Navigation/>
     <aside class=sidebar use:sideBarReveal aria-label=Sidebar/>
     <main class="content" aria-label=Content>
-      {#key mode}
-        {#if mode === 'VIEW'}
-          <!-- Page successfully loaded -->
-            <div class=rhythm
-              use:pageReveal out:fade={{duration: 50}} role=presentation
-              use:load={Prism.highlightAllUnder}
-              >
-              {@html html}
-            </div>
-            <!-- Actions Panel -->
-            <IntersectionPoint
-            onEnter={() => hideActionsPanel = true}
-            onExit={() => hideActionsPanel = false}
-            opts={{rootMargin: '300px'}}/>
-            <ActionsPanel bind:hidden={hideActionsPanel}/>
 
-          <!-- Every other mode folllows -->
+        <!-- Home Page -->
+      <Route path="/"><Page
+        loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
+      /></Route>
 
-          <!-- Page still loading -->
-          {:else if mode === 'LOADING'}
-          <!-- Wait a moment before loading so that we don't instantly and needlessly display a spinner -->
-          {#await sleep(300) then _}
-            <Spinny width=150px top=200px left=50%/>
-          {/await}
+      <!-- User Pages -->
+      <Route path="/scp/*"><Page
+          loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
+      /></Route>
 
-          <!-- Page not found / 404 error-->
-          {:else if mode === '404'}
-          <div class="pgnf rhythm" use:pageReveal out:fade={{duration: 50}}>
-            <div class=pgnf-blackbox>
-              <h1 class=pgnf-header>404</h1>
-              <span class=pgnf-text>PAGE NOT FOUND</span>
-            </div><br />
-            <h4>The requested page either does not exist or was not found.</h4>
-          </div>
+      <!-- Misc. routes-->
+      <Route path="/test/md"><Page
+          loading={fetch('/static/misc/md-test.md').then(res => res.text())}
+      /></Route>
 
-          <!-- Page display error -->
-          {:else if mode === 'ERROR'}
-          <div class=rhythm use:pageReveal out:fade={{duration: 50}}>
-            <h2>Error Displaying Page</h2>
-            <hr>
-            <pre class=code><code>
-              ERR: {error?.name}: {error?.message}
-              MSG: {error?.description}
-            </code></pre>
-          </div>
-        {/if}
-      {/key}
+      <!-- 404 -->
+      <Route fallback>
+        <div class="pgnf rhythm" transition:fade={{duration: 50}}>
+          <div class=pgnf-blackbox>
+            <h1 class=pgnf-header>404</h1>
+            <span class=pgnf-text>PAGE NOT FOUND</span>
+          </div><br />
+          <h4>The requested page either does not exist or was not found.</h4>
+        </div>
+      </Route>
     </main>
   </div>
-{/if}
+</Route>
