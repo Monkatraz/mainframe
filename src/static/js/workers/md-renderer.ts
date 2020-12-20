@@ -30,10 +30,10 @@ import type Token from 'markdown-it/lib/token'
 // TODO: Generic (block -> tag) handler
 // TODO: Generic (lineSymbol -> tag) handler
 // TODO: autoconvert wiki links
+// TODO: anchors on headings
 // TODO: compare Wikidot typography replacements vs markdown-it
 // TODO: Basic grid markup that isn't tables
 // TODO: Built-in ACS module
-// TODO: Put this renderer in a worker
 
 // ?:::collapsible [label-closed] [label-opened] -> block -> :::
 //  uses <details> and <summary>

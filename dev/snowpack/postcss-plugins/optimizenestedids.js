@@ -31,7 +31,7 @@ module.exports = postcss.plugin('postcss-optimize-nested-ids', () => {
         // And then clean up any sequence of spaces longer than 1 space (so that splits don't have a fit)
         precedingSelector = precedingSelector
           .trim()
-          .replace('>', ' ')
+          .replace(/>/, ' ')
           .replace(/\s{2,}/, ' ')
 
         // This checks that our preceding selector only has direct/descendent child combinators

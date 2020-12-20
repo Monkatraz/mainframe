@@ -152,36 +152,39 @@
 
 <!-- Non editor paths (basically we have two apps, one is edit, one isn't) -->
 <Route>
-  <div class=container role=presentation>
-    <nav class=navbar use:navBarReveal aria-label=Navigation/>
-    <aside class=sidebar use:sideBarReveal aria-label=Sidebar/>
-    <main class="content" aria-label=Content>
+  {#if $router.path.startsWith('/edit') === false}
+    <div class=container role=presentation>
 
+      <nav class=navbar use:navBarReveal aria-label=Navigation/>
+      <aside class=sidebar use:sideBarReveal aria-label=Sidebar/>
+
+      <main class="content" aria-label=Content>
         <!-- Home Page -->
-      <Route path="/"><Page
-        loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
-      /></Route>
+        <Route path="/"><Page
+          loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
+        /></Route>
 
-      <!-- User Pages -->
-      <Route path="/scp/*"><Page
+        <!-- User Pages -->
+        <Route path="/scp/*"><Page
           loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
-      /></Route>
+        /></Route>
 
-      <!-- Misc. routes-->
-      <Route path="/test/md"><Page
+        <!-- Misc. routes-->
+        <Route path="/test/md"><Page
           loading={fetch('/static/misc/md-test.md').then(res => res.text())}
-      /></Route>
+        /></Route>
 
-      <!-- 404 -->
-      <Route fallback>
-        <div class="pgnf rhythm" transition:fade={{duration: 50}}>
-          <div class=pgnf-blackbox>
-            <h1 class=pgnf-header>404</h1>
-            <span class=pgnf-text>PAGE NOT FOUND</span>
-          </div><br />
-          <h4>The requested page either does not exist or was not found.</h4>
-        </div>
-      </Route>
-    </main>
-  </div>
+        <!-- 404 -->
+        <Route fallback>
+          <div class="pgnf rhythm" transition:fade={{duration: 50}}>
+            <div class=pgnf-blackbox>
+              <h1 class=pgnf-header>404</h1>
+              <span class=pgnf-text>PAGE NOT FOUND</span>
+            </div><br />
+            <h4>The requested page either does not exist or was not found.</h4>
+          </div>
+        </Route>
+      </main>
+    </div>
+  {/if}
 </Route>

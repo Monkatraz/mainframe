@@ -128,7 +128,8 @@
       position: absolute
       z-index: 20
       top:  0
-      left: center
+      left: 50%
+      transform: translateX(-50%)
       height: var(--actions-panel-button-height)
       width: 10rem
       background: colvar('background-dark')
@@ -139,8 +140,8 @@
     .button_arrow
       position: absolute
       display: block
-      top: center
-      left: center
+      top: 50%
+      left: 50%
       transform: translate(-50%, -45%) !important
       color: colvar('lightgray')
       font-size: 3.5rem
@@ -149,7 +150,8 @@
   .actions-panel
     position: absolute
     bottom: 0
-    left: center
+    left: 50%
+    transform: translateX(-50%)
     width: 100%
     background: colvar('background-dark', lighten 15%, desaturate 5%)
     border-left: var(--actions-panel-border-height) colvar('background-dark') solid

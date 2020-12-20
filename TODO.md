@@ -4,7 +4,6 @@
 - [ ] Add CodeJar+Prism editor component and Markdown lang.
 - [ ] Switch to Vercel due to even better pricing and FOSS ideals
 - [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
-- [ ] Get rid of PostCSS-center (update header)
 
 ### General
 - [ ] Integrate ReCaptcha
@@ -96,3 +95,5 @@
 - [x] Remove CSSNano and depend on ESBuild to optimize CSS
 - [x] Nuke Netlify
 - [x] Try to remove more PostCSS plugins
+- [x] Get rid of PostCSS-center (update header)
+- [x] Generic web workers

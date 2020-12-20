@@ -1,3 +1,8 @@
+/**
+ * @file Compiles the Stylus -> PostCSS - .css chain.
+ * @author Monkatraz
+*/
+
 const fs = require('fs').promises
 const path = require('path')
 const postcss = require('postcss')

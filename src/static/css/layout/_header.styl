@@ -30,7 +30,9 @@
 
 // Header Logo Internal Grid
 #header_logo
-  top: center
+  position: absolute
+  top: 50%
+  transform: translateY(-50%)
   font-size: 1rem
   grid-kiss:"+-----------------------+        +--------------+ ------ ",
             "| #logo_emblem          |        |              |   1fr  ",
@@ -50,8 +52,10 @@
     pointer-events: none
 
   #logo_link
-    top: center
-    left: center
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
     width: 100%
     height: 100%
 
@@ -61,8 +65,10 @@
 
   // Emblem appears looming behind the text
   +match-media(thin, below)
-    top: center
-    left: center
+    position: absolute
+    top: 50%
+    left: 50%
+    transform: translate(-50%, -50%)
     grid-kiss:"+------------------+ ------ ",
               "|                  |  1rem  ",
               "+------------------+ ------ ",
@@ -78,8 +84,10 @@
               "|       auto       |        "
 
     #logo_emblem
-      top: center
-      left: center
+      position: absolute
+      top: 50%
+      left: 50%
+      transform: translate(-50%, -50%)
       height: 21rem
       width: 21rem
 

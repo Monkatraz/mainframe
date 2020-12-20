@@ -6,10 +6,8 @@
 import { createLock } from '@modules/util'
 import DOMPurify from 'dompurify'
 import "@vendor/prism.js"
-export const Prism = window.Prism
-Prism.manual = true
-// Divert languages to CDN instead of storing them ourselves
-Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/'
+
+// -- RENDER WORKER
 
 let renderWorker: Worker
 /** Effectively restarts the Markdown renderer.
@@ -19,7 +17,7 @@ function restartRenderWorker() {
   renderWorker = new Worker(new URL('../workers/md-renderer.js', import.meta.url), {
     name: 'md-renderer',
     credentials: 'same-origin',
-    type: 'module'
+    type: import.meta.env.MODE === 'development' ? "module" : "classic"
   })
 }
 // init. worker on first load
@@ -59,7 +57,14 @@ export const renderPage = createLock((raw: string): Promise<string> => {
       resolve(DOMPurify.sanitize(evt.data as string))
       console.timeEnd('md-render-perf')
     }
-    // send message to worker
+    // everything's ready, send message to worker
     renderWorker.postMessage(raw)
   })
 })
+
+// -- PRISM
+
+export const Prism = window.Prism
+Prism.manual = true
+// Divert languages to CDN instead of storing them ourselves
+Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/'

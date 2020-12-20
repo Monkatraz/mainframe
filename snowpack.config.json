@@ -20,6 +20,7 @@
     "output": "stream"
   },
   "buildOptions": {
+    "out": "build",
     "clean": true,
     "metaDir": "static/snowpack",
     "sourceMaps": true
@@ -37,17 +38,13 @@
         "dest": "/index.html",
         "match": "routes"
       }
-    ],
-    "optimize": {
-      "bundle": true,
-      "minify": true,
-      "manifest": true,
-      "target": "es2020"
-    }
+    ]
   },
   "plugins": [
     "@snowpack/plugin-dotenv",
     "@snowpack/plugin-svelte",
-    "./dev/snowpack/compile-css.js"
+    "./dev/snowpack/compile-css.js",
+    "./dev/snowpack/bundle-workers.js",
+    "./dev/snowpack/fudge-optimize.js"
   ]
 }
