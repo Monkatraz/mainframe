@@ -152,7 +152,7 @@
 <!-- Non editor paths (basically we have two apps, one is edit, one isn't) -->
 <Route>
   {#if $router.path.startsWith('/edit') === false}
-    <div class=container role=presentation>
+    <div class=container out:fade={{duration: 50}} role=presentation>
 
       <nav class=navbar use:navBarReveal aria-label=Navigation/>
       <aside class=sidebar use:sideBarReveal aria-label=Sidebar/>
@@ -168,9 +168,13 @@
           loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
         /></Route>
 
-        <!-- Misc. routes-->
+        <!-- Test routes-->
         <Route path="/test/md"><Page
           loading={fetch('/static/misc/md-test.md').then(res => res.text())}
+        /></Route>
+
+        <Route path="/test/loading"><Page
+          loading={new Promise(() => {})}
         /></Route>
 
         <!-- 404 -->

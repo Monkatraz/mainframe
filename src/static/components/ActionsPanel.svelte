@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onSwipe } from '@modules/gestures'
   import { Agent } from '@modules/util'
-  import { usAnime } from '@js/modules/components'
+  import { tnAnime, usAnime } from '@js/modules/components'
   import { throttle } from '@js/modules/util'
 
   // Props
@@ -27,15 +27,6 @@
   }
 
   // Animations
-  const intro = usAnime({
-    bottom: ['-8rem', '-5rem'],
-    easing: 'easeOutElastic(1, 1.5)'
-  })
-
-  const hide = usAnime({
-    bottom: '-8rem',
-    easing: 'easeOutElastic(1, 1.5)'
-  })
 
   const opts = { easing: 'easeOutElastic(1.5, 2)', duration: 400 }
   const panelOpen = usAnime({
@@ -48,15 +39,13 @@
     ...opts
   })
 
-  // Hide handling
-  $: if (hidden) {
-      revealed = false
-      hide(grip)
-    } else intro(grip)
+  $: if (hidden) revealed = false
 
   // Unfade if mouse is near (simple Y value check, nothing complex)
   window.addEventListener('mousemove', throttle(() => {
-    faded = Agent.mouseY < 0.9
+    const mouseNotNear = Agent.mouseY < 0.9
+    if (!faded && mouseNotNear) faded = true
+    else if (faded && !mouseNotNear) faded = false
   }, 100))
 
   // State toggling
@@ -75,8 +64,6 @@
 
 <style lang="stylus">
   @require '_lib'
-
-  // Styling
 
   :root
     --actions-panel-height: 5rem
@@ -100,11 +87,6 @@
     filter: drop-shadow(0 0 10px rgba(black, 0.5))
     pointer-events: auto
     touch-action: none
-
-    &.hidden
-      pointer-events: none
-      user-select: none
-      opacity: 0 !important
 
     +match-media(thin, below)
       margin-left: calc(var(--layout-body-side-gap) * -1)
@@ -224,19 +206,22 @@
 
 </style>
 
-<div class=actions-panel-container
-  aria-expanded={revealed}
-  class:hidden class:revealed class:faded
-  use:intro
-  use:onSwipe={{callback: handleGrip, direction: revealed ? 'down' : 'up'}}
-  bind:this={grip}>
+{#if !hidden}
+  <div class=actions-panel-container
+    aria-expanded={revealed}
+    class:revealed class:faded
+    in:tnAnime={{bottom: ['-8rem', '-5rem'], easing: 'easeOutElastic(1, 1.5)', delay: 300}}
+    out:tnAnime={{bottom: '-8rem', opacity: 0, easing: 'easeOutQuad', duration: 100}}
+    use:onSwipe={{callback: handleGrip, direction: revealed ? 'down' : 'up'}}
+    bind:this={grip}>
 
-  <button type=button class=actions-panel_button
-    on:click={handleGrip}
-    on:contextmenu={contextmenu}>
-    <span class="iconify-inline actions-panel_button_arrow" data-icon=ic:round-expand-less></span>
-  </button>
+    <button type=button class=actions-panel_button
+      on:click={handleGrip}
+      on:contextmenu={contextmenu}>
+      <span class="iconify-inline actions-panel_button_arrow" data-icon=ic:round-expand-less></span>
+    </button>
 
-  <div class=actions-panel_border/>
-  <div class=actions-panel/>
-</div>
+    <div class=actions-panel_border/>
+    <div class=actions-panel/>
+  </div>
+{/if}

@@ -48,7 +48,8 @@
       {
         "bundle": [
           "static/js/workers/md-renderer.js",
-          "static/js/modules/markdown.js"
+          "static/js/modules/markdown.js",
+          "static/js/modules/components.js"
         ],
         "preload": true,
         "minify": true
