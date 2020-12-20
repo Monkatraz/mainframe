@@ -12,7 +12,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "script-src 'self' sha256-w+5kboX/aYouI2oGHDZKK4He5+6CGyBGgGMr6TSsmEg= https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/ https://code.iconify.design; child-src 'self'; object-src 'none';"
+          "value": "script-src 'self' 'sha256-w+5kboX/aYouI2oGHDZKK4He5+6CGyBGgGMr6TSsmEg=' https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/ https://code.iconify.design; child-src 'self'; object-src 'none';"
         },
         {
           "key": "Cross-Origin-Opener-Policy",
