@@ -44,20 +44,10 @@
     "@snowpack/plugin-svelte",
     "./dev/snowpack/compile-css.js",
     [
-      "./dev/snowpack/esbuild-step.js",
+      "./dev/snowpack/esbuild-bundle.js",
       {
-        "entrypoints": [
-          "src/static/js/workers/md-renderer.ts"
-        ],
-        "bundle": true,
-        "minify": true
-      }
-    ],
-    [
-      "./dev/snowpack/esbuild-step.js",
-      {
-        "entrypoints": [
-          "src/index.html"
+        "bundle": [
+          "static/js/workers/md-renderer.js"
         ],
         "preload": true,
         "minify": true
