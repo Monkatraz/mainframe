@@ -1,0 +1,30 @@
+diff --git a/node_modules/snowpack/lib/build/optimize.js b/node_modules/snowpack/lib/build/optimize.js
+index c070f78..155021f 100644
+--- a/node_modules/snowpack/lib/build/optimize.js
++++ b/node_modules/snowpack/lib/build/optimize.js
+@@ -334,7 +334,7 @@ async function processEntrypoints(originalEntrypointValue, entrypointFiles, buil
+  * Run esbuild on the build directory. This is run regardless of bundle=true or false,
+  * since we use the generated manifest in either case.
+  */
+-async function runEsbuildOnBuildDirectory(bundleEntrypoints, config, esbuildService) {
++async function runEsbuildOnBuildDirectory(bundleEntrypoints, allFiles, config, esbuildService) {
+     var _a;
+     const { outputFiles, warnings } = await esbuildService.build({
+         entryPoints: bundleEntrypoints,
+@@ -349,6 +349,7 @@ async function runEsbuildOnBuildDirectory(bundleEntrypoints, config, esbuildServ
+         publicPath: config.buildOptions.baseUrl,
+         minify: config.experiments.optimize.minify,
+         target: config.experiments.optimize.target,
++				external: Array.from(new Set(allFiles.map((f) => '*' + path_1.default.extname(f)))).filter((ext) => ext !== '*.js' && ext !== '*.mjs' && ext !== '*.css')
+     });
+     const manifestFile = outputFiles.find((f) => f.path.endsWith('build-manifest.json'));
+     const manifestContents = manifestFile.text;
+@@ -410,7 +411,7 @@ async function runBuiltInOptimize(config) {
+     // to disk (bundle: false), we still use the bundle manifest as an in-memory representation
+     // of our import graph, saved to disk.
+     const esbuildService = await esbuild.startService();
+-    const { manifest, outputFiles } = await runEsbuildOnBuildDirectory(bundleEntrypoints, config, esbuildService);
++    const { manifest, outputFiles } = await runEsbuildOnBuildDirectory(bundleEntrypoints, allBuildFiles, config, esbuildService);
+     // * BUNDLE: TRUE - Save the bundle result to the build directory, and clean up to remove all original
+     // build files that now live in the bundles.
+     if (options.bundle) {
