@@ -292,14 +292,6 @@ on-hover(notWithActive = true)
       &:hover
         {block}
 
-// +on-hovertouch()
-// Smart hovering - only 'hovers' if the device can hover, otherwise it works off of only touch events
-on-hovertouch()
-  &.touch:not(:active) 
-    {block}
-  +on-hover()
-    {block}
-
 // Mixins
 
 // hide-scrollbars()

@@ -10,8 +10,7 @@ import type { RenderRule } from 'markdown-it/lib/renderer'
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
 import type Token from 'markdown-it/lib/token'
 
-// ! Before you dig into the depths of this file, read this:
-// I want two things to be noted:
+// Before you dig into the depths of this file, read this:
 //  1. Mainframe /differs from the fundamental syntax of the Commonmark spec in some ways./
 //    The most glaring difference is the handling of *, _, **, __.
 //    This is done because, well, it could be done, and because I think the syntax I came up with is /better./
@@ -42,6 +41,8 @@ import type Token from 'markdown-it/lib/token'
 // ? *[]: | abbr def. | find alternative syntax?
 // ? text alignment: ':--', ':--:', '--:' (matches tables)
 // ? dl -> ...(dt -> dd) -> dl | term -> \t~ definition
+
+// { attrs: /.*?(?<!])(?=:)/ },
 
 // ? yaml/json/kv front matter
 // set render flags?
@@ -138,9 +139,27 @@ function mapKeyVals(str: string) {
   return keyvals
 }
 
-// { attrs: /.*?(?<!])(?=:)/ },
-const syntaxChains = {
-  spans: syntaxChain('inline-span',
+const TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~/]/
+const synExt = [
+  // e.g. '**' -> <strong> mappings
+  ...[
+    ['/', 'i'], ['//', 'em'],
+    ['*', 'b'], ['**', 'strong'],
+    ['__', 'u'],
+    ['--', 's'],
+    ['^', 'sup'], ['~', 'sub'],
+    ['==', 'mark']
+  ].map((arr) => syntaxSymbol({ symb: arr[0], tag: arr[1] })),
+
+  // CriticMarkup
+  syntaxBrackets({ symb: ['{++', '++}'], tag: 'ins' }),
+  syntaxBrackets({ symb: ['{--', '--}'], tag: 'del' }),
+
+  // Katex
+  syntaxSymbol({ symb: '$', render: (str) => katex.renderToString(str, { throwOnError: false }) }),
+
+  // Inline Elements | #elem param param|text#
+  syntaxChain('inline-span',
     [
       /#/, { type: /.+?(?=\s|\|)/ }, /\s*/,
       { param: /./, repeat: true, delimit: /\s/ }, /\|\s*/,
@@ -170,30 +189,7 @@ const syntaxChains = {
         }
       }
     }
-  })
-}
-
-const TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~/]/
-const synExt = [
-  // e.g. '**' -> <strong> mappings
-  ...[
-    ['/', 'i'], ['//', 'em'],
-    ['*', 'b'], ['**', 'strong'],
-    ['__', 'u'],
-    ['--', 's'],
-    ['^', 'sup'], ['~', 'sub'],
-    ['==', 'mark']
-  ].map((arr) => syntaxSymbol({ symb: arr[0], tag: arr[1] })),
-
-  // CriticMarkup
-  syntaxBrackets({ symb: ['{++', '++}'], tag: 'ins' }),
-  syntaxBrackets({ symb: ['{--', '--}'], tag: 'del' }),
-
-  // Katex
-  syntaxSymbol({ symb: '$', render: (str) => katex.renderToString(str, { throwOnError: false }) }),
-
-  // Inline Elements | #elem param param|text#
-  syntaxChains.spans.plugin,
+  }).plugin,
 
   // Escaping text
   syntaxSymbol({ symb: '@@', render: (str) => str }),
