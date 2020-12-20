@@ -17,7 +17,6 @@ const stylusRender = function (str = '', filePath = '') {
       .set('paths', stylusPaths)
       .set('sourcemap', {
         comment: false,
-        inline: true,
         basePath: './src/static/css/'
       })
     renderer.render((err, css) => {

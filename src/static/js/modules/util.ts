@@ -3,17 +3,19 @@
  * @author Monkatraz
  */
 
-/** Contains all environment variables. */
+/** Contains all "environment" variables.
+ *  They're just inlined in the code because that is what Snowpack would've done anyways.
+ */
 export const ENV = {
   /** API related env. variables. Usually database related. */
   API: {
     // Database
-    FDB_PUBLIC: import.meta.env.SNOWPACK_PUBLIC_API_FDB_PUBLIC,
-    FDB_DOMAIN: import.meta.env.SNOWPACK_PUBLIC_API_FDB_DOMAIN,
+    FDB_PUBLIC: 'fnAD335_NTACBv7ohiYXzvekkToWGGfdNKnaI3XB',
+    FDB_DOMAIN: 'db.fauna.com',
     // Serverless functions
-    LAMBDA: import.meta.env.SNOWPACK_PUBLIC_API_LAMBDA
+    LAMBDA: '/api/'
   },
-  HOMEPAGE: import.meta.env.SNOWPACK_PUBLIC_HOMEPAGE
+  HOMEPAGE: '/scp/6842'
 }
 
 /** Browser / User-Agent info. Contains contextual information like normalized mouse position values. */

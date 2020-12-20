@@ -23,18 +23,6 @@ function restartRenderWorker() {
 // init. worker on first load
 restartRenderWorker()
 
-DOMPurify.addHook('afterSanitizeAttributes', (evtNode) => {
-  // bit of a hack for typechecking
-  const node = evtNode as any
-  // makes external links open with no referrer and in another tab
-  if ('target' in node && (!node.hostname || node.hostname !== location.hostname)) {
-    node.setAttribute('target', '_blank')
-    node.setAttribute('rel', 'noreferrer noopener')
-  }
-  // makes all imgs crossorigin (required by CSP)
-  if (node instanceof HTMLImageElement) node.setAttribute('crossorigin', '')
-})
-
 const RENDER_TIMEOUT = 10000
 /** Safely renders (async) the given Markdown string.
  *  The render occurs in a web worker for performance reasons.
@@ -62,6 +50,28 @@ export const renderMarkdown = createLock((raw: string): Promise<string> => {
     // everything's ready, send message to worker
     renderWorker.postMessage(raw)
   })
+})
+
+// -- DOMPURIFY
+
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+
+  // makes external links open with no referrer and in another tab
+  if (node instanceof HTMLAnchorElement) {
+    if (!node.hostname || node.hostname !== location.hostname) {
+      node.setAttribute('target', '_blank')
+      node.setAttribute('rel', 'noreferrer noopener')
+    }
+    return
+  }
+
+  // changes resource http links to https (not perfect, but it's just a simple measure)
+  // this won't affect anchor links as we returned above when we find those
+  for (const attr of ['src', 'href', 'action', 'xlink:href']) if (node.hasAttribute(attr))
+    node.setAttribute(attr, (node.getAttribute(attr) ?? '').replace(/http:/, 'https:'))
+
+  // makes all imgs crossorigin
+  if (node instanceof HTMLImageElement) node.setAttribute('crossorigin', '')
 })
 
 // -- PRISM

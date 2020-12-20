@@ -41,10 +41,27 @@
     ]
   },
   "plugins": [
-    "@snowpack/plugin-dotenv",
     "@snowpack/plugin-svelte",
     "./dev/snowpack/compile-css.js",
-    "./dev/snowpack/bundle-workers.js",
-    "./dev/snowpack/fudge-optimize.js"
+    [
+      "./dev/snowpack/esbuild-step.js",
+      {
+        "entrypoints": [
+          "src/static/js/workers/md-renderer.ts"
+        ],
+        "bundle": true,
+        "minify": true
+      }
+    ],
+    [
+      "./dev/snowpack/esbuild-step.js",
+      {
+        "entrypoints": [
+          "src/index.html"
+        ],
+        "preload": true,
+        "minify": true
+      }
+    ]
   ]
 }

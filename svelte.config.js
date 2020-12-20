@@ -13,6 +13,6 @@ module.exports = {
     }
   }),
   compilerOptions: {
-    css: false
+    css: true
   }
 };
