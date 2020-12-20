@@ -1,0 +1,13 @@
+diff --git a/node_modules/snowpack-plugin-optimize/lib/index.js b/node_modules/snowpack-plugin-optimize/lib/index.js
+index 5b379e4..91f4239 100644
+--- a/node_modules/snowpack-plugin-optimize/lib/index.js
++++ b/node_modules/snowpack-plugin-optimize/lib/index.js
+@@ -2,7 +2,7 @@
+ const tslib_1 = require("tslib");
+ const csso_1 = tslib_1.__importDefault(require("csso"));
+ const dependency_tree_1 = require("dependency-tree");
+-const promises_1 = require("fs/promises");
++const promises_1 = require("fs").promises;
+ const html_minifier_1 = tslib_1.__importDefault(require("html-minifier"));
+ const path_1 = require("path");
+ const terser_1 = require("terser");

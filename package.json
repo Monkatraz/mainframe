@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "snowpack dev",
     "build": "snowpack build",
+    "postinstall": "patch-package",
     "test": "echo \"Mainframe does not currently include a test runner.\""
   },
   "browserslist": [
@@ -35,8 +36,8 @@
     "css-mquery-packer": "^1.2.4",
     "esbuild": "^0.8.24",
     "eslint": "latest",
+    "patch-package": "^6.2.2",
     "postcss": "^8.2.1",
-    "postcss-combine-duplicated-selectors": "^10.0.2",
     "snowpack": "^2.18.5",
     "snowpack-plugin-optimize": "^0.5.0",
     "sort-css-media-queries": "^1.5.2",
