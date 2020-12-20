@@ -25,12 +25,14 @@ restartRenderWorker()
 
 DOMPurify.addHook('afterSanitizeAttributes', (evtNode) => {
   // bit of a hack for typechecking
-  const node = evtNode as HTMLAnchorElement
+  const node = evtNode as any
   // makes external links open with no referrer and in another tab
   if ('target' in node && (!node.hostname || node.hostname !== location.hostname)) {
     node.setAttribute('target', '_blank')
     node.setAttribute('rel', 'noreferrer noopener')
   }
+  // makes all imgs crossorigin (required by CSP)
+  if (node instanceof HTMLImageElement) node.setAttribute('crossorigin', '')
 })
 
 const RENDER_TIMEOUT = 10000
