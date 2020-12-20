@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { sleep } from '@modules/util'
   import { usAnime, load } from '@modules/components'
-  import { renderPage, Prism } from '@modules/markdown'
+  import { renderMarkdown, Prism } from '@modules/markdown'
   import { fade } from 'svelte/transition'
   import Spinny from './Spinny.svelte'
   import IntersectionPoint from './IntersectionPoint.svelte'
@@ -26,7 +26,7 @@
   })
 </script>
 
-{#await loading.then(renderPage)}
+{#await loading.then(renderMarkdown)}
 <!-- Delayed Loading Spinner -->
   {#await sleep(300) then _}
     <Spinny width=150px top=200px left=50%/>

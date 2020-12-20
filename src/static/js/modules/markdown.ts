@@ -38,7 +38,7 @@ const RENDER_TIMEOUT = 10000
  *  The render occurs in a web worker for performance reasons.
  *  Calling this function multiple times is safe - it will render one request at a time.
  */
-export const renderPage = createLock((raw: string): Promise<string> => {
+export const renderMarkdown = createLock((raw: string): Promise<string> => {
   console.time('md-render-perf')
   return new Promise((resolve, reject) => {
     // Timeout reject scenario

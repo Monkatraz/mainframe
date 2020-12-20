@@ -227,12 +227,12 @@ const synExt = [
 
 // -- EXPORT RENDERER
 
-const pageRenderer = new MarkdownIt({ html: true, linkify: true, typographer: true })
-synExt.map(pageRenderer.use, pageRenderer)
+const renderer = new MarkdownIt({ html: true, linkify: true, typographer: true })
+synExt.map(renderer.use, renderer)
 
 onmessage = (evt) => {
   try {
-    postMessage(pageRenderer.render(evt.data))
+    postMessage(renderer.render(evt.data))
   } catch (err) {
     postMessage(err)
   }
