@@ -56,8 +56,10 @@ export const renderMarkdown = createLock((raw: string): Promise<string> => {
 
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
 
-  // makes external links open with no referrer and in another tab
   if (node instanceof HTMLAnchorElement) {
+    // Makes '#' id links work correctly
+    if (node.hash) node.setAttribute('href', location.origin + location.pathname + node.hash)
+    // makes external links open with no referrer and in another tab
     if (!node.hostname || node.hostname !== location.hostname) {
       node.setAttribute('target', '_blank')
       node.setAttribute('rel', 'noreferrer noopener')
