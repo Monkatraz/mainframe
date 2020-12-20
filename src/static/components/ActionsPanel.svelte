@@ -211,7 +211,7 @@
     aria-expanded={revealed}
     class:revealed class:faded
     in:tnAnime={{bottom: ['-8rem', '-5rem'], easing: 'easeOutElastic(1, 1.5)', delay: 300}}
-    out:tnAnime={{bottom: '-8rem', opacity: 0, easing: 'easeOutQuad', duration: 100}}
+    out:tnAnime={{bottom: '-6rem', opacity: 0, easing: 'easeOutQuad', duration: 100}}
     use:onSwipe={{callback: handleGrip, direction: revealed ? 'down' : 'up'}}
     bind:this={grip}>
 
