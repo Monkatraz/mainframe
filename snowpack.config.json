@@ -23,7 +23,7 @@
     "out": "build",
     "clean": true,
     "metaDir": "static/snowpack",
-    "sourceMaps": true
+    "sourceMaps": false
   },
   "alias": {
     "@js": "./src/static/js",
@@ -47,7 +47,8 @@
       "./dev/snowpack/esbuild-bundle.js",
       {
         "bundle": [
-          "static/js/workers/md-renderer.js"
+          "static/js/workers/md-renderer.js",
+          "static/js/modules/markdown.js"
         ],
         "preload": true,
         "minify": true
