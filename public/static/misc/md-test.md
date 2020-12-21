@@ -7,7 +7,7 @@
 | | | |
 | :--: | :-- | :-- |
 | `/.../` | Italics | /This is italicized, without using `<em>`./
-| `//...//` | Emphasis | //This is actually emphasis.//
+| `_..._` | Emphasis | _This is actually emphasis._
 | `*...*` | Bold | *This is just bolded text.*
 | `**...**` | Strong | **This is very important, strong text.**
 | `__...__` | Underline | __This is underlined, not emphasized.__
@@ -26,7 +26,7 @@
 | | | |
 | :--: | :-- | :-- |
 | `$...$` | Math (TeX) | $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$.
-| `@@...@@`| Escaped | @@//This text is __escaped__, and **will only be rendered as plain text.**//@@
+| `@@...@@`| Escaped | @@/This text is __escaped__, and **will only be rendered as plain text.**/@@
 
 ###### Inline Spans
 -	#font sans|Here is the sans font.#

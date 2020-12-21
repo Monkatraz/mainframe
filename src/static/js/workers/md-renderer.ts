@@ -49,12 +49,12 @@ import type Token from 'markdown-it/lib/token'
 // themes?
 
 // available symbols:
-// inline: ++ | _ | ~~ | % | ,, | {  }
+// inline: ++ | // | ~~ | % | ,, | {  }
 // block: ::: | :-- :--: --: | = | < | >
 
 // basic inline:
 // /  -> <i>
-//\// -> <em>
+// _  -> <em>
 //\*  -> <b>
 //\** -> <strong>
 // __ -> <u>
@@ -143,7 +143,7 @@ const TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~/]/
 const synExt = [
   // e.g. '**' -> <strong> mappings
   ...[
-    ['/', 'i'], ['//', 'em'],
+    ['/', 'i'], ['_', 'em'],
     ['*', 'b'], ['**', 'strong'],
     ['__', 'u'],
     ['--', 's'],

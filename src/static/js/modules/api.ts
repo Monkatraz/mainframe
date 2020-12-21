@@ -123,8 +123,10 @@ export interface View {
   template: string
 }
 
+// TODO: Add `Draft` object
 // TODO: convert Ratings[] into { up: Ref[], meh: Ref[], down: Ref[] }
 // TODO: Move `social` into its own document
+// TODO: Content warnings
 /** Root level object retrieved from the FaunaDB database. Contains everything relevant to a `Page`. */
 export interface Page {
   /** URL path, starting from root. Is always unique. */
