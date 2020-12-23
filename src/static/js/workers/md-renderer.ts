@@ -4,7 +4,8 @@
  */
 // Imports
 import MarkdownIt from 'markdown-it'
-import MarkdownMultiMDTable from 'markdown-it-multimd-table'
+import MDMultiMDTables from 'markdown-it-multimd-table'
+import MDDefLists from 'markdown-it-deflist'
 import katex from 'katex'
 // Used for md-it extensions
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
@@ -26,13 +27,13 @@ import type Token from 'markdown-it/lib/token'
 // If you are worried about the performance of this renderer, don't be.
 // The main bottlenecks will be when the DOM is updated, and not the renderer.
 
-// TODO: Generic (block -> tag) handler
-// TODO: Generic (lineSymbol -> tag) handler
+// TODO: nicer line break behavior? may not be easy to implement
 // TODO: autoconvert wiki links
 // TODO: anchors on headings
 // TODO: compare Wikidot typography replacements vs markdown-it
 // TODO: Basic grid markup that isn't tables
 // TODO: Built-in ACS module
+// TODO: Table of contents module
 
 // ?:::collapsible [label-closed] [label-opened] -> block -> :::
 //  uses <details> and <summary>
@@ -49,10 +50,20 @@ import type Token from 'markdown-it/lib/token'
 // themes?
 
 // available symbols:
-// inline: ++ | // | ~~ | % | ,, | {  }
+// inline: ++ | ~~ | % | ,, | @[]
 // block: ::: | :-- :--: --: | = | < | >
 
-// basic inline:
+// comments
+// '//'
+// '/*' -> block, inline -> '*/'
+
+// code:
+// ``` -> block ```
+// ```lang -> block ```
+// `inline` | monospace
+// `lang|inline` | inline code
+
+// inline:
 // /  -> <i>
 // _  -> <em>
 //\*  -> <b>
@@ -64,18 +75,18 @@ import type Token from 'markdown-it/lib/token'
 // ? /~\d[\d,]*\b/ | x~1 only
 // -- -> <s>
 // == -> <mark>
-
-// advanced inline:
-// $tex-expression$ -> Katex powered tex expressions
-// ? ^[inline footnote]
 // @@ -> (escaping)
+// ? ^[inline footnote]
+
+// $tex-expression$ -> Katex powered tex expressions
+// $$$ -> tex-expression-block -> $$$
 
 // criticmarkup
-// {++ ++}
-// {-- --}
-// {~~ ~> ~~}
-// {== ==}
-// {>> <<}
+// {++ ++}    addition
+// {-- --}    deletion
+// {~~ ~> ~~} substitution
+// {== ==}    highlight
+// {>> <<}    comment
 
 // inline formatting elements:
 // #color col|...|#
@@ -85,10 +96,8 @@ import type Token from 'markdown-it/lib/token'
 // ? #<tag> attrs|...|#
 
 // basic blocks
-// ? comments | <!--is unruly-->
 // ? easy line break | ___
 // ? nestable MD tags
-// ? $$$ -> tex-expression-block -> $$$
 
 // preprocessor:
 // ? [myvar]: my variables value | to use: @[myvar] <- (inserts "my variables value")
@@ -151,6 +160,12 @@ const synExt = [
     ['==', 'mark']
   ].map((arr) => syntaxWrap({ symb: arr[0], tag: arr[1] })),
 
+  // Comments (follows JS syntax entirely)
+  syntaxChain('inline-comment', parserChain([{ match: /\/\/.*$/ }])),
+  syntaxBrackets({ symb: ['/*', '*/'], render: () => '' }),
+  syntaxBlock({ symb: ['/*', '*/'], render: () => '' }),
+  syntaxLine({ symb: '//', render: () => '' }),
+
   // CriticMarkup
   syntaxBrackets({ symb: ['{++', '++}'], tag: 'ins' }),
   syntaxBrackets({ symb: ['{--', '--}'], tag: 'del' }),
@@ -174,9 +189,10 @@ const synExt = [
 
   // Katex
   syntaxWrap({ symb: '$', render: (str) => katex.renderToString(str, { throwOnError: false }) }),
+  syntaxBlock({ symb: ['$$$', '$$$'], render: (str) => katex.renderToString(str, { throwOnError: false }) }),
 
   // Inline Elements | #elem param param|text|#
-  // opens an inline element span
+  // opens a generic inline element span
   syntaxChain('inline-span', parserChain([
     { match: /#/, tag: 'span' },
     { match: /\w+/, type: 'type' },
@@ -192,7 +208,7 @@ const synExt = [
           case 'font': {
             let family = '', weight = '', size = ''
             for (const param of tokens) if (param.type === 'param') {
-              if (param.text.endsWith('em')) size = param.text
+              if (param.text.match(/^[\d.]+?(%|\w{2,})$/)) size = param.text
               else if (/^(\d{3}|bolder|lighter|bold|light)$/.test(param.text)) weight = param.text
               else family = param.text
             }
@@ -203,7 +219,7 @@ const synExt = [
           // This is a repeated pattern, so this wacky syntax makes this a bit more concise.
           default: for (const param of tokens) if (param.type === 'param') switch (tokenIR.text) {
             case 'class': token.attrJoin('class', param.text); break
-            case 'color': token.attrSet('style', 'color: ' + param.text); break
+            case 'color': token.attrSet('style', inlineStyle({ color: param.text })); break
           }
         }
       }
@@ -212,11 +228,48 @@ const synExt = [
   // closes a inline-element span
   syntaxSymbol({ symb: '|#', tag: '/span' }),
 
+  // Inline code blocks
+  syntaxChain('inline-code', parserChain([
+    { match: /`+/, tag: 'code' },
+    { match: /\w+/, type: 'lang' },
+    { match: /\s*\|\s*/ },
+    { match: /.*?/, type: 'text' },
+    { match: /`+/, tag: '/code' }
+  ]), {
+    after: 'escape',
+    parse: {
+      'lang': (state, name, tokenIR, idx, tokens) => {
+        const token = state.tokens[state.tokens.length - 1]
+        token.attrSet('class', 'language-' + tokenIR.text)
+      }
+    }
+  }),
+
   // Escaping text
   syntaxWrap({ symb: '@@', render: (str) => str }),
 
+  // Imported plugins.
+  MDMultiMDTables,
+  MDDefLists,
+
+  // Disables syntax that we replaced or that we don't want.
+  (md: MarkdownIt) => md.disable('strikethrough').disable('emphasis').disable('code'),
+
   // Post render operations
   // onEachToken('heading_open', (token) => { token.attrJoin('class', 'heading') }),
+  // (md: MarkdownIt) => md.core.ruler.push('export_state', (state) => {
+  //   tunnelTokens(Array.from(state.tokens))
+  //   return true
+  // }),
+
+  // Sets the data-line attribute on tokens with line mapping information available.
+  // This allows the editor to synchronize the rendered view and the editor view.
+  (md: MarkdownIt) => md.core.ruler.push('line_numbers', (state) => {
+    state.tokens.forEach((token) => {
+      if (token.map) token.attrSet('data-line', String(token.map[0]))
+    })
+    return true
+  }),
 
   // This parser replaces the original text token with a slightly less efficient one.
   // However, this function allows you to extend what is considered a terminator character to the parser.
@@ -236,17 +289,14 @@ const synExt = [
     if (!silent) state.pending += state.src.slice(pos, pos + idx)
     state.pos += idx
     return true
-  }),
+  })
 
-  // Imported plugins.
-  MarkdownMultiMDTable,
-
-  // Disables the syntax that we replaced.
-  (md: MarkdownIt) => md.disable('strikethrough').disable('emphasis')
 ]
 
 // -- EXPORT RENDERER
 
+// let exportTokens: any
+// const tunnelTokens = (tokens: StateCore['tokens']) => exportTokens = tokens
 const renderer = new MarkdownIt({ html: true, linkify: true, typographer: true })
 synExt.map(renderer.use, renderer)
 
@@ -254,7 +304,7 @@ onmessage = (evt) => {
   try {
     postMessage(renderer.render(evt.data))
   } catch (err) {
-    postMessage(err)
+    postMessage(String(err))
   }
 }
 
@@ -310,7 +360,7 @@ function parseTag(tag: string): [string, -1 | 0 | 1] {
   return [tag.replace('/', ''), nesting]
 }
 
-// -- PARSER/PLUGIN GENERATOR FUNCTIONS
+// -- MISC. PARSER/PLUGIN GENERATOR FUNCTIONS
 
 type ChainSub = { type: string, match: RegExp, tag?: string }
 
@@ -378,6 +428,102 @@ function parserChain(chain: ChainRule[]) {
     return { tokens, length }
   }
 }
+
+function onEachToken(onToken: string, fn: (token: Token) => void) {
+  return (md: MarkdownIt) => {
+    md.core.ruler.push(onToken + '_post_tokenized', (state) => {
+      state.tokens
+        .filter(token => token.type === onToken)
+        .forEach(token => fn(token))
+      return true
+    })
+  }
+}
+
+// -- BLOCK PARSER/PLUGIN GENERATOR FUNCTIONS
+
+function syntaxBlock(opts: { symb: [string, string], tag?: string, render?: (contents: string) => string }) {
+  if (!opts.tag) opts.tag = ''
+  const type = opts.symb + (opts.tag !== '' ? opts.tag : '_synExt')
+  return (md: MarkdownIt) => {
+    md.block.ruler.after('blockquote', type, (state, startLine, endLine, silent) => {
+      if (silent) return false
+      const start = state.bMarks[startLine] + state.tShift[startLine]
+      const max = state.eMarks[startLine]
+      const [symbStart, symbEnd] = opts.symb
+      const [lenStart, lenEnd] = [symbStart.length, symbEnd.length]
+      if ((start + lenStart) > max) return false
+      if (state.src.substr(start, lenStart) !== symbStart) return false
+
+      let nextLine = startLine
+      while (nextLine <= endLine) {
+        nextLine++
+        if (nextLine > endLine) return false
+        const start = state.bMarks[nextLine] + state.tShift[nextLine]
+        const max = state.eMarks[nextLine]
+        if ((start + lenEnd) > max) continue
+        // check if the block end symbol is at the end of our line
+        if (state.src.substr(start, max - start).trim().endsWith(symbEnd)) break
+        // check at start of line
+        if (state.src.substr(start, lenEnd) !== symbEnd) continue
+        // matched!
+        break
+      }
+      state.line = nextLine + 1
+      const len = state.sCount[startLine]
+
+      if (!opts.render) {
+        const token = state.push(type, opts.tag as string, 0)
+        token.content = state.getLines(startLine + 1, nextLine, len, true)
+        token.markup = symbStart
+        token.map = [startLine, state.line]
+      } else
+        state.push(type, opts.tag as string, 0)
+          .markup = state.getLines(startLine + 1, nextLine, len, true)
+
+      return true
+    })
+    if (opts.render) md.renderer.rules[type] = (tokens, idx) => (opts.render as any)(tokens[idx].markup)
+  }
+}
+
+function syntaxLine(opts: { symb: string, tag?: string, render?: (contents: string) => string }) {
+  if (!opts.tag) opts.tag = ''
+  const type = opts.symb + (opts.tag !== '' ? opts.tag : '_synExt')
+  return (md: MarkdownIt) => {
+    md.block.ruler.after('blockquote', type, (state, startLine, endLine, silent) => {
+      if (silent) return false
+      const start = state.bMarks[startLine] + state.tShift[startLine]
+      const max = state.eMarks[startLine]
+      const len = opts.symb.length
+      if ((start + len) > max) return false
+      if (state.src.substr(start, len) !== opts.symb) return false
+
+      state.line = startLine + 1
+
+      if (!opts.render) {
+        const startToken = state.push(type + '_open', opts.tag as string, 1)
+        startToken.markup = opts.symb
+        startToken.map = [startLine, state.line]
+
+        const inline = state.push('inline', '', 0)
+        inline.content = state.src.substr(start + len, max)
+        inline.map = [startLine, state.line]
+        inline.children = []
+
+        const endToken = state.push(type + '_close', opts.tag as string, -1)
+        endToken.markup = opts.symb
+      } else
+        state.push(type, opts.tag as string, 0)
+          .markup = state.src.substr(start + len, max)
+
+      return true
+    })
+    if (opts.render) md.renderer.rules[type] = (tokens, idx) => (opts.render as any)(tokens[idx].markup)
+  }
+}
+
+// -- INLINE PARSER/PLUGIN GENERATOR FUNCTIONS
 
 interface SyntaxChainOpts {
   after?: string
@@ -561,16 +707,5 @@ function syntaxSymbol(opts: { symb: string, tag?: string, render?: (contents: st
       return true
     })
     if (opts.render) md.renderer.rules[type] = (tokens, idx) => (opts.render as any)(tokens[idx].markup)
-  }
-}
-
-function onEachToken(onToken: string, fn: (token: Token) => void) {
-  return (md: MarkdownIt) => {
-    md.core.ruler.push(onToken + '_post_tokenized', (state) => {
-      state.tokens
-        .filter(token => token.type === onToken)
-        .forEach(token => fn(token))
-      return true
-    })
   }
 }

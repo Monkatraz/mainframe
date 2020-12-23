@@ -49,7 +49,7 @@
         "bundle": [
           "static/js/workers/md-renderer.js",
           "static/js/modules/markdown.js",
-          "static/js/modules/components.js"
+          "static/js/modules/anime.js"
         ],
         "preload": true,
         "minify": true

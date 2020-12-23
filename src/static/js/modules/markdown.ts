@@ -72,8 +72,10 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
   for (const attr of ['src', 'href', 'action', 'xlink:href']) if (node.hasAttribute(attr))
     node.setAttribute(attr, (node.getAttribute(attr) ?? '').replace(/http:/, 'https:'))
 
-  // makes all imgs crossorigin
-  if (node instanceof HTMLImageElement) node.setAttribute('crossorigin', '')
+  if (node instanceof HTMLImageElement) {
+    node.setAttribute('crossorigin', '')
+    node.setAttribute('loading', 'lazy')
+  }
 })
 
 // -- PRISM

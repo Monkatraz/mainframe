@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { sleep } from '@modules/util'
-  import { tnAnime, load } from '@modules/components'
+  import { tnAnime } from '@modules/anime'
   import { renderMarkdown, Prism } from '@modules/markdown'
   import { fade } from 'svelte/transition'
   import Spinny from './Spinny.svelte'
@@ -10,6 +10,8 @@
   export let loading: Promise<string>
 
   let hideActionsPanel = true
+
+  const onPageLoad = (elem: HTMLElement) => Prism.highlightAllUnder(elem)
 
   const pageReveal = {
     opacity: {
@@ -36,7 +38,7 @@
   <!-- Page loaded -->
   {:then html }
     <div class=rhythm role=presentation
-      in:tnAnime={pageReveal} use:load={Prism.highlightAllUnder}
+      in:tnAnime={pageReveal} use:onPageLoad
     >
       {@html html}
     </div>

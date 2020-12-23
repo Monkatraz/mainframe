@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import { tnAnime } from '@js/modules/components';
+  import { tnAnime } from '@modules/anime';
 
   export let top = '50%'
   export let left = '50%'

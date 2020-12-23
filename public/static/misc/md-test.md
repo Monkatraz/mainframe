@@ -28,10 +28,12 @@
 ##### Special:
 | | | |
 | :--: | :-- | :-- |
+| `` `...` `` | Monospace | `Monospaced text.`
+| `` `lang|...` ``| Inline Code | `js|console.log('Inline code!')`
 | `$...$` | Math (TeX) | $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$.
 | `@@...@@`| Escaped | @@/This text is __escaped__, and **will only be rendered as plain text.**/@@
 
-###### Inline Spans
+###### Inline Spans:
 -	#font sans|Here is the sans font.|#
 -	#font display|Here is the display font.|#
 - #font serif|Here is the serif font.|#
@@ -42,11 +44,27 @@
 - #font bold|Bold.|# #font light|Light.|#
 - #font bolder|Bolder.|# #font lighter|Lighter.|#
 - #font 1em|1em|# #font 1.5em|1.5em|# #font 2em|2em|# #font 2.5em|2.5em|# #font 3em|3em|#
+- #font 150%|150%|# #font 12px|12px|# #font 2rem|2rem|#
 - #font handwriting bold 1.25em|Mixed font style text.|#
 
 - #class fs-serif|Setting font class manually.|#
 - #class fs-mono token function|Multiple classes.|#
 - #class fs-serif|Nesting #color red|with|# #font sans bold|inline elements.|#|#
+
+###### Block:
+Term 1
+:	Definition 1
+: Definition 2
+
+	More of definition 2.
+	
+Term 2
+	~ Definition 1
+	~ Definition 2
+
+Term 3
+	: Definition 1
+	: Definition 2
 
 ##### Math
 $\begin{aligned}
@@ -55,6 +73,33 @@ $\begin{aligned}
 \end{aligned}$
 
 $f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi$
+
+$$$
+\begin{aligned}
+\int_0^1\frac{x^4(1-x)^4}{1+x^2}\,dx &=\frac{22}{7}-\pi\\ \\
+\int_{-\infty}^\infty e^{-x^2}\,dx &=\sqrt{\pi}
+\end{aligned} \\
+
+f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi \\
+
+\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi} \\
+
+\begin{aligned}
+\int_0^1\frac{x^4(1-x)^4}{1+x^2}\,dx &=\frac{22}{7}-\pi\\ \\
+\int_{-\infty}^\infty e^{-x^2}\,dx &=\sqrt{\pi}
+\end{aligned}
+$$$
+
+// Comments
+// This is a line comment.
+This is some content, with this /* comment */ (comment that isn't rendered) running through it.
+This is some content with a comment at the very end. // A comment.
+
+/* This is a 
+	block comment.
+*/
+/* This pattern
+ * looks cleaner. */
 
 ## Tests
 ***

@@ -8,6 +8,9 @@ declare module '@types/prismjs' {
   let manual: boolean
 }
 
+declare module 'markdown-it-multimd-table'
+declare module 'markdown-it-deflist'
+
 // Project-Wide Additions
 declare global {
   // Function Types

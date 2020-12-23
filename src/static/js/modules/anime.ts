@@ -1,18 +1,10 @@
 /**
- * @file Library for Svelte components.
+ * @file AnimeJS wrapper for Svelte.
  * @author Monkatraz
  */
 
 // Imports
 import anime, { AnimeParams } from 'animejs'
-
-/** Runs the provided function as soon as the attached element is created. */
-export function load(elem: Element, fn: (arg: Element) => void) {
-  fn(elem)
-}
-
-// -------
-//  ANIME
 
 /** Creates a function that will play an animejs animation. Specifically for use with Svelte `use:fn`. */
 export function usAnime(opts: AnimeParams) {
@@ -33,16 +25,12 @@ const TNANIME_FORCED_OPTS: AnimeParams = {
 */
 export function tnAnime(elem: Element, opts: AnimeParams) {
   const safeOpts = { ...opts, ...TNANIME_FORCED_OPTS, targets: elem }
-
   const anim = anime(safeOpts)
-  const delay = opts?.delay ?? 0
-  const duration = anim.duration
-
   return () => {
     anim.play()
     return {
-      delay,
-      duration
+      delay: anim.delay,
+      duration: anim.duration
     }
   }
 }
@@ -51,9 +39,7 @@ export function tnAnime(elem: Element, opts: AnimeParams) {
 export function evAnime(opts: AnimeParams) {
   return (event: Event) => {
     if (!event?.target) return
-    // Set up options
     const safeOpts = { ...opts, targets: event.target, autoplay: true }
-    // Execute animation
     return anime(safeOpts)
   }
 }

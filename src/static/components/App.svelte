@@ -2,7 +2,7 @@
   // Imports
   import * as API from '@js/modules/api'
   import { ENV } from '@modules/util'
-  import { usAnime } from '@modules/components'
+  import { usAnime } from '@modules/anime'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import Page from './Page.svelte'
