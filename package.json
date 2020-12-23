@@ -36,7 +36,7 @@
     "autoprefixer": "^10.1.0",
     "css-mquery-packer": "^1.2.4",
     "eslint": "latest",
-    "fs-extra": "^7.0.1",
+    "fs-extra": "^9.0.1",
     "patch-package": "^6.2.2",
     "postcss": "^8.2.1",
     "snowpack": "2.18.4",
