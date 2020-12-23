@@ -29,20 +29,21 @@
 | `@@...@@`| Escaped | @@/This text is __escaped__, and **will only be rendered as plain text.**/@@
 
 ###### Inline Spans
--	#font sans|Here is the sans font.#
--	#font display|Here is the display font.#
-- #font serif|Here is the serif font.#
-- #font mono|Here is the mono font.#
-- #font handwriting|Here is the handwriting font.#
-- #font cursive|Here is the cursive font.#
-- #font 100|100# #font 200|200# #font 300|300# #font 400|400# #font 500|500# #font 600|600# #font 700|700# #font 800|800# #font 900|900#
-- #font bold|Bold.# #font light|Light.#
-- #font bolder|Bolder.# #font lighter|Lighter.#
-- #font 1em|1em# #font 1.5em|1.5em# #font 2em|2em# #font 2.5em|2.5em# #font 3em|3em#
-- #font handwriting bold 1.25em|Mixed font style text.#
+-	#font sans|Here is the sans font.|#
+-	#font display|Here is the display font.|#
+- #font serif|Here is the serif font.|#
+- #font mono|Here is the mono font.|#
+- #font handwriting|Here is the handwriting font.|#
+- #font cursive|Here is the cursive font.|#
+- #font 100|100|# #font 200|200|# #font 300|300|# #font 400|400|# #font 500|500|# #font 600|600|# #font 700|700|# #font 800|800|# #font 900|900|#
+- #font bold|Bold.|# #font light|Light.|#
+- #font bolder|Bolder.|# #font lighter|Lighter.|#
+- #font 1em|1em|# #font 1.5em|1.5em|# #font 2em|2em|# #font 2.5em|2.5em|# #font 3em|3em|#
+- #font handwriting bold 1.25em|Mixed font style text.|#
 
-- #class fs-serif|Setting font class manually.#
-- #class fs-mono token function|Multiple classes.#
+- #class fs-serif|Setting font class manually.|#
+- #class fs-mono token function|Multiple classes.|#
+- #class fs-serif|Nesting #color red|with|# #font sans bold|inline elements.|#|#
 
 ##### Math
 $\begin{aligned}

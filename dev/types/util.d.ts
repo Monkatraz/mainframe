@@ -7,6 +7,7 @@ import '@types/prismjs'
 declare module '@types/prismjs' {
   let manual: boolean
 }
+
 // Project-Wide Additions
 declare global {
   // Function Types

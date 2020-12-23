@@ -41,6 +41,7 @@
         /* I consent that I am fully aware of the stupid type mangling I am commiting. /s */
         /* Additionally, I dislike having to type things that already have a strong implicit type. */
         "@typescript-eslint/no-explicit-any": "off",
+        "@typescript-eslint/no-non-null-assertion": "off",
         "@typescript-eslint/ban-types": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
         /* I just find this lint error annoying. */

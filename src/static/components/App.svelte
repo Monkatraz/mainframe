@@ -149,7 +149,6 @@
 
 </style>
 
-<!-- Non editor paths (basically we have two apps, one is edit, one isn't) -->
 <Route>
   {#if $router.path.startsWith('/edit') === false}
     <div class=container out:fade={{duration: 50}} role=presentation>

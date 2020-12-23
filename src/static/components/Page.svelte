@@ -53,8 +53,8 @@
       <h2>Error Displaying Page</h2>
       <hr>
       <pre class=code><code>
-        ERR: {error?.name}: {error?.message}
-        MSG: {error?.description}
+ERR: {error?.name}: {error?.message}
+MSG: {error?.description}
       </code></pre>
     </div>
   {/await}
