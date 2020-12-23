@@ -93,6 +93,36 @@ del
   text-decoration: underline colvar('critic-deleted') 0.125em
   text-decoration-skip-ink: none
 
+// Substitution arrow. ~>
+span.critic-sub-arrow
+  background: colvar('critic-sub-arrow', opacity 0.25)
+  padding: 0 0.5em
+
+// Highlighted text. {== ==}
+mark.critic-highlighted
+  background: colvar('critic-highlighted', opacity 0.25)
+  text-decoration: underline colvar('critic-highlighted') 0.125em
+  text-decoration-skip-ink: none
+
+// Comment metadata. {>> <<}
+span.critic-metadata
+  position: absolute
+  font-size: 70%
+  transform: translate(-50%, 100%)
+  z-index: 1
+  text-decoration: underline colvar('critic-comment') 0.125em
+  color: colvar('critic-comment')
+  transition: background 0.05s, padding 0.1s, color 0.1s, transform 0.05s, font-size 0.05s
+
+  // TODO: make work on active for mobile
+  +on-hover()
+    background: colvar('critic-comment')
+    color: white
+    padding: 0.1em 0.25em
+    font-size: 100%
+    transform: translate(-50%, 50%)
+    border-radius: 0.25em
+
 // -- A11Y
 
 // Makes tags more semantic and meaningful for screen-readers.

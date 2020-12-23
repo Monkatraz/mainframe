@@ -61,7 +61,7 @@ import type Token from 'markdown-it/lib/token'
 // ^  -> <sup>
 // ~  -> <sub>
 // ? /\^\d[\d,]*\b/ | x^1 only
-// ? /\~\d[\d,]*\b/ | x~1 only
+// ? /~\d[\d,]*\b/ | x~1 only
 // -- -> <s>
 // == -> <mark>
 
@@ -71,11 +71,11 @@ import type Token from 'markdown-it/lib/token'
 // @@ -> (escaping)
 
 // criticmarkup
-// {++ ++} -> ins
-// {-- --} -> del
-// ? {~~ ~> ~~} -> ?
-// ? {>> <<} -> ?
-// ? {== ==}{>> <<} -> ?
+// {++ ++}
+// {-- --}
+// {~~ ~> ~~}
+// {== ==}
+// {>> <<}
 
 // inline formatting elements:
 // #color col|...|#
@@ -154,6 +154,23 @@ const synExt = [
   // CriticMarkup
   syntaxBrackets({ symb: ['{++', '++}'], tag: 'ins' }),
   syntaxBrackets({ symb: ['{--', '--}'], tag: 'del' }),
+  syntaxBrackets({ symb: ['{==', '==}'], tag: 'mark', class: 'critic-highlighted' }),
+  syntaxBrackets({ symb: ['{>>', '<<}'], tag: 'span', class: 'critic-metadata' }),
+  syntaxChain('critic_substitution', parserChain([
+    { match: /{~~/, tag: 'span' },
+    { match: /.*?/, tag: 'del/' },
+    { match: /~>/, type: 'arrow' },
+    { match: /.*?/, tag: 'ins/' },
+    { match: /~~}/, tag: '/span' }
+  ]), {
+    parse: {
+      arrow: (state, name) => {
+        state.push(name + '_open', 'span', 1).attrSet('class', 'critic-sub-arrow')
+        state.push('text', '', 0).content = '⇝'
+        state.push(name + '_close', 'span', -1)
+      }
+    }
+  }),
 
   // Katex
   syntaxWrap({ symb: '$', render: (str) => katex.renderToString(str, { throwOnError: false }) }),
@@ -382,14 +399,19 @@ function syntaxChain(name: string, parse: ReturnType<typeof parserChain>, opts: 
 
       let idx = 0
       for (const token of tokens) {
+        const tokenName = name + '_' + token.type
         if (token.type === 'nest') inlineTokenize(state, start + token.start, start + token.end)
         else if (token.type === 'text') state.push('text', '', 0).content = token.text
         else if (opts?.parse && token.type in opts.parse)
-          opts.parse[token.type].bind(md)(state, name + '_' + token.type, token, idx, tokens)
+          opts.parse[token.type].bind(md)(state, tokenName, token, idx, tokens)
         else if (token.tag) {
           const [tag, nesting] = parseTag(token.tag)
-          state.push(name + '_' + token.type, tag, nesting)
-            .markup = token.text
+          if (nesting !== 0) state.push(tokenName, tag, nesting).markup = token.text
+          else {
+            state.push(tokenName + '_open', tag, 1)
+            inlineTokenize(state, start + token.start, start + token.end)
+            state.push(tokenName + '_close', tag, -1)
+          }
         }
         idx++
       }
@@ -482,7 +504,9 @@ function syntaxWrap(opts: { symb: string, tag?: string, render?: (contents: stri
   }
 }
 
-function syntaxBrackets(opts: { symb: [string, string], tag?: string, render?: (contents: string) => string }) {
+function syntaxBrackets(opts: {
+  symb: [string, string], tag?: string, class?: string, render?: (contents: string) => string
+}) {
   return (md: MarkdownIt) => {
     if (!opts.tag) opts.tag = ''
     const type = opts.symb[0] + opts.symb[1] + (opts.tag !== '' ? opts.tag : '_synExt')
@@ -508,7 +532,8 @@ function syntaxBrackets(opts: { symb: [string, string], tag?: string, render?: (
       if (opts.render) state.push(type, opts.tag as string, 0)
         .markup = state.src.substr(posStart, pos - posStart)
       else {
-        state.push(type, opts.tag as string, 1)
+        const startToken = state.push(type, opts.tag as string, 1)
+        if (opts.class) startToken.attrSet('class', opts.class)
         inlineTokenize(state, posStart, pos)
         state.push(type, opts.tag as string, -1)
       }

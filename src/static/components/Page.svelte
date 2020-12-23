@@ -16,7 +16,7 @@
       value: [0, 1],
       duration: 300,
       easing: 'easeOutQuad',
-      delay: 50
+      delay: 100
     },
     translateY: {
       value: ['-4rem', '0rem'],
@@ -44,7 +44,7 @@
     <IntersectionPoint
       onEnter={() => hideActionsPanel = true}
       onExit={() => hideActionsPanel = false}
-      opts={{rootMargin: '300px'}}/>
+      opts={{rootMargin: '400px'}}/>
     <ActionsPanel bind:hidden={hideActionsPanel}/>
 
   <!-- Page failed to load -->

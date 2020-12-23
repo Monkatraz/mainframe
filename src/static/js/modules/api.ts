@@ -199,7 +199,7 @@ export function getStatusCode(err: Error) {
   return 400
 }
 
-/** FaunaDB JS FQL driver extension. 
+/** FaunaDB JS FQL driver extension.
  *  All functions within map to valid FaunaDB JS driver functions.
  *  AKA these functions do not map to database-side UDF functions.
 */

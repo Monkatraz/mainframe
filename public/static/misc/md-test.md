@@ -21,6 +21,9 @@
 | :--: | :-- | :-- |
 | `{++...++}` | Addition | {++You should add this text.++}
 | `{--...--}` | Deletion | {--You should delete this text.--}
+| `{~~...~>...~~}` | Substitution | {~~Replace this,~>With this.~~}
+| `{==...==}` | Highlight | {==You should take note of this text.==}
+| `{>>...<<}` | Comment | {==This highlighted text is...==}{>>Folllowed by a comment.<<}
 
 ##### Special:
 | | | |
@@ -58,6 +61,7 @@ $f(x) = \int_{-\infty}^\infty\hat f(\xi)\,e^{2 \pi i \xi x}\,d\xi$
 - Nested syntax: 10^10~20~^
 	- ==test ~~one~~ two== ~~one~two~three~~
 - Nested brackets: {++ ins1 {++ ins2 ++} {-- del --} ++}
+- Comments in a pargraph: Sint sit cillum pariatur eiusmod nulla pariatur ipsum. Sit laborum anim qui mollit tempor pariatur nisi minim dolor. Aliquip et{>>Here is a comment<<} adipisicing sit sit fugiat commodo id sunt. Nostrud enim ad commodo incididunt cupidatat in ullamco ullamco Lorem cupidatat velit enim et Lorem.
 		
 #### Styling Tests
 - Links:
