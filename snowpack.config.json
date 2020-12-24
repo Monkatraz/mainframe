@@ -49,7 +49,9 @@
         "bundle": [
           "static/js/workers/md-renderer.js",
           "static/js/modules/markdown.js",
-          "static/js/modules/anime.js"
+          "static/js/modules/anime.js",
+          "web_modules/monaco-editor/esm/vs/editor/editor.worker.js",
+          "static/components/editor/monaco.js"
         ],
         "preload": true,
         "minify": true

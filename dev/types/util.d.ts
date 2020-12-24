@@ -14,7 +14,7 @@ declare module 'markdown-it-deflist'
 // Project-Wide Additions
 declare global {
   // Function Types
-  type NoReturnVal = void | undefined
+  type NoReturnVal = void | undefined | Promise<void>
   type AnyFn<T = void> = (...args: any) => T
   type WrappedFn<T> = (...args: any) => T
   type WrappedPromiseFn<T> = (...args: any) => Promise<T>

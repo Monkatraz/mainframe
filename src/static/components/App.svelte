@@ -6,6 +6,7 @@
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import Page from './Page.svelte'
+  import Spinny from './Spinny.svelte'
 
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
@@ -151,7 +152,7 @@
 
 <Route>
   {#if $router.path.startsWith('/edit') === false}
-    <div class=container out:fade={{duration: 50}} role=presentation>
+    <div class=container out:fade={{duration: 100}} role=presentation>
 
       <nav class=navbar use:navBarReveal aria-label=Navigation/>
       <aside class=sidebar use:sideBarReveal aria-label=Sidebar/>
@@ -188,5 +189,12 @@
         </Route>
       </main>
     </div>
+    {:else}
+    <!-- Async. load the editor -->
+    {#await import('./Editor.svelte')}
+      <Spinny width=150px top=50% left=50%/>
+    {:then Editor} 
+      <svelte:component this={Editor.default}/>
+    {/await}
   {/if}
 </Route>

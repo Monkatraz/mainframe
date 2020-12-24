@@ -29,7 +29,6 @@ const RENDER_TIMEOUT = 10000
  *  Calling this function multiple times is safe - it will render one request at a time.
  */
 export const renderMarkdown = createLock((raw: string): Promise<string> => {
-  console.time('md-render-perf')
   return new Promise((resolve, reject) => {
     // Timeout reject scenario
     const rejectTimer = setTimeout(() => {
@@ -45,7 +44,6 @@ export const renderMarkdown = createLock((raw: string): Promise<string> => {
       // unfortunately DOMPurify requires a reference to Window and Window.document
       // so we have to purify here, I would've liked to have done it in the worker
       resolve(DOMPurify.sanitize(evt.data as string))
-      console.timeEnd('md-render-perf')
     }
     // everything's ready, send message to worker
     renderWorker.postMessage(raw)

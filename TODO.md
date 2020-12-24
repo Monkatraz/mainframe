@@ -1,7 +1,6 @@
 # Mainframe
 
 ### In Progress
-- [ ] Add CodeJar+Prism editor component and Markdown lang.
 - [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
 - [ ] Implement Popper
 
@@ -36,7 +35,6 @@
 - Some sort of "alert" component that pops up and then fades programmatically
 
 #### Editor
-- Split pane editor panel
 - Validations list to the side
 - Single-pane Markdown cheat sheet
 - Path type restrictions
@@ -98,3 +96,4 @@
 - [x] Get rid of PostCSS-center (update header)
 - [x] Generic web workers
 - [x] Switch to Vercel due to even better pricing and FOSS ideals
+- [x] Add Monaco editor component and Markdown lang.
