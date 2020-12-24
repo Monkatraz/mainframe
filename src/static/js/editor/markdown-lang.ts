@@ -1,3 +1,8 @@
+/**
+ * @file Extended Markdown language definition for the Monaco editor.
+ * @author Monkatraz
+ */
+
 export const conf = {
   comments: {
     // ? add block comment syntax

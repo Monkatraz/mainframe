@@ -1,5 +1,5 @@
 diff --git a/node_modules/snowpack/lib/build/optimize.js b/node_modules/snowpack/lib/build/optimize.js
-index c070f78..155021f 100644
+index c070f78..b0be869 100644
 --- a/node_modules/snowpack/lib/build/optimize.js
 +++ b/node_modules/snowpack/lib/build/optimize.js
 @@ -334,7 +334,7 @@ async function processEntrypoints(originalEntrypointValue, entrypointFiles, buil
@@ -11,7 +11,15 @@ index c070f78..155021f 100644
      var _a;
      const { outputFiles, warnings } = await esbuildService.build({
          entryPoints: bundleEntrypoints,
-@@ -349,6 +349,7 @@ async function runEsbuildOnBuildDirectory(bundleEntrypoints, config, esbuildServ
+@@ -342,13 +342,14 @@ async function runEsbuildOnBuildDirectory(bundleEntrypoints, config, esbuildServ
+         outbase: config.buildOptions.out,
+         write: false,
+         bundle: true,
+-        splitting: true,
++        splitting: false,
+         format: 'esm',
+         platform: 'browser',
+         metafile: path_1.default.join(config.buildOptions.out, 'build-manifest.json'),
          publicPath: config.buildOptions.baseUrl,
          minify: config.experiments.optimize.minify,
          target: config.experiments.optimize.target,

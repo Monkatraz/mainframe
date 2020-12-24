@@ -256,7 +256,7 @@ const synExt = [
   (md: MarkdownIt) => md.disable('strikethrough').disable('emphasis').disable('code'),
 
   // Post render operations
-  // onEachToken('heading_open', (token) => { token.attrJoin('class', 'heading') }),
+  // onEachToken('fence', (token) => { if (token.info) token.attrJoin('class', 'code') }),
   // (md: MarkdownIt) => md.core.ruler.push('export_state', (state) => {
   //   tunnelTokens(Array.from(state.tokens))
   //   return true

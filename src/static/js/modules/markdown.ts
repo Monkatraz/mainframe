@@ -81,4 +81,4 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
 export const Prism = window.Prism
 Prism.manual = true
 // Divert languages to CDN instead of storing them ourselves
-Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.21.0/components/'
+Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/components/'

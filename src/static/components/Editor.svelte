@@ -1,12 +1,21 @@
 <script context="module" lang="ts">
   // Import Monaco and its features
-  import * as monaco from './editor/monaco'
-  import * as mdLang from './editor/markdown-lang'
+  import * as monaco from '@js/editor/monaco'
+  import * as mdLang from '@js/editor/markdown-lang'
 
   (self as any).MonacoEnvironment = {
     getWorker: function(moduleId:string, label:string) {
       console.log("Getting worker", moduleId, label)
-      return new Worker('web_modules/monaco-editor/esm/vs/editor/editor.worker.js', {
+      let workerURL = '/static/js/workers/monaco-worker.js'
+      if (label === 'json')
+        workerURL = '/static/js/workers/monaco-worker-json.js'
+      else if (label === 'css')
+        workerURL = '/static/js/workers/monaco-worker-css.js'
+      else if (label === 'html')
+        workerURL = '/static/js/workers/monaco-worker-html.js'
+      else if (label === 'typescript' || label === 'javascript')
+        workerURL = '/static/js/workers/monaco-worker-ts.js'
+      return new Worker(workerURL, {
         type: import.meta.env.MODE === 'development' ? "module" : "classic"
       })
     }
@@ -139,10 +148,13 @@
   let editorContainer: HTMLElement
   let editor: ReturnType<typeof monaco['editor']['create']>
 
+  // Preview Updating
   let html = ''
+  let preview: HTMLElement
   const updateHTML = throttle(async () => { html = await renderMarkdown(editor.getValue()) }, 100)
-  const onPageLoad = (elem: HTMLElement) => Prism.highlightAllUnder(elem)
+  const onPageLoad = throttle(() => { if(preview) { Prism.highlightAllUnder(preview) } }, 1000)
 
+  // Load Editor
   onMount(() => {
     editor = monaco.editor.create(editorContainer, {
       language: 'markdown',
@@ -304,7 +316,7 @@
   <div class=editor bind:this={editorContainer}/>
   <div class=preview>
     {#key html}
-      <div class=rhythm use:onPageLoad>
+      <div class=rhythm use:onPageLoad bind:this={preview}>
         {@html html}
       </div>
     {/key}
