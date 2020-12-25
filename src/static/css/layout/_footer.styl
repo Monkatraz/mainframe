@@ -3,6 +3,12 @@
 :root
   --layout-footer-height: 2rem
 
+@keyframes footer-load
+  from
+    opacity: 0
+  to
+    opacity 1
+
 #footer
   height: var(--layout-footer-height)
   background: colvar('gray')
@@ -11,6 +17,9 @@
   font-size: 1rem
   font-weight: 400
   padding: 0.25rem 0
+
+  // Delays the appearence of the footer to prevent a flash on page load
+  animation: footer-load 0.25s 1 0.5s ease backwards
 
 #footer_list
   display: flex

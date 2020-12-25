@@ -7,9 +7,13 @@ import MarkdownIt from 'markdown-it'
 import MDMultiMDTables from 'markdown-it-multimd-table'
 import MDDefLists from 'markdown-it-deflist'
 import katex from 'katex'
+// Import Prism
+import "@vendor/prism.js"
+const Prism = self.Prism
 // Used for md-it extensions
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
 import type Token from 'markdown-it/lib/token'
+import ParserInline from 'markdown-it/lib/parser_inline'
 
 // Before you dig into the depths of this file, read this:
 //  1. Mainframe /differs from the fundamental syntax of the Commonmark spec in some ways./
@@ -132,9 +136,6 @@ import type Token from 'markdown-it/lib/token'
 // [ ] -> <input type=checkbox disabled>
 // [x] -> <input type=checkbox disabled checked>
 
-
-// -- SYNTAX EXTENSIONS
-
 // ? attrsdef: ![param] (defined default parameter) | ...([param]: default (defined) | [name] (undefined))
 // const parseKeyVals = syntaxChain('keyvals',
 //   [/\s*\[/, 'key', /]:?\s*/, { val: /./, repeat: true, optional: true }], { loop: true }).parse
@@ -147,6 +148,89 @@ import type Token from 'markdown-it/lib/token'
 //   })
 //   return keyvals
 // }
+
+// -- CACHE
+
+/** General purpose cache for the renderer. */
+const mdCache: Map<number, any> = new Map()
+
+// https://stackoverflow.com/a/8831937
+function quickHash(str: string) {
+  let hash = 0
+  for (const i of str) {
+    hash = ((hash << 5) - hash) + i.charCodeAt(0)
+    hash = hash & hash // Convert to 32bit integer
+  }
+  return hash
+}
+
+// https://stackoverflow.com/a/11900218
+function roughSizeOfObject(object: any) {
+  const objectList = []
+  const stack = [object]
+  let bytes = 0
+  while (stack.length) {
+    const value = stack.pop()
+    if (typeof value === 'boolean') bytes += 4
+    else if (typeof value === 'string') bytes += value.length * 2
+    else if (typeof value === 'number') bytes += 8
+    else if (typeof value === 'object' && objectList.indexOf(value) === -1) {
+      objectList.push(value)
+      for (const i in value) stack.push(value[i])
+    }
+  }
+  return bytes
+}
+
+/** A function that caches the results of functions based off an unique ID.
+ *  The ID itself is hashed into a small number - so feed in as big of a string as you want for the ID.
+ *  Used within the renderer widely to massively improve the performance of code blocks and tex expressions.
+ *  This is an absolutely essential optimization in the live preview mode of the editor.
+ */
+function cache<T extends WrappedFn<any>>(fn: T, id: string): ReturnType<T> {
+  const hash = quickHash(id)
+  if (mdCache.has(hash)) {
+    const result = mdCache.get(hash) as any
+    // This usually clears the cache at about 300-700kb.
+    // Which really, is just not a large amount of memory to be using for this.
+    if (mdCache.size > 512) {
+      const size = Math.round(roughSizeOfObject(Array.from(mdCache)) / 1024)
+      console.info(`[md-renderer] Cache flushed. Rough size: ${size}kb`)
+      mdCache.clear()
+    }
+    return result
+  } else {
+    const result = fn() as any
+
+    let doCache = true
+    // some basic checks to avoid caching stupidly huge objects
+    if (typeof result === 'string' && result.length > 65536) doCache = false
+    else if (result instanceof Array && result.length > 128) doCache = false
+
+    if (doCache) mdCache.set(hash, result)
+    return result
+  }
+}
+
+// This is some wizardy - but we're replacing the standard markdown-it parser handler with our own.
+// The reason why is so that we can cache /entire blocks/, and improve live preview performance.
+ParserInline.prototype.parse = function (str, md, env, outTokens) {
+  const state = new this.State(str, md, env, outTokens)
+  // The magic! markdown-it mutates the outTokens array, so we need to as well.
+  let mutated = false
+  const tokens = cache(() => {
+    this.tokenize(state)
+    const rules = this.ruler2.getRules('')
+    const len = rules.length
+    for (let i = 0; i < len; i++) rules[i](state)
+    mutated = true
+    return outTokens
+  }, str + '##PARSER_INLINE##')
+  // mutation garbage.....
+  if (!mutated) tokens.forEach(token => outTokens.push(token))
+}
+
+// -- SYNTAX EXTENSIONS
 
 const TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~/|]/
 const synExt = [
@@ -188,8 +272,14 @@ const synExt = [
   }),
 
   // Katex
-  syntaxWrap({ symb: '$', render: (str) => katex.renderToString(str, { throwOnError: false }) }),
-  syntaxBlock({ symb: ['$$$', '$$$'], render: (str) => katex.renderToString(str, { throwOnError: false }) }),
+  syntaxWrap({
+    symb: '$',
+    render: (str) => cache(() => katex.renderToString(str, { throwOnError: false }), str + '##KATEX##')
+  }),
+  syntaxBlock({
+    symb: ['$$$', '$$$'],
+    render: (str) => cache(() => katex.renderToString(str, { throwOnError: false }), str + '##KATEX##')
+  }),
 
   // Inline Elements | #elem param param|text|#
   // opens a generic inline element span
@@ -208,8 +298,8 @@ const synExt = [
           case 'font': {
             let family = '', weight = '', size = ''
             for (const param of tokens) if (param.type === 'param') {
-              if (param.text.match(/^[\d.]+?(%|\w{2,})$/)) size = param.text
-              else if (/^(\d{3}|bolder|lighter|bold|light)$/.test(param.text)) weight = param.text
+              if (/^(\d{3}|bolder|lighter|bold|light)$/.test(param.text)) weight = param.text
+              else if (param.text.match(/^[\d.]+?(%|\w{2,})$/)) size = param.text
               else family = param.text
             }
             token.attrSet('style', inlineStyle({ 'font-weight': weight, 'font-size': size }))
@@ -230,20 +320,32 @@ const synExt = [
 
   // Inline code blocks
   syntaxChain('inline-code', parserChain([
-    { match: /`+/, tag: 'code' },
+    { match: /`+/ },
     { match: /\w+/, type: 'lang' },
     { match: /\s*\|\s*/ },
-    { match: /.*?/, type: 'text' },
+    { match: /.*?/, type: 'code' },
     { match: /`+/, tag: '/code' }
   ]), {
     after: 'escape',
     parse: {
-      'lang': (state, name, tokenIR, idx, tokens) => {
-        const token = state.tokens[state.tokens.length - 1]
-        token.attrSet('class', 'language-' + tokenIR.text)
+      'lang': (state, name, tokenIR) => {
+        state.push(name, 'code', 1)
+          .attrSet('class', `code language-${tokenIR.text}`)
+      },
+      'code': (state, name, tokenIR, idx, tokens) => {
+        const lang = tokens[idx - 2].text
+        const token = state.push('fence-inline', 'code', 0)
+        token.info = lang
+        token.content = tokenIR.text
       }
     }
   }),
+
+  (md: MarkdownIt) => md.renderer.rules['fence-inline'] = (tokens, idx, opts) => {
+    const token = tokens[idx]
+    if (opts.highlight) return opts.highlight(token.content, token.info, '')
+    return md.utils.escapeHtml(token.content)
+  },
 
   // Escaping text
   syntaxWrap({ symb: '@@', render: (str) => str }),
@@ -297,12 +399,26 @@ const synExt = [
 
 // let exportTokens: any
 // const tunnelTokens = (tokens: StateCore['tokens']) => exportTokens = tokens
-const renderer = new MarkdownIt({ html: true, linkify: true, typographer: true })
+const renderer = new MarkdownIt({
+  html: true, linkify: true, typographer: true,
+  // Hooks up Prism to our renderer
+  highlight(str, lang, attrs) {
+    const id = str + '##LANG:' + lang + '##'
+    if (lang in Prism.languages)
+      return cache(() => Prism.highlight(str, Prism.languages[lang], lang), id)
+    else return ''
+  }
+})
 synExt.map(renderer.use, renderer)
 
 onmessage = (evt) => {
+  const perf = performance.now()
   try {
-    postMessage(renderer.render(evt.data))
+    const html = renderer.render(evt.data)
+    postMessage({
+      html,
+      perf: performance.now() - perf
+    })
   } catch (err) {
     postMessage(String(err))
   }

@@ -129,8 +129,8 @@ export function createAnimQueued<T extends WrappedFn<NoReturnVal>>(fn: T) {
   return (...args: Parameters<T>): NoReturnVal => {
     if (queued !== true) {
       queued = true
-      requestAnimationFrame(() => {
-        fn(...args as any)
+      requestAnimationFrame(async () => {
+        await fn(...args as any)
         queued = false
       })
     }

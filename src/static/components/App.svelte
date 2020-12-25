@@ -1,28 +1,35 @@
 <script lang="ts">
   // Imports
   import * as API from '@js/modules/api'
-  import { ENV } from '@modules/util'
-  import { usAnime } from '@modules/anime'
+  import { ENV, sleep } from '@modules/util'
+  import { tnAnime } from '@modules/anime'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
+  import Iconify from '@iconify/iconify'
   import Page from './Page.svelte'
   import Spinny from './Spinny.svelte'
 
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
 
+  const EditorURL = './Editor.js'
+
   // -- ANIMATIONS
-  const sideBarReveal = usAnime({
+  const sideBarReveal = {
     translateX: ['-100%', '0%'],
-    duration: 500,
+    duration: 600,
     easing: 'easeOutElastic(3, 2)',
-    delay: 50
-  })
-  const navBarReveal = usAnime({
+    delay: 150
+  }
+  const navBarReveal = {
     scaleY: [0, 1],
-    duration: 300,
-    easing: 'easeOutElastic(2, 1.25)'
-  })
+    duration: 500,
+    easing: 'easeOutElastic(2, 1.25)',
+    delay: 50
+  }
+
+  let inEdit = false
+  $: if ($router.path.startsWith('/edit')) inEdit = true
 
 </script>
 
@@ -151,11 +158,11 @@
 </style>
 
 <Route>
-  {#if $router.path.startsWith('/edit') === false}
+  {#if !inEdit}
     <div class=container out:fade={{duration: 100}} role=presentation>
 
-      <nav class=navbar use:navBarReveal aria-label=Navigation/>
-      <aside class=sidebar use:sideBarReveal aria-label=Sidebar/>
+      <nav class=navbar in:tnAnime={navBarReveal} aria-label=Navigation/>
+      <aside class=sidebar in:tnAnime={sideBarReveal} aria-label=Sidebar/>
 
       <main class="content" aria-label=Content>
         <!-- Home Page -->
@@ -189,12 +196,17 @@
         </Route>
       </main>
     </div>
-    {:else}
+    {:else if $router.path.startsWith('/edit')}
     <!-- Async. load the editor -->
-    {#await import('./Editor.svelte')}
-      <Spinny width=150px top=50% left=50%/>
-    {:then Editor} 
-      <svelte:component this={Editor.default}/>
-    {/await}
+    <div
+      out:fade={{ duration: 100, delay: 300 }}
+      on:outroend={async () => { await sleep(50); inEdit = false }}
+    >
+      {#await import(EditorURL)}
+        <Spinny width=150px top=50% left=50%/>
+      {:then Editor}
+        <svelte:component this={Editor.default}/>
+      {/await}
+    </div>
   {/if}
 </Route>

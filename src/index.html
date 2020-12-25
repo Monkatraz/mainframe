@@ -90,14 +90,11 @@
 
   <!-- Init. app. This is literally all it takes. -->
   <script async type="module" src="/static/components/App.js"></script>
-  <script async type="module" integrity="sha256-w+5kboX/aYouI2oGHDZKK4He5+6CGyBGgGMr6TSsmEg=">
+  <script async type="module" integrity="sha256-p7nl9n1gjbJ4UDYFpLi+W9sf4UlI06/n12bmMA0pMkQ=">
     import AppComponent from '@components/App.svelte'
-    const App = new AppComponent({ target: document.querySelector('#app') })
+    const App = new AppComponent({ target: document.querySelector('#app'), intro: true })
   </script>
 
-  <!-- Init. vendor scripts.
-       Vendor scripts will require that their domain be exempted in the CSP. -->
-  <script async src="https://code.iconify.design/2/2.0.0-rc.1/iconify.min.js" integrity="sha256-n8sroMhlgtUcqw3RWkiajIdWSuwjhoCGzuVLjNKKbe8=" crossorigin></script>
 </body>
 
 </html>

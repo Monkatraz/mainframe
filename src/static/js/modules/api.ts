@@ -1,5 +1,5 @@
 /**
- * @file Exports the API for Mainframe. Interfaces with Netlify Functions and FaunaDB.
+ * @file Exports the API for Mainframe. Interfaces with FaunaDB and controls user state.
  * @author Monkatraz
  */
 

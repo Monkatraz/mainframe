@@ -5,7 +5,7 @@
 // Imports
 import { createLock } from '@modules/util'
 import DOMPurify from 'dompurify'
-import "@vendor/prism.js"
+import morphdom from 'morphdom'
 
 // -- RENDER WORKER
 
@@ -23,13 +23,22 @@ function restartRenderWorker() {
 // init. worker on first load
 restartRenderWorker()
 
+export interface RenderMarkdownResult {
+  html: string
+  perf: {
+    sanitize: number
+    parse: number
+  }
+}
+
 const RENDER_TIMEOUT = 10000
 /** Safely renders (async) the given Markdown string.
  *  The render occurs in a web worker for performance reasons.
  *  Calling this function multiple times is safe - it will render one request at a time.
  */
-export const renderMarkdown = createLock((raw: string): Promise<string> => {
+export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownResult> => {
   return new Promise((resolve, reject) => {
+    const perfTotal = performance.now()
     // Timeout reject scenario
     const rejectTimer = setTimeout(() => {
       reject(new Error('Render timed out.'))
@@ -39,11 +48,51 @@ export const renderMarkdown = createLock((raw: string): Promise<string> => {
     renderWorker.onmessage = (evt) => {
       // clear the timer so we don't pointlessly restart the worker
       clearTimeout(rejectTimer)
-      // if the evt.data isn't a string its almost certainly an error object
-      if (typeof evt.data !== 'string') reject(evt.data)
+      // if the evt.data is a string it is a casted error
+      if (typeof evt.data === 'string') reject(evt.data)
       // unfortunately DOMPurify requires a reference to Window and Window.document
       // so we have to purify here, I would've liked to have done it in the worker
-      resolve(DOMPurify.sanitize(evt.data as string))
+      resolve({
+        html: DOMPurify.sanitize(evt.data.html as string),
+        perf: {
+          sanitize: performance.now() - perfTotal,
+          parse: evt.data.perf
+        }
+      })
+    }
+    // everything's ready, send message to worker
+    renderWorker.postMessage(raw)
+  })
+})
+
+// TODO: find method to improve DOMPurify speed
+// TODO: Consider batch diffing the DOM rather than updating it all at once
+
+export const morphMarkdown = createLock((raw: string, node: Node) => {
+  return new Promise((resolve, reject) => {
+    // Timeout reject scenario
+    const rejectTimer = setTimeout(() => {
+      reject(new Error('Render timed out.'))
+      restartRenderWorker()
+    }, RENDER_TIMEOUT)
+
+    renderWorker.onmessage = (evt) => {
+      clearTimeout(rejectTimer)
+      // if the evt.data is a string it is a casted error
+      if (typeof evt.data === 'string') reject(evt.data)
+
+      morphdom(node, '<div>' + evt.data.html + '</div>', {
+        childrenOnly: true,
+        onBeforeNodeAdded: function (toEl) {
+          return DOMPurify.sanitize(toEl, { IN_PLACE: true }) as unknown as Node
+        },
+        onBeforeElUpdated: function (fromEl, toEl) {
+          if (fromEl.isEqualNode(toEl)) return false
+          DOMPurify.sanitize(toEl, { IN_PLACE: true })
+          return true
+        }
+      })
+      resolve(true)
     }
     // everything's ready, send message to worker
     renderWorker.postMessage(raw)
@@ -53,7 +102,6 @@ export const renderMarkdown = createLock((raw: string): Promise<string> => {
 // -- DOMPURIFY
 
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
-
   if (node instanceof HTMLAnchorElement) {
     // Makes '#' id links work correctly
     if (node.hash) node.setAttribute('href', location.origin + location.pathname + node.hash)
@@ -64,7 +112,6 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     }
     return
   }
-
   // changes resource http links to https (not perfect, but it's just a simple measure)
   // this won't affect anchor links as we returned above when we find those
   for (const attr of ['src', 'href', 'action', 'xlink:href']) if (node.hasAttribute(attr))
@@ -75,10 +122,3 @@ DOMPurify.addHook('afterSanitizeAttributes', (node) => {
     node.setAttribute('loading', 'lazy')
   }
 })
-
-// -- PRISM
-
-export const Prism = window.Prism
-Prism.manual = true
-// Divert languages to CDN instead of storing them ourselves
-Prism.plugins.autoloader.languages_path = 'https://cdnjs.cloudflare.com/ajax/libs/prism/1.22.0/components/'

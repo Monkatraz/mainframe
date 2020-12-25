@@ -5,6 +5,7 @@
 
 // Imports
 import anime, { AnimeParams } from 'animejs'
+import { animationFrame } from './util'
 
 /** Creates a function that will play an animejs animation. Specifically for use with Svelte `use:fn`. */
 export function usAnime(opts: AnimeParams) {
@@ -25,9 +26,15 @@ const TNANIME_FORCED_OPTS: AnimeParams = {
 */
 export function tnAnime(elem: Element, opts: AnimeParams) {
   const safeOpts = { ...opts, ...TNANIME_FORCED_OPTS, targets: elem }
-  const anim = anime(safeOpts)
   return () => {
-    anim.play()
+    const anim = anime(safeOpts);
+    // makes sure that the animation doesn't conflict on top of other ones
+    (async () => {
+      await animationFrame()
+      anime.remove(elem)
+      await animationFrame()
+      requestAnimationFrame(anim.play)
+    })()
     return {
       delay: anim.delay,
       duration: anim.duration

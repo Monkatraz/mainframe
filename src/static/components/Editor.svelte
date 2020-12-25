@@ -22,114 +22,8 @@
   }
 
   // Setup theme
-  monaco.editor.defineTheme('confinement', {
-    base: 'vs-dark',
-    inherit: true,
-    rules: [
-      { token: 'delimiter', foreground: '#727d9c' },
-
-      { token: 'operators', foreground: '#56B6C2' },
-      { token: 'keyword', foreground: '#56B6C2' },
-
-      { token: 'string', foreground: '#98C379' },
-      { token: 'entity', foreground: '#98C379' },
-      { token: 'namespace', foreground: '#98C379' },
-      { token: 'regexp', foreground: '#98C379' },
-
-      { token: 'escape', foreground: '#E5C07B' },
-      { token: 'string.escape', foreground: '#E5C07B' },
-      { token: 'constructor', foreground: '#E5C07B' },
-      { token: 'type', foreground: '#E5C07B' },
-
-      { token: 'predefined', foreground: '#919AF7' },
-
-      { token: 'comment', foreground: '#5C6370' },
-      { token: 'comment.doc', foreground: '#687387' },
-
-      { token: 'variable', foreground: '#2D8EDF' },
-      { token: 'identifier', foreground: '#2D8EDF' },
-
-      { token: 'function', foreground: '#61AFEF' },
-
-      { token: 'constant', foreground: '#D19A66' },
-      { token: 'number', foreground: '#D19A66' },
-
-      { token: 'tag', foreground: '#E06C75' },
-      { token: 'attribute', foreground: '#FFCB6B' },
-
-      { token: 'text', foreground: '#ABB2BF' },
-      { token: 'underline', foreground: '#61AFEF', fontStyle: 'underline' },
-      { token: 'emphasis', foreground: '#61AFEF', fontStyle: 'italic' },
-      { token: 'strong', foreground: '#61AFEF', fontStyle: 'bold' },
-    ],
-    colors: {
-    // -1
-    "editorIndentGuide.activeBackground": "#4C5366",
-    // 0
-    "editorRuler.foreground": "#333842",
-    "editorIndentGuide.background": "#333842",
-    // 1
-    "editor.background": "#282C34",
-    // 3
-    "editorHoverWidget.background": "#21252B",
-    "editorHoverWidget.border": "#21252B",
-    "editorSuggestWidget.background": "#21252B",
-    "editorSuggestWidget.border": "#21252B",
-    "editorWidget.background": "#21252B",
-    // 4
-    "widget.shadow": "#181A1F",
-    "menu.background": "#181A1F",
-    "menu.border": "#181A1F",
-    "quickInput.background": "#181A1F",
-    "dropdown.background": "#181A1F",
-    "dropdown.listBackground": "#181A1F",
-    "dropdown.border": "#181A1F",
-    // Against
-    "input.background": "#181A1F55",
-    "input.border": "#181A1F55",
-    // Selection
-    "editorBracketMatch.background": "#4B5365A6",
-    "editor.selectionBackground": "#4B5365A6",
-    "editor.selectionHighlightBackground": "#4B5365A6",
-    "editor.wordHighlightBackground": "#4B5365A6",
-    // Text
-    "foreground": "#ABB2BF",
-    "editor.foreground": "#ABB2BF",
-    "menu.foreground": "#ABB2BF",
-    "editorLineNumber.foreground": "#4B5365",
-    "dropdown.foreground": "#D7DAE0",
-    // Hover
-    "editorLineNumber.activeForeground": "#9DA5B4",
-    "list.hoverBackground": "#2F333D",
-    "list.hoverForeground": "#9DA5B4",
-    // Active
-    "list.focusBackground": "#3A3F4B",
-    "list.focusForeground": "#D7DAE0",
-    "selection.background": "#9DA5B4",
-    // Accent
-    "panelTitle.activeBorder": "#4D78CC",
-    "editorCursor.foreground": "#4D78CC",
-    "button.background": "#4D78CC",
-    "progressBar.background": "#4D78CC",
-    // Against Accent
-    "button.foreground": "#FFFFFF",
-    // Accent Hover
-    "button.hoverBackground": "#6187D2",
-    "extensionButton.prominentHoverBackground": "#6187D2",
-    // Scrollbar
-    "scrollbarSlider.activeBackground": "#4C5366",
-    "scrollbarSlider.background": "#4C536688",
-    "scrollbarSlider.hoverBackground": "#4C536688",
-    // Invisible
-    "editorBracketMatch.border": "#0000",
-    "contrastActiveBorder": "#0000",
-    "contrastBorder": "#0000",
-    "focusBorder": "#0000",
-    "editor.lineHighlightBorder": "#0000",
-    "editorOverviewRuler.border": "#0000",
-    "scrollbar.shadow": "#0000",
-    }
-  })
+  import { theme, settings } from '@js/editor/editor-config'
+  monaco.editor.defineTheme('confinement', theme as any) // strange type error, I think it's a TS bug
   monaco.editor.setTheme('confinement')
 
   // Setup markdown lang.
@@ -142,116 +36,117 @@
 
 <script lang="ts">
   import { onMount } from 'svelte'
-  import { renderMarkdown, Prism } from '@modules/markdown'
-  import { throttle } from '@modules/util';
+  import { spring } from 'svelte/motion'
+  import { morphMarkdown } from '@modules/markdown'
+  import { tnAnime } from '@modules/anime'
+  import { animationFrame, createAnimQueued } from '@modules/util';
 
+  // Editor init. (see onMount() below for the rest)
   let editorContainer: HTMLElement
   let editor: ReturnType<typeof monaco['editor']['create']>
 
   // Preview Updating
-  let html = ''
-  let preview: HTMLElement
-  const updateHTML = throttle(async () => { html = await renderMarkdown(editor.getValue()) }, 100)
-  const onPageLoad = throttle(() => { if(preview) { Prism.highlightAllUnder(preview) } }, 1000)
+  // TODO: figure out if putting the preview in an iframe would help
+  let preview: HTMLDivElement
+  let previewContainer: HTMLElement
+  let perf = 0
+  const updateHTML = createAnimQueued(async () => {
+    if (!preview || !editor) return
+    const startPerf = performance.now()
+    // rather than replace the whole tree we just replace what's changed using MorphDOM
+    await morphMarkdown(editor.getValue(), preview)
+    updateScrollMap()
+    perf = performance.now() - startPerf
+    // wait another frame purely to throttle the function
+    await animationFrame()
+  })
+
+  // Scroll matching
+  let arrLineHeight: [number, number][] = []
+  let mapLineHeight: Map<number, number> = new Map()
+  // what the user scrolled on last will change this value
+  let scrollingWith: 'editor' | 'preview' = 'editor'
+  // These springs are what actually set the scroll values
+  let previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
+  let editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
+
+  let scrollMapPoll: number
+  function updateScrollMap() {
+    if (!preview || !editor) return
+    const previewRect = preview.getBoundingClientRect()
+    // here we map every [data-line] element's line to its offset scroll height
+    // we also make a array version of the same Map
+    // the array version is used so that the `find()` function can be used
+    Array.from(preview.querySelectorAll<HTMLElement>('[data-line]'))
+      .forEach(elem => {
+        const dataLine = parseInt(elem.getAttribute('data-line') as string)
+        mapLineHeight.set(dataLine, elem.getBoundingClientRect().top - previewRect.top)
+      })
+    arrLineHeight = Array.from(mapLineHeight)
+
+    // start a poll to catch flukes
+    clearInterval(scrollMapPoll)
+    scrollMapPoll = setInterval(() => {
+      if (preview && editor) updateScrollMap()
+      else clearInterval(scrollMapPoll)
+    }, 5000)
+  }
+
+  function scrollFromEditor () {
+    if (scrollingWith === 'preview' || !preview || !editor) return
+    editorScrollSpring.set(editor.getScrollTop())
+    // get top most visible line
+    const line = editor.getVisibleRanges()[0].startLineNumber - 1
+    // find our line height
+    let lineHeight = 0
+    let curLine = line
+    // check if we have our line or not
+    if (mapLineHeight.has(line)) lineHeight = mapLineHeight.get(line) as number
+    // no? get closest line before this one
+    else for (;curLine > 0; curLine--) if (mapLineHeight.has(curLine)) {
+      lineHeight = mapLineHeight.get(curLine) as number
+      break
+    }
+    // set preview scroll
+    if (lineHeight) {
+      // fudge value to prevent the preview from getting "sticky"
+      const diff = (editor.getScrollTop() - editor.getTopForLineNumber(curLine)) * 0.75
+      previewScrollSpring.set(lineHeight + diff)
+    }
+  }
+
+  function scrollFromPreview() {
+    if (scrollingWith === 'editor' || !preview || !editor) return
+    const scrollTop = previewContainer.scrollTop
+    previewScrollSpring.set(scrollTop)
+    // filter for the closest line height
+    const line = arrLineHeight.find(([, height]) => scrollTop < height)
+    if (line) {
+      // fudge to prevent the editor from getting sticky
+      const diff = (scrollTop - line[1]) * 0.75
+      editorScrollSpring.set(editor.getTopForLineNumber(line[0]) + diff)
+    }
+  }
+
+  // update scroll position (reactive)
+  $: if (previewContainer && scrollingWith === 'editor') previewContainer.scrollTop = $previewScrollSpring
+  $: if (editor && scrollingWith === 'preview') editor.setScrollTop($editorScrollSpring)
 
   // Load Editor
   onMount(() => {
-    editor = monaco.editor.create(editorContainer, {
-      language: 'markdown',
-      // Functionality
-      minimap: { enabled: false },
-      autoClosingBrackets: 'languageDefined',
-      autoClosingQuotes: 'languageDefined',
-      suggest: { showWords: false },
-      occurrencesHighlight: false,
-      "semanticHighlighting.enabled": true,
-      codeLens: false,
-      // Appearance
-      showUnused: true,
-      matchBrackets: "near",
-      renderLineHighlight: "all",
-      renderLineHighlightOnlyWhenFocus: true,
-      smoothScrolling: true,
-      cursorStyle: "line-thin",
-      cursorBlinking: "smooth",
-      glyphMargin: false,
-      padding: { top: 10 },
-      // Font
-      fontFamily: 'var(--font-mono)',
-      fontSize: 14,
-      fontWeight: "400",
-      fontLigatures: true,
-      lineHeight: 20,
-      // Text
-      wordWrap: 'on',
-      wrappingIndent: 'same',
-      wrappingStrategy: 'advanced',
-      tabSize: 2,
-      value: 
-`## Syntax
-***
-##### Inline Formatting:
-| | | |
-| :--: | :-- | :-- |
-| \`/.../\` | Italics | /This is italicized, without using \`<em>\`./
-| \`_..._\` | Emphasis | _This is actually emphasis._
-| \`*...*\` | Bold | *This is just bolded text.*
-| \`**...**\` | Strong | **This is very important, strong text.**
-| \`__...__\` | Underline | __This is underlined, not emphasized.__
-| \`^...^\` | Superscript | 10^10^ Some^tiny text.^
-| \`~...~\` | Subscript | X~1~, X~2~, Some~more tiny text.~
-| \`--...--\` | Strikethrough | --This text was a mistake.--
-| \`==...==\`| Mark | ==This text is important for some reason, and thus highlighted.==
+    editor = monaco.editor.create(editorContainer, settings as any)
 
-##### Critical Markup:
-| | | |
-| :--: | :-- | :-- |
-| \`{++...++}\` | Addition | {++You should add this text.++}
-| \`{--...--}\` | Deletion | {--You should delete this text.--}
-| \`{~~...~>...~~}\` | Substitution | {~~Replace this,~>With this.~~}
-| \`{==...==}\` | Highlight | {==You should take note of this text.==}
-| \`{>>...<<}\` | Comment | {==This highlighted text is...==}{>>Folllowed by a comment.<<}
-
-##### Special:
-| | | |
-| :--: | :-- | :-- |
-| \`\` \`...\` \`\` | Monospace | \`Monospaced text.\`
-| \`\` \`lang|...\` \`\`| Inline Code | \`js|console.log('Inline code!')\`
-| \`$...$\` | Math (TeX) | $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$.
-| \`@@...@@\`| Escaped | @@/This text is __escaped__, and **will only be rendered as plain text.**/@@
-
-###### Inline Spans:
--	#font sans|Here is the sans font.|#
--	#font display|Here is the display font.|#
-- #font serif|Here is the serif font.|#
-- #font mono|Here is the mono font.|#
-- #font handwriting|Here is the handwriting font.|#
-- #font cursive|Here is the cursive font.|#
-- #font 100|100|# #font 200|200|# #font 300|300|# #font 400|400|# #font 500|500|# #font 600|600|# #font 700|700|# #font 800|800|# #font 900|900|#
-- #font bold|Bold.|# #font light|Light.|#
-- #font bolder|Bolder.|# #font lighter|Lighter.|#
-- #font 1em|1em|# #font 1.5em|1.5em|# #font 2em|2em|# #font 2.5em|2.5em|# #font 3em|3em|#
-- #font 150%|150%|# #font 12px|12px|# #font 2rem|2rem|#
-- #font handwriting bold 1.25em|Mixed font style text.|#
-
-- #class fs-serif|Setting font class manually.|#
-- #class fs-mono token function|Multiple classes.|#
-- #class fs-serif|Nesting #color red|with|# #font sans bold|inline elements.|#|#
-
-\`\`\`ts
-(self as any).MonacoEnvironment = {
-    getWorker: function(moduleId:string, label:string) {
-      console.log("Getting worker", moduleId, label)
-      return new Worker('web_modules/monaco-editor/esm/vs/editor/editor.worker.js', {
-        type: import.meta.env.MODE === 'development' ? "module" : "classic"
-      })
-    }
-  }
-\`\`\``
+    // Update Preview
+    editor.onDidChangeModelContent(() => {
+      updateHTML()
+      scrollingWith = 'editor'
     })
+    updateHTML();
 
-    editor.onDidChangeModelContent(updateHTML)
-    updateHTML()
+    // Scroll Matching
+    (editor.getDomNode() as HTMLElement).addEventListener('wheel', () => scrollingWith = 'editor')
+    editor.onDidScrollChange(scrollFromEditor)
+
   })
 
 </script>
@@ -259,19 +154,22 @@
 <style lang="stylus">
   @require '_lib'
 
-  :global(:root)
-    overflow-y: hidden
-
-  $col-bg = #333842
-  $hght = calc(100vh - var(--layout-header-height))
+  $hght = calc(100vh - var(--layout-header-height) - var(--layout-footer-height))
   $body-w = minmax(0, var(--layout-body-max-width))
   $edit-w = minmax(50%, 1fr)
 
-  .editor-container
-    position: relative
+  .overflow-container
     height: $hght
     width: 100%
-    background: $col-bg
+    overflow: hidden
+    background: #333842
+
+  .editor-container
+    position: relative
+    height: 100%
+    width: 100%
+    box-shadow: 0 0 4rem black
+    box-sizing: content-box
 
     grid-kiss:"+------------------------------------------------+      ",
               "| .topbar                                        | 2rem ",
@@ -293,32 +191,70 @@
   .topbar
     background: #23272E
     z-index: 10
-    box-shadow: 0 3px 5px rgba(0,0,0,0.5)
 
   $col-editor-bg = #282C34
   .editor
     background: $col-editor-bg
+    z-index: 2
+
 
   .preview
+    position: relative
     background: colvar('background-light')
     box-shadow: 0 0 10px rgba(0,0,0,0.5) inset
     padding: 1rem
+    padding-bottom: 100%
     overflow-y: scroll
     font-size: 90%
+    z-index: 1
+    transform: translate(0,0)
+
+  .perf-box
+    position: sticky
+    display: inline-flex
+    flex-direction: column
+    top: 0.5rem
+    float: right
+    padding: 0.25rem
+    background: #23272E
+    border-radius: 0.25rem
+    color: #ABB2BF
+    z-index: 10
 
 
 </style>
 
-<svelte:window on:resize={() => editor.layout()}/>
+<!-- some chores to do on resize -->
+<svelte:window on:resize={() => { if (preview && editor) { editor.layout(); updateScrollMap() } }}/>
 
-<div class=editor-container>
-  <div class=topbar/>
-  <div class=editor bind:this={editorContainer}/>
-  <div class=preview>
-    {#key html}
-      <div class=rhythm use:onPageLoad bind:this={preview}>
-        {@html html}
+<div class=overflow-container
+  in:tnAnime={{ background: ['transparent', '#333842'], easing: 'easeOutExpo', duration: 500, delay: 300 }}
+>
+  <div class=editor-container>
+
+    <!-- Top | Info Bar -->
+    <div class=topbar
+      in:tnAnime={{ translateY: ['-150%', '0'], duration: 600, delay: 200, easing: 'easeOutExpo' }}
+      out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
+    />
+
+    <!-- Left | Editor Pane -->
+    <div class=editor bind:this={editorContainer}
+      in:tnAnime={{ translateX: ['-150%', '0'], duration: 700, delay: 500, easing: 'easeOutExpo' }}
+      out:tnAnime={{ translateX: '-150%', duration: 200, easing: 'easeInExpo' }}
+    />
+
+    <!-- Right | Preview Pane -->
+    <div class=preview bind:this={previewContainer}
+      on:scroll={scrollFromPreview} on:wheel={() => scrollingWith = 'preview'}
+      in:tnAnime={{ translateX: ['-300%', '0'], duration: 700, delay: 500, easing: 'easeOutExpo' }}
+      out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInExpo' }}
+    >
+      <div class=perf-box>
+        <span>PERF: {Math.round(perf)}ms</span>
       </div>
-    {/key}
+      <div class=rhythm bind:this={preview}/>
+    </div>
+
   </div>
 </div>
