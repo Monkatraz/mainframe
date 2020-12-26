@@ -37,9 +37,9 @@
 
   import { TokenizationRegistry } from 'monaco-editor/esm/vs/editor/common/modes.js'
 
-  waitFor(() => TokenizationRegistry['_colorMap'] !== null).then(() => {
+  waitFor(() => TokenizationRegistry._colorMap !== null).then(() => {
     function mtk(red: number, green: number, blue: number) {
-      const colorMap = TokenizationRegistry['_colorMap'] as {rgba: { r: number, g: number, b: number }}[]
+      const colorMap = TokenizationRegistry._colorMap as {rgba: { r: number, g: number, b: number }}[]
       // for some reason forEach is the only method that works here
       let result = 0
       colorMap.forEach((color, idx) => {
