@@ -23,15 +23,47 @@
 
   // Setup theme
   import { theme, settings } from '@js/editor/editor-config'
-  monaco.editor.defineTheme('confinement', theme as any) // strange type error, I think it's a TS bug
+  monaco.editor.defineTheme('confinement', theme)
   monaco.editor.setTheme('confinement')
 
   // Setup markdown lang.
-  monaco.languages.register({ id: 'markdown' })
+  // We don't use the original 'markdown' lang. so that it doesn't conflict
+  monaco.languages.register({ id: 'markdown-extended' })
   // the language definition is literally copied from the monaco codebase
   // so the fact that it doesn't type-check is just confusing and ignored
-  monaco.languages.setLanguageConfiguration('markdown', mdLang.conf as any)
-  monaco.languages.setMonarchTokensProvider('markdown', mdLang.language as any)
+  monaco.languages.setLanguageConfiguration('markdown-extended', mdLang.conf as any)
+  monaco.languages.setMonarchTokensProvider('markdown-extended', mdLang.language as any)
+
+  import { TokenizationRegistry } from 'monaco-editor/esm/vs/editor/common/modes.js'
+
+  function mtk(red: number, green: number, blue: number) {
+    const colorMap = TokenizationRegistry['_colorMap'] as {rgba: { r: number, g: number, b: number }}[]
+    // for some reason forEach is the only method that works here
+    let result = 0
+    colorMap.forEach((color, idx) => {
+      const { r, g, b } = color.rgba
+      if (r === red && g === green && b === blue) result = idx
+    })
+    return '.mtk' + result
+  }
+
+  const extendedTokenStyling = [
+    `${mtk(160, 165, 180)} { text-decoration: line-through; }`, // strikethrough
+    `${mtk(50, 50, 60)} { background: #FFCB6BEE; }`, // mark
+    `${mtk(190, 195, 205)} { position: relative; top: -0.25em; font-size: 90%; }`, // superscript
+    `${mtk(195, 190, 205)} { position: relative; top: 0.25em; font-size: 90%; }`, // subscript
+    // horizontal rules
+    `${mtk(225, 100, 110)}::after {
+      content: ""; position: absolute; left: 0; top: 50%; z-index: -1;
+      width: calc(50 * 14px); border-top: 0.125rem solid #333842;}`,
+  ]
+  const oldElement = document.head.querySelector('#mainframe-monaco-token-styling')
+  if (oldElement) document.head.removeChild(oldElement)
+
+  const styleElement = document.createElement('style')
+  styleElement.id = 'mainframe-monaco-token-styling'
+  styleElement.innerHTML = extendedTokenStyling.join('\n')
+  document.head.appendChild(styleElement)
 </script>
 
 <script lang="ts">
@@ -39,7 +71,7 @@
   import { spring } from 'svelte/motion'
   import { morphMarkdown } from '@modules/markdown'
   import { tnAnime } from '@modules/anime'
-  import { animationFrame, createAnimQueued } from '@modules/util';
+  import { sleep, idleCallback, createIdleQueued } from '@modules/util';
 
   // Editor init. (see onMount() below for the rest)
   let editorContainer: HTMLElement
@@ -50,33 +82,36 @@
   let preview: HTMLDivElement
   let previewContainer: HTMLElement
   let perf = 0
-  const updateHTML = createAnimQueued(async () => {
+  let cacheSize = 0
+  const updateHTML = createIdleQueued(async () => {
     if (!preview || !editor) return
     const startPerf = performance.now()
     // rather than replace the whole tree we just replace what's changed using MorphDOM
-    await morphMarkdown(editor.getValue(), preview)
-    updateScrollMap()
-    perf = performance.now() - startPerf
-    // wait another frame purely to throttle the function
-    await animationFrame()
+    await idleCallback(async () => {
+      const stats = await morphMarkdown(editor.getValue(), preview)
+      updateScrollMap()
+      cacheSize = stats.cacheSize
+      perf = performance.now() - startPerf
+      // basically a fudge, but this helps prevent chugging
+      await sleep(perf)
+    })
   })
 
-  // Scroll matching
+  // Scroll Matching
   let arrLineHeight: [number, number][] = []
   let mapLineHeight: Map<number, number> = new Map()
-  // what the user scrolled on last will change this value
+  // What the user scrolled on last will change this value.
   let scrollingWith: 'editor' | 'preview' = 'editor'
-  // These springs are what actually set the scroll values
+  // These springs are what actually set the scroll values.
   let previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
   let editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
 
   let scrollMapPoll: number
-  function updateScrollMap() {
+  const updateScrollMap = createIdleQueued(() => {
     if (!preview || !editor) return
     const previewRect = preview.getBoundingClientRect()
     // here we map every [data-line] element's line to its offset scroll height
-    // we also make a array version of the same Map
-    // the array version is used so that the `find()` function can be used
+    // we also make a array version of the same Map, for usage with iterators
     Array.from(preview.querySelectorAll<HTMLElement>('[data-line]'))
       .forEach(elem => {
         const dataLine = parseInt(elem.getAttribute('data-line') as string)
@@ -90,7 +125,7 @@
       if (preview && editor) updateScrollMap()
       else clearInterval(scrollMapPoll)
     }, 5000)
-  }
+  })
 
   function scrollFromEditor () {
     if (scrollingWith === 'preview' || !preview || !editor) return
@@ -134,13 +169,14 @@
 
   // Load Editor
   onMount(() => {
-    editor = monaco.editor.create(editorContainer, settings as any)
+    editor = monaco.editor.create(editorContainer, settings)
 
     // Update Preview
     editor.onDidChangeModelContent(() => {
-      updateHTML()
       scrollingWith = 'editor'
+      updateHTML()
     })
+    // init. preview
     updateHTML();
 
     // Scroll Matching
@@ -153,6 +189,7 @@
 
 <style lang="stylus">
   @require '_lib'
+      
 
   $hght = calc(100vh - var(--layout-header-height) - var(--layout-footer-height))
   $body-w = minmax(0, var(--layout-body-max-width))
@@ -162,7 +199,7 @@
     height: $hght
     width: 100%
     overflow: hidden
-    background: #333842
+    background: #23272E
 
   .editor-container
     position: relative
@@ -171,22 +208,22 @@
     box-shadow: 0 0 4rem black
     box-sizing: content-box
 
-    grid-kiss:"+------------------------------------------------+      ",
-              "| .topbar                                        | 2rem ",
-              "+------------------------------------------------+      ",
-              "+---------------+ +----+ +--------------+ +------+      ",
-              "| .editor       | |    | | .preview     | |      |      ",
-              "|               | |    | |              | |      |      ",
-              "|               | |    | |              | |      |      ",
-              "|               | |    | |              | |      |      ",
-              "|               | |    | |              | |      | auto ",
-              "|               | |    | |              | |      |      ",
-              "|               | |    | |              | |      |      ",
-              "|               | |    | |              | |      |      ",
-              "|               | |    | |              | |      |      ",
-              "|               | |    | |              | |      |      ",
-              "+---------------+ +----+ +--------------+ +------+      ",
-              "| $edit-w       | |1rem| |   $body-w    | | 1rem |      "
+    grid-kiss:"+--------------------------------------------------+      ",
+              "| .topbar                                          | 2rem ",
+              "+--------------------------------------------------+      ",
+              "+---------------+ +------+ +--------------+ +------+      ",
+              "| .editor       | |      | | .preview     | |      |      ",
+              "|               | |      | |              | |      |      ",
+              "|               | |      | |              | |      |      ",
+              "|               | |      | |              | |      |      ",
+              "|               | |      | |              | |      | auto ",
+              "|               | |      | |              | |      |      ",
+              "|               | |      | |              | |      |      ",
+              "|               | |      | |              | |      |      ",
+              "|               | |      | |              | |      |      ",
+              "|               | |      | |              | |      |      ",
+              "+---------------+ +------+ +--------------+ +------+      ",
+              "|    $edit-w    | |0.5rem| |   $body-w    | |0.5rem|      "
 
   .topbar
     background: #23272E
@@ -228,7 +265,7 @@
 <svelte:window on:resize={() => { if (preview && editor) { editor.layout(); updateScrollMap() } }}/>
 
 <div class=overflow-container
-  in:tnAnime={{ background: ['transparent', '#333842'], easing: 'easeOutExpo', duration: 500, delay: 300 }}
+  in:tnAnime={{ background: ['transparent', '#23272E'], easing: 'easeOutExpo', duration: 500, delay: 300 }}
 >
   <div class=editor-container>
 
@@ -246,12 +283,14 @@
 
     <!-- Right | Preview Pane -->
     <div class=preview bind:this={previewContainer}
-      on:scroll={scrollFromPreview} on:wheel={() => scrollingWith = 'preview'}
+      on:scroll={scrollFromPreview} 
+      on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
       in:tnAnime={{ translateX: ['-300%', '0'], duration: 700, delay: 500, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInExpo' }}
     >
       <div class=perf-box>
         <span>PERF: {Math.round(perf)}ms</span>
+        <span>CACHE: {Math.round(cacheSize)}</span>
       </div>
       <div class=rhythm bind:this={preview}/>
     </div>

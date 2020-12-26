@@ -3,22 +3,51 @@
  * @author Monkatraz
  */
 
+// TODO: color decorators for #color col|
+
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Regular_Expressions
+function escapeRegExp(str: string) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') // $& means the whole matched string
+}
+
+function markupWrap(symb: string, token: string, strict = true) {
+  symb = escapeRegExp(symb)
+  if (strict) {
+    const bndry = /\w/.test(symb) ? '\\b' : '\\B'
+    return [
+      RegExp(`(${bndry}${symb})((?:(?:(?!${symb})[^])|@escapes)+)(${symb}${bndry})`),
+      ['delimiter', token, 'delimiter']
+    ]
+  } else return [
+    RegExp(`(${symb})((?:(?:(?!${symb})[^])|@escapes)+)(${symb})`),
+    ['delimiter', token, 'delimiter']
+  ]
+}
+
 export const conf = {
   comments: {
-    // ? add block comment syntax
-    blockComment: ['<!--', '-->'],
+    blockComment: ['/*', '*/'],
     lineComment: '//'
   },
   brackets: [
     ['{', '}'],
     ['[', ']'],
-    ['(', ')']
+    ['(', ')'],
+    ['#', '|#'],
+    ['{++', '++}'],
+    ['{--', '--}'],
+    ['{~~', '~~}'],
+    ['{==', '==}'],
+    ['{>>', '<<}']
   ],
+  // TODO: add inline formatting to this
   autoClosingPairs: [
-    { open: '{', close: '}' },
     { open: '[', close: ']' },
     { open: '(', close: ')' },
     { open: '<', close: '>', notIn: ['string'] },
+    { open: '/*', close: '*/' },
+    { open: '`', close: '`' },
+    { open: '@@', close: '@@' },
     { open: '"', close: '"' },
     { open: "'", close: "'" }
   ],
@@ -26,6 +55,7 @@ export const conf = {
     { open: '(', close: ')' },
     { open: '[', close: ']' },
     { open: '`', close: '`' },
+    { open: '@@', close: '@@' },
     { open: '"', close: '"' },
     { open: "'", close: "'" }
   ],
@@ -36,12 +66,13 @@ export const conf = {
     }
   }
 }
+
 export const language = {
   defaultToken: 'text',
   tokenPostfix: '.md',
   // escape codes
-  control: /[\\`*_[\]{}()#+\-.!]/,
-  noncontrol: /[^\\`*_[\]{}()#+\-.!]/,
+  control: /[\\`@~*=^$_[\]{}()#+\-.!]/,
+  noncontrol: /[^\\`@~*=^$_[\]{}()#+\-.!]/,
   escapes: /\\(?:@control)/,
   // escape codes for javascript/CSS strings
   jsescapes: /\\(?:[btnfr\\"']|[0-7][0-7]?|[0-3][0-7]{2})/,
@@ -63,29 +94,52 @@ export const language = {
   ],
   tokenizer: {
     root: [
+      { include: '@block' },
+      { include: '@linecontent' }
+    ],
+    global: [
+      // auto-detect links (huge frickin' regex )
+      // https://stackoverflow.com/questions/3809401/what-is-a-good-regular-expression-to-match-a-url
+      [/(http(s)?:\/\/.)?(www\.)?[-a-zA-Z0-9@:%._+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:%_+.~#?&//=]*)/,
+        'string.link'],
+
       // comments
-      [/\/\/.*$/, 'comment'],
+      [/^\s*\/\/.*$/, 'comment'],
+      [/\/\*/, 'comment', '@comment'],
+
+      // escapes
+      [/@@[^]*?@@/, 'escape'],
+      [/&\w+;/, 'escape'],
+      [/@escapes/, 'escape'],
+    ],
+    // Block Level State
+    block: [
+
+      { include: '@global' },
 
       // markdown tables
       [/^\s*\|/, '@rematch', '@table_header'],
 
+      // hrs
+      // TODO: somehow detect ==== ---- headings
+      [/^\s*(-|\*)(?:(?:\s*)?\1){2,}\s*$/, 'keyword.hr'],
+
+      // TODO: use slightly different colors for different # lengths?
       // headers (with #)
-      [/^\s*(#+)\s*(?!.*#+$)/, 'keyword'],
+      [/^\s*(#+)\s*(?!.*#+$)/, 'keyword.heading'],
       // headers (with # and another # at the end)
       [
         /^(\s{0,3})(#+)((?:[^\\#]|@escapes)+)((?:#+)?)/,
-        ['white', 'keyword', '', 'keyword']
+        ['', 'keyword.heading', 'text', 'keyword.heading']
       ],
-      // headers (with =)
-      [/^\s*(=+|-+)\s*$/, 'keyword'],
-      // headers (with ***)
-      [/^\s*((\*[ ]?)+)\s*$/, 'meta.separator'],
+      // headers (with = or -)
+      [/^\s*(=+|-+)\s*$/, 'keyword.heading'],
 
       // quote
       [/^\s*>+/, 'comment'],
 
       // list (starting with * or number)
-      [/^\s*([*\-+:]|\d+\.)\s/, 'keyword'],
+      [/^\s*([*\-+:~]|\d+\.)\s/, 'keyword'],
 
       // code block (3 tilde)
       [/^\s*~~~\s*((?:\w|[/\-#])+)?\s*$/, { token: 'string', next: '@codeblock' }],
@@ -98,8 +152,69 @@ export const language = {
       // github style code blocks (with backticks but no language)
       [/^\s*```\s*$/, { token: 'string', next: '@codeblock' }],
 
-      // markup within lines
-      { include: '@linecontent' }
+    ],
+    // Inline Level State
+    linecontent: [
+
+      { include: '@global' },
+
+      // inline code
+      [/`((?:\w|[/\-#])+)\|/, { token: 'string', next: '@codeblockinline', nextEmbedded: '$1' }],
+      // `...` no lang
+      [/(`+)((?!\1)[^]|@escapes)+\1/, 'string'],
+
+      // -- markup
+      // TODO: nested inline markup
+      markupWrap('_', 'emphasis'),
+      markupWrap('/', 'emphasis'),
+      markupWrap('**', 'strong'),
+      markupWrap('*', 'strong'),
+      markupWrap('__', 'underline'),
+      markupWrap('--', 'strikethrough', false),
+      markupWrap('^', 'superscript', false),
+      markupWrap('~', 'subscript', false),
+      markupWrap('==', 'mark', false),
+
+      // misc. inline or symbols
+      [/(#)(\w+\s*)([^#|]*?)(\|)/,
+        ['delimiter', 'function', 'variable.parameter', 'delimiter']],
+      [/\|#/, 'delimiter'],
+
+      // -- critic markup
+      // addition
+      [/({\+\+)((?:(?!\+\+})[^]|@escapes)+)(\+\+})/,
+        ['critic.addition.delimiter', 'critic.addition', 'critic.addition.delimiter']],
+      // deletion
+      [/({--)((?:(?!--})[^]|@escapes)+)(--})/,
+        ['critic.deletion.delimiter', 'critic.deletion', 'critic.deletion.delimiter']],
+      // substitution
+      [/({~~)((?:(?!~~}|~>)[^]|@escapes)+)(~>)((?:(?!~~})[^]|@escapes)+)(~~})/,
+        [
+          'critic.substitution.delimiter',
+          'critic.deletion', 'critic.substitution.delimiter', 'critic.addition',
+          'critic.substitution.delimiter'
+        ]
+      ],
+      // highlight
+      [/({==)((?:(?!==})[^]|@escapes)+)(==})/,
+        ['critic.highlight.delimiter', 'critic.highlight', 'critic.highlight.delimiter']],
+      // comments
+      [/({>>)((?:(?!<<})[^]|@escapes)+)(<<})/,
+        ['critic.comment.delimiter', 'critic.comment', 'critic.comment.delimiter']],
+
+      // links
+      [/(!?\[)((?:[^\\]|@escapes)+)(\]\([^)]+\))/, ['string.link', 'text', 'string.link']],
+      [/(!?\[)((?:[^\\]|@escapes)+)(\])/, ['string.link', 'text', 'string.link']],
+
+      // html
+      { include: 'html' }
+    ],
+    // Misc. States
+    comment: [
+      [/[^/*]+/, 'comment'],
+      [/\/\*/, 'comment', '@push'], // nested comment
+      ["\\*/", 'comment', '@pop'],
+      [/[/*]/, 'comment']
     ],
     table_header: [
       { include: '@table_common' },
@@ -107,19 +222,16 @@ export const language = {
     ],
     table_body: [{ include: '@table_common' }, { include: '@linecontent' }],
     table_common: [
-      [/\s*[-:]+\s*/, { token: 'keyword', switchTo: 'table_body' }],
+      [/\s*(?!\w--|--\w)[-:]+\s*/, { token: 'keyword', switchTo: 'table_body' }],
       [/^\s*\|/, 'keyword.table.left'],
       [/^\s*[^|]/, '@rematch', '@pop'],
       [/^\s*$/, '@rematch', '@pop'],
-      [
-        /\|/,
-        {
-          cases: {
-            '@eos': 'keyword.table.right',
-            '@default': 'keyword.table.middle' // inner |
-          }
+      [/\|/, {
+        cases: {
+          '@eos': 'keyword.table.right',
+          '@default': 'keyword.table.middle' // inner |
         }
-      ]
+      }]
     ],
     codeblock: [
       [/^\s*~~~\s*$/, { token: 'string', next: '@pop' }],
@@ -128,34 +240,12 @@ export const language = {
     ],
     // github style code blocks
     codeblockgh: [
-      [/```\s*$/, { token: 'variable.source', next: '@pop', nextEmbedded: '@pop' }],
+      [/```\s*$/, { token: 'string', next: '@pop', nextEmbedded: '@pop' }],
       [/[^`]+/, 'variable.source']
     ],
-    linecontent: [
-      // escapes
-      [/&\w+;/, 'escape'],
-      [/@escapes/, 'escape'],
-      [/@@.*?@@/, 'escape'],
-
-      // markup
-      [/(_)((?:[^_]|@escapes)+)(_)/, ['delimiter', 'emphasis', 'delimiter']],
-      [/(\/)((?:[^/]|@escapes)+)(\/)/, ['delimiter', 'emphasis', 'delimiter']],
-
-      [/(\*)((?:[^*]|@escapes)+)(\*)/, ['delimiter', 'strong', 'delimiter']],
-      [/(\*\*)((?:[^*]|@escapes)+)(\*\*)/, ['delimiter', 'strong', 'delimiter']],
-
-      [/(__)((?:(?!__)[^]|@escapes)+)(__)/, ['delimiter', 'underline', 'delimiter']],
-
-      [/(--)((?:(?!--)[^]|@escapes)+)(--)/, ['delimiter', 'strikethrough', 'delimiter']],
-
-      [/`([^\\`]|@escapes)+`/, 'string'],
-
-      // links
-      [/(!?\[)((?:[^\]\\]|@escapes)*)(\]\([^)]+\))/, ['string.link', '', 'string.link']],
-      [/(!?\[)((?:[^\]\\]|@escapes)*)(\])/, 'string.link'],
-
-      // html
-      { include: 'html' }
+    codeblockinline: [
+      [/`/, { token: 'string', next: '@pop', nextEmbedded: '@pop' }],
+      [/[^`]+/, 'variable.source']
     ],
     // Note: it is tempting to rather switch to the real HTML mode instead of building our own here
     // but currently there is a limitation in Monarch that prevents us from doing it: The opening
@@ -175,9 +265,9 @@ export const language = {
         }
       ],
       [/<\/(\w+)\s*>/, { token: 'tag' }],
-      [/<!--/, 'comment', '@comment']
+      [/<!--/, 'comment', '@commenthtml']
     ],
-    comment: [
+    commenthtml: [
       [/[^<-]+/, 'comment.content'],
       [/-->/, 'comment', '@pop'],
       [/<!--/, 'comment.content.invalid'],

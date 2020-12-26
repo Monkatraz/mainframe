@@ -137,6 +137,32 @@ export function createAnimQueued<T extends WrappedFn<NoReturnVal>>(fn: T) {
   }
 }
 
+const HAS_IDLE_CALLBACK = 'requestIdleCallback' in window
+
+/** Safely calls `requestIdleCallback` in an awaitable `Promise`. */
+export function idleCallback<T extends AnyFn<any>>(cb: T, timeout = 100): Promise<ReturnType<T>> {
+  if (!HAS_IDLE_CALLBACK) return new Promise(resolve => setTimeout(() => resolve(cb()), timeout))
+  else return new Promise(resolve => (window as any).requestIdleCallback(() => resolve(cb()), { timeout }))
+}
+
+/** See `createAnimQueued` for a description of how this function works.
+ *  The only difference is that this function uses `requestIdleCallback` instead.
+ *  If `requestIdleCallback` isn't available, it will use `createAnimQueued` instead.
+ * @see createAnimQueued */
+export function createIdleQueued<T extends WrappedFn<NoReturnVal>>(fn: T, timeout = 100) {
+  if (!HAS_IDLE_CALLBACK) return createAnimQueued(fn)
+  let queued: boolean
+  return (...args: Parameters<T>): NoReturnVal => {
+    if (queued !== true) {
+      queued = true;
+      (window as any).requestIdleCallback(async () => {
+        await fn(...args as any)
+        queued = false
+      }, { timeout })
+    }
+  }
+}
+
 /** Helper function for creating event listeners. */
 export function evtlistener(target: typeof window | typeof document | Element, events: string[], fn: AnyFn, opts: AddEventListenerOptions = {}) {
   events.forEach(event => {

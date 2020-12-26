@@ -92,8 +92,8 @@ $$$
 
 // Comments
 // This is a line comment.
-This is some content, with this /* comment */ (comment that isn't rendered) running through it.
-This is some content with a comment at the very end. // A comment.
+This is some content, with this /* inline comment */ (comment that isn't rendered) running through it.
+This is some content with a comment at the very end.
 
 /* This is a 
 	block comment.

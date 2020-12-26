@@ -28,6 +28,7 @@ export interface RenderMarkdownResult {
   perf: {
     sanitize: number
     parse: number
+    cacheSize: number
   }
 }
 
@@ -56,7 +57,8 @@ export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownRe
         html: DOMPurify.sanitize(evt.data.html as string),
         perf: {
           sanitize: performance.now() - perfTotal,
-          parse: evt.data.perf
+          parse: evt.data.perf,
+          cacheSize: evt.data.cacheSize
         }
       })
     }
@@ -64,9 +66,6 @@ export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownRe
     renderWorker.postMessage(raw)
   })
 })
-
-// TODO: find method to improve DOMPurify speed
-// TODO: Consider batch diffing the DOM rather than updating it all at once
 
 export const morphMarkdown = createLock((raw: string, node: Node) => {
   return new Promise((resolve, reject) => {
@@ -84,6 +83,8 @@ export const morphMarkdown = createLock((raw: string, node: Node) => {
       morphdom(node, '<div>' + evt.data.html + '</div>', {
         childrenOnly: true,
         onBeforeNodeAdded: function (toEl) {
+          // Don't sanitize if it's just a raw text node
+          if (toEl.nodeType === 3) return toEl
           return DOMPurify.sanitize(toEl, { IN_PLACE: true }) as unknown as Node
         },
         onBeforeElUpdated: function (fromEl, toEl) {
@@ -92,7 +93,11 @@ export const morphMarkdown = createLock((raw: string, node: Node) => {
           return true
         }
       })
-      resolve(true)
+
+      resolve({
+        perf: evt.data.perf,
+        cacheSize: evt.data.cacheSize
+      })
     }
     // everything's ready, send message to worker
     renderWorker.postMessage(raw)

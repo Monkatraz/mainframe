@@ -101,6 +101,7 @@ import ParserInline from 'markdown-it/lib/parser_inline'
 
 // basic blocks
 // ? easy line break | ___
+// ? | left side column
 // ? nestable MD tags
 
 // preprocessor:
@@ -182,6 +183,8 @@ function roughSizeOfObject(object: any) {
   return bytes
 }
 
+// TODO: in edit mode prevent the caching of the most recently edited line
+
 /** A function that caches the results of functions based off an unique ID.
  *  The ID itself is hashed into a small number - so feed in as big of a string as you want for the ID.
  *  Used within the renderer widely to massively improve the performance of code blocks and tex expressions.
@@ -234,18 +237,19 @@ ParserInline.prototype.parse = function (str, md, env, outTokens) {
 
 const TERMINATOR_RE = /[\n!#$%&*+\-:<=>@[\\\]^_`{}~/|]/
 const synExt = [
-  // e.g. '**' -> <strong> mappings
   ...[
     ['/', 'i'], ['_', 'em'],
     ['*', 'b'], ['**', 'strong'],
-    ['__', 'u'],
+    ['__', 'u']
+  ].map((arr) => syntaxWrap({ symb: arr[0], tag: arr[1], strict: true })),
+
+  ...[
     ['--', 's'],
     ['^', 'sup'], ['~', 'sub'],
     ['==', 'mark']
   ].map((arr) => syntaxWrap({ symb: arr[0], tag: arr[1] })),
 
-  // Comments (follows JS syntax entirely)
-  syntaxChain('inline-comment', parserChain([{ match: /\/\/.*$/ }])),
+  // Comments
   syntaxBrackets({ symb: ['/*', '*/'], render: () => '' }),
   syntaxBlock({ symb: ['/*', '*/'], render: () => '' }),
   syntaxLine({ symb: '//', render: () => '' }),
@@ -273,7 +277,7 @@ const synExt = [
 
   // Katex
   syntaxWrap({
-    symb: '$',
+    symb: '$', ignoreFlanking: true,
     render: (str) => cache(() => katex.renderToString(str, { throwOnError: false }), str + '##KATEX##')
   }),
   syntaxBlock({
@@ -348,7 +352,7 @@ const synExt = [
   },
 
   // Escaping text
-  syntaxWrap({ symb: '@@', render: (str) => str }),
+  syntaxWrap({ symb: '@@', ignoreFlanking: true, render: (str) => str }),
 
   // Imported plugins.
   MDMultiMDTables,
@@ -417,7 +421,8 @@ onmessage = (evt) => {
     const html = renderer.render(evt.data)
     postMessage({
       html,
-      perf: performance.now() - perf
+      perf: performance.now() - perf,
+      cacheSize: mdCache.size
     })
   } catch (err) {
     postMessage(String(err))
@@ -453,17 +458,16 @@ function flanking(state: StateInline, start: number, delimiter: string, strict: 
   const isNextWhiteSpace = state.md.utils.isWhiteSpace(next)
 
   let left = true, right = true
+
   if (isNextWhiteSpace) left = false
-  else if (isNextPunct) {
-    if (!(isLastWhiteSpace || isLastPunct)) left = false
-  }
   if (isLastWhiteSpace) right = false
-  else if (isLastPunct) {
-    if (!(isNextWhiteSpace || isNextPunct)) right = false
-  }
   if (strict) {
-    left = left && (!right || isLastPunct)
-    right = right && (!left || isNextPunct)
+    if (isNextPunct && !isLastWhiteSpace) left = false
+    if (isLastPunct && !isNextWhiteSpace) right = false
+
+    if (!isLastPunct && !isLastWhiteSpace && !isNextPunct && !isNextWhiteSpace) {
+      left = false, right = false
+    }
   }
 
   return { left, right }
@@ -684,7 +688,11 @@ function syntaxChain(name: string, parse: ReturnType<typeof parserChain>, opts: 
   }
 }
 
-function syntaxWrap(opts: { symb: string, tag?: string, render?: (contents: string) => string }) {
+function syntaxWrap(
+  opts: {
+    symb: string, tag?: string, ignoreFlanking?: boolean, strict?: boolean
+    render?: (contents: string) => string
+  }) {
   return (md: MarkdownIt) => {
     if (!opts.tag) opts.tag = ''
     const type = opts.symb + (opts.tag !== '' ? opts.tag : '_synExt')
@@ -702,8 +710,8 @@ function syntaxWrap(opts: { symb: string, tag?: string, render?: (contents: stri
       while (state.src.substr(start + (len * count), len) === opts.symb && (start + (len * count)) < max)
         count++
       if (!count) return false
-      const { left, right } = flanking(state, start, state.src.substr(start, len * count), false)
-      if (!left && !right) return false
+      const { left, right } = flanking(state, start, state.src.substr(start, len * count), opts.strict ?? false)
+      if (!opts.ignoreFlanking && !left && !right) return false
       // we only care about the end delimiter if we're using a render function
       // if we're not, we just want to tokenize the delimiters themselves
       if (opts.render) {
@@ -711,8 +719,8 @@ function syntaxWrap(opts: { symb: string, tag?: string, render?: (contents: stri
         let pos = start + (len * count)
         for (; pos < max; pos++)
           if (state.src.substr(pos, len) === opts.symb) {
-            const { left, right } = flanking(state, start, opts.symb, false)
-            if (!left && !right) continue
+            const { left, right } = flanking(state, pos, opts.symb, opts.strict ?? false)
+            if (!opts.ignoreFlanking && !left && !right) continue
             break
           }
         if (pos === max) return false
@@ -730,8 +738,8 @@ function syntaxWrap(opts: { symb: string, tag?: string, render?: (contents: stri
             jump: i,
             token: state.tokens.length - 1,
             end: -1,
-            open: left,
-            close: right
+            open: !opts.ignoreFlanking ? left : true,
+            close: !opts.ignoreFlanking ? right : true
           })
         }
         state.pos += len * count

@@ -3,18 +3,21 @@
  * @author Monkatraz
  */
 
+import type monaco from 'monaco-editor'
+
 /* eslint-disable no-useless-escape */
-export const settings = {
-  language: 'markdown',
+export const settings: monaco.editor.IStandaloneEditorConstructionOptions = {
+  language: 'markdown-extended',
   // Functionality
   minimap: { enabled: false },
   autoClosingBrackets: 'languageDefined',
   autoClosingQuotes: 'languageDefined',
   suggest: { showWords: false },
-  occurrencesHighlight: false,
-  "semanticHighlighting.enabled": true,
   codeLens: false,
   // Appearance
+  colorDecorators: true,
+  "semanticHighlighting.enabled": true,
+  occurrencesHighlight: false,
   showUnused: true,
   matchBrackets: "near",
   renderLineHighlight: "all",
@@ -30,8 +33,10 @@ export const settings = {
   fontWeight: "400",
   fontLigatures: true,
   lineHeight: 20,
+  renderWhitespace: 'none',
   // Text
-  wordWrap: 'on',
+  wordWrap: 'bounded',
+  wordWrapColumn: 90,
   wrappingIndent: 'same',
   wrappingStrategy: 'advanced',
   tabSize: 2,
@@ -49,7 +54,7 @@ export const settings = {
 | \`^...^\` | Superscript | 10^10^ Some^tiny text.^
 | \`~...~\` | Subscript | X~1~, X~2~, Some~more tiny text.~
 | \`--...--\` | Strikethrough | --This text was a mistake.--
-| \`==...==\`| Mark | ==This text is important for some reason, and thus highlighted.==
+| \`==...==\`| Mark | ==This text is important for some reason, and is suitably highlighted.==
 
 ##### Critical Markup:
 | | | |
@@ -58,7 +63,7 @@ export const settings = {
 | \`{--...--}\` | Deletion | {--You should delete this text.--}
 | \`{~~...~>...~~}\` | Substitution | {~~Replace this,~>With this.~~}
 | \`{==...==}\` | Highlight | {==You should take note of this text.==}
-| \`{>>...<<}\` | Comment | {==This highlighted text is...==}{>>Folllowed by a comment.<<}
+| \`{>>...<<}\` | Comment | {==This highlighted text is...==}{>>Followed by a comment.<<}
 
 ##### Special:
 | | | |
@@ -98,14 +103,18 @@ export const settings = {
 \`\`\``
 }
 
-export const theme = {
+export const theme: monaco.editor.IStandaloneThemeData = {
   base: 'vs-dark',
   inherit: true,
   rules: [
+    // default color
+    { token: '', foreground: '#ABB2BF' },
+
     { token: 'delimiter', foreground: '#727d9c' },
 
     { token: 'operators', foreground: '#56B6C2' },
-    { token: 'keyword', foreground: '#56B6C2' },
+
+    { token: 'keyword', foreground: '#C678DD' },
 
     { token: 'string', foreground: '#98C379' },
     { token: 'entity', foreground: '#98C379' },
@@ -133,10 +142,51 @@ export const theme = {
     { token: 'tag', foreground: '#E06C75' },
     { token: 'attribute', foreground: '#FFCB6B' },
 
-    { token: 'text', foreground: '#ABB2BF' },
-    { token: 'underline', foreground: '#61AFEF', fontStyle: 'underline' },
-    { token: 'emphasis', foreground: '#61AFEF', fontStyle: 'italic' },
-    { token: 'strong', foreground: '#61AFEF', fontStyle: 'bold' },
+    // Markdown Specific
+
+    // misc. symbols
+    { token: 'keyword.md', foreground: '#61AFEF' },
+    { token: 'keyword.heading.md', foreground: '#E06C75' },
+    { token: 'keyword.table', foreground: '#687387' },
+    { token: 'keyword.table.header', foreground: '#ABB2BF' },
+    { token: 'delimiter.md', foreground: '#C678DD' },
+    // inline formatting
+    { token: 'text.md', foreground: '#ABB2BF' },
+    { token: 'underline.md', fontStyle: 'underline' },
+    { token: 'emphasis.md', fontStyle: 'italic' },
+    { token: 'strong.md', fontStyle: 'bold' },
+    // misc. elements
+    { token: 'variable.parameter.md', foreground: '#D19A66' },
+    { token: 'string.link', foreground: '#64a0ff' },
+    // critic markup
+    { token: 'critic.addition', foreground: '#54D169' },
+    { token: 'critic.addition.delimiter', foreground: '#32FF41' },
+    { token: 'critic.deletion', foreground: '#E04B36' },
+    { token: 'critic.deletion.delimiter', foreground: '#FF3214' },
+    { token: 'critic.substitution.delimiter', foreground: '#FF9614' },
+    { token: 'critic.highlight', foreground: '#C878C8' },
+    { token: 'critic.highlight.delimiter', foreground: '#DB84DB' },
+    { token: 'critic.comment', foreground: '#5694D6' },
+    { token: 'critic.comment.delimiter', foreground: '#3296FF' },
+
+    // Color Extensions Hack
+    // This is a hack that allows us to expose CSS class names for token colors.
+    // This lets us extend what styling is possible for tokens by giving them an unique color.
+    // For example, you can't do strikethrough unless you do a hack like this.
+    // This is _very much_ not supported by Monaco.
+    // You can still extract the color map if you know where to look.
+
+    // 160, 165, 180
+    { token: 'strikethrough.md', foreground: '#A0A5B4' },
+    // 50, 50, 60
+    { token: 'mark.md', foreground: '#32323C' },
+    // 190, 195, 205
+    { token: 'superscript.md', foreground: '#BEC3CD', fontStyle: 'italic' },
+    // 195, 190, 205
+    { token: 'subscript.md', foreground: '#C3BECD', fontStyle: 'italic' },
+    // 225, 100, 110
+    { token: 'keyword.hr.md', foreground: '#E1646E' },
+
   ],
   colors: {
     // -1
