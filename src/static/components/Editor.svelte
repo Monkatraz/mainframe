@@ -2,6 +2,7 @@
   // Import Monaco and its features
   import * as monaco from '@js/editor/monaco'
   import * as mdLang from '@js/editor/markdown-lang'
+  import { waitFor } from '@modules/util'
 
   (self as any).MonacoEnvironment = {
     getWorker: function(moduleId:string, label:string) {
@@ -36,34 +37,36 @@
 
   import { TokenizationRegistry } from 'monaco-editor/esm/vs/editor/common/modes.js'
 
-  function mtk(red: number, green: number, blue: number) {
-    const colorMap = TokenizationRegistry['_colorMap'] as {rgba: { r: number, g: number, b: number }}[]
-    // for some reason forEach is the only method that works here
-    let result = 0
-    colorMap.forEach((color, idx) => {
-      const { r, g, b } = color.rgba
-      if (r === red && g === green && b === blue) result = idx
-    })
-    return '.mtk' + result
-  }
+  waitFor(() => TokenizationRegistry['_colorMap'] !== null).then(() => {
+    function mtk(red: number, green: number, blue: number) {
+      const colorMap = TokenizationRegistry['_colorMap'] as {rgba: { r: number, g: number, b: number }}[]
+      // for some reason forEach is the only method that works here
+      let result = 0
+      colorMap.forEach((color, idx) => {
+        const { r, g, b } = color.rgba
+        if (r === red && g === green && b === blue) result = idx
+      })
+      return '.mtk' + result
+    }
 
-  const extendedTokenStyling = [
-    `${mtk(160, 165, 180)} { text-decoration: line-through; }`, // strikethrough
-    `${mtk(50, 50, 60)} { background: #FFCB6BEE; }`, // mark
-    `${mtk(190, 195, 205)} { position: relative; top: -0.25em; font-size: 90%; }`, // superscript
-    `${mtk(195, 190, 205)} { position: relative; top: 0.25em; font-size: 90%; }`, // subscript
-    // horizontal rules
-    `${mtk(225, 100, 110)}::after {
-      content: ""; position: absolute; left: 0; top: 50%; z-index: -1;
-      width: calc(50 * 14px); border-top: 0.125rem solid #333842;}`,
-  ]
-  const oldElement = document.head.querySelector('#mainframe-monaco-token-styling')
-  if (oldElement) document.head.removeChild(oldElement)
+    const extendedTokenStyling = [
+      `${mtk(160, 165, 180)} { text-decoration: line-through; }`, // strikethrough
+      `${mtk(50, 50, 60)} { background: #FFCB6BEE; }`, // mark
+      `${mtk(190, 195, 205)} { position: relative; top: -0.25em; font-size: 90%; }`, // superscript
+      `${mtk(195, 190, 205)} { position: relative; top: 0.25em; font-size: 90%; }`, // subscript
+      // horizontal rules
+      `${mtk(225, 100, 110)}::after {
+        content: ""; position: absolute; left: 0; top: 50%; z-index: -1;
+        width: calc(50 * 14px); border-top: 0.125rem solid #333842;}`,
+    ]
+    const oldElement = document.head.querySelector('#mainframe-monaco-token-styling')
+    if (oldElement) document.head.removeChild(oldElement)
 
-  const styleElement = document.createElement('style')
-  styleElement.id = 'mainframe-monaco-token-styling'
-  styleElement.innerHTML = extendedTokenStyling.join('\n')
-  document.head.appendChild(styleElement)
+    const styleElement = document.createElement('style')
+    styleElement.id = 'mainframe-monaco-token-styling'
+    styleElement.innerHTML = extendedTokenStyling.join('\n')
+    document.head.appendChild(styleElement)
+  })
 </script>
 
 <script lang="ts">
@@ -71,7 +74,7 @@
   import { spring } from 'svelte/motion'
   import { morphMarkdown } from '@modules/markdown'
   import { tnAnime } from '@modules/anime'
-  import { sleep, idleCallback, createIdleQueued } from '@modules/util';
+  import { sleep, idleCallback, createIdleQueued } from '@modules/util'
 
   // Editor init. (see onMount() below for the rest)
   let editorContainer: HTMLElement
