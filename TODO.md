@@ -5,6 +5,7 @@
 - [ ] Implement Popper
 - [ ] Create a separate, more tightly bundled Monaco build package to be imported as a web_module
 - [ ] Recreate def-list md-it plugin
+- [ ] Switch to CodeMirror due to Monaco being fairly under supported in the client-space
 
 ### General
 - [ ] Integrate ReCaptcha

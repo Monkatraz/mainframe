@@ -12,7 +12,7 @@
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
 
-  const EditorURL = './Editor.js'
+  const EditorURL = '../editor/Editor.js'
 
   // -- ANIMATIONS
   const sideBarReveal = {
@@ -30,6 +30,7 @@
 
   let inEdit = false
   $: if ($router.path.startsWith('/edit')) inEdit = true
+  $: document.documentElement.classList.toggle('in-edit', inEdit)
 
 </script>
 

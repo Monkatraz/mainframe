@@ -143,17 +143,17 @@ ins
 [aria-controls]
   cursor: pointer
 
-// Change the cursor on disabled, not-editable, or otherwise inoperable elements.
-[aria-disabled="true" i], [disabled]
-  cursor: not-allowed
+// // Change the cursor on disabled, not-editable, or otherwise inoperable elements.
+// [aria-disabled="true" i], [disabled]
+//   cursor: not-allowed
 
-// Change the display on visually hidden accessible elements.
-[aria-hidden="false" i][hidden]
-  display: initial
+// // Change the display on visually hidden accessible elements.
+// [aria-hidden="false" i][hidden]
+//   display: initial
 
-[aria-hidden="false" i][hidden]:not(:focus)
-  clip: rect(0, 0, 0, 0)
-  position: absolute
+// [aria-hidden="false" i][hidden]:not(:focus)
+//   clip: rect(0, 0, 0, 0)
+//   position: absolute
 
 // Prevent VoiceOver from ignoring list semantics in Safari.
 nav li::before

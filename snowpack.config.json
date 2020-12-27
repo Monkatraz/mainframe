@@ -48,14 +48,6 @@
       {
         "bundle": [
           [
-            "static/js/editor/monaco.js",
-            "static/js/workers/monaco-worker.js",
-            "static/js/workers/monaco-worker-json.js",
-            "static/js/workers/monaco-worker-css.js",
-            "static/js/workers/monaco-worker-html.js",
-            "static/js/workers/monaco-worker-ts.js"
-          ],
-          [
             "static/js/workers/md-renderer.js",
             "static/js/modules/markdown.js"
           ],
