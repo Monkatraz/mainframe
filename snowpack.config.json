@@ -48,6 +48,9 @@
       {
         "bundle": [
           [
+            "static/editor/editor-config.js"
+          ],
+          [
             "static/js/workers/md-renderer.js",
             "static/js/modules/markdown.js"
           ],
