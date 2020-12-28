@@ -64,9 +64,6 @@
   let perf = 0
   let cacheSize = 0
 
-  let previewRect: DOMRect
-  let domRect: DOMRect
-
   // Scroll Sync.
   let arrLineHeight: number[] = []
   let mapLineHeight: Map<number, number> = new Map()
@@ -81,8 +78,6 @@
 
   /** Generally updates the entire editor's misc. state variables. */
   const update = throttle(() => {
-    previewRect = preview.getBoundingClientRect()
-    domRect = editorView.dom.getBoundingClientRect()
     updateHTML()
     updateScrollMap()
     scrollFromEditor()
@@ -114,16 +109,19 @@
   /** Updates the scroll map that is used for scroll syncing between the editor and preview. */
   const updateScrollMap = createAnimQueued(() => {
     if (!preview || !editorView) return
-    const previewTop = preview.getBoundingClientRect().top
+    const previewRect = preview.getBoundingClientRect()
     // here we map every [data-line] element's line to its offset scroll height
     // we also make a array version of the same Map, for usage with iterators
+    mapLineHeight.clear()
     arrLineHeight = []
     Array.from(preview.querySelectorAll<HTMLElement>('[data-line]'))
       .forEach(elem => {
         const dataLine = parseInt(elem.getAttribute('data-line') as string)
-        const height = elem.getBoundingClientRect().top - previewTop
+        if (elem.offsetParent === preview) {
+        const height = elem.getBoundingClientRect().top - previewRect.top
         mapLineHeight.set(dataLine, height)
         arrLineHeight[dataLine] = height
+        }
       })
 
     // starts a poll (because it calls itself) to catch flukes
@@ -137,9 +135,10 @@
     const scrollTop = editorContainer.scrollTop
     editorScrollSpring.set(scrollTop)
     // get top most visible line
+    const domRect = editorContainer.getBoundingClientRect()
     const pos = editorView.posAtCoords({ x: domRect.x, y: domRect.y })
     let line =
-    editorView.state.doc.lineAt(pos ?? 0).number
+    editorView.state.doc.lineAt(pos ?? 1).number
     // find our line height
     let lineHeight = 0
     let curLine = line
@@ -168,8 +167,8 @@
     const line = arrLineHeight.findIndex(height => scrollTop < height)
     if (line !== -1) {
       // fudge to prevent the editor from getting sticky
-      // const diff = (scrollTop - line) * 0.75
-      editorScrollSpring.set(heightAtLine(line))
+      const diff = (scrollTop - arrLineHeight[line]) * 0.75
+      editorScrollSpring.set(heightAtLine(line) + diff)
     }
   })
 
