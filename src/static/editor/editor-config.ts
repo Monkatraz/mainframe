@@ -1,7 +1,7 @@
 import { EditorState } from "@codemirror/next/state"
 import { EditorView } from '@codemirror/next/view'
 import type { Extension } from '@codemirror/next/state'
-import { highlightStyle, tags as t } from '@codemirror/next/highlight'
+import { HighlightStyle, tags as t } from '@codemirror/next/highlight'
 
 export { EditorState } from "@codemirror/next/state"
 export { EditorView } from '@codemirror/next/view'
@@ -37,33 +37,25 @@ export const confinementTheme = EditorView.theme({
     '& ::selection': { backgroundColor: selection },
     caretColor: accent,
     '&$focused': { outline: 'none' },
-    width: '100%',
-    height: '100%'
+    width: '100%'
   },
 
   $scroller: {
     fontFamily: 'var(--font-mono)',
-    lineHeight: '1.4',
     height: '100%',
     fontSize: '13px',
     position: 'relative',
     overflowX: 'auto',
-    overflowY: 'scroll',
     zIndex: 0
   },
 
   $content: {
-    margin: 0,
-    flexGrow: 2,
     width: '100%',
-    maxWidth: '90ch',
-    display: 'block',
-    boxSizing: 'border-box',
-    contain: 'style',
-
-    padding: '4px 0',
-    paddingBottom: '100%',
-    outline: 'none'
+    whiteSpace: 'pre-wrap',
+    paddingBottom: '70vh',
+    maxWidth: '45rem',
+    lineHeight: '18px',
+    overflowWrap: 'normal'
   },
 
   '$$focused $cursor': { borderLeftColor: accent },
@@ -112,7 +104,7 @@ export const confinementTheme = EditorView.theme({
 }, { dark: true })
 
 
-export const confinementHighlightStyle = highlightStyle(
+export const confinementHighlightStyle = HighlightStyle.define(
   {
     tag: [t.keyword, t.operatorKeyword, t.logicOperator, t.compareOperator],
     color: keyword
@@ -179,7 +171,7 @@ export const confinement: Extension = [confinementTheme, confinementHighlightSty
 // Extensions
 
 import { keymap } from '@codemirror/next/view'
-import { highlightSpecialChars, drawSelection } from '@codemirror/next/view'
+import { highlightSpecialChars, highlightActiveLine, drawSelection } from '@codemirror/next/view'
 import { history, historyKeymap } from '@codemirror/next/history'
 import { foldGutter, foldKeymap } from '@codemirror/next/fold'
 import { indentOnInput } from '@codemirror/next/language'
@@ -187,53 +179,52 @@ import { lineNumbers } from '@codemirror/next/gutter'
 import { defaultKeymap } from '@codemirror/next/commands'
 import { bracketMatching } from '@codemirror/next/matchbrackets'
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/next/closebrackets'
-import { searchKeymap } from '@codemirror/next/search'
+import { highlightSelectionMatches, searchKeymap } from '@codemirror/next/search'
 import { autocompletion, completionKeymap } from '@codemirror/next/autocomplete'
 import { commentKeymap } from '@codemirror/next/comment'
 import { rectangularSelection } from '@codemirror/next/rectangular-selection'
-import { gotoLineKeymap } from '@codemirror/next/goto-line'
-import { highlightActiveLine, highlightSelectionMatches } from '@codemirror/next/highlight-selection'
-import { defaultHighlightStyle } from '@codemirror/next/highlight'
 // Languages
+import { languages } from '@codemirror/next/language-data'
 import { markdown } from '@codemirror/next/lang-markdown'
-// import { javascript } from '@codemirror/next/lang-javascript'
 // Local Extensions
 import { redo } from '@codemirror/next/history'
 import { indentMore, indentLess, copyLineDown } from '@codemirror/next/commands'
 
-export const extensions = [
-  EditorView.lineWrapping,
-  lineNumbers(),
-  highlightSpecialChars(),
-  history(),
-  foldGutter(),
-  drawSelection(),
-  EditorState.allowMultipleSelections.of(true),
-  indentOnInput(),
-  defaultHighlightStyle,
-  bracketMatching(),
-  closeBrackets(),
-  autocompletion(),
-  rectangularSelection(),
-  highlightActiveLine(),
-  highlightSelectionMatches(),
-  keymap([
-    ...closeBracketsKeymap,
-    ...defaultKeymap,
-    ...searchKeymap,
-    ...historyKeymap,
-    ...foldKeymap,
-    ...commentKeymap,
-    ...gotoLineKeymap,
-    ...completionKeymap,
-    ...[
-      { key: 'Tab', run: indentMore, preventDefault: true },
-      { key: 'Shift-Tab', run: indentLess, preventDefault: true },
-      { key: 'Mod-Shift-z', run: redo, preventDefault: true },
-      { key: 'Mod-d', run: copyLineDown, preventDefault: true }
-    ]
-  ]),
-  markdown(),
-  // javascript({ jsx: false, typescript: true }),
-  confinement
-]
+export async function getExtensions() {
+  // TODO: remove when this isn't an issue anymore
+  // certain legacy languages currently crash CodeMirror, so this filters those out
+  const freezingLangs = ['Go', 'Lua']
+  const langs = languages.filter(lang => !freezingLangs.includes(lang.name))
+  return [
+    lineNumbers(),
+    highlightSpecialChars(),
+    history(),
+    foldGutter(),
+    drawSelection(),
+    EditorState.allowMultipleSelections.of(true),
+    indentOnInput(),
+    bracketMatching(),
+    closeBrackets(),
+    highlightSelectionMatches(),
+    autocompletion(),
+    rectangularSelection(),
+    highlightActiveLine(),
+    keymap.of([
+      ...closeBracketsKeymap,
+      ...defaultKeymap,
+      ...searchKeymap,
+      ...historyKeymap,
+      ...foldKeymap,
+      ...commentKeymap,
+      ...completionKeymap,
+      ...[
+        { key: 'Tab', run: indentMore, preventDefault: true },
+        { key: 'Shift-Tab', run: indentLess, preventDefault: true },
+        { key: 'Mod-Shift-z', run: redo, preventDefault: true },
+        { key: 'Mod-d', run: copyLineDown, preventDefault: true }
+      ]
+    ]),
+    markdown({ codeLanguages: langs, addKeymap: true }),
+    confinement
+  ]
+}

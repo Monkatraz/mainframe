@@ -34,8 +34,9 @@ export interface RenderMarkdownResult {
 
 const RENDER_TIMEOUT = 10000
 /** Safely renders (async) the given Markdown string.
- *  The render occurs in a web worker for performance reasons.
  *  Calling this function multiple times is safe - it will render one request at a time.
+ *
+ *  The render occurs in a web worker due to performance considerations.
  */
 export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownResult> => {
   return new Promise((resolve, reject) => {
@@ -67,6 +68,13 @@ export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownRe
   })
 })
 
+/** Safely renders a given Markdown string and then updates the given node with the resultant HTML.
+ *  This is _much_ faster than updating the entire DOM node at once.
+ *
+ *  Like `renderMarkdown`, the rendering process itself occurs within a web-worker for higher performance.
+ *  Also, again like `renderMarkdown`, this function can safely be called multiple times. 
+ *  It will only render one request at a time.
+ */
 export const morphMarkdown = createLock((raw: string, node: Node) => {
   return new Promise((resolve, reject) => {
     // Timeout reject scenario

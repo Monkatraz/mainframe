@@ -597,9 +597,13 @@ function syntaxBlock(opts: { symb: [string, string], tag?: string, render?: (con
         token.content = state.getLines(startLine + 1, nextLine, len, true)
         token.markup = symbStart
         token.map = [startLine, state.line]
-      } else
+      } else {
+        state.push('block_wrapper_open', 'div', 1)
+          .map = [startLine, state.line]
         state.push(type, opts.tag as string, 0)
           .markup = state.getLines(startLine + 1, nextLine, len, true)
+        state.push('block_wrapper_close', 'div', -1)
+      }
 
       return true
     })
