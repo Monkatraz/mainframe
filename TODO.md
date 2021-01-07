@@ -3,9 +3,7 @@
 ### In Progress
 - [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
 - [ ] Implement Popper
-- [ ] Create a separate, more tightly bundled Monaco build package to be imported as a web_module
 - [ ] Recreate def-list md-it plugin
-- [ ] Switch to CodeMirror due to Monaco being fairly under supported in the client-space
 
 ### General
 - [ ] Integrate ReCaptcha
@@ -101,3 +99,4 @@
 - [x] Switch to Vercel due to even better pricing and FOSS ideals
 - [x] Add Monaco editor component and Markdown lang.
 - [x] Implement Prism into the Markdown render worker directly somehow
+- [x] Switch to CodeMirror due to Monaco being fairly under supported in the client-space

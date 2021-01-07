@@ -184,6 +184,7 @@ function roughSizeOfObject(object: any) {
 }
 
 // TODO: in edit mode prevent the caching of the most recently edited line
+// could do this with debouncing?
 
 /** A function that caches the results of functions based off an unique ID.
  *  The ID itself is hashed into a small number - so feed in as big of a string as you want for the ID.
@@ -250,8 +251,8 @@ const synExt = [
   ].map((arr) => syntaxWrap({ symb: arr[0], tag: arr[1] })),
 
   // Comments
-  syntaxBrackets({ symb: ['/*', '*/'], render: () => '' }),
   syntaxBlock({ symb: ['/*', '*/'], render: () => '' }),
+  syntaxBrackets({ symb: ['/*', '*/'], render: () => '' }),
   syntaxLine({ symb: '//', render: () => '' }),
 
   // CriticMarkup

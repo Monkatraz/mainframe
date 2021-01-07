@@ -1,34 +1,25 @@
-<!-- <script context="module" lang="ts">
-  const extendedTokenStyling = [
-    `${mtk(160, 165, 180)} { text-decoration: line-through; }`, // strikethrough
-    `${mtk(50, 50, 60)} { background: #FFCB6BEE; }`, // mark
-    `${mtk(190, 195, 205)} { position: relative; top: -0.25em; font-size: 90%; }`, // superscript
-    `${mtk(195, 190, 205)} { position: relative; top: 0.25em; font-size: 90%; }`, // subscript
-    // horizontal rules
-    `${mtk(225, 100, 110)}::after {
-      content: ""; position: absolute; left: 0; top: 50%; z-index: -1;
-      width: calc(50 * 14px); border-top: 0.125rem solid #333842;}`,
-  ]
-  const oldElement = document.head.querySelector('#mainframe-monaco-token-styling')
-  if (oldElement) document.head.removeChild(oldElement)
-
-  const styleElement = document.createElement('style')
-  styleElement.id = 'mainframe-monaco-token-styling'
-  styleElement.innerHTML = extendedTokenStyling.join('\n')
-  document.head.appendChild(styleElement)
-</script> -->
-
 <script lang="ts">
   // Library Imports
   import { onDestroy, onMount } from 'svelte'
   import { spring } from 'svelte/motion'
   import { morphMarkdown } from '@modules/markdown'
   import { tnAnime } from '@modules/anime'
-  import { sleep, idleCallback, createIdleQueued, createAnimQueued, throttle } from '@modules/util'
+  import { idleCallback, createIdleQueued, createAnimQueued, throttle } from '@modules/util'
   // CodeMirror
   import { EditorState, EditorView, getExtensions } from './editor-config'
+  // Components
+  // import Spinny from '../components/Spinny.svelte'
 
-  // CodeMirror Init.
+  // -- CONTAINER
+
+  let containerClass: 'show-editor' | 'show-both' | 'show-preview' = 'show-both'
+  let showLivePreview = true
+
+  $: containerClass = showLivePreview ? 'show-both' : 'show-editor'
+  $: if (preview) updatePreview()
+
+  // -- EDITOR
+
   let editorContainer: HTMLElement
   let editorView: EditorView
 
@@ -45,18 +36,19 @@
 
     editorView = new EditorView({
       state: EditorState.create({
-        doc: "Hello World",
+        doc: await fetch('/static/misc/md-test.md').then(res => res.text()),
         extensions: mergedExtensions
       }),
       parent: editorContainer
     })
 
-    update()
+    updatePreview()
+
   })
 
   onDestroy(() => { editorView.destroy() })
 
-  // -- STATE
+  // -- PREVIEW <-> EDITOR
 
   let preview: HTMLDivElement
   let previewContainer: HTMLElement
@@ -65,6 +57,7 @@
   let cacheSize = 0
 
   // Scroll Sync.
+  let scrollMapNeedsUpdate = true
   let arrLineHeight: number[] = []
   let mapLineHeight: Map<number, number> = new Map()
   /** Denotes whether the editor or the preview is the element the user is scrolling with. */
@@ -74,10 +67,8 @@
   /** The spring for the editor's sync. scroll position. */
   let editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
 
-  // -- UTIL. FUNCTIONS
-
-  /** Generally updates the entire editor's misc. state variables. */
-  const update = throttle(() => {
+  /** Generally updates the preview's state, such as the rendered HTML and the scroll map. */
+  const updatePreview = throttle(() => {
     updateHTML()
     updateScrollMap()
     scrollFromEditor()
@@ -89,8 +80,6 @@
     return editorView.visualLineAt(editorView.state.doc.line(line).from).top
   }
 
-  // -- FUNCTIONS
-
   /** Updates the preview's HTML based on the current editor state. */
   const updateHTML = createIdleQueued(async () => {
     if (!preview || !editorView) return
@@ -98,17 +87,16 @@
     // rather than replace the whole tree we just replace what's changed using MorphDOM
     await idleCallback(async () => {
       const stats = await morphMarkdown(editorView.state.doc.toString(), preview)
-      updateScrollMap()
+      scrollMapNeedsUpdate = true
       cacheSize = stats.cacheSize
       perf = performance.now() - startPerf
-      // basically a fudge, but this helps prevent chugging
-      await sleep(perf)
     })
   })
 
   /** Updates the scroll map that is used for scroll syncing between the editor and preview. */
   const updateScrollMap = createAnimQueued(() => {
     if (!preview || !editorView) return
+    scrollMapNeedsUpdate = false
     const previewRect = preview.getBoundingClientRect()
     // here we map every [data-line] element's line to its offset scroll height
     // we also make a array version of the same Map, for usage with iterators
@@ -125,14 +113,15 @@
       })
 
     // starts a poll (because it calls itself) to catch flukes
-    setTimeout(() => { if (preview && editorView) updateScrollMap() }, 5000)
+    setTimeout(updateScrollMap, 5000)
   })
 
   /** Updates the preview scroll position if the scroll sync. is currently editor based.
    *  Should be called whenever a scrolling event is detected from the editor. */
   const scrollFromEditor = createAnimQueued(() => {
     if (scrollingWith === 'preview' || !preview || !editorView) return
-    const scrollTop = editorContainer.scrollTop
+    if (scrollMapNeedsUpdate) updateScrollMap()
+    const scrollTop = editorView.scrollDOM.scrollTop
     editorScrollSpring.set(scrollTop)
     // get top most visible line
     const domRect = editorContainer.getBoundingClientRect()
@@ -161,6 +150,7 @@
    *  Should be called whenever a scrolling event is detected from the preview. */
   const scrollFromPreview = createAnimQueued(() => {
     if (scrollingWith === 'editor' || !preview || !editorView) return
+    if (scrollMapNeedsUpdate) updateScrollMap()
     const scrollTop = previewContainer.scrollTop
     previewScrollSpring.set(scrollTop)
     // filter for the closest line height
@@ -172,19 +162,17 @@
     }
   })
 
-  // -- REACTIVE
-
   // updates scroll sync. positions
   $: if (previewContainer && scrollingWith === 'editor') previewContainer.scrollTop = $previewScrollSpring
-  $: if (editorView && scrollingWith === 'preview') editorContainer.scrollTop = $editorScrollSpring
+  $: if (editorView && scrollingWith === 'preview') editorView.scrollDOM.scrollTop = $editorScrollSpring
 
 </script>
 
 <style lang="stylus">
   @require '_lib'
 
-  $hght = calc(100vh - var(--layout-header-height) - var(--layout-footer-height))
-  $hght2 = calc(100vh - 2rem - var(--layout-header-height) - var(--layout-footer-height))
+  $hght = calc(100vh - var(--layout-header-height))
+  $hght2 = calc(100vh - 2rem - var(--layout-header-height))
   $body-w = minmax(0, var(--layout-body-max-width))
   $edit-w = minmax(50%, 1fr)
 
@@ -198,46 +186,93 @@
   .editor-container
     width: 100%
     box-shadow: 0 0 4rem black
-    box-sizing: content-box
 
-    grid-kiss:"+--------------------------------------------------+      ",
-              "| .topbar                                          | 2rem ",
-              "+--------------------------------------------------+      ",
-              "+---------------+ +------+ +--------------+ +------+      ",
-              "| .editor       | |      | | .preview     | |      |      ",
-              "|               | |      | |              | |      |      ",
-              "|               | |      | |              | |      |      ",
-              "|               | |      | |              | |      |      ",
-              "|               | |      | |              | |      |$hght2",
-              "|               | |      | |              | |      |      ",
-              "|               | |      | |              | |      |      ",
-              "|               | |      | |              | |      |      ",
-              "|               | |      | |              | |      |      ",
-              "|               | |      | |              | |      |      ",
-              "+---------------+ +------+ +--------------+ +------+      ",
-              "|    $edit-w    | |0.5rem| |   $body-w    | |0.5rem|      "
+    &.show-both
+      grid-kiss:"+--------------------------------------------------+      ",
+                "| .topbar                                          | 2rem ",
+                "+--------------------------------------------------+      ",
+                "+---------------+ +------+ +--------------+ +------+      ",
+                "| .editor       | |      | | .preview     | |      |      ",
+                "|               | |      | |              | |      |      ",
+                "|               | |      | |              | |      |      ",
+                "|               | |      | |              | |      |      ",
+                "|               | |      | |              | |      |$hght2",
+                "|               | |      | |              | |      |      ",
+                "|               | |      | |              | |      |      ",
+                "|               | |      | |              | |      |      ",
+                "|               | |      | |              | |      |      ",
+                "|               | |      | |              | |      |      ",
+                "+---------------+ +------+ +--------------+ +------+      ",
+                "|    $edit-w    | |0.5rem| |   $body-w    | |0.5rem|      "
+
+    &.show-editor
+      grid-kiss:"+--------------------------------------------------+      ",
+                "| .topbar                                          | 2rem ",
+                "+--------------------------------------------------+      ",
+                "+--------------------------------------------------+      ",
+                "| .editor                                          |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |$hght2",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "+--------------------------------------------------+      ",
+                "| 100%                                             |      "
+
+    &.show-preview
+      grid-kiss:"+--------------------------------------------------+      ",
+                "| .topbar                                          | 2rem ",
+                "+--------------------------------------------------+      ",
+                "+------+ +--------------------------------+ +------+      ",
+                "|      | | .preview                       | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |$hght2",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "+------+ +--------------------------------+ +------+      ",
+                "|0.5rem| | auto                           | |0.5rem|      "
+      .editor
+        display: none
 
   .topbar
     background: #23272E
+    color: colvar('text-light')
+    font-set('display')
+    font-size: 0.9rem
+    line-height: 2rem
+    padding: 0 1rem
     z-index: 10
 
-  $col-editor-bg = #282C34
-  .editor
-    background: $col-editor-bg
-    z-index: 2
-    overflow-y: scroll
+    > label
+      padding-right: 1rem
 
+  .editor
+    background: #282C34
+    z-index: 2
+    overflow: hidden
 
   .preview
     position: relative
     background: colvar('background-light')
-    box-shadow: 0 0 10px rgba(0,0,0,0.5) inset
+    width: var(--layout-body-max-width)
+    max-width: 100%
+    margin-left: auto
+    margin-right: auto
     padding: 1rem
     padding-bottom: 100%
     overflow-y: scroll
     font-size: 90%
     z-index: 1
-    transform: translate(0,0)
+    contain: strict
 
   .perf-box
     position: sticky
@@ -245,6 +280,7 @@
     flex-direction: column
     top: 0.5rem
     float: right
+    margin-left: -100%
     padding: 0.25rem
     background: #23272E
     border-radius: 0.25rem
@@ -255,18 +291,23 @@
 </style>
 
 <!-- some chores to do on resize -->
-<svelte:window on:resize={update}/>
+<svelte:window on:resize={updatePreview}/>
 
 <div class=overflow-container
   in:tnAnime={{ background: ['transparent', '#23272E'], easing: 'easeOutExpo', duration: 500, delay: 300 }}
 >
-  <div class=editor-container>
+  <div class="editor-container {containerClass}">
 
     <!-- Top | Info Bar -->
     <div class=topbar
       in:tnAnime={{ translateY: ['-150%', '0'], duration: 600, delay: 200, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
-    />
+    >
+      <label>
+        <input type='checkbox' bind:checked={showLivePreview}>
+        Live Preview
+      </label>
+    </div>
 
     <!-- Left | Editor Pane -->
     <div class=editor bind:this={editorContainer}
@@ -281,11 +322,13 @@
       in:tnAnime={{ translateX: ['-300%', '0'], duration: 700, delay: 500, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInExpo' }}
     >
-      <div class=perf-box>
-        <span>PERF: {Math.round(perf)}ms</span>
-        <span>CACHE: {Math.round(cacheSize)}</span>
-      </div>
-      <div class=rhythm bind:this={preview}/>
+      {#if containerClass === 'show-both' || containerClass === 'show-preview'}
+        <div class=perf-box>
+          <span>PERF: {Math.round(perf)}ms</span>
+          <span>CACHE: {Math.round(cacheSize)}</span>
+        </div>
+        <div class=rhythm bind:this={preview}/>
+      {/if}
     </div>
 
   </div>

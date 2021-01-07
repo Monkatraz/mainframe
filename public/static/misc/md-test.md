@@ -14,7 +14,7 @@
 | `^...^` | Superscript | 10^10^ Some^tiny text.^
 | `~...~` | Subscript | X~1~, X~2~, Some~more tiny text.~
 | `--...--` | Strikethrough | --This text was a mistake.--
-| `==...==`| Mark | ==This text is important for some reason, and thus highlighted.==
+| `==...==`| Mark | ==This text is important, so it is highlighted.==
 
 ##### Critical Markup:
 | | | |
@@ -23,7 +23,7 @@
 | `{--...--}` | Deletion | {--You should delete this text.--}
 | `{~~...~>...~~}` | Substitution | {~~Replace this,~>With this.~~}
 | `{==...==}` | Highlight | {==You should take note of this text.==}
-| `{>>...<<}` | Comment | {==This highlighted text is...==}{>>Folllowed by a comment.<<}
+| `{>>...<<}` | Comment | {==This highlighted text is...==}{>>Followed by a comment.<<}
 
 ##### Special:
 | | | |
@@ -103,8 +103,6 @@ This is some content with a comment at the very end.
 
 ## Tests
 ***
-- Nested syntax: 10^10~20~^
-	- ==test ~~one~~ two== ~~one~two~three~~
 - Nested brackets: {++ ins1 {++ ins2 ++} {-- del --} ++}
 - Comments in a pargraph: Sint sit cillum pariatur eiusmod nulla pariatur ipsum. Sit laborum anim qui mollit tempor pariatur nisi minim dolor. Aliquip et{>>Here is a comment<<} adipisicing sit sit fugiat commodo id sunt. Nostrud enim ad commodo incididunt cupidatat in ullamco ullamco Lorem cupidatat velit enim et Lorem.
 		

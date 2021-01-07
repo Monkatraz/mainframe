@@ -16,11 +16,6 @@ html, body
   line-height: 1.5 // Should also not be messed with
 
 body
-  $head-h = var(--layout-header-height)
-  $foot-h = var(--layout-footer-height)
   width: 100%
   max-width: 100%
   min-height: 100vh
-
-  // Stylus bug makes the multi-line thing break so this is just a work-around
-  grid-kiss:"+---------+         ","| #header | $head-h ","+---------+         ","+---------+         ","| #app    | auto    ","+---------+         ","+---------+         ","| #footer | $foot-h ","+---------+         "

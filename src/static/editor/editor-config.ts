@@ -1,10 +1,12 @@
-import { EditorState } from "@codemirror/next/state"
-import { EditorView } from '@codemirror/next/view'
-import type { Extension } from '@codemirror/next/state'
-import { HighlightStyle, tags as t } from '@codemirror/next/highlight'
+import { EditorState } from "@codemirror/state"
+import { EditorView } from '@codemirror/view'
+import type { Extension } from '@codemirror/state'
+import { HighlightStyle, tags as t } from '@codemirror/highlight'
 
-export { EditorState } from "@codemirror/next/state"
-export { EditorView } from '@codemirror/next/view'
+export { EditorState } from "@codemirror/state"
+export { EditorView } from '@codemirror/view'
+
+import monarchMarkdown from './monarch-markdown'
 
 // Confinement Theme
 
@@ -37,7 +39,8 @@ export const confinementTheme = EditorView.theme({
     '& ::selection': { backgroundColor: selection },
     caretColor: accent,
     '&$focused': { outline: 'none' },
-    width: '100%'
+    width: 'auto',
+    height: '100%'
   },
 
   $scroller: {
@@ -50,7 +53,6 @@ export const confinementTheme = EditorView.theme({
   },
 
   $content: {
-    width: '100%',
     whiteSpace: 'pre-wrap',
     paddingBottom: '70vh',
     maxWidth: '45rem',
@@ -89,9 +91,11 @@ export const confinementTheme = EditorView.theme({
   '$gutterElement.lineNumber': { color: 'inherit' },
 
   $foldPlaceholder: {
-    backgroundColor: 'none',
+    background: doc,
     border: 'none',
-    color: '#ddd'
+    padding: '0 0.5rem',
+    margin: '0 0.25rem',
+    color: 'white'
   },
 
   $tooltip: {
@@ -103,6 +107,7 @@ export const confinementTheme = EditorView.theme({
   }
 }, { dark: true })
 
+const mt = monarchMarkdown.tags
 
 export const confinementHighlightStyle = HighlightStyle.define(
   {
@@ -110,7 +115,7 @@ export const confinementHighlightStyle = HighlightStyle.define(
     color: keyword
   },
   {
-    tag: [t.deleted, t.propertyName, t.macroName],
+    tag: [t.deleted, t.propertyName, t.macroName,],
     color: property
   },
   {
@@ -122,11 +127,11 @@ export const confinementHighlightStyle = HighlightStyle.define(
     color: ident
   },
   {
-    tag: [t.processingInstruction, t.string, t.regexp, t.inserted, t.special(t.string)],
+    tag: [t.processingInstruction, t.monospace, t.string, t.regexp, t.inserted, t.special(t.string)],
     color: string
   },
   {
-    tag: [t.character, t.color, t.constant(t.name), t.number, t.bool, t.null],
+    tag: [t.character, t.unit, t.color, t.constant(t.name), t.number, t.bool, t.null],
     color: constant
   },
   {
@@ -156,45 +161,65 @@ export const confinementHighlightStyle = HighlightStyle.define(
   {
     tag: [t.link, t.url],
     color: link,
+  },
+  {
+    tag: t.url,
+    color: link,
     textDecoration: 'underline'
   },
-
+  {
+    tag: [t.atom, t.special(t.variableName)],
+    color: func
+  },
+  {
+    tag: t.invalid,
+    color: invalid
+  },
+  // markdown
   { tag: t.strong, fontWeight: 'bold' },
   { tag: t.emphasis, fontStyle: 'italic' },
   { tag: t.heading, fontWeight: 'bold', color: tag },
-  { tag: [t.atom, t.special(t.variableName)], color: func },
-  { tag: t.invalid, color: invalid },
+  {
+    tag: t.contentSeparator,
+    fontWeight: 'bold', color: tag,
+    display: 'inline-block', width: 'calc(100% - 1rem)',
+    boxShadow: '0 -0.125rem 0 #333842'
+  },
+  // markdown extended
+  { tag: mt.superscript, position: 'relative', top: '-0.25em', fontSize: '90%' },
+  { tag: mt.subscript, position: 'relative', top: '0.25em', fontSize: '90%' },
+  { tag: mt.underline, textDecoration: 'underline' },
+  { tag: mt.strikethrough, textDecoration: 'line-through' },
+  { tag: mt.mark, background: '#FFCB6BEE', color: 'black' },
+  // critical markup
+  { tag: mt.criticAddition, color: '#54D169' },
+  { tag: mt.criticDeletion, color: '#E04B36' },
+  { tag: mt.criticSub, color: '#FF9614' },
+  { tag: mt.criticHighlight, color: '#C878C8' },
+  { tag: mt.criticComment, color: '#5694D6' },
 )
 
 export const confinement: Extension = [confinementTheme, confinementHighlightStyle]
 
 // Extensions
 
-import { keymap } from '@codemirror/next/view'
-import { highlightSpecialChars, highlightActiveLine, drawSelection } from '@codemirror/next/view'
-import { history, historyKeymap } from '@codemirror/next/history'
-import { foldGutter, foldKeymap } from '@codemirror/next/fold'
-import { indentOnInput } from '@codemirror/next/language'
-import { lineNumbers } from '@codemirror/next/gutter'
-import { defaultKeymap } from '@codemirror/next/commands'
-import { bracketMatching } from '@codemirror/next/matchbrackets'
-import { closeBrackets, closeBracketsKeymap } from '@codemirror/next/closebrackets'
-import { highlightSelectionMatches, searchKeymap } from '@codemirror/next/search'
-import { autocompletion, completionKeymap } from '@codemirror/next/autocomplete'
-import { commentKeymap } from '@codemirror/next/comment'
-import { rectangularSelection } from '@codemirror/next/rectangular-selection'
-// Languages
-import { languages } from '@codemirror/next/language-data'
-import { markdown } from '@codemirror/next/lang-markdown'
+import { keymap, highlightSpecialChars, highlightActiveLine, drawSelection } from '@codemirror/view'
+import { history, historyKeymap } from '@codemirror/history'
+import { foldGutter, foldKeymap } from '@codemirror/fold'
+import { indentOnInput, Language } from '@codemirror/language'
+import { lineNumbers } from '@codemirror/gutter'
+import { defaultKeymap } from '@codemirror/commands'
+import { bracketMatching } from '@codemirror/matchbrackets'
+import { closeBrackets, closeBracketsKeymap } from '@codemirror/closebrackets'
+import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
+import { autocompletion, completionKeymap } from '@codemirror/autocomplete'
+import { commentKeymap } from '@codemirror/comment'
+import { rectangularSelection } from '@codemirror/rectangular-selection'
 // Local Extensions
-import { redo } from '@codemirror/next/history'
-import { indentMore, indentLess, copyLineDown } from '@codemirror/next/commands'
+import { redo } from '@codemirror/history'
+import { indentMore, indentLess, copyLineDown } from '@codemirror/commands'
 
 export async function getExtensions() {
-  // TODO: remove when this isn't an issue anymore
-  // certain legacy languages currently crash CodeMirror, so this filters those out
-  const freezingLangs = ['Go', 'Lua']
-  const langs = languages.filter(lang => !freezingLangs.includes(lang.name))
   return [
     lineNumbers(),
     highlightSpecialChars(),
@@ -224,7 +249,7 @@ export async function getExtensions() {
         { key: 'Mod-d', run: copyLineDown, preventDefault: true }
       ]
     ]),
-    markdown({ codeLanguages: langs, addKeymap: true }),
+    monarchMarkdown.load(),
     confinement
   ]
 }
