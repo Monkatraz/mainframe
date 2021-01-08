@@ -5,7 +5,7 @@
   import { tnAnime } from '@modules/anime'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
-  import Iconify from '@iconify/iconify'
+  import '@iconify/iconify'
   import Page from './Page.svelte'
   import Spinny from './Spinny.svelte'
 

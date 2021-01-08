@@ -146,14 +146,14 @@ export interface Page {
      */
     flags: string[]
     /** List of strings describing the contents of the article. */
-    tags: Tags[]
+    tags: Tags
   }
-  social: {
-    /** A list of `Rating` objects representing how users have voted on this page. */
-    ratings: Rating[]
-    /** A list of 'Comment' objects, storing how users commented on this page. */
-    comments: string[]
-  }
+  // social: {
+  //   /** A list of `Rating` objects representing how users have voted on this page. */
+  //   ratings: Rating[]
+  //   /** A list of 'Comment' objects, storing how users commented on this page. */
+  //   comments: string[]
+  // }
   /** Dictionary-like object (e.g `en: {}`) listing all versions of this page.
    *  Fields denote which language the `View` is for.
    */
@@ -354,18 +354,18 @@ export function withPage(path: string, lang: string | Expr = qe.PageLang(q.Var('
       qe.Filter(local, [
         'title', 'subtitle', 'description', 'template'
       ])))),
-    /** Requests just the `social` record. */
-    requestSocial: () => User.client.query<Page['social']>(ql(q.Select('social', q.Var('data')))),
+    // /** Requests just the `social` record. */
+    // requestSocial: () => User.client.query<Page['social']>(ql(q.Select('social', q.Var('data')))),
     /** Requests the `title`, `subtitle`, and `description` fields. */
     requestDescription: () => User.client.query<Omit<View, 'template'>>(ql(qe.Filter(local, [
       'title', 'subtitle', 'description'
     ])))
     // field
-    // ratings
-    // comments
     // langs
     // meta?
     // template?
+    // ratings
+    // comments
     // upvote
     // mehvote
     // downvote

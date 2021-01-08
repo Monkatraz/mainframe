@@ -1,11 +1,6 @@
-import { EditorState } from "@codemirror/state"
 import { EditorView } from '@codemirror/view'
 import type { Extension } from '@codemirror/state'
 import { HighlightStyle, tags as t } from '@codemirror/highlight'
-
-export { EditorState } from "@codemirror/state"
-export { EditorView } from '@codemirror/view'
-
 import monarchMarkdown from './monarch-markdown'
 
 // Confinement Theme
@@ -200,56 +195,3 @@ export const confinementHighlightStyle = HighlightStyle.define(
 )
 
 export const confinement: Extension = [confinementTheme, confinementHighlightStyle]
-
-// Extensions
-
-import { keymap, highlightSpecialChars, highlightActiveLine, drawSelection } from '@codemirror/view'
-import { history, historyKeymap } from '@codemirror/history'
-import { foldGutter, foldKeymap } from '@codemirror/fold'
-import { indentOnInput, Language } from '@codemirror/language'
-import { lineNumbers } from '@codemirror/gutter'
-import { defaultKeymap } from '@codemirror/commands'
-import { bracketMatching } from '@codemirror/matchbrackets'
-import { closeBrackets, closeBracketsKeymap } from '@codemirror/closebrackets'
-import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
-import { autocompletion, completionKeymap } from '@codemirror/autocomplete'
-import { commentKeymap } from '@codemirror/comment'
-import { rectangularSelection } from '@codemirror/rectangular-selection'
-// Local Extensions
-import { redo } from '@codemirror/history'
-import { indentMore, indentLess, copyLineDown } from '@codemirror/commands'
-
-export async function getExtensions() {
-  return [
-    lineNumbers(),
-    highlightSpecialChars(),
-    history(),
-    foldGutter(),
-    drawSelection(),
-    EditorState.allowMultipleSelections.of(true),
-    indentOnInput(),
-    bracketMatching(),
-    closeBrackets(),
-    highlightSelectionMatches(),
-    autocompletion(),
-    rectangularSelection(),
-    highlightActiveLine(),
-    keymap.of([
-      ...closeBracketsKeymap,
-      ...defaultKeymap,
-      ...searchKeymap,
-      ...historyKeymap,
-      ...foldKeymap,
-      ...commentKeymap,
-      ...completionKeymap,
-      ...[
-        { key: 'Tab', run: indentMore, preventDefault: true },
-        { key: 'Shift-Tab', run: indentLess, preventDefault: true },
-        { key: 'Mod-Shift-z', run: redo, preventDefault: true },
-        { key: 'Mod-d', run: copyLineDown, preventDefault: true }
-      ]
-    ]),
-    monarchMarkdown.load(),
-    confinement
-  ]
-}
