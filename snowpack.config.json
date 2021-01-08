@@ -24,20 +24,8 @@
         "@codemirror/gutter",
         "@codemirror/highlight",
         "@codemirror/history",
-        "@codemirror/lang-cpp",
-        "@codemirror/lang-css",
-        "@codemirror/lang-html",
-        "@codemirror/lang-java",
-        "@codemirror/lang-javascript",
-        "@codemirror/lang-json",
-        "@codemirror/lang-markdown",
-        "@codemirror/lang-python",
-        "@codemirror/lang-rust",
-        "@codemirror/lang-sql",
-        "@codemirror/lang-xml",
         "@codemirror/language",
         "@codemirror/language-data",
-        "@codemirror/legacy-modes",
         "@codemirror/matchbrackets",
         "@codemirror/rectangular-selection",
         "@codemirror/search",
@@ -81,9 +69,6 @@
       "./dev/snowpack/esbuild-bundle.js",
       {
         "bundle": [
-          [
-            "static/editor/editor-config.js"
-          ],
           [
             "static/js/workers/md-renderer.js",
             "static/js/modules/markdown.js"
