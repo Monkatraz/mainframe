@@ -68,7 +68,7 @@
     "eslint": "latest",
     "fs-extra": "^9.0.1",
     "patch-package": "^6.2.2",
-    "postcss": "^8.2.1",
+    "postcss": "^8.2.3",
     "snowpack": "^2.18.5",
     "sort-css-media-queries": "^1.5.2",
     "stylus": "^0.54.8",
