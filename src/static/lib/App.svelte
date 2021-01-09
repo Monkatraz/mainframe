@@ -1,18 +1,18 @@
 <script lang="ts">
   // Imports
-  import * as API from '@js/modules/api'
-  import { ENV, sleep } from '@modules/util'
-  import { tnAnime } from '@modules/anime'
+  import * as API from './modules/api'
+  import { ENV, sleep } from './modules/util'
+  import { tnAnime } from './modules/anime'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import '@iconify/iconify'
-  import Page from './Page.svelte'
-  import Spinny from './Spinny.svelte'
+  import Page from './components/Page.svelte'
+  import Spinny from './components/Spinny.svelte'
 
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
 
-  const EditorURL = '../editor/Editor.js'
+  const EditorURL = './Editor.js'
 
   // -- ANIMATIONS
   const sideBarReveal = {

@@ -4,6 +4,8 @@
 - [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
 - [ ] Implement Popper
 - [ ] Recreate def-list md-it plugin
+- [ ] Move all components and JS into a `/lib` folder
+- [ ] Implement Storybook
 
 ### General
 - [ ] Integrate ReCaptcha

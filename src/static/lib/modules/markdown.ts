@@ -3,7 +3,7 @@
  * @author Monkatraz
  */
 // Imports
-import { createLock } from '@modules/util'
+import { createLock } from './util'
 import DOMPurify from 'dompurify'
 import morphdom from 'morphdom'
 

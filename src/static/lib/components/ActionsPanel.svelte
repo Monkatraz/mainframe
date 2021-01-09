@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { onSwipe } from '@modules/gestures'
-  import { Agent } from '@modules/util'
-  import { tnAnime, usAnime } from '@modules/anime'
-  import { throttle } from '@modules/util'
+  import { onSwipe } from '../modules/gestures'
+  import { Agent } from '../modules/util'
+  import { tnAnime, usAnime } from '../modules/anime'
+  import { throttle } from '../modules/util'
 
   // Props
   export let hidden = true

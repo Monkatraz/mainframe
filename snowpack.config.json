@@ -48,9 +48,6 @@
     "sourceMaps": false
   },
   "alias": {
-    "@js": "./src/static/js",
-    "@modules": "./src/static/js/modules",
-    "@components": "./src/static/components",
     "@vendor": "./public/vendor"
   },
   "experiments": {
@@ -70,10 +67,10 @@
       {
         "bundle": [
           [
-            "static/js/workers/md-renderer.js",
-            "static/js/modules/markdown.js"
+            "static/lib/workers/md-renderer.js",
+            "static/lib/modules/markdown.js"
           ],
-          "static/js/modules/anime.js"
+          "static/lib/modules/anime.js"
         ],
         "preload": true,
         "minify": true

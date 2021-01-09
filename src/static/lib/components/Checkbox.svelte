@@ -28,5 +28,5 @@
 <label>
   <input type='checkbox' bind:checked>
   <Icon i={checked ? 'fa:check-square' : 'fa:square'}/>
-  <span class='slot'><slot/></span>
+  <span class='slot' {...$$restProps}><slot/></span>
 </label>

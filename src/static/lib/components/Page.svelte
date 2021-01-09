@@ -1,7 +1,6 @@
 <script lang='ts'>
-  import { sleep } from '@modules/util'
-  import { tnAnime } from '@modules/anime'
-  import { renderMarkdown } from '@modules/markdown'
+  import { tnAnime } from '../modules/anime'
+  import { renderMarkdown } from '../modules/markdown'
   import { fade } from 'svelte/transition'
   import Spinny from './Spinny.svelte'
   import IntersectionPoint from './IntersectionPoint.svelte'

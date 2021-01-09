@@ -21,17 +21,8 @@
     ],
     "baseUrl": "./",
     "paths": {
-      "@js/*": [
-        "./src/static/js/*"
-      ],
-      "@modules/*": [
-        "./src/static/js/modules/*"
-      ],
       "@vendor/*": [
         "./public/vendor/*"
-      ],
-      "@components/*": [
-        "./src/static/components/*"
       ]
     }
   },

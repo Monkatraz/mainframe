@@ -18,8 +18,8 @@ import { rectangularSelection } from '@codemirror/rectangular-selection'
 // Local Extensions
 import { redo } from '@codemirror/history'
 import { indentMore, indentLess, copyLineDown } from '@codemirror/commands'
-import { confinement } from './editor-config'
-import monarchMarkdown from './monarch-markdown'
+import { confinement } from './editor/editor-config'
+import monarchMarkdown from './editor/monarch-markdown'
 
 function getExtensions() {
   return [
@@ -63,13 +63,13 @@ function getExtensions() {
   import { onDestroy, onMount } from 'svelte'
   import { spring } from 'svelte/motion'
   import { fade } from 'svelte/transition'
-  import { morphMarkdown } from '@modules/markdown'
-  import { tnAnime } from '@modules/anime'
-  import { idleCallback, createIdleQueued, createAnimQueued, throttle } from '@modules/util'
-  import type { Page } from '@modules/api';
+  import { morphMarkdown } from './modules/markdown'
+  import { tnAnime } from './modules/anime'
+  import { idleCallback, createIdleQueued, createAnimQueued, throttle } from './modules/util'
+  import type { Page } from './modules/api';
   // Components
-  import Checkbox from '../components/Checkbox.svelte'
-  import Icon from '../components/Icon.svelte'
+  import Checkbox from './components/Checkbox.svelte'
+  import Icon from './components/Icon.svelte'
 
   // TODO: make dropdowns actually work
   // TODO: add misc. info on topbar like word count and the like
@@ -77,7 +77,7 @@ function getExtensions() {
   // TODO: allow adjusting line-wrap?
   // TODO: mobile mode
   // TODO: swipe to show preview on mobile
-  // TODO: separate out the preview into a component
+  // TODO: split the editor+preview into its own component, API is handled by its parent
 
   export let page: Page = {
     path: 'scp/3685',
@@ -536,7 +536,7 @@ function getExtensions() {
           Title & Description <Icon i='ion:caret-down'/>
         </span>
         <span class=topbar-selector>
-          Tags <Icon i='ion:caret-down'/>
+          Metadata <Icon i='ion:caret-down'/>
         </span>
       </div>
 

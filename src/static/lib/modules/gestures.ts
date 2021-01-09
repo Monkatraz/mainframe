@@ -3,7 +3,7 @@
  * @author Monkatraz
  */
 // Imports
-import { evtlistener, rmEvtlistener } from '@modules/util'
+import { evtlistener, rmEvtlistener } from './util'
 
 /** Represents the valid swipe directions. */
 export type SwipeDirection = 'up' | 'down' | 'left' | 'right'

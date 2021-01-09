@@ -9,7 +9,7 @@ import FaunaDB, { Expr, values as v, errors as e } from 'faunadb'
 const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
-import { ENV } from '@modules/util'
+import { ENV } from './util'
 
 // ---------
 //  FAUNADB
