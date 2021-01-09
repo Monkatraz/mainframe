@@ -4,7 +4,6 @@
 - [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
 - [ ] Implement Popper
 - [ ] Recreate def-list md-it plugin
-- [ ] Move all components and JS into a `/lib` folder
 - [ ] Implement Storybook
 
 ### General
@@ -103,3 +102,4 @@
 - [x] Add Monaco editor component and Markdown lang.
 - [x] Implement Prism into the Markdown render worker directly somehow
 - [x] Switch to CodeMirror due to Monaco being fairly under supported in the client-space
+- [x] Move all components and JS into a `/lib` folder
