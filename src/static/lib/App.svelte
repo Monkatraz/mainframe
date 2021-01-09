@@ -9,6 +9,8 @@
   import Page from './components/Page.svelte'
   import Spinny from './components/Spinny.svelte'
 
+  const meta = router.meta()
+
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
 
@@ -197,7 +199,7 @@
         </Route>
       </main>
     </div>
-    {:else if $router.path.startsWith('/edit')}
+    {:else if $meta.match.startsWith('/edit')}
     <!-- Async. load the editor -->
     <div
       out:fade={{ duration: 100, delay: 300 }}
