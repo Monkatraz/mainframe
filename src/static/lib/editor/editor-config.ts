@@ -51,7 +51,7 @@ export const confinementTheme = EditorView.theme({
     fontFamily: 'var(--font-mono)',
     height: '100%',
     fontSize: '13px',
-    fontWeigth: '400',
+    fontWeight: '400',
     position: 'relative',
     overflowX: 'auto',
     zIndex: 0
