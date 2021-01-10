@@ -71,7 +71,7 @@
           ],
           "static/lib/modules/anime.js"
         ],
-        "preload": false,
+        "preload": true,
         "minify": true
       }
     ]
