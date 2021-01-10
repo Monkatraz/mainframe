@@ -8,6 +8,7 @@ import { languages } from '@codemirror/language-data'
 import { createMonarchLanguage } from 'cm6-monarch'
 
 // TODO: color decorators for #color col|
+// TODO: accept replacement / deletion / addition actions
 
 const open = (name: string) => {
   return { token: '@rematch', next: '@' + name, parser: { open: name[0].toUpperCase() + name.substr(1) } }
@@ -29,8 +30,11 @@ export default createMonarchLanguage({
         "Container": (tree, state) => {
           return { from: Math.min(tree.from + 20, state.doc.lineAt(tree.from).to), to: tree.to - 1 }
         },
-        "Table CodeBlock": (tree, state) => {
+        "Table": (tree, state) => {
           return { from: state.doc.lineAt(tree.from).to, to: tree.to - 1 }
+        },
+        "CodeBlock": (tree, state) => {
+          return { from: state.doc.lineAt(tree.from).to, to: tree.to }
         },
         "HeadingSection": (tree, state) => {
           return { from: state.doc.lineAt(tree.from).to, to: tree.to - 2 }
@@ -169,18 +173,18 @@ export default createMonarchLanguage({
 
         // -- critic markup
 
-        [/({\+\+)((?:(?!\+\+})[^]|@escapes)+)(\+\+})/, 'criticAddition'],
-        [/({--)((?:(?!--})[^]|@escapes)+)(--})/, 'criticDeletion'],
+        [/({\+\+)((?:(?!\+\+})[^]|@escapes)+)(\+\+})/, 'inserted'],
+        [/({--)((?:(?!--})[^]|@escapes)+)(--})/, 'deleted'],
         [/({==)((?:(?!==})[^]|@escapes)+)(==})/, 'criticHighlight'],
         [/({>>)((?:(?!<<})[^]|@escapes)+)(<<})/, 'criticComment'],
         // substitution
         [/({~~)((?:(?!~~}|~>)[^]|@escapes)+)(~>)((?:(?!~~})[^]|@escapes)+)(~~})/,
           [
-            'criticSub',
-            'criticDeletion',
-            'criticSub',
-            'criticAddition',
-            'criticSub'
+            'changed',
+            'deleted',
+            'changed',
+            'inserted',
+            'changed'
           ]
         ],
 

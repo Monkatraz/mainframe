@@ -8,12 +8,8 @@
 $text-tags = 'a, p, span, small, h1, h2, h3, h4, h5, h6'
 
 ::selection
-  color: colvar('text-light')
+  color: colvar('text')
   background-color: colvar('text-select')
-
-body
-  background: colvar('background-light')
-  color: colvar('text-dark')
 
 // Orderly Heading Sizes
 for $num in (0..5)
@@ -26,7 +22,7 @@ for $num in (0..5)
 hr
   display: block
   height: 0.125rem
-  background: colvar('background-dim')
+  background: colvar('border')
 
 // Indents lists.
 ul, ol

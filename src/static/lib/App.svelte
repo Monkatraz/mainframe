@@ -9,8 +9,6 @@
   import Page from './components/Page.svelte'
   import Spinny from './components/Spinny.svelte'
 
-  const meta = router.meta()
-
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
 
@@ -61,9 +59,6 @@
     --layout-body-centering-factor: calc((50vw - (var(--layout-body-max-width) / 2)) - var(--layout-sidebar-width))
     // Total height of the header + navbar
     --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-navbar-height))
-
-  :global(#app)
-    color: colvar('text-dark')
 
   // Shorthands
   // Makes the grid-kiss declaration more compact and visually understandable.
@@ -118,7 +113,6 @@
   .navbar
     position: relative
     z-index: 80
-    background: colvar('gray')
     box-shadow: 0 3px 5px rgba(0,0,0,0.5)
     transform-origin: top
 
@@ -128,9 +122,9 @@
 
   .sidebar
     position: relative
-    background: colvar('accent')
+    background: colvar('accent-1')
     // Buffer overlap on the top
-    border-top: solid 1rem colvar('accent')
+    border-top: solid 1rem colvar('accent-1')
     margin-top: -1rem
 
   .content
@@ -164,7 +158,7 @@
   {#if !inEdit}
     <div class=container out:fade={{duration: 100}} role=presentation>
 
-      <nav class=navbar in:tnAnime={navBarReveal} aria-label=Navigation/>
+      <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation/>
       <aside class=sidebar in:tnAnime={sideBarReveal} aria-label=Sidebar/>
 
       <main class="content" aria-label=Content>
@@ -199,7 +193,7 @@
         </Route>
       </main>
     </div>
-    {:else if $meta.match.startsWith('/edit')}
+    {:else if $router.path.startsWith('/edit')}
     <!-- Async. load the editor -->
     <div
       out:fade={{ duration: 100, delay: 300 }}

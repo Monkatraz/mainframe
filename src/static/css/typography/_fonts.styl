@@ -81,6 +81,11 @@ html, body
   font-weight: 400
   font-family: var(--font-sans)
   --font-cap: var(--font-sans-cap)
+  text-rendering: optimizeLegibility
+
+// Darker backgrounds tend to make the 'observed weight' of fonts go up
+.dark
+  font-weight: 300
 
 $sel-content = 'main, article, section'
 $sel-text = 'a, p, span, small, ol, ul'
@@ -104,7 +109,7 @@ $sel-quotes = 'blockquote, q'
 
 {$sel-headings}
   font-set('display')
-  font-weight: 460
+  font-weight: 500
 
 b, strong
   font-weight: bolder

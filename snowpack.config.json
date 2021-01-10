@@ -32,8 +32,7 @@
         "@codemirror/state",
         "@codemirror/view",
         "lezer",
-        "lezer-tree",
-        "svelte"
+        "lezer-tree"
       ]
     }
   },

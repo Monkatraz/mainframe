@@ -8,8 +8,8 @@ pre
   padding: 0
   contain: content
 
-  color: #ABB2BF
-  shadow-elevation(8)
+  color: var(--colcode-content)
+  box-shadow: 0 0 0.125rem 0 colvar('border')
   border-radius: 10px
 
   font-size: 0.875rem
@@ -28,7 +28,7 @@ pre
     padding: 1.5em 1em
     width: 100%
     overflow-x: auto
-    background: #282C34
+    background: var(--colcode-background)
 
 
 :not(pre)
@@ -39,65 +39,68 @@ pre
     padding: 0.1em 0.25em
     border-radius: 0.2em
   > code[class*=language-], > code.code
-    background: #282C34
-    color: #ABB2BF
-
-
-// #ABB2BF
-// #5C6370
-// #D19A66
-// #56B6C2
-// #E06C75
-// #E5C07B
-// #98C379
-// #C678DD
-// #61AFEF
-// #2D8EDF
+    background: var(--colcode-background)
+    color: var(--colcode-content)
 
 +prefix-classes('token.')
   .block-comment, .cdata, .comment, .doctype, .prolog
-    color: #5C6370
+    color: var(--colcode-comment)
 
   .punctuation
-    color: #FFFFFF30
+    color: var(--colcode-punct)
 
-  .variable, .deleted, .tag
-    color: #E06C75
+  .variable, .parameter
+     color: var(--colcode-ident)
+
+  .deleted
+    color: var(--colcode-invalid)
 
   .inserted
-    color: #98C379
+    color: var(--colcode-inserted)
 
   .function, .function-name, .attr-id
-    color: #61AFEF
+    color: var(--colcode-function)
+  
+  .property
+    color: var(--colcode-property)
 
-  .parameter, .property
-    color: #2D8EDF
+  .tag
+    color: var(--colcode-tag)
 
-  .attr-name, .attr-value, .class-name, .builtin, .selector
-    color: #E5C07B
+  .attr-name, .attr-value, .selector
+    color: var(--colcode-attribute)
 
   .boolean, .number, .constant, .symbol, .unit
-    color: #D19A66
+    color: var(--colcode-constant)
 
   .keyword, .atrule, .important
-    color: #C678DD
+    color: var(--colcode-keyword)
 
-  .namespace, .url, .char, .string
-    color: #98C379
+  .char, .string
+    color: var(--colcode-string)
 
-  .regex, .entity, .operator
-    color: #56B6C2
+  .builtin, .generic, .class-name
+    color: var(--colcode-type)
+
+  .url
+    color: var(--colcode-link)
+
+  .namespace, .entity
+    color: var(--colcode-entity)
+
+  .regex, .operator
+    color: var(--colcode-operator)
 
   +prefix-classes('token.keyword-')
-    .public, .private, .readonly, 
-    .const, .let, .var, .new
-      color: #56B6C2
+    // .public, .private, .readonly, 
+    // .const, .let, .var, .new, .type
+    //   color: var(--colcode-storage)
 
-    .this
-      color: #E06C75
+    .this, .self
+      color: var(--colcode-special)
 
   .bold, .important
-    font-weight: 700
+    font-weight: bold
 
   .italic
     font-style: italic

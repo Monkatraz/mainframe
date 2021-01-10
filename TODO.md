@@ -5,6 +5,7 @@
 - [ ] Implement Popper
 - [ ] Recreate def-list md-it plugin
 - [ ] Implement Storybook
+- [ ] Add a media-size Svelte store
 
 ### General
 - [ ] Integrate ReCaptcha
@@ -33,7 +34,6 @@
 - Automatic repository pages (maybe a Markdown syntax for interfacing with the database)
 - Notifications for users (new replies to their comments etc.)
 - Table of contents to left of article when room is available
-- Make a snowpack plugin for proxy.js files
 - Signify how the user voted on the article when they comment
 - Some sort of "alert" component that pops up and then fades programmatically
 

@@ -188,7 +188,7 @@ function getExtensions() {
     return true
   }
 
-  const activeExclude = ['TBODY', 'THEAD']
+  const activeExclude = ['TBODY', 'THEAD', 'CODE']
 
   let activeElements: Set<Element> = new Set
   const getActiveElements = createIdleQueued((lines: number[]) => {
@@ -373,8 +373,8 @@ function getExtensions() {
     position: relative
     height: $hght
     width: 100%
+    background: var(--colcode-background)
     overflow: hidden
-    background: #23272E
 
   .editor-container
     width: 100%
@@ -384,19 +384,19 @@ function getExtensions() {
       grid-kiss:"+--------------------------------------------------+      ",
                 "| .topbar                                          | 2rem ",
                 "+--------------------------------------------------+      ",
-                "+---------------+ +------+ +--------------+ +------+      ",
-                "| .editor       | |      | | .preview     | |      |      ",
-                "|               | |      | |              | |      |      ",
-                "|               | |      | |              | |      |      ",
-                "|               | |      | |              | |      |      ",
-                "|               | |      | |              | |      |$hght2",
-                "|               | |      | |              | |      |      ",
-                "|               | |      | |              | |      |      ",
-                "|               | |      | |              | |      |      ",
-                "|               | |      | |              | |      |      ",
-                "|               | |      | |              | |      |      ",
-                "+---------------+ +------+ +--------------+ +------+      ",
-                "|    $edit-w    | |0.5rem| |   $body-w    | |0.5rem|      "
+                "+------------------------+ +-----------------------+      ",
+                "| .editor                | | .preview              |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |$hght2",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "+------------------------+ +-----------------------+      ",
+                "|        $edit-w         | |        $body-w        |      "
 
     &.show-editor
       grid-kiss:"+--------------------------------------------------+      ",
@@ -438,42 +438,42 @@ function getExtensions() {
 
   .topbar
     display: flex
-    background: #21252B
-    color: colvar('text-light')
+    background: var(--colcode-background)
     font-set('display')
     font-size: 0.9rem
-    line-height: 2.1rem
-    padding: 0 0.5rem
+    line-height: 1.9rem
+    padding: 0.1rem 0.5rem
     z-index: 10
     flex-wrap: nowrap
     white-space: nowrap
 
   .topbar-section
     padding: 0 0.5rem
-    border-right: 0.15rem solid #333842
+    border-right: 0.15rem solid colvar('border')
 
   .topbar-selector
     padding: 0.2em 0.5em
     margin: 0 0.125rem
     border-radius: 0.25em
-    background: #333842
+    background: colvar('border')
     shadow-elevation(2)
     transition: box-shadow 0.1s, color 0.1s, background 0.1s
     cursor: pointer
 
     +on-hover(false)
-      background: #2F333D
-      color: #6187D2
-      shadow-elevation(4)
+      background: colvar('border', darken 2.5%)
+      color: colvar('hint')
+      shadow-elevation(1)
 
   .editor
-    background: #282C34
     z-index: 2
     overflow: hidden
+    border-right: solid 0.125rem colvar('border')
+    padding-right: 0.25rem
+    background: var(--colcode-background)
 
   .preview
     position: relative
-    background: colvar('background-light')
     width: var(--layout-body-max-width)
     max-width: 100%
     padding: 0 1rem
@@ -481,13 +481,14 @@ function getExtensions() {
     overflow-y: scroll
     font-size: 90%
     z-index: 1
+    box-shadow: inset 0 1rem 0.5rem -1rem rgba(black, 0.25)
     contain: strict
 
   .active-element
     position: absolute
-    box-shadow: 0 0 1rem 0.25rem colvar('info', opacity 0.075)
+    box-shadow: 0 0 1rem 0.25rem colvar('text-select', opacity 0.075)
     border-radius: 0.25rem
-    background: colvar('info', opacity 0.075)
+    background: colvar('text-select', opacity 0.075)
     pointer-events: none
     user-select: none
     z-index: 1
@@ -500,9 +501,8 @@ function getExtensions() {
     float: right
     margin-left: -100%
     padding: 0.25rem
-    background: #23272E
+    color: colvar('text-dim')
     border-radius: 0.25rem
-    color: #ABB2BF
     z-index: 10
 
 
@@ -511,8 +511,8 @@ function getExtensions() {
 <!-- some chores to do on resize -->
 <svelte:window on:resize={updatePreview}/>
 
-<div class=overflow-container
-  in:tnAnime={{ background: ['transparent', '#23272E'], easing: 'easeOutExpo', duration: 500, delay: 300 }}
+<div class='overflow-container dark codetheme-dark'
+  in:tnAnime={{ opacity: ['0', '1'], easing: 'easeOutSine', duration: 150, delay: 50 }}
 >
   <div class="editor-container {containerClass}">
 
@@ -551,19 +551,19 @@ function getExtensions() {
 
     <!-- Left | Editor Pane -->
     <div class=editor bind:this={editorContainer}
-      in:tnAnime={{ translateX: ['-150%', '0'], duration: 700, delay: 500, easing: 'easeOutExpo' }}
-      out:tnAnime={{ translateX: '-150%', duration: 200, easing: 'easeInExpo' }}
+      in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 100, easing: 'easeOutExpo' }}
+      out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     />
 
     <!-- Right | Preview Pane -->
-    <div class=preview bind:this={previewContainer}
+    <div class='preview light codetheme-dark' bind:this={previewContainer}
       on:scroll={scrollFromPreview} 
       on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
-      in:tnAnime={{ translateX: ['-300%', '0'], duration: 700, delay: 500, easing: 'easeOutExpo' }}
-      out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInExpo' }}
+      in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 150, easing: 'easeOutQuint' }}
+      out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
       {#if containerClass === 'show-both' || containerClass === 'show-preview'}
-        <div class=perf-box>
+        <div class='perf-box dark'>
           <span>PERF: {Math.round(perf)}ms</span>
           <span>CACHE: {Math.round(cacheSize)}</span>
         </div>

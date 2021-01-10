@@ -6,26 +6,35 @@ import monarchMarkdown from './monarch-markdown'
 // Confinement Theme
 
 const
-  background = '#282C34',
-  accent = '#4D78CC',
-  selection = '#4B5365A6',
-  text = '#ABB2BF',
-  comment = '#5C6370',
-  doc = '#687387',
-  punct = '#727d9c',
-  operator = '#56B6C2',
-  keyword = '#C678DD',
-  string = '#98C379',
-  entity = '#98C379',
-  type = '#E5C07B',
-  ident = '#2D8EDF',
-  func = '#61AFEF',
-  constant = '#D19A66',
-  property = '#E06C75',
-  tag = '#E06C75',
-  attr = '#FFCB6B',
-  link = '#64a0ff',
-  invalid = '#FF3214'
+  background = 'var(--colcode-background)',
+  border = 'var(--colcode-border)',
+  accent = 'var(--colcode-accent)',
+  selection = 'var(--colcode-selection)',
+  text = 'var(--colcode-content)',
+  comment = 'var(--colcode-comment)',
+  doc = 'var(--colcode-commentdoc)',
+  punct = 'var(--colcode-punct)',
+  operator = 'var(--colcode-operator)',
+  keyword = 'var(--colcode-keyword)',
+  logical = 'var(--colcode-logical)',
+  string = 'var(--colcode-string)',
+  entity = 'var(--colcode-entity)',
+  type = 'var(--colcode-type)',
+  ident = 'var(--colcode-ident)',
+  func = 'var(--colcode-function)',
+  constant = 'var(--colcode-constant)',
+  property = 'var(--colcode-property)',
+  tag = 'var(--colcode-tag)',
+  classes = 'var(--colcode-class)',
+  attr = 'var(--colcode-attribute)',
+  link = 'var(--colcode-link)',
+  invalid = 'var(--colcode-invalid)',
+  inserted = 'var(--colcode-inserted)',
+  changed = 'var(--colcode-changed)',
+  important = 'var(--colcode-important)',
+  highlight = 'var(--colcode-highlight)',
+  note = 'var(--colcode-note)',
+  special = 'var(--colcode-special)'
 
 export const confinementTheme = EditorView.theme({
   $: {
@@ -42,6 +51,7 @@ export const confinementTheme = EditorView.theme({
     fontFamily: 'var(--font-mono)',
     height: '100%',
     fontSize: '13px',
+    fontWeigth: '400',
     position: 'relative',
     overflowX: 'auto',
     zIndex: 0
@@ -55,12 +65,28 @@ export const confinementTheme = EditorView.theme({
     overflowWrap: 'normal'
   },
 
-  '$$focused $cursor': { borderLeftColor: accent },
-  '$$focused $selectionBackground': { backgroundColor: selection },
+  '$$focused $cursor': {
+    borderLeftColor: accent,
+    transition: 'left 0.1s ease-out, top 0.1s ease-out'
+  },
+  '$$focused $selectionBackground': {
+    backgroundColor: selection
+  },
+  '$line': {
+    '& ::selection': { color: 'inherit !important' },
+    '&::selection': { color: 'inherit !important' }
+  },
+
+  '$$focused $cursorLayer': {
+    animation: 'cubic-bezier(0.95, 0, 0.05, 1) cm-blink 1.2s infinite'
+  },
+
+  '@keyframes cm-blink': { '0%': {}, '50%': { opacity: '0' }, '100%': {} },
+  '@keyframes cm-blink2': { '0%': {}, '50%': { opacity: '0' }, '100%': {} },
 
   $panels: { backgroundColor: background, color: text },
-  '$panels.top': { borderBottom: '2px solid black' },
-  '$panels.bottom': { borderTop: '2px solid black' },
+  '$panels.top': { borderBottom: `2px solid ${border}` },
+  '$panels.bottom': { borderTop: `2px solid ${border}` },
 
   $searchMatch: {
     backgroundColor: '#72a1ff59',
@@ -70,7 +96,10 @@ export const confinementTheme = EditorView.theme({
     backgroundColor: '#6199ff2f'
   },
 
-  $activeLine: { backgroundColor: '#2c313c' },
+  $activeLine: {
+    background: background,
+    filter: 'brightness(102.5%)'
+  },
   $selectionMatch: { backgroundColor: '#aafe661a' },
 
   '$matchingBracket, $nonmatchingBracket': {
@@ -80,7 +109,7 @@ export const confinementTheme = EditorView.theme({
 
   $gutters: {
     backgroundColor: background,
-    color: '#545868',
+    color: comment,
     border: 'none'
   },
   '$gutterElement.lineNumber': { color: 'inherit' },
@@ -105,45 +134,75 @@ export const confinementTheme = EditorView.theme({
 const mt = monarchMarkdown.tags
 
 export const confinementHighlightStyle = HighlightStyle.define(
+  // Keywords + Operators
   {
-    tag: [t.keyword, t.operatorKeyword, t.logicOperator, t.compareOperator],
+    tag: [t.keyword],
     color: keyword
   },
   {
-    tag: [t.deleted, t.propertyName, t.macroName,],
-    color: property
+    tag: [t.controlOperator, t.logicOperator, t.compareOperator],
+    color: logical
   },
   {
-    tag: [t.function(t.variableName), t.function(t.propertyName), t.function(t.name), t.labelName],
-    color: func
+    tag: [t.regexp, t.operator],
+    color: operator
   },
+  // Names and Types
   {
-    tag: [t.name, t.standard(t.name)],
+    tag: [t.name],
     color: ident
   },
   {
-    tag: [t.processingInstruction, t.monospace, t.string, t.regexp, t.inserted, t.special(t.string)],
-    color: string
+    tag: [t.propertyName],
+    color: property
   },
   {
-    tag: [t.character, t.unit, t.color, t.constant(t.name), t.number, t.bool, t.null],
-    color: constant
+    tag: [t.className],
+    color: classes
   },
   {
-    tag: [t.definition(t.name), t.separator, t.punctuation, t.bracket],
-    color: punct
-  },
-  {
-    tag: [t.typeName, t.escape, t.changed, t.annotation, t.self],
+    tag: [t.typeName, t.escape, t.standard(t.name)],
     color: type
   },
   {
-    tag: [t.namespace, t.className],
+    tag: [t.namespace],
     color: entity
   },
+  // Functions
   {
-    tag: [t.operator, t.modifier, t.definitionKeyword, t.derefOperator, t.typeOperator],
-    color: operator
+    tag: [t.function(t.name), t.function(t.propertyName), t.macroName],
+    color: func
+  },
+  {
+    tag: [t.atom, t.annotation, t.special(t.name), t.special(t.string)],
+    color: func
+  },
+  // Literals
+  {
+    tag: [t.labelName, t.monospace, t.string],
+    color: string
+  },
+  {
+    tag: [t.constant(t.name), t.local(t.name), t.literal, t.unit],
+    color: constant
+  },
+  // Changes
+  {
+    tag: [t.deleted, t.invalid],
+    color: invalid
+  },
+  {
+    tag: [t.inserted],
+    color: inserted
+  },
+  {
+    tag: [t.changed],
+    color: changed
+  },
+  // Punctuation, Comments
+  {
+    tag: [t.punctuation],
+    color: punct
   },
   {
     tag: [t.meta, t.comment],
@@ -153,8 +212,14 @@ export const confinementHighlightStyle = HighlightStyle.define(
     tag: [t.docComment, t.docString],
     color: doc
   },
+  // Misc.
   {
-    tag: [t.link, t.url],
+    tag: [t.self],
+    color: special
+  },
+  // Markup
+  {
+    tag: [t.link],
     color: link,
   },
   {
@@ -162,15 +227,6 @@ export const confinementHighlightStyle = HighlightStyle.define(
     color: link,
     textDecoration: 'underline'
   },
-  {
-    tag: [t.atom, t.special(t.variableName)],
-    color: func
-  },
-  {
-    tag: t.invalid,
-    color: invalid
-  },
-  // markdown
   { tag: t.strong, fontWeight: 'bold' },
   { tag: t.emphasis, fontStyle: 'italic' },
   { tag: t.heading, fontWeight: 'bold', color: tag },
@@ -178,20 +234,17 @@ export const confinementHighlightStyle = HighlightStyle.define(
     tag: t.contentSeparator,
     fontWeight: 'bold', color: tag,
     display: 'inline-block', width: 'calc(100% - 1rem)',
-    boxShadow: '0 -0.125rem 0 #333842'
+    boxShadow: `inset 0 0.125rem 0 ${border}`
   },
   // markdown extended
   { tag: mt.superscript, position: 'relative', top: '-0.25em', fontSize: '90%' },
   { tag: mt.subscript, position: 'relative', top: '0.25em', fontSize: '90%' },
   { tag: mt.underline, textDecoration: 'underline' },
   { tag: mt.strikethrough, textDecoration: 'line-through' },
-  { tag: mt.mark, background: '#FFCB6BEE', color: 'black' },
+  { tag: mt.mark, background: important, color: 'black' },
   // critical markup
-  { tag: mt.criticAddition, color: '#54D169' },
-  { tag: mt.criticDeletion, color: '#E04B36' },
-  { tag: mt.criticSub, color: '#FF9614' },
-  { tag: mt.criticHighlight, color: '#C878C8' },
-  { tag: mt.criticComment, color: '#5694D6' },
+  { tag: mt.criticHighlight, color: highlight },
+  { tag: mt.criticComment, color: note },
 )
 
 export const confinement: Extension = [confinementTheme, confinementHighlightStyle]

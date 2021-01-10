@@ -34,8 +34,8 @@
 | `@@...@@`| Escaped | @@/This text is __escaped__, and **will only be rendered as plain text.**/@@
 
 ###### Inline Spans:
--	#font sans|Here is the sans font.|#
--	#font display|Here is the display font.|#
+- #font sans|Here is the sans font.|#
+- #font display|Here is the display font.|#
 - #font serif|Here is the serif font.|#
 - #font mono|Here is the mono font.|#
 - #font handwriting|Here is the handwriting font.|#
@@ -53,18 +53,18 @@
 
 ###### Block:
 Term 1
-:	Definition 1
+: Definition 1
 : Definition 2
 
-	More of definition 2.
-	
+  More of definition 2.
+  
 Term 2
-	~ Definition 1
-	~ Definition 2
+  ~ Definition 1
+  ~ Definition 2
 
 Term 3
-	: Definition 1
-	: Definition 2
+  : Definition 1
+  : Definition 2
 
 ##### Math
 $\begin{aligned}
@@ -96,7 +96,7 @@ This is some content, with this /* inline comment */ (comment that isn't rendere
 This is some content with a comment at the very end.
 
 /* This is a 
-	block comment.
+  block comment.
 */
 /* This pattern
  * looks cleaner. */
@@ -105,13 +105,69 @@ This is some content with a comment at the very end.
 ***
 - Nested brackets: {++ ins1 {++ ins2 ++} {-- del --} ++}
 - Comments in a pargraph: Sint sit cillum pariatur eiusmod nulla pariatur ipsum. Sit laborum anim qui mollit tempor pariatur nisi minim dolor. Aliquip et{>>Here is a comment<<} adipisicing sit sit fugiat commodo id sunt. Nostrud enim ad commodo incididunt cupidatat in ullamco ullamco Lorem cupidatat velit enim et Lorem.
-		
+    
 #### Styling Tests
 - Links:
-	- This is an [external link.](//google.com)
-	- This is an [internal link.](/)
-	- This is a [link with descenders: typography](//google.com) 
-		-	[typography](//google.com)
+  - This is an [external link.](//google.com)
+  - This is an [internal link.](/)
+  - This is a [link with descenders: typography](//google.com) 
+    -  [typography](//google.com)
+    
+```ts
+/**
+ * @file Gesture library, such as swipes and dragging actions.
+ * @author Monkatraz
+ */
+// Imports
+import { evtlistener, rmEvtlistener } from './util'
+
+/** Represents the valid swipe directions. */
+export type SwipeDirection = 'up' | 'down' | 'left' | 'right'
+const SWIPE_DIRECTIONS: SwipeDirection[] = ['up', 'down', 'left', 'right']
+
+/** Represents a _potential_ swipe, using a direction and (px) distance. */
+type SwipeEvent = [dir: SwipeDirection, dist: number]
+function resolveSwipe([x1, y1]: Point, [x2, y2]: Point): SwipeEvent {
+  // on these vars: 0 is vertical, 1 is horizontal
+  const diff = [y1 - y2, x1 - x2]
+  const diffAbs = diff.map(Math.abs)
+  const axis = diffAbs[1] > diffAbs[0] ? 1 : 0
+  const dir = SWIPE_DIRECTIONS[(axis * 2) + (diff[axis] < 0 as any)]
+  //                                ^               ^  get direction via sign (+ = up|left, - = down|right)
+  //                                ^ this is either 0 or 2, as axis is either 0 or 1
+  return [dir, diffAbs[axis]]
+}
+```
+
+```rust
+fn force_to_memory(&mut self) -> Result<&mut Arc<Vec<Data>>, Error> {
+    if let Some(ref mut data) = self.data {
+        Ok(data)
+    } else {
+        if self.disk_is_up_to_date {
+            let file = File::open(&self.path)?;
+            // same as above: Reading and deserialization
+            self.data = Some(Arc::new(desered));
+            Ok(self.data.as_mut().unwrap())
+        } else {
+            bail!(
+                "No data, but disk not up to date!? ({})",
+                self.path.to_string_lossy()
+            );
+        }
+    }
+}
+
+fn update_no_sort<F, R>(&mut self, f: F) -> Result<R, Error>
+where
+    F: FnOnce(&mut Vec<Data>) -> R,
+{
+    let r = f(Arc::make_mut(self.force_to_memory()?));
+    self.serialized = None;
+    self.disk_is_up_to_date = false;
+    Ok(r)
+}
+```
 
 ##### SPECIAL CONTAINMENT PROCEDURES
 ***
@@ -276,24 +332,26 @@ func main() {
 ```
 
 ```ts
-/** Eagerly loads the rest of the LazyDocument. */
-public async _eagerLoad() {
-	// Just plain get the whole object
-	const response = await this._client.query<DataObject>(this._requestExpr)
-	if (response.ok === false) throw new Error('Error retrieving document.')
-	// Set every field to its actual value
-	this._fields.forEach((field) => {
-		this._setField(field, response.body[field] as DataValue)
-	})
-	return this
-}
+class LazyDocument {
+  /** Eagerly loads the rest of the LazyDocument. */
+  public async _eagerLoad() {
+    // Just plain get the whole object
+    const response = await this._client.query<DataObject>(this._requestExpr)
+    if (response.ok === false) throw new Error('Error retrieving document.')
+    // Set every field to its actual value
+    this._fields.forEach((field) => {
+      this._setField(field, response.body[field] as DataValue)
+    })
+    return this
+  }
 
-/** Returns the requested field as another LazyDocument.
- *  The requested field _must_ be an object for this to work. LazyDocument requires key-value pairs. */
-public async _getLazy<K extends string & keyof T>(field: K): Promise<Lazyify<T[K]> & LazyDocument<T[K]>> {
-	const lazydoc = await new LazyDocument<T[K]>(q.Select(field, this._requestExpr), this._client)._start()
-	this._setField(field, lazydoc)
-	return lazydoc as Lazyify<T[K]> & typeof lazydoc
+  /** Returns the requested field as another LazyDocument.
+   *  The requested field _must_ be an object for this to work. LazyDocument requires key-value pairs. */
+  public async _getLazy<K extends string & keyof T>(field: K): Promise<Lazyify<T[K]> & LazyDocument<T[K]>> {
+    const lazydoc = await new LazyDocument<T[K]>(q.Select(field, this._requestExpr), this._client)._start()
+    this._setField(field, lazydoc)
+    return lazydoc as Lazyify<T[K]> & typeof lazydoc
+  }
 }
 ```
 

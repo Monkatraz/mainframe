@@ -18,23 +18,36 @@
     display: block
     z-index: 99
     transform: translate(-50%, -50%)
+    fill: colvar('text-subtle')
     pointer-events: none
 </style>
 
-{#if wait}
-  {#await sleep(wait) then _ }
-  <img class=spinny alt="Page Loading Symbol"
-    src="data:image/svg+xml,%3Csvg width='120' height='60' viewBox='0 -30 120 30' xmlns='http://www.w3.org/2000/svg' fill='%23323232'%3E%3Cstyle%3E @keyframes load-wave %7B 0%25 %7B transform: translateY(15px); %7D 100%25 %7B transform: translateY(-15px); %7D %7D .ld1 %7B animation: load-wave 0.3s -0.9s infinite alternate ease-in-out; %7D .ld2 %7B animation: load-wave 0.3s -0.8s infinite alternate ease-in-out; %7D .ld3 %7B animation: load-wave 0.3s -0.7s infinite alternate ease-in-out; %7D %3C/style%3E%3Ccircle cx='15' cy='-15' r='15' class='ld1'%3E%3C/circle%3E%3Ccircle cx='60' cy='-15' r='15' class='ld2'%3E%3C/circle%3E%3Ccircle cx='105' cy='-15' r='15' class='ld3'%3E%3C/circle%3E%3C/svg%3E%0A"
-    style={cssText + 'transform: translate(-50%, -50%)'}
-    in:tnAnime={{scale: [0, 1], opacity: { value: 1, delay: 20, easing: 'easeOutQuad', duration: 200}}}
-    out:tnAnime={{scale: 0.8, opacity: 0, easing: 'easeOutQuad', duration: 100}}
+
+{#await sleep(wait) then _ }
+<svg aria-hidden=true class=spinny
+  {width} viewBox='0 -50 120 70' xmlns='http://www.w3.org/2000/svg'
+  style={cssText + 'transform: translate(-50%, -50%)'}
+  in:tnAnime={{scale: [0, 1], opacity: { value: 1, delay: 20, easing: 'easeOutQuad', duration: 200}}}
+  out:tnAnime={{scale: 0.8, opacity: 0, easing: 'easeOutQuad', duration: 100}}
   >
-  {/await}
-  {:else}
-  <img class=spinny alt="Page Loading Symbol"
-    src="data:image/svg+xml,%3Csvg width='120' height='60' viewBox='0 -30 120 30' xmlns='http://www.w3.org/2000/svg' fill='%23323232'%3E%3Cstyle%3E @keyframes load-wave %7B 0%25 %7B transform: translateY(15px); %7D 100%25 %7B transform: translateY(-15px); %7D %7D .ld1 %7B animation: load-wave 0.3s -0.9s infinite alternate ease-in-out; %7D .ld2 %7B animation: load-wave 0.3s -0.8s infinite alternate ease-in-out; %7D .ld3 %7B animation: load-wave 0.3s -0.7s infinite alternate ease-in-out; %7D %3C/style%3E%3Ccircle cx='15' cy='-15' r='15' class='ld1'%3E%3C/circle%3E%3Ccircle cx='60' cy='-15' r='15' class='ld2'%3E%3C/circle%3E%3Ccircle cx='105' cy='-15' r='15' class='ld3'%3E%3C/circle%3E%3C/svg%3E%0A"
-    style={cssText + 'transform: translate(-50%, -50%)'}
-    in:tnAnime={{scale: [0, 1], opacity: { value: 1, delay: 20, easing: 'easeOutQuad', duration: 200}}}
-    out:tnAnime={{scale: 0.8, opacity: 0, easing: 'easeOutQuad', duration: 100}}
-  >
-{/if}
+	<style>
+    @keyframes load-wave {
+    0% {
+      transform: translateY(15px); }
+    100% {
+      transform: translateY(-15px); }
+    }
+
+    .ld1 {
+    animation: load-wave 0.3s -0.9s infinite alternate ease-in-out; }
+    .ld2 {
+    animation: load-wave 0.3s -0.8s infinite alternate ease-in-out; }
+    .ld3 {
+    animation: load-wave 0.3s -0.7s infinite alternate ease-in-out; }
+  </style>
+
+  <circle cx='15' cy='-15' r='15' class='ld1'></circle>
+  <circle cx='60' cy='-15' r='15' class='ld2'></circle>
+  <circle cx='105' cy='-15' r='15' class='ld3'></circle>
+</svg>
+{/await}

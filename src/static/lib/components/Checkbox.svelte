@@ -12,7 +12,7 @@
 
     +on-hover(false)
       .slot
-        color: #6187D2
+        color: colvar('hint')
 
   .slot
     transition: color 0.1s

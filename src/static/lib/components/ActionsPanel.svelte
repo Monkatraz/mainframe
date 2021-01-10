@@ -84,6 +84,7 @@
     width: 100%
     height: var(--actions-panel-total-height)
     margin-top: calc(var(--actions-panel-total-height) * -1)
+    background: none
     filter: drop-shadow(0 0 10px rgba(black, 0.5))
     pointer-events: auto
     touch-action: none
@@ -100,7 +101,7 @@
       top: var(--actions-panel-button-height)
       width: 100%
       height: var(--actions-panel-border-height)
-      background: colvar('background-dark')
+      background: colvar('background')
       border-radius: 10px 10px 0 0
 
       +match-media(thin, below)
@@ -114,7 +115,7 @@
       transform: translateX(-50%)
       height: var(--actions-panel-button-height)
       width: 10rem
-      background: colvar('background-dark')
+      background: colvar('background')
       border-radius: 10px 10px 0 0
       // Overlap
       margin-bottom: -0.1rem
@@ -135,9 +136,9 @@
     left: 50%
     transform: translateX(-50%)
     width: 100%
-    background: colvar('background-dark', lighten 15%, desaturate 5%)
-    border-left: var(--actions-panel-border-height) colvar('background-dark') solid
-    border-right: var(--actions-panel-border-height) colvar('background-dark') solid
+    background: colvar('background', lighten 15%)
+    border-left: var(--actions-panel-border-height) colvar('background') solid
+    border-right: var(--actions-panel-border-height) colvar('background') solid
     box-shadow: inset 0 0 10px -2px rgba(black, 0.5)
     // Overlap
     height: calc(var(--actions-panel-height) + 1rem)
@@ -207,7 +208,7 @@
 </style>
 
 {#if !hidden}
-  <div class=actions-panel-container
+  <div class='actions-panel-container dark'
     aria-expanded={revealed}
     class:revealed class:faded
     in:tnAnime={{bottom: ['-8rem', '-5rem'], easing: 'easeOutElastic(1, 1.5)', delay: 300}}
