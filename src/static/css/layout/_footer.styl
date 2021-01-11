@@ -13,19 +13,22 @@
   display: none
 
 #footer
-  height: var(--layout-footer-height)
+  min-height: var(--layout-footer-height)
+  line-height: 1.25
+  padding: 0.25rem 0
   background: colvar('background')
   color: colvar('text-subtle')
   font-set('display')
   font-size: 1rem
   font-weight: 400
-  padding: 0.25rem 0
 
   // Delays the appearence of the footer to prevent a flash on page load
   animation: footer-load 0.25s 1 0.5s ease backwards
 
 #footer_list
   display: flex
+  min-height: var(--layout-footer-height)
+  align-items: center
   margin: 0
   padding: 0
   list-style: none
@@ -35,9 +38,19 @@
     margin-left: 1rem
     padding: 0
 
-    > a
-      text-decoration: none
+  +match-media(thin, below)
+    flex-direction: column
+    > li
+      margin: 0 0.5rem
+      text-align: center
 
-#footer_pmf
+#footer_license
+  font-size: 0.75rem
+  font-set('sans')
+
+#footer_pb
+  white-space: nowrap
+
+#footer_pbmf
   color: colvar('text')
   font-family: 'Title Font', var(--font-mono)
