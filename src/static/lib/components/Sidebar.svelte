@@ -67,16 +67,30 @@
 
 </style>
 <div class='sb-container' role='presentation'>
+
   <div class=sb-buttons>
     <a class=sb-button href='/' aria-label='Home'><Icon i='entypo:home' size='1.5em'/></a>
     <a class=sb-button href='/edit'><Icon i='ri:edit-2-fill' size='1.5em'/>Open Editor</a>
   </div>
+
   <div class=sb-header>About</div>
   <a class=sb-link
     href='https://github.com/Monkatraz/mainframe'><Icon i='mdi:github' size='2em'/> Source Repository</a>
+  <a class=sb-link href='http://www.scpwiki.com/'><Icon i='@c:scp:logo' size='2em'/> SCP Wiki</a>
+
+  <div class=sb-header>Resources</div>
+  <a class=sb-link href='/guide/editor-syntax'><Icon i='entypo:code' size='2em'/> Editor Syntax</a>
+  <a class=sb-link href='/guide/modules'><Icon i='ph:stack-simple-bold' size='2em'/> Modules</a>
+  <a class=sb-link href='/guide/api'><Icon i='carbon:cloud-app' size='2em'/> Mainframe API</a>
+
+  <div class=sb-header>Customization</div>
+  <a class=sb-link href='/guide/theming'><Icon i='mdi:palette' size='2em'/> User Themes</a>
+  <a class=sb-link href='/guide/modules'><Icon i='ph:stack-bold' size='2em'/> User Modules</a>
+
   <div class=sb-header>Test Pages</div>
-  <a class=sb-link href='/test/md'><Icon i='ion:logo-markdown' size='2em'/> Markdown</a>
-  <a class=sb-link href='/test/loading'><Icon i='ion:hourglass' size='2em'/> Loading Spinner</a>
+  <a class=sb-link-small href='/test/md'><Icon i='ion:logo-markdown' size='1.25em'/> Markdown</a>
+  <a class=sb-link-small href='/test/loading'><Icon i='ion:hourglass' size='1.25em'/> Loading Spinner</a>
+
   <div class=sb-header>Articles</div>
   <a class=sb-link-small href='/scp/3685'><Icon i='ic:round-article' size='1.25em'/> SCP-3685</a>
   <a class=sb-link-small href='/scp/173'><Icon i='ic:round-article' size='1.25em'/> SCP-173</a>
