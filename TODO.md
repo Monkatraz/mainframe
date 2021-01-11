@@ -33,6 +33,7 @@
 - [ ] Comments / Discussion Tab Component Thingy
 - [ ] Top of page button
 - [ ] Share button
+- [ ] Overlay scrollbar component
 
 ### Random Ideas
 - Automatic repository pages (maybe a Markdown syntax for interfacing with the database)

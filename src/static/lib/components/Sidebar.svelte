@@ -6,7 +6,11 @@
   @require '_lib'
 
   .sb-container
+    overflow-y: scroll
+    overflow-x: hidden
+    hide-scrollbars()
     font-set('display')
+
 
   .sb-buttons
     display: flex
