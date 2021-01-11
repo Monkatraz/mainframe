@@ -6,6 +6,7 @@
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import '@iconify/iconify'
+  import Sidebar from './components/Sidebar.svelte'
   import Page from './components/Page.svelte'
   import Spinny from './components/Spinny.svelte'
 
@@ -121,11 +122,19 @@
       top: 0
 
   .sidebar
-    position: relative
+    position: sticky
+    top: -1rem
+    height: calc(100vh + 1rem)
     background: colvar('accent-1')
     // Buffer overlap on the top
     border-top: solid 1rem colvar('accent-1')
     margin-top: -1rem
+
+    +match-media(thin, below)
+      display: none
+      position: absolute
+      top: 0
+      left: -100%
 
   .content
     position: relative
@@ -159,7 +168,9 @@
     <div class=container out:fade={{duration: 100}} role=presentation>
 
       <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation/>
-      <aside class=sidebar in:tnAnime={sideBarReveal} aria-label=Sidebar/>
+      <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>
+        <Sidebar />
+      </aside>
 
       <main class="content" aria-label=Content>
         <!-- Home Page -->

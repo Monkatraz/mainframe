@@ -2,11 +2,13 @@
 
 ### In Progress
 - [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
-- [ ] Implement Popper
-- [ ] Recreate def-list md-it plugin
-- [ ] Implement Storybook
-- [ ] Add a media-size Svelte store
+- [ ] Add tooltips / hints
+- [ ] Incorporate language into the URL for best practices
 
+### Markdown
+- [ ] Recreate def-list md-it plugin
+- [ ] Dynamic Svelte components generation
+  
 ### General
 - [ ] Integrate ReCaptcha
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
@@ -14,6 +16,8 @@
 - [ ] Generic cache library
 - [ ] Add better page history schema
 - [ ] Some sort of script or system for data-backups
+- [ ] Add a media-size Svelte store
+- [ ] Implement Storybook / Something like it
 
 ### Users
 - [ ] Author draft pages that are linkable
@@ -103,3 +107,4 @@
 - [x] Implement Prism into the Markdown render worker directly somehow
 - [x] Switch to CodeMirror due to Monaco being fairly under supported in the client-space
 - [x] Move all components and JS into a `/lib` folder
+- [x] Add sidebar

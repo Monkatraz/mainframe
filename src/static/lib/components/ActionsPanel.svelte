@@ -91,7 +91,7 @@
 
     +match-media(thin, below)
       margin-left: calc(var(--layout-body-side-gap) * -1)
-      width: 100vw
+      width: calc(100% + var(--layout-body-side-gap) * 2)
 
   +prefix-classes('actions-panel_')
 

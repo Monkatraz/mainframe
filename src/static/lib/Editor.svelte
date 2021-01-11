@@ -78,6 +78,7 @@ function getExtensions() {
   // TODO: mobile mode
   // TODO: swipe to show preview on mobile
   // TODO: split the editor+preview into its own component, API is handled by its parent
+  // TODO: figure out whatever the hell I have to do to make the menubar work correctly on mobile
 
   export let page: Page = {
     path: 'scp/3685',

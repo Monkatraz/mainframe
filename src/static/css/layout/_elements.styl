@@ -54,26 +54,26 @@ table
   margin-right: auto
 
 // -- LINKS AND INPUTS
+.content a
+  &[href]
+    transition: color 0.05s, text-decoration-color 0.1s
+    text-decoration: currentColor underline 0.1em
 
-a[href]
-  transition: color 0.05s, text-decoration-color 0.1s
-  text-decoration: currentColor underline 0.1em
+  // Styles external links.
+  &[href*='//']:not([href*='scp-mainframe.com']):not([href*='localhost'])
+    color: colvar('link-ext')
+    text-decoration-color: colvar('link-ext', opacity 0.5)
+    +on-hover()
+      color: colvar('link-ext', darken 10%)
+      text-decoration-color: currentColor
 
-// Styles external links.
-a[href*='//']:not([href*='scp-mainframe.com']):not([href*='localhost'])
-  color: colvar('link-ext')
-  text-decoration-color: colvar('link-ext', opacity 0.5)
-  +on-hover()
-    color: colvar('link-ext', darken 10%)
-    text-decoration-color: currentColor
-
-// Styles internal links.
-a[href^="/"], a[href^=".."], a[href^="#"], a[href*='scp-mainframe.com'], a[href*='localhost']
-  color: colvar('link-int')
-  text-decoration-color: transparent
-  +on-hover()
-    color: colvar('link-int', darken 10%)
-    text-decoration-color: currentColor
+  // Styles internal links.
+  &[href^="/"], &[href^=".."], &[href^="#"], &[href*='scp-mainframe.com'], &[href*='localhost']
+    color: colvar('link-int')
+    text-decoration-color: transparent
+    +on-hover()
+      color: colvar('link-int', darken 10%)
+      text-decoration-color: currentColor
 
 label
   cursor: pointer

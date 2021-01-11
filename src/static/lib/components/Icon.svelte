@@ -3,6 +3,7 @@
   import type { IconifyIcon } from '@iconify/iconify'
 
   export let i: string = ''
+  export let size: string = '1em'
 
   let icon: IconifyIcon | null = null
   let viewBox: string = '0 0 0 0'
@@ -23,7 +24,7 @@
 
 <svg xmlns="http://www.w3.org/2000/svg"
   aria-hidden=true focusable=false
-  width=1em height=1em {viewBox}
+  width={size} height={size} {viewBox}
   {...$$restProps}
   >
   {@html icon?.body ?? ''}
