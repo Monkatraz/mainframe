@@ -183,62 +183,64 @@
 
 </style>
 
-<Route firstmatch>
-  {#if $router.path === '/edit'}
-    <!-- Editor -->
-    <div
-    out:fade={{ duration: 100, delay: 300 }}
-    on:outroend={async () => { await sleep(50); inEdit = false }}
-    >
-    <!-- Async. loading -->
-      {#await import(EditorURL)}
-        <Spinny width=150px top=50% left=50%/>
-      {:then Editor}
-        <svelte:component this={Editor.default}/>
-      {/await}
-    </div>
-  {:else if !inEdit}
-    <div class=container out:fade={{duration: 100}} role=presentation>
+{#if $router.path === '/edit'}
+  <!-- Editor -->
+  <div
+  out:fade={{ duration: 100, delay: 300 }}
+  on:outroend={async () => { await sleep(50); inEdit = false }}
+  >
+  <!-- Async. loading -->
+    {#await import(EditorURL)}
+      <Spinny width=150px top=50% left=50%/>
+    {:then Editor}
+      <svelte:component this={Editor.default}/>
+    {/await}
+  </div>
+{:else if !inEdit}
+  <div class=container out:fade={{duration: 100}} role=presentation>
 
-      <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation/>
-      <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>
-        <Sidebar />
-      </aside>
+    <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation/>
+    <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>
+      <Sidebar />
+    </aside>
 
-      <main class="content" aria-label=Content>
-        <!-- Dummy route for the editor -->
-        <Route path='/edit'/>
-      
-        <!-- Home Page -->
-        <Route path="/"><Page
-          loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
-        /></Route>
+    <main class="content" aria-label=Content>
+      {#key $router.path}
+        <Route firstmatch>
+          <!-- Dummy route for the editor -->
+          <Route path='/edit'/>
+        
+          <!-- Home Page -->
+          <Route path="/"><Page
+            loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
+          /></Route>
 
-        <!-- Test routes-->
-        <Route path="/test/md"><Page
-          loading={fetch('/static/misc/md-test.md').then(res => res.text())}
-        /></Route>
+          <!-- Test routes-->
+          <Route path="/test/md"><Page
+            loading={fetch('/static/misc/md-test.md').then(res => res.text())}
+          /></Route>
 
-        <Route path="/test/loading"><Page
-          loading={new Promise(() => {})}
-        /></Route>
+          <Route path="/test/loading"><Page
+            loading={new Promise(() => {})}
+          /></Route>
 
-        <!-- User Pages -->
-        <Route path="/*"><Page
-          loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
-        /></Route>
+          <!-- User Pages -->
+          <Route path="/*"><Page
+            loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
+          /></Route>
 
-        <!-- 404 -->
-        <Route fallback>
-          <div class="pgnf rhythm" transition:fade={{duration: 50}}>
-            <div class=pgnf-blackbox>
-              <h1 class=pgnf-header>404</h1>
-              <span class=pgnf-text>PAGE NOT FOUND</span>
-            </div><br />
-            <h4>The requested page either does not exist or was not found.</h4>
-          </div>
+          <!-- 404 -->
+          <Route fallback>
+            <div class="pgnf rhythm" transition:fade={{duration: 50}}>
+              <div class=pgnf-blackbox>
+                <h1 class=pgnf-header>404</h1>
+                <span class=pgnf-text>PAGE NOT FOUND</span>
+              </div><br />
+              <h4>The requested page either does not exist or was not found.</h4>
+            </div>
+          </Route>
         </Route>
-      </main>
-    </div>
-  {/if}
-</Route>
+      {/key}
+    </main>
+  </div>
+{/if}

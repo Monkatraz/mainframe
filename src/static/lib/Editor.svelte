@@ -513,7 +513,7 @@ function getExtensions() {
 <svelte:window on:resize={updatePreview}/>
 
 <div class='overflow-container dark codetheme-dark'
-  in:tnAnime={{ opacity: ['0', '1'], easing: 'easeOutSine', duration: 150, delay: 50 }}
+  in:tnAnime={{ opacity: ['0', '1'], easing: 'easeOutSine', duration: 150 }}
 >
   <div class="editor-container {containerClass}">
 
