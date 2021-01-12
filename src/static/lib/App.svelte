@@ -176,7 +176,7 @@
     {/await}
   </div>
 {:else if !inEdit}
-  <div class=container out:fade={{duration: 100}} role=presentation>
+  <div class=container out:fade={{duration: 150}} role=presentation>
 
     <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation/>
     <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>

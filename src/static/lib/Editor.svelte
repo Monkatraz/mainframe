@@ -513,13 +513,13 @@ function getExtensions() {
 <svelte:window on:resize={updatePreview}/>
 
 <div class='overflow-container dark codetheme-dark'
-  in:tnAnime={{ opacity: ['0', '1'], easing: 'easeOutSine', duration: 150 }}
+  in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
 >
   <div class="editor-container {containerClass}">
 
     <!-- Top | Settings Bar -->
     <div class=topbar
-      in:tnAnime={{ translateY: ['-150%', '0'], duration: 600, delay: 200, easing: 'easeOutExpo' }}
+      in:tnAnime={{ translateY: ['-150%', '0'], duration: 600, delay: 400, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <div class=topbar-section>
@@ -552,7 +552,7 @@ function getExtensions() {
 
     <!-- Left | Editor Pane -->
     <div class=editor bind:this={editorContainer}
-      in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 100, easing: 'easeOutExpo' }}
+      in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     />
 
@@ -560,7 +560,7 @@ function getExtensions() {
     <div class='preview light codetheme-dark' bind:this={previewContainer}
       on:scroll={scrollFromPreview} 
       on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
-      in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 150, easing: 'easeOutQuint' }}
+      in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 350, easing: 'easeOutQuint' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
       {#if containerClass === 'show-both' || containerClass === 'show-preview'}
