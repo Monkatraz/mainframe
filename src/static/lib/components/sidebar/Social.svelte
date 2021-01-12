@@ -8,7 +8,6 @@
   @require '_lib'
 
   a
-    reset-styling(false)
     display: flex
     align-items: center
     justify-content: center
@@ -16,9 +15,11 @@
     width: 2rem
 
   img
-    transition: filter 0.05s
+    transition: filter 0.1s, transform 0.1s
+
     +on-hover()
       filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5))
+      transform: scale(1.075)
 
 </style>
 

@@ -329,12 +329,11 @@ label-for-screenreaders(text)
 
 reset-styling(useCache = true)
   resetter()
-    outline: none
-    border: none
+    color: inherit
     background: none
     text-decoration: none
     font: inherit
-    &:focus
+    &:not(:focus-visible)
       outline: none
       border: none
   if useCache

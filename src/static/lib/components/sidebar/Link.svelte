@@ -9,16 +9,12 @@
   @require '_lib'
 
   a
-    reset-styling(false)
     display: flex
     align-items: center
     gap: 0.75rem
-    height: 3em
-    width: 100%
+    height: 3rem
     padding-left: 1rem
 
-    line-height: 0
-    color: colvar('text')
     white-space: nowrap
     font-set('display')
     font-size: 1rem
@@ -30,7 +26,7 @@
       background: rgba(255,255,255,0.125)
 
   a.small
-    height: 2em
+    height: 2rem
     font-set('display')
     font-weight: 300
 

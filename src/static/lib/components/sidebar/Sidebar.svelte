@@ -43,7 +43,6 @@
     color: colvar('text-subtle')
 
   .sb-button
-    reset-styling(false)
     display: flex
     align-items: center
     justify-content: center
@@ -54,7 +53,6 @@
     padding: 0 1rem
     font-size: 1rem
     font-weight: bolder
-    color: colvar('text')
     background: colvar('accent-1')
     border-radius: 0.25rem
     transition: background 0.125s
