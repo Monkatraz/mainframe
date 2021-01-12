@@ -183,8 +183,21 @@
 
 </style>
 
-<Route>
-  {#if !inEdit}
+<Route firstmatch>
+  {#if $router.path === '/edit'}
+    <!-- Editor -->
+    <div
+    out:fade={{ duration: 100, delay: 300 }}
+    on:outroend={async () => { await sleep(50); inEdit = false }}
+    >
+    <!-- Async. loading -->
+      {#await import(EditorURL)}
+        <Spinny width=150px top=50% left=50%/>
+      {:then Editor}
+        <svelte:component this={Editor.default}/>
+      {/await}
+    </div>
+  {:else if !inEdit}
     <div class=container out:fade={{duration: 100}} role=presentation>
 
       <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation/>
@@ -193,14 +206,12 @@
       </aside>
 
       <main class="content" aria-label=Content>
+        <!-- Dummy route for the editor -->
+        <Route path='/edit'/>
+      
         <!-- Home Page -->
         <Route path="/"><Page
           loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
-        /></Route>
-
-        <!-- User Pages -->
-        <Route path="/scp/*"><Page
-          loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
         /></Route>
 
         <!-- Test routes-->
@@ -210,6 +221,11 @@
 
         <Route path="/test/loading"><Page
           loading={new Promise(() => {})}
+        /></Route>
+
+        <!-- User Pages -->
+        <Route path="/*"><Page
+          loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
         /></Route>
 
         <!-- 404 -->
@@ -223,18 +239,6 @@
           </div>
         </Route>
       </main>
-    </div>
-    {:else if $router.path.startsWith('/edit')}
-    <!-- Async. load the editor -->
-    <div
-      out:fade={{ duration: 100, delay: 300 }}
-      on:outroend={async () => { await sleep(50); inEdit = false }}
-    >
-      {#await import(EditorURL)}
-        <Spinny width=150px top=50% left=50%/>
-      {:then Editor}
-        <svelte:component this={Editor.default}/>
-      {/await}
     </div>
   {/if}
 </Route>
