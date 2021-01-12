@@ -160,27 +160,6 @@
     position: relative
     padding: 2rem 0
 
-  // 404 / page not found
-  .pgnf
-    text-align: center
-
-  .pgnf-blackbox
-    background: black
-    border-radius: 10px
-    padding-top: 1rem
-    padding-bottom: 2rem
-    shadow-elevation(8px)
-
-  .pgnf-header, .pgnf-text
-    terminal-text()
-    font-set('mono')
-
-  .pgnf-header
-    font-size: 5em
-
-  .pgnf-text
-    font-size: 2.5em
-
 </style>
 
 {#if $router.path === '/edit'}
@@ -228,17 +207,6 @@
           <Route path="/*"><Page
             loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
           /></Route>
-
-          <!-- 404 -->
-          <Route fallback>
-            <div class="pgnf rhythm" transition:fade={{duration: 50}}>
-              <div class=pgnf-blackbox>
-                <h1 class=pgnf-header>404</h1>
-                <span class=pgnf-text>PAGE NOT FOUND</span>
-              </div><br />
-              <h4>The requested page either does not exist or was not found.</h4>
-            </div>
-          </Route>
         </Route>
       {/key}
     </main>

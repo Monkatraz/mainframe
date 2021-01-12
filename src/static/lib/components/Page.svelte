@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import { getStatusCode } from '../modules/api'
   import { tnAnime } from '../modules/anime'
   import { renderMarkdown } from '../modules/markdown'
   import { fade } from 'svelte/transition'
@@ -25,6 +26,31 @@
   }
 </script>
 
+<style lang='stylus'>
+  @require '_lib'
+
+  // 404 / page not found
+  .pgnf
+    text-align: center
+
+  .pgnf-blackbox
+    background: black
+    border-radius: 10px
+    padding-top: 1rem
+    padding-bottom: 2rem
+    shadow-elevation(8px)
+
+  .pgnf-header, .pgnf-text
+    terminal-text()
+    font-set('mono')
+
+  .pgnf-header
+    font-size: 5em
+
+  .pgnf-text
+    font-size: 2.5em
+</style>
+
 <div role=presentation out:fade={{duration: 100}}>
   {#await loading.then(renderMarkdown)}
 
@@ -44,13 +70,23 @@
 
   <!-- Page failed to load -->
   {:catch error}
-    <div class=rhythm in:tnAnime={pageReveal}>
-      <h2>Error Displaying Page</h2>
-      <hr>
-      <pre class=code><code>
+    {#if getStatusCode(error) === 404 }
+      <div class="pgnf rhythm" in:tnAnime={pageReveal}>
+        <div class=pgnf-blackbox>
+          <h1 class=pgnf-header>404</h1>
+          <span class=pgnf-text>PAGE NOT FOUND</span>
+        </div><br />
+        <h4>The requested page either does not exist or was not found.</h4>
+      </div>
+    {:else}
+      <div class=rhythm in:tnAnime={pageReveal}>
+        <h2>Error Displaying Page</h2>
+        <hr>
+        <pre class=code><code>
 ERR: {error?.name}: {error?.message}
 MSG: {error?.description}
-      </code></pre>
-    </div>
+        </code></pre>
+      </div>
+    {/if}
   {/await}
 </div>
