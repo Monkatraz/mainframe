@@ -6,7 +6,7 @@
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import Iconify from '@iconify/iconify'
-  import Sidebar from './components/Sidebar.svelte'
+  import Sidebar from './components/sidebar/Sidebar.svelte'
   import Page from './components/Page.svelte'
   import Spinny from './components/Spinny.svelte'
 
