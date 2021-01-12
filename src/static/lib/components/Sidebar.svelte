@@ -8,19 +8,32 @@
   .sb-container
     overflow-y: scroll
     overflow-x: hidden
+    height: 100%
     hide-scrollbars()
     font-set('display')
 
 
   .sb-buttons
     display: flex
-    width: 100%
+    flex-wrap: wrap
     align-items: center
     justify-content: space-around
     background: colvar('accent-1', darken 5%)
     padding: 0.5rem 0.5rem
 
+  .sb-socials
+    display: flex
+    align-items: center
+    justify-content: space-evenly
+    height: 2.5rem
+    margin: 0 0.25rem
+    padding-top: 0.5rem
+    padding-left: 0.5rem
+    padding-right: 0.5rem
+    border-top: solid 0.125rem colvar('accent-1', lighten 10%, desaturate 40%)
+
   .sb-header
+    margin-top: 0.5rem
     padding-top: 0.5rem
     padding-bottom: 0.25rem
     padding-left: 1rem
@@ -28,10 +41,7 @@
     font-weight: bolder
     color: colvar('text-subtle')
 
-    ~ .sb-header
-      margin-top: 0.5rem
-
-  .sb-link, .sb-link-small, .sb-button
+  .sb-link, .sb-link-small, .sb-button, .sb-social
     reset-styling(false)
     display: flex
     align-items: center
@@ -41,6 +51,18 @@
     font-size: 1rem
     font-weight: bolder
     transition: background 0.125s
+
+  .sb-social
+    align-items: center
+    justify-content: center
+    height: 2rem
+    width: 2rem
+
+    > img
+      transition: filter 0.05s
+
+      +on-hover()
+        filter: drop-shadow(0 2px 2px rgba(0,0,0,0.5))
 
   .sb-button
     gap: 0.5rem
@@ -77,10 +99,43 @@
     <a class=sb-button href='/edit'><Icon i='ri:edit-2-fill' size='1.5em'/>Open Editor</a>
   </div>
 
+  <div class=sb-socials>
+    <a class=sb-social aria-label='SCP DeviantArt'
+      href='https://scp-foundation.deviantart.com/'>
+      <img src='/static/media/social-deviantart.png' alt='' aria-hidden/>
+    </a>
+    <a class=sb-social aria-label='SCP Facebook'
+      href='https://www.facebook.com/scpfoundation'>
+      <img src='/static/media/social-facebook.png' alt='' aria-hidden/>
+    </a>
+    <a class=sb-social aria-label='SCP Twitter'
+      href='https://twitter.com/scpwiki'>
+      <img src='/static/media/social-twitter.png' alt='' aria-hidden/>
+    </a>
+    <a class=sb-social aria-label='SCP Subreddit'
+      href='https://www.reddit.com/r/SCP'>
+      <img src='/static/media/social-reddit.png' alt='' aria-hidden/>
+    </a>
+    <a class=sb-social aria-label='SCP Tumblr'
+      href='https://scp-wiki-official.tumblr.com/'>
+      <img src='/static/media/social-tumblr.png' alt='' aria-hidden/>
+    </a>
+    <a class=sb-social aria-label='SCP Instagram'
+      href='https://www.instagram.com/scpfoundationwiki'>
+      <img src='/static/media/social-instagram.png' alt='' aria-hidden/>
+    </a>
+    <a class=sb-social aria-label='SCP Twitch'
+      href='https://www.twitch.tv/scpwiki'>
+      <img src='/static/media/social-twitch.png' alt='' aria-hidden/>
+    </a>
+  </div>
+
   <div class=sb-header>About</div>
   <a class=sb-link
     href='https://github.com/Monkatraz/mainframe'><Icon i='mdi:github' size='2em'/> Source Repository</a>
-  <a class=sb-link href='http://www.scpwiki.com/'><Icon i='@c:scp:logo' size='2em'/> SCP Wiki</a>
+  <a class=sb-link href='http://www.scpwiki.com/'><Icon i='@c:scp:logo' size='2em'/> Official SCP Wiki</a>
+  <a class=sb-link href='/admin/license'><Icon i='tabler:copyright' size='2em'/> Licensing</a>
+  <a class=sb-link href='/admin/contributors'><Icon i='clarity:heart-line' size='2em'/> Contributors</a>
 
   <div class=sb-header>Resources</div>
   <a class=sb-link href='/guide/editor-syntax'><Icon i='entypo:code' size='2em'/> Editor Syntax</a>
@@ -88,8 +143,8 @@
   <a class=sb-link href='/guide/api'><Icon i='carbon:cloud-app' size='2em'/> Mainframe API</a>
 
   <div class=sb-header>Customization</div>
-  <a class=sb-link href='/guide/theming'><Icon i='mdi:palette' size='2em'/> User Themes</a>
-  <a class=sb-link href='/guide/modules'><Icon i='ph:stack-bold' size='2em'/> User Modules</a>
+  <a class=sb-link href='/guide/user-themes'><Icon i='mdi:palette-outline' size='2em'/> User Themes</a>
+  <a class=sb-link href='/guide/user-modules'><Icon i='ph:stack-bold' size='2em'/> User Modules</a>
 
   <div class=sb-header>Test Pages</div>
   <a class=sb-link-small href='/test/md'><Icon i='ion:logo-markdown' size='1.25em'/> Markdown</a>

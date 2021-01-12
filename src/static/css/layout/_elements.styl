@@ -60,7 +60,7 @@ table
     text-decoration: currentColor underline 0.1em
 
   // Styles external links.
-  &[href*='//']:not([href*='scp-mainframe.com']):not([href*='localhost'])
+  &[href*='//']:not([href*='mainframe.vercel.app']):not([href*='localhost'])
     color: colvar('link-ext')
     text-decoration-color: colvar('link-ext', opacity 0.5)
     +on-hover()
@@ -68,7 +68,7 @@ table
       text-decoration-color: currentColor
 
   // Styles internal links.
-  &[href^="/"], &[href^=".."], &[href^="#"], &[href*='scp-mainframe.com'], &[href*='localhost']
+  &[href^="/"], &[href^=".."], &[href^="#"], &[href*='mainframe.vercel.app'], &[href*='localhost']
     color: colvar('link-int')
     text-decoration-color: transparent
     +on-hover()

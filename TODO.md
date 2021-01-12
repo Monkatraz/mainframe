@@ -1,16 +1,16 @@
 # Mainframe
 
 ### In Progress
-- [ ] See if it is possible to entirely avoid serverless functions for page updates / creation
+- [ ] Login component
+- [ ] Page creation, and updating
 - [ ] Add tooltips / hints
-- [ ] Incorporate language into the URL for best practices
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin
 - [ ] Dynamic Svelte components generation
   
 ### General
-- [ ] Integrate ReCaptcha
+- [ ] Integrate ReCaptcha?
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
   - Force passing a ReCaptcha when registering
 - [ ] Generic cache library
@@ -24,16 +24,15 @@
 - [ ] Account deletion
 
 ### Components
-- [ ] Login component
 - [ ] Licensing Widget
-- [ ] Humans.txt button
 - [ ] Navbar dropdowns
 - [ ] Search bar component
 - [ ] Rating component
 - [ ] Comments / Discussion Tab Component Thingy
 - [ ] Top of page button
-- [ ] Share button
+- [ ] Share widget
 - [ ] Overlay scrollbar component
+- [ ] The Admin Panel
 
 ### Random Ideas
 - Automatic repository pages (maybe a Markdown syntax for interfacing with the database)
@@ -43,7 +42,6 @@
 - Some sort of "alert" component that pops up and then fades programmatically
 
 #### Editor
-- Validations list to the side
 - Single-pane Markdown cheat sheet
 - Path type restrictions
 	- "scp/scp-3685" is illegal (must be a 4 digit number)

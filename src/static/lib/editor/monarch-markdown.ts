@@ -77,8 +77,8 @@ export default createMonarchLanguage({
         [/@s(-|\*)(?:\s*?\1){2,}\s*$/, 'contentSeparator'],
 
         // Headers (block-level)
-        [/@s(#+)\s*(?!$)/, { token: 'heading', parser: { open: 'HeadingSection', close: 'HeadingSection' } }],
-        [/(?<=@s#+\s*.+\s*)(#+)\s*$/, 'heading'], // ending hashes on headers
+        [/@s(#+)\s+(?!$)/, { token: 'heading', parser: { open: 'HeadingSection', close: 'HeadingSection' } }],
+        [/(?<=@s#+\s+.+\s*)(#+)\s*$/, 'heading'], // ending hashes on headers
         [/@s(=|-)\1{2,}\s*$/, 'heading'], // ===== / ----- headings
 
         // Code Blocks
