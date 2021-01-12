@@ -301,9 +301,9 @@ function getExtensions() {
       .forEach(elem => {
         const dataLine = parseInt(elem.getAttribute('data-line') as string)
         if (elem.offsetParent === preview) {
-        const height = elem.getBoundingClientRect().top - previewRect.top
-        mapLineHeight.set(dataLine, height)
-        arrLineHeight[dataLine] = height
+          const height = elem.getBoundingClientRect().top - previewRect.top
+          mapLineHeight.set(dataLine, height)
+          arrLineHeight[dataLine] = height
         }
       })
 
