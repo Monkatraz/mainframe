@@ -58,31 +58,7 @@
 <style lang="stylus">
   @require '_lib'
 
-  :global(:root)
-    // Basic layout variables
-    // These can be edited
-    --layout-navbar-height: 2.5rem
-    --layout-sidebar-width: 16rem
-    --layout-body-max-width: 45rem
-    --layout-body-side-gap: 1.5rem
-
-    // Layout variables for smaller devices
-    +match-media(thin, below)
-      --layout-navbar-height: 3rem
-      --layout-sidebar-width: 16rem
-      --layout-body-max-width: 45rem
-      --layout-body-side-gap: 1rem
-
-    // Variables that probably shouldn't be edited
-    --layout-header-height-scalefactor: calc(var(--layout-header-height) / 8)
-    //                        Center of screen | Offset to left edge of body | Remove the offset caused by sidebar
-    //                                     v                  v                           v
-    --layout-body-centering-factor: calc((50vw - (var(--layout-body-max-width) / 2)) - var(--layout-sidebar-width))
-    // Total height of the header + navbar
-    --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-navbar-height))
-
   // Shorthands
-  // Makes the grid-kiss declaration more compact and visually understandable.
   $nav-h = var(--layout-navbar-height)
   $side-w = var(--layout-sidebar-width)
   $body-w = minmax(0, var(--layout-body-max-width))
@@ -188,7 +164,7 @@
         <Route firstmatch>
           <!-- Dummy route for the editor -->
           <Route path='/edit'/>
-        
+
           <!-- Home Page -->
           <Route path="/"><Page
             loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}

@@ -65,18 +65,6 @@
 <style lang="stylus">
   @require '_lib'
 
-  :root
-    --actions-panel-height: 5rem
-    --actions-panel-border-height: 0.5rem
-    --actions-panel-button-height: 2rem
-    --actions-panel-hover-shift: -0.5rem
-    --actions-panel-active-shift: -0.75rem
-
-    +match-media(thin, below)
-      --actions-panel-border-height: 1rem
-
-    --actions-panel-total-height: calc(var(--actions-panel-border-height) + var(--actions-panel-button-height) + var(--actions-panel-height))
-
   .actions-panel-container
     position: sticky
     z-index: 90

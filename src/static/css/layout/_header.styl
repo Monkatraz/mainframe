@@ -1,14 +1,6 @@
 @require '_lib'
 
 // Header Layout
-:root
-  --layout-header-height: 8rem
-  --layout-top-max-width: 60rem
-
-  // Layout for smaller devices
-  +match-media(thin, below) 
-    --layout-header-height: 6rem
-    --layout-top-max-width: 60rem
 
 #header
   height: var(--layout-header-height)

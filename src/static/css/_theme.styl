@@ -35,7 +35,7 @@
   colvar-set('critic-highlighted', rgb(200, 120, 200))
   colvar-set('critic-comment',     rgb(50, 150, 255))
 
-// -- Theme Colors (dark, light)
+// -- Light / Dark Colors
 
 .light
   colvar-set('text',        rgb(30, 25, 25))
@@ -130,3 +130,46 @@
   --colcode-id:         #3394cc
   --colcode-class:      #10AB00
   --colcode-attribute:  #FFCB6B
+
+
+// -- Global Layout
+:root
+  --layout-navbar-height: 2.5rem
+  --layout-sidebar-width: 16rem
+  --layout-body-max-width: 45rem
+  --layout-body-side-gap: 1.5rem
+
+  --layout-header-height: 8rem
+  --layout-top-max-width: 60rem
+
+  --layout-footer-height: 2rem
+
+  --actions-panel-height: 5rem
+  --actions-panel-border-height: 0.5rem
+  --actions-panel-button-height: 2rem
+  --actions-panel-hover-shift: -0.5rem
+  --actions-panel-active-shift: -0.75rem
+
+  // Layout variables for smaller devices
+  +match-media(thin, below)
+    --layout-navbar-height: 3rem
+    --layout-sidebar-width: 16rem
+    --layout-body-max-width: 45rem
+    --layout-body-side-gap: 1rem
+
+    --layout-header-height: 6rem
+    --layout-top-max-width: 60rem
+
+    --actions-panel-border-height: 1rem
+
+  // Variables that probably shouldn't be edited
+
+  --layout-header-height-scalefactor: calc(var(--layout-header-height) / 8)
+  //                        Center of screen | Offset to left edge of body | Remove the offset caused by sidebar
+  //                                     v                  v                           v
+  --layout-body-centering-factor: calc((50vw - (var(--layout-body-max-width) / 2)) - var(--layout-sidebar-width))
+  // Total height of the header + navbar
+  --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-navbar-height))
+
+  --actions-panel-total-height: calc(var(--actions-panel-border-height) + var(--actions-panel-button-height) + var(--actions-panel-height))
+
