@@ -106,6 +106,7 @@ function getExtensions() {
   // -- CONTAINER
 
   let containerClass: 'show-editor' | 'show-both' | 'show-preview' = 'show-both'
+  let darkMode = true
   let spellCheck = false
   let showLivePreview = true
   let showPreviewActiveLine = true
@@ -533,7 +534,7 @@ function getExtensions() {
 <!-- some chores to do on resize -->
 <svelte:window on:resize={updatePreview}/>
 
-<div class='overflow-container dark codetheme-dark'
+<div class='overflow-container {darkMode ? 'dark codetheme-dark' : 'light codetheme-light'}'
   in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
 >
   <div class="editor-container {containerClass}">
@@ -571,6 +572,7 @@ function getExtensions() {
       <div class='editor-settings'>
         <DetailsMenu i='fluent:settings-28-filled'>
           <div class='editor-settings-menu'>
+            <Checkbox bind:checked={darkMode}>Dark Mode</Checkbox>
             <Checkbox bind:checked={spellCheck}>Spellcheck</Checkbox>
             <Checkbox bind:checked={showLivePreview}>Live Preview</Checkbox>
             <Checkbox bind:checked={showPreviewActiveLine}>Preview Active Line</Checkbox>
