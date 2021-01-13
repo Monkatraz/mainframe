@@ -16,6 +16,7 @@
 
   .slot
     transition: color 0.1s
+    margin-left: 0.25em
 
   input
     position: absolute
@@ -28,5 +29,5 @@
 <label>
   <input type='checkbox' bind:checked>
   <Icon i={checked ? 'fa:check-square' : 'fa:square'}/>
-  <span class='slot' {...$$restProps}><slot/></span>
+  <span class='slot' {...$$restProps}><slot /></span>
 </label>

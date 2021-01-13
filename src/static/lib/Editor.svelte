@@ -70,6 +70,7 @@ function getExtensions() {
   // Components
   import Checkbox from './components/Checkbox.svelte'
   import Icon from './components/Icon.svelte'
+  import DetailsMenu from './components/DetailsMenu.svelte'
 
   // TODO: make dropdowns actually work
   // TODO: add misc. info on topbar like word count and the like
@@ -120,7 +121,7 @@ function getExtensions() {
 
   // -- EDITOR
 
-  let editorContainer: HTMLElement
+  let editor: HTMLElement
   let editorView: EditorView
 
   onMount(async () => {
@@ -163,7 +164,7 @@ function getExtensions() {
         doc: await fetch('/static/misc/md-test.md').then(res => res.text()),
         extensions: mergedExtensions
       }),
-      parent: editorContainer
+      parent: editor
     })
 
     updatePreview()
@@ -319,7 +320,7 @@ function getExtensions() {
     const scrollTop = editorView.scrollDOM.scrollTop
     editorScrollSpring.set(scrollTop)
     // get top most visible line
-    const domRect = editorContainer.getBoundingClientRect()
+    const domRect = editor.getBoundingClientRect()
     const pos = editorView.posAtCoords({ x: domRect.x, y: domRect.y })
     let line = editorView.state.doc.lineAt(pos ?? 1).number - 1
     // find our line height
@@ -386,7 +387,7 @@ function getExtensions() {
                 "| .topbar                                          | 2rem ",
                 "+--------------------------------------------------+      ",
                 "+------------------------+ +-----------------------+      ",
-                "| .editor                | | .preview              |      ",
+                "| .editor-pane           | | .preview              |      ",
                 "|                        | |                       |      ",
                 "|                        | |                       |      ",
                 "|                        | |                       |      ",
@@ -404,7 +405,7 @@ function getExtensions() {
                 "| .topbar                                          | 2rem ",
                 "+--------------------------------------------------+      ",
                 "+--------------------------------------------------+      ",
-                "| .editor                                          |      ",
+                "| .editor-pane                                     |      ",
                 "|                                                  |      ",
                 "|                                                  |      ",
                 "|                                                  |      ",
@@ -466,12 +467,32 @@ function getExtensions() {
       color: colvar('hint')
       shadow-elevation(1)
 
-  .editor
+  .editor-pane
+    position: relative
     z-index: 2
     overflow: hidden
     border-right: solid 0.125rem colvar('border')
     padding-right: 0.25rem
     background: var(--colcode-background)
+
+  .editor-settings
+    position: absolute
+    height: 2.5rem
+    width: 2.5rem
+    top: 1rem
+    right: 1rem
+    z-index: 10
+
+  .editor-settings-menu
+    display: flex
+    flex-direction: column
+    row-gap: 0.75rem
+    width: max-content
+    font-set('display')
+    font-size: 0.9rem
+
+  .editor
+    height: 100%
 
   .preview
     position: relative
@@ -540,21 +561,24 @@ function getExtensions() {
           Metadata <Icon i='ion:caret-down'/>
         </span>
       </div>
-
-      <div class=topbar-section>
-        <Checkbox bind:checked={spellCheck}>Spellcheck</Checkbox>
-        <span style='padding: 0 0.25em'/>
-        <Checkbox bind:checked={showLivePreview}>Live Preview</Checkbox>
-        <span style='padding: 0 0.25em'/>
-        <Checkbox bind:checked={showPreviewActiveLine}>Preview Active Line</Checkbox>
-      </div>
     </div>
 
     <!-- Left | Editor Pane -->
-    <div class=editor bind:this={editorContainer}
+    <div class=editor-pane
       in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
-    />
+    >
+      <div class='editor-settings'>
+        <DetailsMenu i='fluent:settings-28-filled'>
+          <div class='editor-settings-menu'>
+            <Checkbox bind:checked={spellCheck}>Spellcheck</Checkbox>
+            <Checkbox bind:checked={showLivePreview}>Live Preview</Checkbox>
+            <Checkbox bind:checked={showPreviewActiveLine}>Preview Active Line</Checkbox>
+          </div>
+        </DetailsMenu>
+      </div>
+      <div class=editor bind:this={editor}/>
+    </div>
 
     <!-- Right | Preview Pane -->
     <div class='preview light codetheme-dark' bind:this={previewContainer}
