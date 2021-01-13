@@ -8,7 +8,6 @@
   "scripts": {
     "dev": "snowpack dev",
     "build": "snowpack build",
-    "postinstall": "patch-package",
     "test": "echo \"Mainframe does not currently include a test runner.\""
   },
   "browserslist": [
@@ -48,16 +47,16 @@
     "morphdom": "^2.6.1"
   },
   "devDependencies": {
-    "@snowpack/plugin-svelte": "^3.4.1",
+    "@snowpack/plugin-svelte": "^3.5.0",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
     "autoprefixer": "^10.1.0",
     "css-mquery-packer": "^1.2.4",
+    "esbuild": "^0.8.31",
     "eslint": "latest",
-    "fs-extra": "^9.0.1",
-    "patch-package": "^6.2.2",
     "postcss": "^8.2.3",
-    "snowpack": "^2.18.5",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "snowpack": "^3.0.3",
     "sort-css-media-queries": "^1.5.2",
     "stylus": "^0.54.8",
     "svelte": "^3.31.2",

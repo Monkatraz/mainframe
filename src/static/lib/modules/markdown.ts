@@ -17,7 +17,7 @@ function restartRenderWorker() {
   renderWorker = new Worker(new URL('../workers/md-renderer.js', import.meta.url), {
     name: 'md-renderer',
     credentials: 'same-origin',
-    type: import.meta.env.MODE === 'development' ? "module" : "classic"
+    type: 'classic'
   })
 }
 // init. worker on first load

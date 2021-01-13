@@ -32,7 +32,7 @@
 
   // kind of hacky, but we don't want esbuild to preload the entire editor
   // so we use a dynamic import string
-  const EditorURL = './Editor.js'
+  const EditorURL = './Editor.svelte.js'
 
   // -- ANIMATIONS
 
