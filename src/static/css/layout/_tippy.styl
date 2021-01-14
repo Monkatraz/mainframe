@@ -3,8 +3,10 @@
 .tippy-box[data-theme~='mainframe']
   filter: drop-shadow(0 0 5px rgba(black, 0.4))
   background-color: colvar('background')
+  border-color: colvar('border')
   color: colvar('text')
   font-size: 0.875rem
+  transition-timing-function: ease-out
 
   .tippy-svg-arrow
     color: colvar('background')
@@ -14,6 +16,7 @@
   background-color: #333
   color: #fff
   border-radius: 4px
+  border 1px solid #333
   font-size: 14px
   line-height: 1.4
   outline: 0
@@ -42,7 +45,13 @@
   height: 16px
   color: #333
   &:before
-    content: ""
+    content: ''
+    position: absolute
+    border-color: transparent
+    border-style: solid
+  &:after
+    content: ''
+    z-index: -1
     position: absolute
     border-color: transparent
     border-style: solid
@@ -64,10 +73,10 @@
   > .tippy-arrow
     bottom: 0
     &:before
-      bottom: -7px
+      bottom: -8px
       left: 0
       border-width: 8px 8px 0
-      border-top-color: initial
+      border-top-color: inherit
       transform-origin: center top
 
   > .tippy-svg-arrow
@@ -75,6 +84,8 @@
     &:after, > svg
       top: 16px
       transform: rotate(180deg)
+    > svg:first-child:not(:last-child)
+      top: 17px
 
 .tippy-box[data-placement^=bottom]
 
@@ -84,16 +95,18 @@
   > .tippy-arrow
     top: 0
     &:before
-      top: -7px
+      top: -8px
       left: 0
       border-width: 0 8px 8px
-      border-bottom-color: initial
+      border-bottom-color: inherit
       transform-origin: center bottom
 
   > .tippy-svg-arrow
     top: 0
     > svg
       bottom: 16px
+    > svg:first-child:not(:last-child)
+      bottom: 17px
 
 .tippy-box[data-placement^=left]
 
@@ -104,8 +117,8 @@
     right: 0
     &:before
       border-width: 8px 0 8px 8px
-      border-left-color: initial
-      right: -7px
+      border-left-color: inherit
+      right: -8px
       transform-origin: center left
 
   > .tippy-svg-arrow
@@ -114,6 +127,8 @@
       transform: rotate(90deg)
       top: calc(50% - 3px)
       left: 11px
+    > svg:first-child:not(:last-child)
+      left: 12px
 
 .tippy-box[data-placement^=right]
 
@@ -123,9 +138,9 @@
   > .tippy-arrow
     left: 0
     &:before
-      left: -7px
+      left: -8px
       border-width: 8px 8px 8px 0
-      border-right-color: initial
+      border-right-color: inherit
       transform-origin: center right
 
   > .tippy-svg-arrow
@@ -134,3 +149,5 @@
       transform: rotate(-90deg)
       top: calc(50% - 3px)
       right: 11px
+    > svg:first-child:not(:last-child)
+      right: 12px
