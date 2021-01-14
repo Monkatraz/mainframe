@@ -64,7 +64,7 @@ function getExtensions() {
   import { spring } from 'svelte/motion'
   import { fade } from 'svelte/transition'
   import { morphMarkdown } from './modules/markdown'
-  import { tnAnime } from './modules/components'
+  import { tnAnime, tip } from './modules/components'
   import { idleCallback, createIdleQueued, createAnimQueued, throttle } from './modules/util'
   import type { Page } from './modules/api';
   // Components
@@ -569,7 +569,7 @@ function getExtensions() {
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <div class='editor-settings'>
-        <DetailsMenu i='fluent:settings-28-filled'>
+        <DetailsMenu i='fluent:settings-28-filled' label='Editor Settings'>
           <div class='editor-settings-menu'>
             <Toggle bind:toggled={darkMode}>Dark Mode</Toggle>
             <Toggle bind:toggled={spellCheck}>Spellcheck</Toggle>

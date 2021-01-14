@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import { tip } from '../../modules/components'
   export let href = ''
   export let src = ''
   export let label = ''
@@ -23,4 +24,4 @@
 
 </style>
 
-<a aria-label={label} {href}><img {src} alt='' aria-hidden/></a>
+<a aria-label={label} {href} use:tip><img {src} alt='' aria-hidden/></a>

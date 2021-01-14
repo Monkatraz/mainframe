@@ -1,13 +1,136 @@
 @require '_lib'
 
 .tippy-box[data-theme~='mainframe']
-
   filter: drop-shadow(0 0 5px rgba(black, 0.4))
   background-color: colvar('background')
   color: colvar('text')
-
-  font-set('display', false)
-  font-size: 1rem
+  font-size: 0.875rem
 
   .tippy-svg-arrow
     color: colvar('background')
+
+.tippy-box
+  position: relative
+  background-color: #333
+  color: #fff
+  border-radius: 4px
+  font-size: 14px
+  line-height: 1.4
+  outline: 0
+  transition-property: transform, visibility, opacity
+
+[data-tippy-root]
+  max-width: calc(100vw - 10px)
+
+.tippy-content
+  position: relative
+  padding: 5px 9px
+  z-index: 1
+
+.tippy-box[data-animation=fade][data-state=hidden]
+  opacity: 0
+
+.tippy-box[data-animation=scale][data-state=hidden]
+  transform: scale(.5)
+  opacity: 0
+
+.tippy-box[data-inertia][data-state=visible]
+  transition-timing-function: cubic-bezier(.54,1.5,.38,1.11)
+
+.tippy-arrow
+  width: 16px
+  height: 16px
+  color: #333
+  &:before
+    content: ""
+    position: absolute
+    border-color: transparent
+    border-style: solid
+
+.tippy-svg-arrow
+  width: 16px
+  height: 16px
+  fill: currentColor
+  text-align: initial
+
+.tippy-svg-arrow, .tippy-svg-arrow > svg
+  position: absolute
+
+.tippy-box[data-placement^=top]
+
+  &[data-animation=scale]
+    transform-origin: bottom
+
+  > .tippy-arrow
+    bottom: 0
+    &:before
+      bottom: -7px
+      left: 0
+      border-width: 8px 8px 0
+      border-top-color: initial
+      transform-origin: center top
+
+  > .tippy-svg-arrow
+    bottom: 0
+    &:after, > svg
+      top: 16px
+      transform: rotate(180deg)
+
+.tippy-box[data-placement^=bottom]
+
+  &[data-animation=scale]
+    transform-origin: top
+
+  > .tippy-arrow
+    top: 0
+    &:before
+      top: -7px
+      left: 0
+      border-width: 0 8px 8px
+      border-bottom-color: initial
+      transform-origin: center bottom
+
+  > .tippy-svg-arrow
+    top: 0
+    > svg
+      bottom: 16px
+
+.tippy-box[data-placement^=left]
+
+  &[data-animation=scale]
+    transform-origin: right
+
+  > .tippy-arrow
+    right: 0
+    &:before
+      border-width: 8px 0 8px 8px
+      border-left-color: initial
+      right: -7px
+      transform-origin: center left
+
+  > .tippy-svg-arrow
+    right: 0
+    &:after, > svg
+      transform: rotate(90deg)
+      top: calc(50% - 3px)
+      left: 11px
+
+.tippy-box[data-placement^=right]
+
+  &[data-animation=scale]
+    transform-origin: left
+
+  > .tippy-arrow
+    left: 0
+    &:before
+      left: -7px
+      border-width: 8px 8px 8px 0
+      border-right-color: initial
+      transform-origin: center right
+
+  > .tippy-svg-arrow
+    left: 0
+    &:after, > svg
+      transform: rotate(-90deg)
+      top: calc(50% - 3px)
+      right: 11px

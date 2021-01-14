@@ -8,12 +8,8 @@
 import tippy, { Props as TippyProps } from 'tippy.js'
 import {
   roundArrow as TippyRoundArrow,
-  followCursor as TippyFollowCursor,
   sticky as TippySticky
 } from 'tippy.js'
-import 'tippy.js/dist/tippy.css'
-import 'tippy.js/dist/svg-arrow.css'
-import 'tippy.js/animations/scale.css'
 // Anime
 import anime, { AnimeParams } from 'animejs'
 import { animationFrame } from './util'
@@ -27,14 +23,19 @@ const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
   touch: ['hold', 600],
   duration: [50, 100],
   delay: [400, 50],
-  followCursor: 'horizontal',
-  plugins: [TippyFollowCursor, TippySticky]
+  plugins: [TippySticky]
 }
 
 function parseTipOpts(elem: Element, opts: Partial<TippyProps> | string) {
   if (opts) {
     if (typeof opts === 'string')
       opts = { content: opts }
+    else if (!opts.content) {
+      if (elem.hasAttribute('aria-label'))
+        opts.content = elem.getAttribute('aria-label')!
+      else
+        opts.content = '(unknown)'
+    }
   } else {
     if (elem.hasAttribute('aria-label'))
       opts = { content: elem.getAttribute('aria-label')! }

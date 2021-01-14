@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import { tip } from '../../modules/components'
   import Icon from '../Icon.svelte'
   import Link from './Link.svelte'
   import Social from './Social.svelte'
@@ -64,7 +65,7 @@
 <div class='sb-container' role='presentation'>
 
   <div class=sb-buttons>
-    <a class=sb-button href='/' aria-label='Home'><Icon i='entypo:home' size='1.5em'/></a>
+    <a class=sb-button href='/' aria-label='Home' use:tip><Icon i='entypo:home' size='1.5em'/></a>
     <a class=sb-button href='/edit'><Icon i='ri:edit-2-fill' size='1.5em'/>Open Editor</a>
   </div>
 

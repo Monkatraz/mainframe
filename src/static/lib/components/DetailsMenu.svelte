@@ -1,10 +1,12 @@
 <script lang='ts'>
   import { onMount } from 'svelte';
+  import { tip } from '../modules/components'
   import Icon from './Icon.svelte'
 
   export let i = ''
   export let size = '1.5rem'
   export let hover = false
+  export let label = ''
 
   let details: HTMLElement
   let summary: HTMLElement
@@ -92,7 +94,11 @@
 <svelte:body on:pointerdown={checkClose} />
 
 <details bind:this={details} {...$$restProps}>
-  <summary bind:this={summary}><Icon {i} {size}/></summary>
+  {#if label}
+    <summary aria-label={label} use:tip bind:this={summary}><Icon {i} {size}/></summary>
+  {:else}
+    <summary bind:this={summary}><Icon {i} {size}/></summary>
+  {/if}
   <div class=menu>
     <svg class='arrow' xmlns='http://www.w3.org/2000/svg' aria-hidden='true' focusable='false' width='1rem' height='1rem' viewBox='0 0 24 24'><path d='M3 19h18a1.002 1.002 0 0 0 .823-1.569l-9-13c-.373-.539-1.271-.539-1.645 0l-9 13A.999.999 0 0 0 3 19z'/></svg>
     <slot />
