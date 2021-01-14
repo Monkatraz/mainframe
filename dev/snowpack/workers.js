@@ -18,10 +18,12 @@ module.exports = function (snowpackConfig, pluginOptions) {
         entryPoints: [filePath],
         bundle: true,
         treeShaking: true,
+        sourcemap: true,
+        outdir: './',
+        outbase: './',
         write: false
       })
-
-      return { '.js': { code: result.outputFiles[0].text } }
+      return { '.js': { code: result.outputFiles[1].text, map: result.outputFiles[0].text } }
     }
   }
 }
