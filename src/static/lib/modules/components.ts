@@ -6,10 +6,7 @@
 // -- Imports
 // Tippy
 import tippy, { Props as TippyProps } from 'tippy.js'
-import {
-  roundArrow as TippyRoundArrow,
-  sticky as TippySticky
-} from 'tippy.js'
+import { roundArrow as TippyRoundArrow } from 'tippy.js'
 // Anime
 import anime, { AnimeParams } from 'animejs'
 import { animationFrame } from './util'
@@ -22,8 +19,7 @@ const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
   animation: 'scale',
   touch: ['hold', 600],
   duration: [50, 100],
-  delay: [400, 50],
-  plugins: [TippySticky]
+  delay: [400, 50]
 }
 
 function parseTipOpts(elem: Element, opts: Partial<TippyProps> | string) {
