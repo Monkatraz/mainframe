@@ -46,14 +46,37 @@ s
 // Highlighted text.
 mark
   background: colvar('text-highlight')
-  color: colvar('black')
+  color: inherit
+
+// -- TABLES
 
 table
-  width: 100%
-  margin-left: auto
-  margin-right: auto
+  display: block
+  width: max-content
+  max-width: 100%
+  empty-cells: hide
+  table-layout: fixed
+
+th
+  font-weight: bolder
+
+th, td
+  padding: 0.5rem 1rem
+  border: 0.075rem solid colvar('border')
+
+  &:empty
+    padding: 0
+
+tr
+  background-color: colvar('background')
+  border: 0.075rem solid colvar('border')
+
+  &:nth-child(2n)
+    background-color: colvar('background', darken 2.5%)
+
 
 // -- LINKS AND INPUTS
+
 .content a
   &[href]
     transition: color 0.05s, text-decoration-color 0.1s
