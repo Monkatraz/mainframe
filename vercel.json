@@ -12,7 +12,7 @@
       "headers": [
         {
           "key": "Content-Security-Policy",
-          "value": "script-src 'self' 'sha256-jf5vX2pNToQQOGMA3y1FZvK0WhCwoAfAzsglmnPc71M='; child-src 'self'; object-src 'none';"
+          "value": "script-src 'self'; child-src 'self'; object-src 'none';"
         },
         {
           "key": "Cross-Origin-Opener-Policy",
