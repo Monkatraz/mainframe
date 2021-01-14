@@ -4,12 +4,12 @@
 
 #header
   height: var(--layout-header-height)
-  grid-kiss:"+-------------+ +----------------------------------+ +-----------+",
-            "|             | |                 v                | |           |",
-            "|             | |           #header_logo           | |           |",
-            "|             | |                 ^                | |           |",
-            "+-------------+ +----------------------------------+ +-----------+",
-            "| 5vh - 0.5fr | |  vm(auto, layout-top-max-width)  | | 5vh - 2fr |"
+  grid-kiss:"+---------------+ +--------------+ +---------------+ +---------------+",
+            "|               | |       v      | |               | |               |",
+            "|               | | #header_logo | | > #user-panel | |               |",
+            "|               | |       ^      | |      ^        | |               |",
+            "+---------------+ +--------------+ +---------------+ +---------------+",
+            "| 5vh - 0.25fr  | |     auto     | |      auto     | | 5vh - 0.25fr  |"
 
   // Centered logo
   +match-media(thin, below)
@@ -83,6 +83,13 @@
       height: 21rem
       width: 21rem
 
+#user-panel
+  isolation: isolate
+  margin-top: 1rem
+  background: none
+  color: colvar('text')
+  z-index: 90
+
 // Header Styling
 :root
   $bg-terminaleffect = repeating-linear-gradient(0deg, rgba(black,0.1) 0, rgba(black,0.1) 2px, transparent 0, transparent 4px)
@@ -97,7 +104,7 @@
   --header-background-color: colvar('accent-1')
 
 #header
-  contain: strict
+  position: relative
   background: var(--header-background)
   box-shadow: 0 3px 5px rgba(0,0,0,0.5)
 

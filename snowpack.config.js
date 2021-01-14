@@ -41,7 +41,7 @@ module.exports = {
     out: 'build',
     clean: true,
     metaUrlPath: 'static/snowpack',
-    sourcemap: true
+    sourcemap: false
   },
   alias: {
     '@vendor': './public/vendor'

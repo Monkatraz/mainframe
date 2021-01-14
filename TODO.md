@@ -1,9 +1,8 @@
 # Mainframe
 
 ### In Progress
-- [ ] Login component
 - [ ] Page creation, and updating
-- [ ] Add tooltips / hints
+- [ ] Update the account creation and login forms to use forms correctly
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin
@@ -107,3 +106,5 @@
 - [x] Switch to CodeMirror due to Monaco being fairly under supported in the client-space
 - [x] Move all components and JS into a `/lib` folder
 - [x] Add sidebar
+- [x] Add tooltips / hints
+- [x] Login component

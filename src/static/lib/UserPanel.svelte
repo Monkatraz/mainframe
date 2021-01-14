@@ -1,0 +1,125 @@
+<script lang='ts'>
+  import { User } from './modules/api'
+  import Icon from './components/Icon.svelte'
+  import Dropdown from './components/Dropdown.svelte'
+  import TextInput from './components/TextInput.svelte'
+  import Button from './components/Button.svelte'
+
+  let authed = User.authed
+  function checkAuth() { authed = User.authed }
+
+  // -- REGISTER
+
+  let registerEmail: HTMLInputElement
+  let registerPass: HTMLInputElement
+
+  let registerButtonMSG = 'Register'
+
+  async function register() {
+    if (!registerEmail || !registerPass) return
+    if (registerEmail.validity.valid && registerPass.validity.valid) {
+      registerButtonMSG = 'Working...'
+      try {
+        await User.guestRegister(registerEmail.value, registerPass.value)
+        registerButtonMSG = 'Registered!'
+      } catch {
+        registerButtonMSG = 'Sorry, failed to register.'
+      } finally {
+        registerEmail.value = ''
+        registerPass.value = ''
+        setTimeout(() => registerButtonMSG = 'Register', 5000)
+      }
+    }
+  }
+
+  // -- LOGIN
+
+  let loginEmail: HTMLInputElement
+  let loginPass: HTMLInputElement
+
+  let loginButtonMSG = 'Login'
+
+  async function login() {
+    if (!loginEmail || !loginPass) return
+    if (loginEmail.validity.valid && loginPass.validity.valid) {
+      loginButtonMSG = 'Working...'
+      try {
+        await User.login(loginEmail.value, loginPass.value)
+        loginButtonMSG = 'Logged in!'
+      } catch {
+        loginButtonMSG = 'Sorry, login failed.'
+      } finally {
+        loginEmail.value = ''
+        loginPass.value = ''
+        setTimeout(() => loginButtonMSG = 'Login', 5000)
+        checkAuth()
+      }
+    }
+  }
+
+</script>
+
+<style lang='stylus'>
+  @require '_lib'
+  .log-btn
+    display: flex
+    gap: 0.25rem
+    transition: color 0.15s
+
+    +on-hover()
+      color: colvar('hint')
+
+    &.open
+      color: colvar('hint')
+
+  .or
+    color: colvar('text-subtle')
+    margin: 0 0.25rem
+
+  .submit
+    margin-top: 1rem
+</style>
+
+{#if !authed}
+  <div class='guest' role='presentation'>
+    <Dropdown>
+      <span slot='label' class='log-btn' let:open class:open>
+        <Icon i='fluent:add-12-filled' size='1.5rem'/> Create Account
+      </span>
+      <form>
+        <TextInput bind:input={registerEmail} on:enter={() => { registerPass.focus() }}
+          label='Email' type='email' placeholder='Enter email address...' required
+          autocomplete='username'
+          info='Your email is private.'
+        />
+        <TextInput bind:input={registerPass} on:enter={() => { register() }}
+          label='Password' type='password' placeholder='Enter password...' required
+          autocomplete='new-password'
+          minLength='6' maxLength='32'
+          info='Between 6 and 32 characters.'
+        />
+      </form>
+      <div class='submit'><Button on:click={register} wide primary>{registerButtonMSG}</Button></div>
+    </Dropdown>
+
+    <span class='or'>or</span>
+
+    <Dropdown>
+      <span slot='label' class='log-btn' let:open class:open>
+        <Icon i='ion:log-in-outline' size='1.5rem'/> Login
+      </span>
+      <form>
+        <TextInput bind:input={loginEmail} on:enter={() => { loginPass.focus() }}
+          label='Email' type='email' placeholder='Enter email address...' required
+          autocomplete='username'
+        />
+        <TextInput bind:input={loginPass} on:enter={() => { login() }}
+          label='Password' type='password' placeholder='Enter password...' required
+          autocomplete='current-password'
+          minLength='6' maxLength='32'
+        />
+      </form>
+      <div class='submit'><Button on:click={login} wide primary>{loginButtonMSG}</Button></div>
+    </Dropdown>
+  </div>
+{/if}

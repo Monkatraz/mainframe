@@ -1,5 +1,6 @@
 import Iconify from '@iconify/iconify'
 import AppComponent from './App.svelte'
+import UserPanelComponent from './UserPanel.svelte'
 
 // adds a Iconify SCP outline logo
 Iconify.addIcon('@c:scp:logo', {
@@ -17,3 +18,4 @@ Iconify.addIcon('@c:scp:logo', {
 })
 
 const App = new AppComponent({ target: document.querySelector('#app')!, intro: true })
+const UserPanel = new UserPanelComponent({ target: document.querySelector('#user-panel')! })

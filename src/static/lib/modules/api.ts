@@ -303,7 +303,7 @@ type ModeUser = {
   id: Ref, token: string, social: Social
 }
 /** Represents the current user. */
-const User = {
+export const User = {
   // type wizardy that allows for `User.loggedIn` type narrowing without nested objects being needed
   ...{ authed: false, client: new Client(ENV.API.FDB_PUBLIC) } as (ModeUser | ModeGuest),
 
@@ -322,7 +322,7 @@ const User = {
       .invoke<{ instance: Ref, secret: string }>('guest_login', email, password)
     // Assigns is used here for cleanliness and also because type wizardy
     Object.assign(User, {
-      loggedIn: true,
+      authed: true,
       id: res.instance, token: res.secret,
       social: await User.client.invoke<Social>('socials_of', res.instance),
       client: new Client(res.secret)
@@ -333,7 +333,7 @@ const User = {
     if (!User.authed) throw new Error()
     await User.client.query(q.Logout(true))
     Object.assign(User,
-      { loggedIn: false, client: new Client(ENV.API.FDB_PUBLIC) },
+      { authed: false, client: new Client(ENV.API.FDB_PUBLIC) },
       { id: undefined, token: undefined, social: undefined }) // clear out mem. of old values
   }
 }
