@@ -8,7 +8,6 @@
 
   label
     position: relative
-    height: 1em
 
     +on-hover(false)
       .slot

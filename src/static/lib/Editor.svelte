@@ -69,6 +69,7 @@ function getExtensions() {
   import type { Page } from './modules/api';
   // Components
   import Checkbox from './components/Checkbox.svelte'
+  import Toggle from './components/Toggle.svelte'
   import Icon from './components/Icon.svelte'
   import DetailsMenu from './components/DetailsMenu.svelte'
 
@@ -487,7 +488,6 @@ function getExtensions() {
   .editor-settings-menu
     display: flex
     flex-direction: column
-    row-gap: 0.75rem
     width: max-content
     font-set('display')
     font-size: 0.9rem
@@ -572,10 +572,10 @@ function getExtensions() {
       <div class='editor-settings'>
         <DetailsMenu i='fluent:settings-28-filled'>
           <div class='editor-settings-menu'>
-            <Checkbox bind:checked={darkMode}>Dark Mode</Checkbox>
-            <Checkbox bind:checked={spellCheck}>Spellcheck</Checkbox>
-            <Checkbox bind:checked={showLivePreview}>Live Preview</Checkbox>
-            <Checkbox bind:checked={showPreviewActiveLine}>Preview Active Line</Checkbox>
+            <Toggle bind:toggled={darkMode}>Dark Mode</Toggle>
+            <Toggle bind:toggled={spellCheck}>Spellcheck</Toggle>
+            <Toggle bind:toggled={showLivePreview}>Live Preview</Toggle>
+            <Toggle bind:toggled={showPreviewActiveLine}>Preview Active Line</Toggle>
           </div>
         </DetailsMenu>
       </div>
