@@ -1,16 +1,18 @@
 @require '_lib'
 
 .tippy-box[data-theme~='mainframe']
-  filter: drop-shadow(0 0 5px rgba(black, 0.25))
-  background-color: colvar('background')
-  border-color: colvar('border')
-  border-width: 0.125rem
-  color: colvar('text')
+  background-color: colvar('con-background')
+  border-color: colvar('con-border')
+  border-width: 0.075rem
+  border-radius: 0.25rem
+  color: colvar('con-text')
   font-size: 0.875rem
   transition-timing-function: ease-out
+  filter: drop-shadow(0 0 5px rgba(black, 0.25))
 
   .tippy-svg-arrow
-    color: colvar('background')
+    color: colvar('con-background')
+    filter: 'drop-shadow(0 0.075rem 0 %s)' % colvar('con-border')
 
 .tippy-box
   position: relative
@@ -58,13 +60,14 @@
     border-style: solid
 
 .tippy-svg-arrow
+  position: absolute
   width: 16px
   height: 16px
   fill: currentColor
   text-align: initial
 
-.tippy-svg-arrow, .tippy-svg-arrow > svg
-  position: absolute
+  > svg
+    position: absolute
 
 .tippy-box[data-placement^=top]
 
