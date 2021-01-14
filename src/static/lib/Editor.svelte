@@ -64,11 +64,10 @@ function getExtensions() {
   import { spring } from 'svelte/motion'
   import { fade } from 'svelte/transition'
   import { morphMarkdown } from './modules/markdown'
-  import { tnAnime } from './modules/anime'
+  import { tnAnime } from './modules/components'
   import { idleCallback, createIdleQueued, createAnimQueued, throttle } from './modules/util'
   import type { Page } from './modules/api';
   // Components
-  import Checkbox from './components/Checkbox.svelte'
   import Toggle from './components/Toggle.svelte'
   import Icon from './components/Icon.svelte'
   import DetailsMenu from './components/DetailsMenu.svelte'

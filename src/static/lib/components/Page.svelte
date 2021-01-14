@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { getStatusCode } from '../modules/api'
-  import { tnAnime } from '../modules/anime'
+  import { tnAnime } from '../modules/components'
   import { renderMarkdown } from '../modules/markdown'
   import { fade } from 'svelte/transition'
   import Spinny from './Spinny.svelte'

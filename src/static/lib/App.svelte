@@ -2,7 +2,7 @@
   // Imports
   import * as API from './modules/api'
   import { ENV, sleep } from './modules/util'
-  import { tnAnime } from './modules/anime'
+  import { tnAnime } from './modules/components'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import Iconify from '@iconify/iconify'
