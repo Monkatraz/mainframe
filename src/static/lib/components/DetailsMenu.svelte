@@ -63,8 +63,7 @@
     position: absolute
     top: 85%
     right: 0
-    padding: 1rem 0.5rem
-    padding-top: 0.5rem
+    padding: 0.5rem 0.5rem
     background: colvar('background')
     border: solid 0.1rem colvar('border')
     border-top: none

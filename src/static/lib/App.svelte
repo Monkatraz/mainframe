@@ -9,6 +9,7 @@
   import Sidebar from './components/sidebar/Sidebar.svelte'
   import Page from './components/Page.svelte'
   import Spinny from './components/Spinny.svelte'
+import { onMount } from 'svelte';
 
   // chores on init
 
@@ -34,8 +35,6 @@
   // so we use a dynamic import string
   const EditorURL = './Editor.svelte.js'
 
-  // -- ANIMATIONS
-
   const sideBarReveal = {
     translateX: ['-100%', '0%'],
     duration: 600,
@@ -52,6 +51,10 @@
   let inEdit = false
   $: if ($router.path.startsWith('/edit')) inEdit = true
   $: document.documentElement.classList.toggle('in-edit', inEdit)
+
+  onMount(() => {
+    document.documentElement.classList.add('loaded')
+  })
 
 </script>
 
