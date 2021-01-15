@@ -1,6 +1,7 @@
 <script lang='ts'>
   import { User } from './modules/api'
   import Icon from './components/Icon.svelte'
+  import Toggle from './components/Toggle.svelte'
   import Dropdown from './components/Dropdown.svelte'
   import TextInput from './components/TextInput.svelte'
   import Button from './components/Button.svelte'
@@ -36,6 +37,7 @@
 
   let loginEmail: HTMLInputElement
   let loginPass: HTMLInputElement
+  let rememberMe = false
 
   let loginButtonMSG = 'Login'
 
@@ -83,12 +85,12 @@
     &.open
       color: colvar('hint')
 
+  .user .log-btn
+    color: colvar('text-subtle')
+
   .or
     color: colvar('text-subtle')
     margin: 0 0.25rem
-
-  .submit
-    margin-top: 1rem
 
 </style>
 
@@ -111,7 +113,7 @@
           info='Between 6 and 32 characters.'
         />
       </form>
-      <div class='submit'><Button on:click={register} wide primary>{registerButtonMSG}</Button></div>
+      <div style='margin-top: 0.5rem;'><Button on:click={register} wide primary>{registerButtonMSG}</Button></div>
     </Dropdown>
 
     <span class='or'>or</span>
@@ -131,6 +133,7 @@
           minLength='6' maxLength='32'
         />
       </form>
+      <Toggle bind:toggled={rememberMe}>Remember Me</Toggle>
       <div class='submit'><Button on:click={login} wide primary>{loginButtonMSG}</Button></div>
     </Dropdown>
   </div>
@@ -139,7 +142,7 @@
     <Dropdown>
       <span slot='label' class='log-btn' let:open class:open>
         <span style='margin-right: 0.5rem'>{User.authed ? User.social.nickname : ''}</span>
-        <Icon i='carbon:user-avatar-filled' size='1.5rem'/>
+        <Icon i='carbon:user-avatar-filled' size='2rem'/>
       </span>
       <Button on:click={logout} wide>Logout</Button>
     </Dropdown>
