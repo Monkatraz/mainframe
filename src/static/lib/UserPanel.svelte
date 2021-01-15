@@ -5,7 +5,7 @@
   import Dropdown from './components/Dropdown.svelte'
   import TextInput from './components/TextInput.svelte'
   import Button from './components/Button.svelte'
-import { onMount } from 'svelte';
+  import { onMount } from 'svelte';
 
   let authed = User.authed
   function checkAuth() { authed = User.authed }
