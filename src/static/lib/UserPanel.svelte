@@ -57,6 +57,17 @@
     }
   }
 
+  // -- LOGOUT
+
+  async function logout() {
+    if (!authed) return
+    try {
+      await User.logout()
+    } finally {
+      checkAuth()
+    }
+  }
+
 </script>
 
 <style lang='stylus'>
@@ -78,6 +89,7 @@
 
   .submit
     margin-top: 1rem
+
 </style>
 
 {#if !authed}
@@ -120,6 +132,16 @@
         />
       </form>
       <div class='submit'><Button on:click={login} wide primary>{loginButtonMSG}</Button></div>
+    </Dropdown>
+  </div>
+{:else}
+  <div class='user' role='presentation'>
+    <Dropdown>
+      <span slot='label' class='log-btn' let:open class:open>
+        <span style='margin-right: 0.5rem'>{User.authed ? User.social.nickname : ''}</span>
+        <Icon i='carbon:user-avatar-filled' size='1.5rem'/>
+      </span>
+      <Button on:click={logout} wide>Logout</Button>
     </Dropdown>
   </div>
 {/if}

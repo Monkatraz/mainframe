@@ -45,6 +45,7 @@
   details
     position: relative
     display: inline-block
+    vertical-align: bottom
 
   summary
     reset-styling(false)
