@@ -34,7 +34,7 @@
     "@codemirror/rectangular-selection": "^0.17.1",
     "@codemirror/search": "^0.17.1",
     "@codemirror/state": "^0.17.1",
-    "@codemirror/view": "^0.17.3",
+    "@codemirror/view": "^0.17.4",
     "@iconify/iconify": "^2.0.0-rc.6",
     "animejs": "^3.2.1",
     "cm6-monarch": "^0.2.2",
