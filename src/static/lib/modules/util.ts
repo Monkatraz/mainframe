@@ -10,7 +10,7 @@ export const ENV = {
   /** API related env. variables. Usually database related. */
   API: {
     // Database
-    FDB_PUBLIC: 'fnAD335_NTACBv7ohiYXzvekkToWGGfdNKnaI3XB',
+    FDB_PUBLIC: 'fnAD_o-GF3ACAjp24m6GKwf87jYlTEbFqwOVPIH3',
     FDB_DOMAIN: 'db.fauna.com',
     // Serverless functions
     LAMBDA: '/api/'

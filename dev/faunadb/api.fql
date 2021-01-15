@@ -134,21 +134,40 @@ CreateFunction({
 
 # Login function.
 # The actual login function is unavailable to users, so they must go through this function.
-# Tokens created through this function expire after a day.
 CreateFunction({
   name: "guest_login",
   body: Query(Lambda(
-    ["email", "password"],
+    ["email", "password", "remember"],
     Login(
       Match(Index("users_by_email"), Var("email")),
       {
         password: Var("password"),
-        ttl: TimeAdd(Now(), 1, "day")
+        ttl: If(Var("remember"), TimeAdd(Now(), 7, "day"), TimeAdd(Now(), 1, "day")),
+        data: {
+          remember: Var("remember")
+        }
       }
     )
   )),
   role: "server"
 })
 
-# To use, it would look like:
-# Client.query(q.Call(q.Function('guest_login'), email, password))
+# Handles automatically logging in when using "Remember Me".
+CreateFunction({
+  name: "auto_login",
+  body: Query(Lambda(
+    ["secret"],
+    Let(
+      { object: KeyFromSecret(Var("secret")) },
+      Do(
+        If(
+          Select(["data", "remember"], Get(Select("ref", Var("object")))),
+          Update(Select("ref", Var("object")), { ttl: TimeAdd(Now(), 7, "day") }),
+          null
+        )
+        Select('instance', Var("object"))
+      )
+    )
+  )),
+  role: "server"
+})

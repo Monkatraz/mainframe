@@ -3,6 +3,7 @@
 ### In Progress
 - [ ] Page creation, and updating
 - [ ] Update the account creation and login forms to use forms correctly
+- [ ] Add some sort of `pref` object that handles localStorage shenanigans automatically
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin

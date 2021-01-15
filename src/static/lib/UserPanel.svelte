@@ -5,6 +5,7 @@
   import Dropdown from './components/Dropdown.svelte'
   import TextInput from './components/TextInput.svelte'
   import Button from './components/Button.svelte'
+import { onMount } from 'svelte';
 
   let authed = User.authed
   function checkAuth() { authed = User.authed }
@@ -46,7 +47,7 @@
     if (loginEmail.validity.valid && loginPass.validity.valid) {
       loginButtonMSG = 'Working...'
       try {
-        await User.login(loginEmail.value, loginPass.value)
+        await User.login(loginEmail.value, loginPass.value, rememberMe)
         loginButtonMSG = 'Logged in!'
       } catch {
         loginButtonMSG = 'Sorry, login failed.'
@@ -69,6 +70,12 @@
       checkAuth()
     }
   }
+
+  onMount(async () => {
+    // Auto-login for the user
+    const autoLoggedIn = await User.autologin()
+    if (autoLoggedIn) checkAuth()
+  })
 
 </script>
 

@@ -286,7 +286,8 @@ class Client {
     this.client = new FaunaDB.Client({
       secret: key,
       domain: ENV.API.FDB_DOMAIN,
-      scheme: 'https'
+      scheme: 'https',
+      fetch: fetch
     })
     this.query = this.client.query.bind(this.client)
     this.paginate = this.client.paginate.bind(this.client)
@@ -304,7 +305,7 @@ type ModeUser = {
 }
 /** Represents the current user. */
 export const User = {
-  // type wizardy that allows for `User.loggedIn` type narrowing without nested objects being needed
+  // type wizardy that allows for `User.authed` type narrowing without nested objects being needed
   ...{ authed: false, client: new Client(ENV.API.FDB_PUBLIC) } as (ModeUser | ModeGuest),
 
   preferences: {
@@ -316,10 +317,10 @@ export const User = {
     await User.client.invoke<Ref>('guest_register', email, password)
   },
   /** Signs an unsigned guest in using the provided credentials. */
-  async login(email: string, password: string) {
+  async login(email: string, password: string, remember = false) {
     if (User.authed) throw new Error()
     const res = await User.client
-      .invoke<{ instance: Ref, secret: string }>('guest_login', email, password)
+      .invoke<{ instance: Ref, secret: string }>('guest_login', email, password, remember)
     // Assigns is used here for cleanliness and also because type wizardy
     Object.assign(User, {
       authed: true,
@@ -327,14 +328,54 @@ export const User = {
       social: await User.client.invoke<Social>('socials_of', res.instance),
       client: new Client(res.secret)
     })
+    // handling remember me
+    // current strategy does the following:
+    //  - sets the TTL on the token to 1 week instead of 1 day
+    //  - stores the token in localStorage instead of sessionStorage
+    //  - enables a behavior where the token can be 'refreshed'
+    //    which sets the token's expiration to the next week
+    if (remember) {
+      sessionStorage.removeItem('user-secret')
+      localStorage.setItem('user-remember', 'true')
+      localStorage.setItem('user-secret', res.secret)
+    } else {
+      sessionStorage.setItem('user-secret', res.secret)
+      localStorage.removeItem('user-remember')
+      localStorage.removeItem('user-secret')
+    }
   },
-  /** Signs out a signed in user. Nullifies all tokens. */
+  /** Attempts to automatically log the user in.
+   *  Returns whether or not this was successful. */
+  async autologin() {
+    if (User.authed) throw new Error()
+    const secret = localStorage.getItem('user-remember') ?
+      localStorage.getItem('user-secret') :
+      sessionStorage.getItem('user-secret')
+    if (!secret) return false
+    try {
+      const instance = await this.client.invoke<Ref>('auto_login', secret)
+      Object.assign(User, {
+        authed: true,
+        id: instance, token: secret,
+        social: await User.client.invoke<Social>('socials_of', instance),
+        client: new Client(secret)
+      })
+      return true
+    } catch {
+      return false
+    }
+  },
+  /** Signs out a signed in user. */
   async logout() {
     if (!User.authed) throw new Error()
-    await User.client.query(q.Logout(true))
+    await User.client.query(q.Logout(false))
     Object.assign(User,
       { authed: false, client: new Client(ENV.API.FDB_PUBLIC) },
       { id: undefined, token: undefined, social: undefined }) // clear out mem. of old values
+    // clear out auto-login data
+    sessionStorage.removeItem('user-secret')
+    localStorage.removeItem('user-remember')
+    localStorage.removeItem('user-secret')
   }
 }
 
@@ -371,142 +412,3 @@ export function withPage(path: string, lang: string | Expr = qe.PageLang(q.Var('
     // downvote
   }
 }
-
-// const pageTemplate: Page = {
-//   path: '/scp/6842',
-//   meta: {
-//     authors: [],
-//     revision: 1,
-//     dateCreated: new Date,
-//     dateLastEdited: new Date,
-//     flags: [],
-//     tags: []
-//   },
-//   social: {
-//     ratings: [],
-//     comments: []
-//   },
-//   locals: {
-//     'en': {
-//       title: 'SCP-6842',
-//       subtitle: 'Something Else Entirely',
-//       description: 'Very interesting description!',
-//       template: `# Mainframe
-// ## An unofficial proof-of-concept for the [SCP-Wiki](www.scpwiki.com).
-
-// [![Netlify Status](https://api.netlify.com/api/v1/badges/78e6519c-b9ab-440a-9a77-ef79694eac65/deploy-status)](https://app.netlify.com/sites/scp-mainframe/deploys)
-
-// Mainframe is a personal attempt to create an affordable, modern replacement for the SCP-Wiki website.
-
-// Right off the bat, Mainframe is:
-//   * A _clean slate_. No considerations for legacy content were considered.
-//   * A modern site, using modern features. There is no IE11 support and there never will be.
-//   * An upgrade. Mainframe has a lot of things going for it compared to the old wiki. It's almost hard to call it a wiki
-//     \\- it's entirely geared for just displaying pages and handling users.
-//   * High performance. Mainframe is heavily optimized for first-load times and smooth runtime performance.
-//   * Actually good mobile support, with touchscreen gestures.
-//   * Really accessible. A lot of work was put into a11y - although there is some limitations. (Must have JS, and unfortunately no Opera Mini support)
-//   * Finally, and absolutely most importantly: _cheap as hell._ Mainframe attempts to do literally everything as cheaply as possible. A SCP Wiki replacement has to support at least 10,000 active users.
-
-// There is a lot of technical implementation details I could talk about, but that's for later. This project is a huge learning experience and I hope the work I have done here can be put to use.
-
-// If you wish to know more about me, or contact me, you can go to [my personal website.](www.monkasite.com) If you're simply just curious and wish to ask a few questions, my DMs on Discord are open. \\[Monkatraz#7929\\]
-
-// ### Some Shoutouts
-// This list is not inclusive. It is mostly for some people/projects that cannot be easily credited.
-//   * [Dimitar Donovski (u/ArduousIntent)](https://www.reddit.com/user/ArduousIntent) for their excellent SCP logo concept.
-//   * [grid-kiss](https://github.com/sylvainpolletvillard/postcss-grid-kiss): Converted into a Stylus plugin within the project.
-//   * [postcss-discard-overridden-props](https://github.com/mcler)
-
-// ----
-// ## Parameters
-// ### Target
-// Create a replacement wiki-like system for the SCP-Wiki.
-//   * Navigate to user generated pages 
-//     - A slick, clean editor 
-//     - Page sources use Markdown
-//     - Search support
-//   * Users can create accounts and can use mild personalization features
-//     - Author pages
-//     - Display names can be changed at any time
-//     - Admin roles and tools
-//     - User preferences (e.g. language)
-//   * Pages have social features designed for the SCP community
-//     - Ratings
-//     - Discussion / Comments
-//       - Pinned comments
-//   * Accessible and semantic design, aka full a11y support
-
-// ### Constraints
-//   * Must be absurdly cheap to operate
-//   * Must support up to 10,000 active users
-//   * Use only modern web technology and markup
-//   * Speedy and native-like web experience if possible
-
-// ### Anti-Constraints
-//   * Explicit lack of IE11 support
-//   * ESNext codebase, compiled down using a transpiler only if needed
-
-// ### Security and Privacy
-//   * Must use a restrictive content security policy
-//   * Use only \`HTTPS\`
-//   * No significant monitoring or storage of fingerprint-like user-data
-//     - If possible, the only confidential data that should be stored specific to users is their email, (securely handled)
-//       password, and user preferences.
-//   * Use only opt-in personalization
-//   * Prevent mass scraping of the public database
-
-// ### Not Doing
-//   * Advertisement slots
-//     - Why? Because I hate ads, and this is meant to be cheap. It shouldn't need ads if it can be cheap enough to be self-hosted by the community through donations. 
-//   * Replacement for the forums
-//     - Forum hosting would likely require custom software and complete server hosting. It would likely be much more
-//       cost-effective to just use public services like Discord, IRC, etc.
-//   * Legacy database migration and to-native conversion
-
-// ### Non-MVP Targets
-// There are various features Mainframe would need to support if it were to actually be used.
-//   * Complete multi-lingual support, with verification that RTL and LTR text works correctly
-//   * Email service, e.g. account verification or password resets
-//   * Legacy content renderer
-//   * Pass a security audit
-//   * Potentially have a test suite for the codebase
-//   * Solution for storing binary data such as images
-//   * Bootstrap script for setting up database instances either locally or on a development remote
-
-// ### Unknowns
-//   * Would admins be limited to a language?
-//   * How would non-English wikis work?
-//     - Separate repositories?
-//   * What inexpensive service could be used to store binary data?
-//     - Incredibly aggressive image compression and resizing?
-//     - S3 bucket?
-//     - Use FaunaDB again but store binaries in string buffers?
-//       - Permanent links would be difficult with this solution.
-
-// \`\`\`ts
-//   /** Eagerly loads the rest of the LazyDocument. */
-//   public async _eagerLoad() {
-//     // Just plain get the whole object
-//     const response = await this._client.query<DataObject>(this._requestExpr)
-//     if (response.ok === false) throw new Error('Error retrieving document.')
-//     // Set every field to its actual value
-//     this._fields.forEach((field) => {
-//       this._setField(field, response.body[field] as DataValue)
-//     })
-//     return this
-//   }
-
-//   /** Returns the requested field as another LazyDocument.
-//    *  The requested field _must_ be an object for this to work. LazyDocument requires key-value pairs. */
-//   public async _getLazy<K extends string & keyof T>(field: K): Promise<Lazyify<T[K]> & LazyDocument<T[K]>> {
-//     const lazydoc = await new LazyDocument<T[K]>(q.Select(field, this._requestExpr), this._client)._start()
-//     this._setField(field, lazydoc)
-//     return lazydoc as Lazyify<T[K]> & typeof lazydoc
-//   }
-// \`\`\``
-//     }
-//   }
-// }
-
-// // invokeLambda('page-update', pageTemplate).then(console.log)
