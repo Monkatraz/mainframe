@@ -1,11 +1,12 @@
 <script lang='ts'>
   import { User } from './modules/api'
+  import { tnAnime } from './modules/components'
+  import { onMount } from 'svelte'
   import Icon from './components/Icon.svelte'
   import Toggle from './components/Toggle.svelte'
   import Dropdown from './components/Dropdown.svelte'
   import TextInput from './components/TextInput.svelte'
   import Button from './components/Button.svelte'
-  import { onMount } from 'svelte';
 
   let authed = User.authed
   function checkAuth() { authed = User.authed }
@@ -70,11 +71,12 @@
       checkAuth()
     }
   }
-
+  let checkingLogin = true
   onMount(async () => {
     // Auto-login for the user
     const autoLoggedIn = await User.autologin()
     if (autoLoggedIn) checkAuth()
+    checkingLogin = false
   })
 
 </script>
@@ -101,8 +103,10 @@
 
 </style>
 
-{#if !authed}
-  <div class='guest' role='presentation'>
+{#if !authed && !checkingLogin}
+  <div class='guest' role='presentation'
+    in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
+  >
     <Dropdown>
       <span slot='label' class='log-btn' let:open class:open>
         <Icon i='fluent:add-12-filled' size='1.5rem'/> Create Account
@@ -144,8 +148,10 @@
       <div class='submit'><Button on:click={login} wide primary>{loginButtonMSG}</Button></div>
     </Dropdown>
   </div>
-{:else}
-  <div class='user' role='presentation'>
+{:else if !checkingLogin}
+  <div class='user' role='presentation'
+    in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
+  >
     <Dropdown>
       <span slot='label' class='log-btn' let:open class:open>
         <span style='margin-right: 0.5rem'>{User.authed ? User.social.nickname : ''}</span>
