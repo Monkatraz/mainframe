@@ -1,15 +1,14 @@
 <script lang="ts">
   // Imports
   import * as API from './modules/api'
-  import { ENV, sleep } from './modules/util'
+  import { ENV, sleep, matchMedia } from './modules/util'
   import { tnAnime } from './modules/components'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
+  import { onMount } from 'svelte'
   import Sidebar from './components/sidebar/Sidebar.svelte'
   import Page from './components/Page.svelte'
   import Spinny from './components/Spinny.svelte'
-  import { onMount } from 'svelte';
-
 
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
@@ -113,7 +112,6 @@
     margin-top: -1rem
 
     +match-media(thin, below)
-      display: none
       position: absolute
       top: 0
       left: -100%

@@ -71,14 +71,6 @@
       checkAuth()
     }
   }
-  let checkingLogin = true
-  onMount(async () => {
-    // Auto-login for the user
-    const autoLoggedIn = await User.autologin()
-    if (autoLoggedIn) checkAuth()
-    checkingLogin = false
-  })
-
 </script>
 
 <style lang='stylus'>
@@ -103,7 +95,7 @@
 
 </style>
 
-{#if !authed && !checkingLogin}
+{#if !authed}
   <div class='guest' role='presentation'
     in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
   >
@@ -148,14 +140,14 @@
       <div class='submit'><Button on:click={login} wide primary>{loginButtonMSG}</Button></div>
     </Dropdown>
   </div>
-{:else if !checkingLogin}
+{:else}
   <div class='user' role='presentation'
     in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
   >
     <Dropdown>
       <span slot='label' class='log-btn' let:open class:open>
-        <span style='margin-right: 0.5rem'>{User.authed ? User.social.nickname : ''}</span>
-        <Icon i='carbon:user-avatar-filled' size='2rem'/>
+        <span style='margin-right: 0.25rem'>{User.authed ? User.social.nickname : ''}</span>
+        <Icon i='carbon:user-avatar-filled-alt' size='1.75rem'/>
       </span>
       <Button on:click={logout} wide>Logout</Button>
     </Dropdown>

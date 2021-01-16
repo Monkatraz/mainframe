@@ -1,4 +1,5 @@
 import Iconify from '@iconify/iconify'
+import * as API from './modules/api'
 import AppComponent from './App.svelte'
 import UserPanelComponent from './UserPanel.svelte'
 
@@ -17,5 +18,14 @@ Iconify.addIcon('@c:scp:logo', {
   height: 632
 })
 
-const App = new AppComponent({ target: document.querySelector('#app')!, intro: true })
-const UserPanel = new UserPanelComponent({ target: document.querySelector('#user-panel')! })
+// init components
+
+// main app
+new AppComponent({ target: document.querySelector('#app')!, intro: true });
+
+// userpanel
+(async () => {
+  // wait for login state before init of the user panel
+  await API.User.autologin()
+  new UserPanelComponent({ target: document.querySelector('#user-panel')!, intro: true })
+})()
