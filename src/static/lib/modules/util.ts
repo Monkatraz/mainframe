@@ -226,7 +226,7 @@ for (const size in sizeQueries) {
  * For example: matches('narrow', 'only')
  * This will be true only if we're entirely with the bounds of 'narrow'.
  */
-export function matchMedia(
+export function doMatchMedia(
   size: 'narrow' | 'thin' | 'small' | 'normal' | 'wide',
   inclusivity: 'only' | 'up' | 'below' = 'only') {
   // Our size map means this function is relatively simple.
@@ -239,5 +239,16 @@ export function matchMedia(
       return sizeMap.get(curSize) >= sizeMap.get(size)
     case 'below':
       return sizeMap.get(curSize) < sizeMap.get(size)
+  }
+}
+
+// Media query Svelte store
+
+export const matchMedia = {
+  subscribe(fn: (match: typeof doMatchMedia) => void) {
+    fn(doMatchMedia)
+    const eventFn = () => { fn(doMatchMedia) }
+    window.addEventListener('MF_MediaSizeChanged', eventFn)
+    return () => window.removeEventListener('MF_MediaSizeChanged', eventFn)
   }
 }
