@@ -4,6 +4,7 @@
 - [ ] Page creation, and updating
 - [ ] Update the account creation and login forms to use forms correctly
 - [ ] Add some sort of `pref` object that handles localStorage shenanigans automatically
+- [ ] Implement `svelte-i18n` and create a basic `en` language mapping
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin
@@ -16,7 +17,6 @@
 - [ ] Generic cache library
 - [ ] Add better page history schema
 - [ ] Some sort of script or system for data-backups
-- [ ] Add a media-size Svelte store
 - [ ] Implement Storybook / Something like it
 
 ### Users
@@ -109,3 +109,4 @@
 - [x] Add sidebar
 - [x] Add tooltips / hints
 - [x] Login component
+- [x] Add a media-size Svelte store

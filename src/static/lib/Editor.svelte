@@ -68,18 +68,18 @@ function getExtensions() {
   import { idleCallback, createIdleQueued, createAnimQueued, throttle } from './modules/util'
   import type { Page } from './modules/api';
   // Components
+  import Button from './components/Button.svelte'
+  import IconButton from './components/IconButton.svelte'
   import Toggle from './components/Toggle.svelte'
   import Icon from './components/Icon.svelte'
   import DetailsMenu from './components/DetailsMenu.svelte'
 
-  // TODO: make dropdowns actually work
   // TODO: add misc. info on topbar like word count and the like
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?
   // TODO: mobile mode
   // TODO: swipe to show preview on mobile
   // TODO: split the editor+preview into its own component, API is handled by its parent
-  // TODO: figure out whatever the hell I have to do to make the menubar work correctly on mobile
 
   export let page: Page = {
     path: 'scp/3685',
@@ -106,18 +106,20 @@ function getExtensions() {
   // -- CONTAINER
 
   let containerClass: 'show-editor' | 'show-both' | 'show-preview' = 'show-both'
-  let darkMode = true
-  let spellCheck = false
-  let showLivePreview = true
-  let showPreviewActiveLine = true
+  let editorDarkMode = true
+  let editorSpellCheck = false
+  let editorLivePreview = true
 
-  $: containerClass = showLivePreview ? 'show-both' : 'show-editor'
+  let previewDarkMode = false
+  let previewActiveLine = true
+
+  $: containerClass = editorLivePreview ? 'show-both' : 'show-editor'
   $: if (preview) updatePreview()
-  $: if (!showPreviewActiveLine) activeElements = new Set
+  $: if (!previewActiveLine) activeElements = new Set
 
   // handle spellcheck
   $: if(editorView) editorView.dispatch({ reconfigure: {
-    'spellcheck': EditorView.contentAttributes.of({ spellcheck: String(spellCheck) })
+    'spellcheck': EditorView.contentAttributes.of({ spellcheck: String(editorSpellCheck) })
   }})
 
   // -- EDITOR
@@ -179,9 +181,6 @@ function getExtensions() {
   let preview: HTMLDivElement
   let previewContainer: HTMLElement
 
-  let perf = 0
-  let cacheSize = 0
-
   // Active Line Highlighting
 
   function hasSiblings(elem: Element, ln: number) {
@@ -195,7 +194,7 @@ function getExtensions() {
 
   let activeElements: Set<Element> = new Set
   const getActiveElements = createIdleQueued((lines: number[]) => {
-    if (!preview || !editorView || !showPreviewActiveLine) return
+    if (!preview || !editorView || !previewActiveLine) return
     // disable all currently active lines
     activeElements = new Set
     // get elements covered by the provided list of lines
@@ -280,13 +279,10 @@ function getExtensions() {
   /** Updates the preview's HTML based on the current editor state. */
   const updateHTML = createIdleQueued(async () => {
     if (!preview || !editorView) return
-    const startPerf = performance.now()
     // rather than replace the whole tree we just replace what's changed using MorphDOM
     await idleCallback(async () => {
-      const stats = await morphMarkdown(editorView.state.doc.toString(), preview)
+      await morphMarkdown(editorView.state.doc.toString(), preview)
       scrollMapNeedsUpdate = true
-      cacheSize = stats.cacheSize
-      perf = performance.now() - startPerf
     })
   })
 
@@ -451,22 +447,11 @@ function getExtensions() {
     white-space: nowrap
 
   .topbar-section
+    display: flex
+    gap: 0.5rem
+    align-items: center
     padding: 0 0.5rem
     border-right: 0.15rem solid colvar('border')
-
-  .topbar-selector
-    padding: 0.2em 0.5em
-    margin: 0 0.125rem
-    border-radius: 0.25em
-    background: colvar('border')
-    shadow-elevation(2)
-    transition: box-shadow 0.1s, color 0.1s, background 0.1s
-    cursor: pointer
-
-    +on-hover(false)
-      background: colvar('border', darken 2.5%)
-      color: colvar('hint')
-      shadow-elevation(1)
 
   .editor-pane
     position: relative
@@ -476,7 +461,7 @@ function getExtensions() {
     padding-right: 0.25rem
     background: var(--colcode-background)
 
-  .editor-settings
+  .editor-settings, .preview-settings
     position: absolute
     height: 2.5rem
     width: 2.5rem
@@ -484,15 +469,21 @@ function getExtensions() {
     right: 1rem
     z-index: 10
 
-  .editor-settings-menu
+  .preview-settings
+    position: sticky
+    top: 1rem
+    right: 0
+    margin-left: calc(100% - 1.5rem)
+
+  .editor
+    height: 100%
+
+  .settings-menu
     display: flex
     flex-direction: column
     width: max-content
     font-set('display')
     font-size: 0.9rem
-
-  .editor
-    height: 100%
 
   .preview
     position: relative
@@ -515,25 +506,12 @@ function getExtensions() {
     user-select: none
     z-index: 1
 
-  .perf-box
-    position: sticky
-    display: inline-flex
-    flex-direction: column
-    top: 0.5rem
-    float: right
-    margin-left: -100%
-    padding: 0.25rem
-    color: colvar('text-dim')
-    border-radius: 0.25rem
-    z-index: 10
-
-
 </style>
 
 <!-- some chores to do on resize -->
 <svelte:window on:resize={updatePreview}/>
 
-<div class='overflow-container {darkMode ? 'dark codetheme-dark' : 'light codetheme-light'}'
+<div class='overflow-container {editorDarkMode ? 'dark codetheme-dark' : 'light codetheme-light'}'
   in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
 >
   <div class="editor-container {containerClass}">
@@ -544,22 +522,9 @@ function getExtensions() {
       out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <div class=topbar-section>
-        <span class=topbar-selector>Save</span>
-        <span class=topbar-selector>Publish</span>
-      </div>
-      <div class=topbar-section>
-        <span class=topbar-selector>
-          {page.path.toUpperCase()} <Icon i='ri:edit-2-fill'/>
-        </span>
-        <span class=topbar-selector>
-          {pageLocal.toUpperCase()} <Icon i='ion:caret-down'/>
-        </span>
-        <span class=topbar-selector>
-          Title & Description <Icon i='ion:caret-down'/>
-        </span>
-        <span class=topbar-selector>
-          Metadata <Icon i='ion:caret-down'/>
-        </span>
+        <IconButton i='carbon:document-download' label='Open' size='1.5rem' baseline/>
+        <IconButton i='carbon:save' label='Save Draft' size='1.5rem' baseline/>
+        <IconButton i='carbon:fetch-upload-cloud' label='Publish' size='1.5rem' baseline/>
       </div>
     </div>
 
@@ -570,11 +535,10 @@ function getExtensions() {
     >
       <div class='editor-settings'>
         <DetailsMenu i='fluent:settings-28-filled' label='Editor Settings'>
-          <div class='editor-settings-menu'>
-            <Toggle bind:toggled={darkMode}>Dark Mode</Toggle>
-            <Toggle bind:toggled={spellCheck}>Spellcheck</Toggle>
-            <Toggle bind:toggled={showLivePreview}>Live Preview</Toggle>
-            <Toggle bind:toggled={showPreviewActiveLine}>Preview Active Line</Toggle>
+          <div class='settings-menu'>
+            <Toggle bind:toggled={editorDarkMode}>Dark Mode</Toggle>
+            <Toggle bind:toggled={editorSpellCheck}>Spellcheck</Toggle>
+            <Toggle bind:toggled={editorLivePreview}>Live Preview</Toggle>
           </div>
         </DetailsMenu>
       </div>
@@ -582,20 +546,24 @@ function getExtensions() {
     </div>
 
     <!-- Right | Preview Pane -->
-    <div class='preview light codetheme-dark' bind:this={previewContainer}
+    <div class='preview {previewDarkMode ? 'dark' : 'light'} codetheme-dark' bind:this={previewContainer}
       on:scroll={scrollFromPreview} 
       on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
       in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 350, easing: 'easeOutQuint' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
       {#if containerClass === 'show-both' || containerClass === 'show-preview'}
-        <div class='perf-box dark'>
-          <span>PERF: {Math.round(perf)}ms</span>
-          <span>CACHE: {Math.round(cacheSize)}</span>
-        </div>
         {#each Array.from(activeElements) as elem (elem)}
           <div class=active-element transition:fade={{duration: 100}} style={getActiveElementStyle(elem)} />
         {/each}
+        <div class='preview-settings'>
+          <DetailsMenu i='fluent:settings-28-filled' label='Preview Settings'>
+            <div class='settings-menu'>
+              <Toggle bind:toggled={previewDarkMode}>Dark Mode</Toggle>
+              <Toggle bind:toggled={previewActiveLine}>Show Active Line</Toggle>
+            </div>
+          </DetailsMenu>
+        </div>
         <div class=rhythm bind:this={preview}/>
       {/if}
     </div>

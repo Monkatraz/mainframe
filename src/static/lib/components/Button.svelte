@@ -12,8 +12,7 @@
     justify-content: center
     flex-grow: 1
     gap: 0.5rem
-    height: 2.5rem
-    padding: 0 1rem
+    padding: 0.25rem 1rem
     font-size: 1rem
     background: colvar('border')
     color: colvar('text-subtle')
@@ -22,11 +21,11 @@
 
     +on-hover()
       background: colvar('border', lighten 2.5%)
-      color: colvar('text')
+      color: colvar('hint')
 
     &:active
       background: colvar('border', darken 2.5%)
-      color: colvar('text')
+      color: colvar('hint')
 
     &.wide
       width: 100%
