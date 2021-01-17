@@ -1,0 +1,518 @@
+---
+  ## Types describe the general purpose the content of a page serves.
+  types:
+  - admin
+  - scp
+  - goi
+  - tale
+  - supplement # may not be required if page nesting is added
+  - guide
+  - essay
+  - artwork
+  - hub
+
+  ## Modes determine what sort of metadata should be expected from the page.
+  ## For example, a nonfiction page probably does not need metadata relevant to fictional content.
+  ## Pages can have _multiple_ modes. Used this way, modes are a special type of flag.
+  modes:
+  - fiction
+  - nonfiction
+  - admin
+  - collab
+
+  ## Flags affect the behavior of pages, e.g. by locking them or by affecting how they render.
+  ## These effects should have nothing to do with theming.
+  flags:
+  - rewrite
+  - deletion
+  - archived
+  - cc-valid
+  - cc-pending
+
+  ## Attributes describe the formatting, characteristics, or artistic style of a page.
+  attributes:
+  - joke
+  - experiment
+  - exploration
+  - incident
+  - interview
+  - video
+  - audio
+  - image
+  - poetry
+
+  ## Special tags are misc. metadata, usually relevant to only a few pages.
+  ## e.g. contests, historical pages, etc.
+  ## Special tags can be dynamically defined, however the more common ones are predefined here.
+  special:
+  - contest
+  - featured
+  - news
+
+  ## Warnings inform the reader of any potentially distressing content contained within of the page.
+  warnings:
+
+  # this is incomplete, feel free to add / or suggest more
+  # but keep in mind:
+  #   - verbose warnings make the warnings omnipresent, and thus ultimately ignored and turned meaningless
+  #   - overly terse warnings are too broad and are ultimately unhelpful
+  #   - a warning needs to be a very 'vivid' and explicit advisory, not a categorization
+  #
+  # there are a handful of 'general' warnings which are exceptions to the above conditions
+  # these warnings serve as categories for the type of potentially discomforting content that the article contains
+
+    general:
+    - 'adult'
+    - 'sensitive'
+    - 'distressing'
+    - 'gross'
+
+    specific:
+    - 'gore'
+    - 'mutilation'
+    - 'sexual-content'
+    - 'rape'
+    - 'mental-illness'
+    - 'drug-addiction'
+    - 'self-harm'
+    - 'domestic-abuse'
+    - 'child-abuse'
+    - 'animal-abuse'
+    - 'bigotry'
+    - 'racism'
+    - 'homophobia'
+    - 'religious-prejudice'
+    - 'racial-slurs'
+    - 'sexist-slurs'
+
+  ## Groups describe what fictional group the article is related to or based on.
+  ## They are separate from tags in order to better facilitate non-Foundation based content.
+  groups:
+  - foundation # default
+  - nonspecific
+  - alexylva
+  - ambrose-restaurant
+  - anderson
+  - are-we-cool-yet
+  - asci
+  - black-queen
+  - broken-god
+  - chaos-insurgency
+  - chicago-spirit
+  - daevite
+  - deer-college
+  - dr-wondertainment
+  - factory
+  - fifthist
+  - gamers-against-weed
+  - global-occult-coalition
+  - gru-division-p
+  - herman-fuller
+  - horizon-initiative
+  - ijamea
+  - mages-academy
+  - manna-charitable-foundation
+  - marshall-carter-and-dark
+  - medicea-accademia
+  - nobody
+  - oneiroi
+  - parawatch
+  - prometheus
+  - reclamation
+  - sapphire
+  - sarkic
+  - second-hytoth
+  - serpents-hand
+  - shark-punching-center
+  - three-moons-initiative
+  - unusual-incidents-unit
+  - wilsons-wildlife
+  - arcadia
+  - accelerate-the-future
+  - blackwood
+  - brothers-of-death
+  - children-of-the-torch
+  - children-of-the-night
+  - class-of-76
+  - decommissioning-dept
+  - miscommunications
+  - nameless
+  - ethics-committee
+  - obskura
+  - pangloss
+  - pattern-screamer
+  - pentagram
+  - pitch-haven
+  - professor-aw
+  - sugarcomb-confectionery
+  - tactical-theology
+  - westhead-media
+  - xia-dynasty
+
+  ## Canons are fictional contexts for articles.
+  canons:
+  - nonspecific # default
+  - aiad
+  - ad-astra
+  - aces-and-eights
+  - alchemy-department
+  - antarctic-exchange
+  - apotheosis
+  - bellerverse
+  - black-rabbit-company
+  - broken-masquerade
+  - competitive-eschatology
+  - cool-war-2
+  - doctors-of-the-church
+  - dread&circuses
+  - deepwell-catalog
+  - end-of-death
+  - etdp
+  - green-king
+  - insect-hell
+  - lolfoundation
+  - memoria-adytum
+  - old-man-in-the-sea
+  - on-mount-golgotha
+  - only-game-in-town
+  - orcadia
+  - heimdall
+  - rats-nest
+  - resurrection
+  - s&c-plastics
+  - ship-in-a-bottle
+  - sotm
+  - the-coldest-war
+  - the-gulf
+  - man-who-wasnt-there
+  - the-trashfire
+  - third-law
+  - twisted-pines
+  - unfounded
+  - war-on-all-fronts
+  - wonderful-world
+
+  ## Tags describe the content of a page, or what the content is related to.
+  tags:
+  # -- classes
+  - safe
+  - euclid
+  - keter
+  - thaumiel
+  - neutralized
+  - esoteric-class
+  - explained
+  # -- locations
+  - alagadda
+  - backdoor-soho
+  - hy-brasil
+  - la-rue-macabre
+  - three-portlands
+  - wanderers-library
+  # -- characters
+  - '51174'
+  - aaron-siegel
+  - able
+  - agent-green
+  - agent-kazmarek
+  - agent-laferrier
+  - agent-lament
+  - agent-merlo
+  - agent-navarro
+  - agent-strelnikov
+  - agent-yoric
+  - alexandra
+  - alexei-belitrov
+  - aldon
+  - big-cheese-horace
+  - bobble-the-clown
+  - bones
+  - brainy-brian
+  - chaz-ambrose
+  - cousin-johnny
+  - d-11424
+  - dado
+  - director-aktus
+  - director-bold
+  - director-gillespie
+  - director-mctiriss
+  - director-moose
+  - django-bridge
+  - draven-kondraki
+  - doctor-bright
+  - doctor-cimmerian
+  - doctor-clef
+  - doctor-dan
+  - doctor-edison
+  - doctor-everwood
+  - doctor-fynegan
+  - doctor-gears
+  - doctor-gerald
+  - doctor-glass
+  - doctor-heiden
+  - doctor-hoygull
+  - doctor-iceberg
+  - doctor-king
+  - doctor-kondraki
+  - doctor-light
+  - doctor-mann
+  - doctor-rights
+  - doctor-roget
+  - doctor-sorts
+  - doctor-spanko
+  - doctor-vang
+  - donkman
+  - eric
+  - faeowynn-wilson
+  - fred
+  - finnegan
+  - general-bowe
+  - glacon
+  - grand-karcist-ion
+  - hanged-king
+  - halyna-ieva
+  - heather-mason
+  - holly-light
+  - iris-dark
+  - iris-thompson
+  - isabel-v
+  - kain-pathos-crow
+  - kenneth-spencer
+  - jude-kriyot
+  - judy-papill
+  - kindness
+  - leslie
+  - lewitt-zairi-family
+  - lombardi
+  - maria-jones
+  - marion-wheeler
+  - mark-kiryu
+  - moon-champion
+  - mr-fish
+  - plague-doctor
+  - researcher-conwell
+  - researcher-james
+  - researcher-labelle
+  - researcher-lloyd
+  - researcher-rosen
+  - researcher-smalls
+  - researcher-talloran
+  - riven-mercer
+  - robert-bumaro
+  - robin-thorne
+  - ruiz-duchamp
+  - saturn-deer
+  - scarlet-king
+  - sheldon-katz
+  - simon-pietrykau
+  - thad-xyank
+  - the-administrator
+  - veronica-fitzroy
+  - zyn-kiryu
+  # -- general content tags
+  - acoustic
+  - adaptive
+  - addictive
+  - airborne
+  - alive
+  - amorphous
+  - animal
+  - antimemetic
+  - apian
+  - appliance
+  - aquatic
+  - arachnid
+  - arboreal
+  - arthropod
+  - artistic
+  - artifact
+  - auditory
+  - automaton
+  - autonomous
+  - avian
+  - bacteria
+  - biohazard
+  - biological
+  - bovine
+  - building
+  - cadaver
+  - cactaceous
+  - canine
+  - carnivorous
+  - cervine
+  - cephalopodic
+  - cetacean
+  - chelonian
+  - chemical
+  - city
+  - clay
+  - clockwork
+  - clothing
+  - cognitohazard
+  - compulsion
+  - computer
+  - concept
+  - contagion
+  - container
+  - corrosive
+  - currency
+  - crystalline
+  - cube
+  - dental
+  - document
+  - dinosaurian
+  - ectoentropic
+  - electrical
+  - electromagnetic
+  - electronic
+  - empathic
+  - engraved
+  - entropic
+  - equine
+  - exchange
+  - extradimensional
+  - extraterrestrial
+  - extremity
+  - feline
+  - fire
+  - food
+  - formic
+  - foundation-made
+  - fungus
+  - furniture
+  - future
+  - game
+  - gaseous
+  - genetic
+  - geological
+  - glass
+  - gravity
+  - gustatory
+  - hallucination
+  - historical
+  - hive-mind
+  - hostile
+  - humanoid
+  - immobile
+  - indestructible
+  - infohazard
+  - interactive
+  - insect
+  - inscribed
+  - inscription
+  - instrument
+  - intangible
+  - invertebrate
+  - jewelry
+  - k-class-scenario
+  - key
+  - knowledge
+  - language
+  - lepidopteran
+  - leporine
+  - light
+  - liquid
+  - location
+  - loop
+  - magnetic
+  - map
+  - mathematical
+  - mechanical
+  - media
+  - medical
+  - memetic
+  - memory-affecting
+  - meta
+  - metallic
+  - metamorphic
+  - meteorological
+  - microscopic
+  - military
+  - mimetic
+  - mind-affecting
+  - miniature
+  - mobile
+  - moon
+  - murine
+  - musical
+  - narrative
+  - neurological
+  - nocturnal
+  - observational
+  - ocular
+  - olfactory
+  - omnivorous
+  - online
+  - ontokinetic
+  - ophidian
+  - organic
+  - ovine
+  - paradox
+  - parasitic
+  - performance
+  - physics
+  - photographic
+  - piscine
+  - plant
+  - planet
+  - polyhedral
+  - portal
+  - predatory
+  - predictive
+  - probability
+  - radioactive
+  - ranine
+  - reanimation
+  - recording
+  - religious
+  - reproductive
+  - reptilian
+  - ritual
+  - sapient
+  - satellite
+  - sciurine
+  - sculpture
+  - selachian
+  - self-repairing
+  - self-replicating
+  - sensory
+  - sexual
+  - sentient
+  - shadow
+  - simian
+  - skeletal
+  - sleep
+  - spacetime
+  - species
+  - sphere
+  - sport
+  - statue
+  - stone
+  - structure
+  - subterranean
+  - sun
+  - swarm
+  - tactile
+  - telekinetic
+  - telepathic
+  - teleportation
+  - temporal
+  - thermal
+  - thermodynamic
+  - timepiece
+  - tool
+  - toxic
+  - toy
+  - transfiguration
+  - transmission
+  - uncontained
+  - ursine
+  - vehicle
+  - vermian
+  - vibration
+  - virus
+  - visual
+  - vulpine
+  - weapon
+  - wooden
+  - xenarthran

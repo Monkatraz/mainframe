@@ -5,6 +5,8 @@
 - [ ] Update the account creation and login forms to use forms correctly
 - [ ] Add some sort of `pref` object that handles localStorage shenanigans automatically
 - [ ] Implement `svelte-i18n` and create a basic `en` language mapping
+- [ ] Drafts stored either with `localStorage` (must be serialized) or in the user document
+- [ ] Create data-files in `yaml` and compile with Snowpack to `JSON`
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin
@@ -33,6 +35,8 @@
 - [ ] Share widget
 - [ ] Overlay scrollbar component
 - [ ] The Admin Panel
+- [ ] Modal component that is definable where it is used (svelte portal + conditional rendering)
+- [ ] Markdown rendering component (with morphing support/flag)
 
 ### Random Ideas
 - Automatic repository pages (maybe a Markdown syntax for interfacing with the database)

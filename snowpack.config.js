@@ -44,7 +44,8 @@ module.exports = {
     sourcemap: true
   },
   alias: {
-    '@vendor': './public/vendor'
+    '@vendor': './public/vendor',
+    '@data': './src/static/data'
   },
   routes: [ { src: '.*', dest: '/index.html', match: 'routes' } ],
   optimize: {
@@ -56,6 +57,7 @@ module.exports = {
     target: 'es2020'
   },
   plugins: [
+    ['@snowpack/plugin-build-script', { cmd: 'js-yaml', input: ['.yaml'], output: ['.json'] }],
     '@snowpack/plugin-svelte',
     './dev/snowpack/compile-css.js',
     './dev/snowpack/workers.js'

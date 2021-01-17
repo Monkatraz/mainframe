@@ -108,6 +108,7 @@ export interface Comment {
 
 /** Tuple representing a user rating on a page. */
 type Rating = [Ref, 1 | -1 | 0]
+
 /** A list of page tags. */
 type Tags = string[]
 
@@ -123,10 +124,13 @@ export interface View {
   template: string
 }
 
-// TODO: Add `Draft` object
-// TODO: convert Ratings[] into { up: Ref[], meh: Ref[], down: Ref[] }
-// TODO: Move `social` into its own document
-// TODO: Content warnings
+export interface PageSocial {
+  /** A list of `Rating` objects representing how users have voted on this page. */
+  ratings: Rating[]
+  /** A list of 'Comment' objects, storing how users commented on this page. */
+  comments: string[]
+}
+
 /** Root level object retrieved from the FaunaDB database. Contains everything relevant to a `Page`. */
 export interface Page {
   /** URL path, starting from root. Is always unique. */
@@ -148,12 +152,6 @@ export interface Page {
     /** List of strings describing the contents of the article. */
     tags: Tags
   }
-  // social: {
-  //   /** A list of `Rating` objects representing how users have voted on this page. */
-  //   ratings: Rating[]
-  //   /** A list of 'Comment' objects, storing how users commented on this page. */
-  //   comments: string[]
-  // }
   /** Dictionary-like object (e.g `en: {}`) listing all versions of this page.
    *  Fields denote which language the `View` is for.
    */
@@ -224,7 +222,7 @@ export const qe = {
     return conditionals.reverse().reduce(reducer, exhausted)
   },
 
-  /** Returns the fields of the specified array/objcet.. */
+  /** Returns the fields of the specified array/object. */
   Fields(obj: Expr) {
     // Reduces `[id, value]` pair to just `id`
     const lambda = q.Lambda(((keyvalue) => q.Select(0, keyvalue)))
@@ -235,9 +233,8 @@ export const qe = {
   },
 
   /** "Searches" and returns matches using the specified index.
-   * 
-   *  Shorthand for `q.Match(q.Index(index))`.
-   */
+   *
+   *  Shorthand for `q.Match(q.Index(index))`. */
   Search(index: Expr | string, ...terms: Expr[]) {
     // Use simple index string if specified
     const qindex = typeof index === 'string' ? q.Index(index) : index

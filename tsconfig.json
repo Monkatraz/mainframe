@@ -23,6 +23,9 @@
     "paths": {
       "@vendor/*": [
         "./public/vendor/*"
+      ],
+      "@data/*": [
+        "./src/static/data/*"
       ]
     }
   },

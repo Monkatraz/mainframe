@@ -48,6 +48,7 @@
     "tippy.js": "^6.2.7"
   },
   "devDependencies": {
+    "@snowpack/plugin-build-script": "^2.1.0",
     "@snowpack/plugin-svelte": "^3.5.2",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
@@ -55,6 +56,7 @@
     "css-mquery-packer": "^1.2.4",
     "esbuild": "^0.8.32",
     "eslint": "latest",
+    "js-yaml": "^3.14.1",
     "postcss": "^8.2.4",
     "rollup-plugin-node-polyfills": "^0.2.1",
     "snowpack": "^3.0.11",
