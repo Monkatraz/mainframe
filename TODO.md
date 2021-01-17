@@ -6,7 +6,6 @@
 - [ ] Add some sort of `pref` object that handles localStorage shenanigans automatically
 - [ ] Implement `svelte-i18n` and create a basic `en` language mapping
 - [ ] Drafts stored either with `localStorage` (must be serialized) or in the user document
-- [ ] Create data-files in `yaml` and compile with Snowpack to `JSON`
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin
@@ -17,7 +16,6 @@
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
   - Force passing a ReCaptcha when registering
 - [ ] Generic cache library
-- [ ] Add better page history schema
 - [ ] Some sort of script or system for data-backups
 - [ ] Implement Storybook / Something like it
 
@@ -114,3 +112,5 @@
 - [x] Add tooltips / hints
 - [x] Login component
 - [x] Add a media-size Svelte store
+- [x] Create data-files in `yaml` and compile with Snowpack to `JSON`
+- [x] Add better page history schema

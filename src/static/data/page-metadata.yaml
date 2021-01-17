@@ -10,15 +10,7 @@
   - essay
   - artwork
   - hub
-
-  ## Modes determine what sort of metadata should be expected from the page.
-  ## For example, a nonfiction page probably does not need metadata relevant to fictional content.
-  ## Pages can have _multiple_ modes. Used this way, modes are a special type of flag.
-  modes:
-  - fiction
-  - nonfiction
-  - admin
-  - collab
+  - other
 
   ## Flags affect the behavior of pages, e.g. by locking them or by affecting how they render.
   ## These effects should have nothing to do with theming.
@@ -29,7 +21,9 @@
   - cc-valid
   - cc-pending
 
-  ## Attributes describe the formatting, characteristics, or artistic style of a page.
+  ## Attributes are metacontextual (i.e. about the page, not the content) tags for a page.
+  ## e.g. the artistic style, what type of format the page is in, if it was a contest entry, etc.
+  ## They can be dynamically defined, but the common ones are listed here.
   attributes:
   - joke
   - experiment
@@ -40,11 +34,6 @@
   - audio
   - image
   - poetry
-
-  ## Special tags are misc. metadata, usually relevant to only a few pages.
-  ## e.g. contests, historical pages, etc.
-  ## Special tags can be dynamically defined, however the more common ones are predefined here.
-  special:
   - contest
   - featured
   - news
@@ -59,37 +48,91 @@
   #   - a warning needs to be a very 'vivid' and explicit advisory, not a categorization
   #
   # there are a handful of 'general' warnings which are exceptions to the above conditions
-  # these warnings serve as categories for the type of potentially discomforting content that the article contains
+  # these warnings serve as categories for the type of potentially discomforting content that the page contains
 
     general:
-    - 'adult'
-    - 'sensitive'
-    - 'distressing'
-    - 'gross'
+    - adult
+    - sensitive
+    - distressing
+    - gross
 
     specific:
-    - 'gore'
-    - 'mutilation'
-    - 'sexual-content'
-    - 'rape'
-    - 'mental-illness'
-    - 'drug-addiction'
-    - 'self-harm'
-    - 'domestic-abuse'
-    - 'child-abuse'
-    - 'animal-abuse'
-    - 'bigotry'
-    - 'racism'
-    - 'homophobia'
-    - 'religious-prejudice'
-    - 'racial-slurs'
-    - 'sexist-slurs'
+    - gore
+    - mutilation
+    - sexual-content
+    - rape
+    - mental-illness
+    - drug-addiction
+    - self-harm
+    - domestic-abuse
+    - child-abuse
+    - animal-abuse
+    - bigotry
+    - racism
+    - homophobia
+    - religious-prejudice
+    - racial-slurs
+    - sexist-slurs
 
-  ## Groups describe what fictional group the article is related to or based on.
-  ## They are separate from tags in order to better facilitate non-Foundation based content.
-  groups:
+  ## 'Contexts' can be thought of as the fictional context that the page is meant to be read in.
+  ## e.g. a GOI-format page might be in a GOI context, which may have varied effects, such as theming the page.
+  contexts:
   - foundation # default
-  - nonspecific
+  - goc
+
+  ## Canons represent shared contexts between pages.
+  canons:
+  - aiad
+  - ad-astra
+  - aces-and-eights
+  - alchemy-department
+  - antarctic-exchange
+  - apotheosis
+  - bellerverse
+  - black-rabbit-company
+  - broken-masquerade
+  - competitive-eschatology
+  - cool-war-2
+  - doctors-of-the-church
+  - dread&circuses
+  - deepwell-catalog
+  - end-of-death
+  - etdp
+  - green-king
+  - insect-hell
+  - lolfoundation
+  - memoria-adytum
+  - old-man-in-the-sea
+  - on-mount-golgotha
+  - only-game-in-town
+  - orcadia
+  - heimdall
+  - rats-nest
+  - resurrection
+  - s&c-plastics
+  - ship-in-a-bottle
+  - sotm
+  - the-coldest-war
+  - the-gulf
+  - man-who-wasnt-there
+  - the-trashfire
+  - third-law
+  - twisted-pines
+  - unfounded
+  - war-on-all-fronts
+  - wonderful-world
+
+  ## Tags describe the content of a page, or what the content is related to.
+  tags:
+  # -- classes
+  - safe
+  - euclid
+  - keter
+  - thaumiel
+  - neutralized
+  - esoteric-class
+  - explained
+  # -- groups
   - alexylva
   - ambrose-restaurant
   - anderson
@@ -148,60 +191,6 @@
   - tactical-theology
   - westhead-media
   - xia-dynasty
-
-  ## Canons are fictional contexts for articles.
-  canons:
-  - nonspecific # default
-  - aiad
-  - ad-astra
-  - aces-and-eights
-  - alchemy-department
-  - antarctic-exchange
-  - apotheosis
-  - bellerverse
-  - black-rabbit-company
-  - broken-masquerade
-  - competitive-eschatology
-  - cool-war-2
-  - doctors-of-the-church
-  - dread&circuses
-  - deepwell-catalog
-  - end-of-death
-  - etdp
-  - green-king
-  - insect-hell
-  - lolfoundation
-  - memoria-adytum
-  - old-man-in-the-sea
-  - on-mount-golgotha
-  - only-game-in-town
-  - orcadia
-  - heimdall
-  - rats-nest
-  - resurrection
-  - s&c-plastics
-  - ship-in-a-bottle
-  - sotm
-  - the-coldest-war
-  - the-gulf
-  - man-who-wasnt-there
-  - the-trashfire
-  - third-law
-  - twisted-pines
-  - unfounded
-  - war-on-all-fronts
-  - wonderful-world
-
-  ## Tags describe the content of a page, or what the content is related to.
-  tags:
-  # -- classes
-  - safe
-  - euclid
-  - keter
-  - thaumiel
-  - neutralized
-  - esoteric-class
-  - explained
   # -- locations
   - alagadda
   - backdoor-soho
