@@ -2,17 +2,9 @@
  * @file Misc. type declarations for the project.
  * @author Monkatraz
  */
-// Fixing missing `manual` property on PrismJS
-import '@types/prismjs'
-declare module '@types/prismjs' {
-  let manual: boolean
-}
-
-declare module 'markdown-it-multimd-table'
-declare module 'markdown-it-deflist'
 
 // Project-Wide Additions
-declare global {
+export declare global {
   // Function Types
   type NoReturnVal = void | undefined | Promise<void>
   type AnyFn<T = void> = (...args: any) => T

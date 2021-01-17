@@ -8,6 +8,7 @@ import MDMultiMDTables from 'markdown-it-multimd-table'
 import MDDefLists from 'markdown-it-deflist'
 import katex from 'katex'
 // Import Prism
+import type { } from 'prismjs' // haha uhh don't question this
 import "@vendor/prism.js"
 const Prism = self.Prism
 // Used for md-it extensions
