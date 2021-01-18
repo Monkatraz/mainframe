@@ -62,16 +62,13 @@ function getExtensions() {
   // Library Imports
   import { onDestroy, onMount } from 'svelte'
   import { spring } from 'svelte/motion'
-  import { fade } from 'svelte/transition'
-  import { morphMarkdown } from './modules/markdown'
-  import { tnAnime, tip } from './modules/components'
-  import { idleCallback, createIdleQueued, createAnimQueued, throttle } from './modules/util'
+  import { tnAnime } from './modules/components'
+  import { createAnimQueued, throttle } from './modules/util'
   import type { Page } from './modules/api';
   // Components
-  import Button from './components/Button.svelte'
+  import Markdown from './components/Markdown.svelte'
   import IconButton from './components/IconButton.svelte'
   import Toggle from './components/Toggle.svelte'
-  import Icon from './components/Icon.svelte'
   import DetailsMenu from './components/DetailsMenu.svelte'
 
   // TODO: add misc. info on topbar like word count and the like
@@ -115,12 +112,18 @@ function getExtensions() {
 
   $: containerClass = editorLivePreview ? 'show-both' : 'show-editor'
   $: if (preview) updatePreview()
-  $: if (!previewActiveLine) activeElements = new Set
+  $: if (!previewActiveLine) activelines.clear()
 
   // handle spellcheck
   $: if(editorView) editorView.dispatch({ reconfigure: {
     'spellcheck': EditorView.contentAttributes.of({ spellcheck: String(editorSpellCheck) })
   }})
+
+  // Markdown
+  let template = ''
+  let heightmap: Map<number, number>
+  let heightlist: number[]
+  let activelines: Set<number> = new Set()
 
   // -- EDITOR
 
@@ -133,21 +136,21 @@ function getExtensions() {
       return {
         update(update: ViewUpdate) {
           // update html on change
-          if (update.docChanged) { updateHTML() }
+          if (update.docChanged) { template = update.state.doc.toString() }
           // get active lines
           if (update.selectionSet || update.docChanged) {
-            const lines: number[] = []
+            const lines: Set<number> = new Set()
             for (const r of update.state.selection.ranges) {
               const lnStart = update.state.doc.lineAt(r.from).number
               const lnEnd = update.state.doc.lineAt(r.to).number
-              if (lnStart === lnEnd) lines.push(lnStart - 1)
+              if (lnStart === lnEnd) lines.add(lnStart - 1)
               else {
                 const diff = lnEnd - lnStart
                 for (let i = 0; i <= diff; i++)
-                  lines.push((lnStart + i) - 1)
+                  lines.add((lnStart + i) - 1)
               }
             }
-            getActiveElements(lines)
+            activelines = lines
           }
         }
       }
@@ -179,83 +182,9 @@ function getExtensions() {
   // -- PREVIEW <-> EDITOR
 
   let preview: HTMLDivElement
-  let previewContainer: HTMLElement
-
-  // Active Line Highlighting
-
-  function hasSiblings(elem: Element, ln: number) {
-    if (!elem.parentElement) return false
-    if (elem.parentElement.querySelectorAll(`:scope > [data-line="${ln}"]`).length === 1)
-      return false
-    return true
-  }
-
-  const activeExclude = ['TBODY', 'THEAD', 'CODE']
-
-  let activeElements: Set<Element> = new Set
-  const getActiveElements = createIdleQueued((lines: number[]) => {
-    if (!preview || !editorView || !previewActiveLine) return
-    // disable all currently active lines
-    activeElements = new Set
-    // get elements covered by the provided list of lines
-    for (let ln of lines) {
-
-      // skip empty new lines
-      if (/^\s*$/.test(editorView.state.doc.line(ln + 1).text)) continue
-
-      // find match
-      let elems = preview.querySelectorAll(`[data-line="${ln}"]`)
-      // hunt for the first line number that maches
-      while (!elems.length && ln >= 0) {
-        ln--
-        elems = preview.querySelectorAll(`[data-line="${ln}"]`)
-      }
-
-      let curElem = elems[elems.length - 1]
-      if (!curElem) continue
-
-      // if our direct match has no siblings, highlight it
-      if (!activeExclude.includes(curElem.tagName) && !hasSiblings(curElem, ln))
-        activeElements.add(curElem)
-      // else, use first ancestor that has no siblings of the same line number
-      else while(curElem.parentElement && curElem.parentElement !== preview) {
-        curElem = curElem.parentElement
-        if (!activeExclude.includes(curElem.tagName) && !hasSiblings(curElem, ln)) {
-          activeElements.add(curElem)
-          break
-        }
-      }
-
-      // add last ancestor to match
-      while(curElem.parentElement && curElem.parentElement !== preview)
-        curElem = curElem.parentElement
-      if (curElem.parentElement && !activeExclude.includes(curElem.tagName)) 
-        activeElements.add(curElem)
-    }
-  })
-
-  function getActiveElementStyle(target: Element) {
-    if (!preview || !target) return
-    const parentRect = previewContainer.getBoundingClientRect()
-    const rect = target.getBoundingClientRect()
-    const style = window.getComputedStyle(target)
-    const padding = [
-      parseFloat(style.paddingTop),
-      parseFloat(style.paddingBottom),
-      parseFloat(style.paddingLeft),
-      parseFloat(style.paddingRight)
-    ]
-    const height = rect.height - padding[0] - padding[1]
-    const width = rect.width - padding[2] - padding[3]
-    const offsetTop = rect.top - parentRect.top + padding[0] + padding[1] + previewContainer.scrollTop
-    const offsetLeft = rect.left - parentRect.left + padding[2] + padding[3]
-    return `height: ${height}px; width: ${width}px; top: ${offsetTop}px; left: ${offsetLeft}px;`
-  }
 
   // Scroll Sync.
-  let scrollMapNeedsUpdate = true
-  let arrLineHeight: number[] = []
-  let mapLineHeight: Map<number, number> = new Map()
+
   /** Denotes whether the editor or the preview is the element the user is scrolling with. */
   let scrollingWith: 'editor' | 'preview' = 'editor'
   /** The spring for the preview's sync. scroll position. */
@@ -263,10 +192,7 @@ function getExtensions() {
   /** The spring for the editor's sync. scroll position. */
   let editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
 
-  /** Generally updates the preview's state, such as the rendered HTML and the scroll map. */
   const updatePreview = throttle(() => {
-    updateHTML()
-    updateScrollMap()
     scrollFromEditor()
     scrollFromPreview()
   }, 100)
@@ -276,44 +202,10 @@ function getExtensions() {
     return editorView.visualLineAt(editorView.state.doc.line(line).from).top
   }
 
-  /** Updates the preview's HTML based on the current editor state. */
-  const updateHTML = createIdleQueued(async () => {
-    if (!preview || !editorView) return
-    // rather than replace the whole tree we just replace what's changed using MorphDOM
-    await idleCallback(async () => {
-      await morphMarkdown(editorView.state.doc.toString(), preview)
-      scrollMapNeedsUpdate = true
-    })
-  })
-
-  /** Updates the scroll map that is used for scroll syncing between the editor and preview. */
-  const updateScrollMap = createAnimQueued(() => {
-    if (!preview || !editorView) return
-    scrollMapNeedsUpdate = false
-    const previewRect = preview.getBoundingClientRect()
-    // here we map every [data-line] element's line to its offset scroll height
-    // we also make a array version of the same Map, for usage with iterators
-    mapLineHeight.clear()
-    arrLineHeight = []
-    Array.from(preview.querySelectorAll<HTMLElement>('[data-line]'))
-      .forEach(elem => {
-        const dataLine = parseInt(elem.getAttribute('data-line') as string)
-        if (elem.offsetParent === preview) {
-          const height = elem.getBoundingClientRect().top - previewRect.top
-          mapLineHeight.set(dataLine, height)
-          arrLineHeight[dataLine] = height
-        }
-      })
-
-    // starts a poll (because it calls itself) to catch flukes
-    setTimeout(updateScrollMap, 5000)
-  })
-
   /** Updates the preview scroll position if the scroll sync. is currently editor based.
    *  Should be called whenever a scrolling event is detected from the editor. */
   const scrollFromEditor = createAnimQueued(() => {
     if (scrollingWith === 'preview' || !preview || !editorView) return
-    if (scrollMapNeedsUpdate) updateScrollMap()
     const scrollTop = editorView.scrollDOM.scrollTop
     editorScrollSpring.set(scrollTop)
     // get top most visible line
@@ -324,10 +216,10 @@ function getExtensions() {
     let lineHeight = 0
     let curLine = line
     // check if we have our line or not
-    if (mapLineHeight.has(line)) lineHeight = mapLineHeight.get(line) as number
+    if (heightmap.has(line)) lineHeight = heightmap.get(line)!
     // no? get closest line before this one
-    else for (;curLine > 0; curLine--) if (mapLineHeight.has(curLine)) {
-      lineHeight = mapLineHeight.get(curLine) as number
+    else for (;curLine > 0; curLine--) if (heightmap.has(curLine)) {
+      lineHeight = heightmap.get(curLine)!
       break
     }
     // set preview scroll
@@ -342,20 +234,19 @@ function getExtensions() {
    *  Should be called whenever a scrolling event is detected from the preview. */
   const scrollFromPreview = createAnimQueued(() => {
     if (scrollingWith === 'editor' || !preview || !editorView) return
-    if (scrollMapNeedsUpdate) updateScrollMap()
-    const scrollTop = previewContainer.scrollTop
+    const scrollTop = preview.scrollTop
     previewScrollSpring.set(scrollTop)
     // filter for the closest line height
-    const line = arrLineHeight.findIndex(height => scrollTop < height)
+    const line = heightlist.findIndex(height => scrollTop < height)
     if (line !== -1) {
       // fudge to prevent the editor from getting sticky
-      const diff = (scrollTop - arrLineHeight[line]) * 0.75
+      const diff = (scrollTop - heightlist[line]) * 0.75
       editorScrollSpring.set(heightAtLine(line) + diff)
     }
   })
 
   // updates scroll sync. positions
-  $: if (previewContainer && scrollingWith === 'editor') previewContainer.scrollTop = $previewScrollSpring
+  $: if (preview && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
   $: if (editorView && scrollingWith === 'preview') editorView.scrollDOM.scrollTop = $editorScrollSpring
 
 </script>
@@ -475,15 +366,15 @@ function getExtensions() {
     right: 0
     margin-left: calc(100% - 1.5rem)
 
-  .editor
-    height: 100%
-
   .settings-menu
     display: flex
     flex-direction: column
     width: max-content
     font-set('display')
     font-size: 0.9rem
+
+  .editor
+    height: 100%
 
   .preview
     position: relative
@@ -496,15 +387,6 @@ function getExtensions() {
     z-index: 1
     box-shadow: inset 0 1rem 0.5rem -1rem rgba(black, 0.25)
     contain: strict
-
-  .active-element
-    position: absolute
-    box-shadow: 0 0 1rem 0.25rem colvar('text-select', opacity 0.075)
-    border-radius: 0.25rem
-    background: colvar('text-select', opacity 0.075)
-    pointer-events: none
-    user-select: none
-    z-index: 1
 
 </style>
 
@@ -546,16 +428,13 @@ function getExtensions() {
     </div>
 
     <!-- Right | Preview Pane -->
-    <div class='preview {previewDarkMode ? 'dark' : 'light'} codetheme-dark' bind:this={previewContainer}
+    <div class='preview {previewDarkMode ? 'dark' : 'light'} codetheme-dark' bind:this={preview}
       on:scroll={scrollFromPreview} 
       on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
       in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 350, easing: 'easeOutQuint' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
       {#if containerClass === 'show-both' || containerClass === 'show-preview'}
-        {#each Array.from(activeElements) as elem (elem)}
-          <div class=active-element transition:fade={{duration: 100}} style={getActiveElementStyle(elem)} />
-        {/each}
         <div class='preview-settings'>
           <DetailsMenu i='fluent:settings-28-filled' label='Preview Settings'>
             <div class='settings-menu'>
@@ -564,7 +443,7 @@ function getExtensions() {
             </div>
           </DetailsMenu>
         </div>
-        <div class=rhythm bind:this={preview}/>
+        <Markdown {template} {activelines} bind:heightmap bind:heightlist details morph />
       {/if}
     </div>
 

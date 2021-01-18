@@ -34,7 +34,6 @@
 - [ ] Overlay scrollbar component
 - [ ] The Admin Panel
 - [ ] Modal component that is definable where it is used (svelte portal + conditional rendering)
-- [ ] Markdown rendering component (with morphing support/flag)
 
 ### Random Ideas
 - Automatic repository pages (maybe a Markdown syntax for interfacing with the database)
@@ -114,3 +113,4 @@
 - [x] Add a media-size Svelte store
 - [x] Create data-files in `yaml` and compile with Snowpack to `JSON`
 - [x] Add better page history schema
+- [x] Markdown rendering component (with morphing support/flag)
