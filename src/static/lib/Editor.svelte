@@ -111,7 +111,7 @@ function getExtensions() {
   let previewActiveLine = true
 
   $: containerClass = editorLivePreview ? 'show-both' : 'show-editor'
-  $: if (preview) updatePreview()
+  $: if (preview) updateScroll()
   $: if (!previewActiveLine) activelines.clear()
 
   // handle spellcheck
@@ -173,7 +173,8 @@ function getExtensions() {
       parent: editor
     })
 
-    updatePreview()
+    template = editorView.state.doc.toString()
+    updateScroll()
 
   })
 
@@ -192,7 +193,7 @@ function getExtensions() {
   /** The spring for the editor's sync. scroll position. */
   let editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
 
-  const updatePreview = throttle(() => {
+  const updateScroll = throttle(() => {
     scrollFromEditor()
     scrollFromPreview()
   }, 100)
@@ -391,7 +392,7 @@ function getExtensions() {
 </style>
 
 <!-- some chores to do on resize -->
-<svelte:window on:resize={updatePreview}/>
+<svelte:window on:resize={updateScroll}/>
 
 <div class='overflow-container {editorDarkMode ? 'dark codetheme-dark' : 'light codetheme-light'}'
   in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
