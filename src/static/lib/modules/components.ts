@@ -11,7 +11,6 @@ import { roundArrow as TippyRoundArrow } from 'tippy.js'
 import anime, { AnimeParams } from 'animejs'
 import { animationFrame } from './util'
 
-
 const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
   ignoreAttributes: true,
   theme: 'mainframe',

@@ -1,7 +1,6 @@
 <script lang='ts'>
   import { User } from './modules/api'
   import { tnAnime } from './modules/components'
-  import { onMount } from 'svelte'
   import Icon from './components/Icon.svelte'
   import Toggle from './components/Toggle.svelte'
   import Dropdown from './components/Dropdown.svelte'

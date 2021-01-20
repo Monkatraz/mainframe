@@ -64,7 +64,6 @@ function getExtensions() {
   import { spring } from 'svelte/motion'
   import { tnAnime } from './modules/components'
   import { createAnimQueued, throttle } from './modules/util'
-  import type { Page } from './modules/api';
   // Components
   import Markdown from './components/Markdown.svelte'
   import IconButton from './components/IconButton.svelte'
@@ -77,28 +76,6 @@ function getExtensions() {
   // TODO: mobile mode
   // TODO: swipe to show preview on mobile
   // TODO: split the editor+preview into its own component, API is handled by its parent
-
-  export let page: Page = {
-    path: 'scp/3685',
-    meta: {
-      authors: [],
-      revision: 1,
-      dateCreated: new Date,
-      dateLastEdited: new Date,
-      flags: [],
-      tags: []
-    },
-    locals: {
-      'en': {
-        title: 'SCP-3685',
-        subtitle: 'Something Else Entirely',
-        description: 'Very interesting description!',
-        template: ''
-      }
-    }
-  }
-
-  let pageLocal = 'en'
 
   // -- CONTAINER
 
@@ -312,7 +289,7 @@ function getExtensions() {
                 "| .topbar                                          | 2rem ",
                 "+--------------------------------------------------+      ",
                 "+------+ +--------------------------------+ +------+      ",
-                "|      | | .preview                       | |      |      ",
+                "|      | | > .preview <                   | |      |      ",
                 "|      | |                                | |      |      ",
                 "|      | |                                | |      |      ",
                 "|      | |                                | |      |      ",

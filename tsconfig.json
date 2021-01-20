@@ -26,6 +26,9 @@
       ],
       "@data/*": [
         "./src/static/data/*"
+      ],
+      "@schemas": [
+        "./src/static/data/schemas.d.ts"
       ]
     }
   },

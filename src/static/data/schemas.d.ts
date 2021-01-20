@@ -122,6 +122,10 @@ export namespace Page {
     authors: Ref[]
     /** Metadata - contains tags and other context-related things. */
     metadata: Metadata
+    /** History information, such as the current revision and edit dates. */
+    history: History
+    /** FDB reference to the `Social` document for the page. */
+    social: Ref
     /** Dictionary-like object (e.g `en: {}`) listing all versions of this page.
      *  Fields denote which language the `View` is for. */
     locals: {
@@ -129,7 +133,7 @@ export namespace Page {
     }
   }
 
-  /** Minimal form of a page instance, localized to a language and with no `social` data included. */
+  /** Minimal form of a page instance, localized to a specific language. */
   export interface LocalizedInstance {
     /** Version number, used for backwards compatibility handling (if needed) */
     version: number
@@ -139,6 +143,10 @@ export namespace Page {
     authors: Ref[]
     /** Metadata - contains tags and other context-related things. */
     meta: Metadata
+    /** History information, such as the current revision and edit dates. */
+    history: History
+    /** FDB reference to the `Social` document for the page. */
+    social: Ref
     /** Language that this particular localized page is in. */
     lang: string
     /** Page title. */

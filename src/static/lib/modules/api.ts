@@ -10,6 +10,7 @@ const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
 import { ENV } from './util'
+import type { Social, Page } from '@schemas'
 
 // ---------
 //  FAUNADB
@@ -66,119 +67,6 @@ export type QueryInputError = QueryBadRequest | QueryInvalidValue
 export type QueryPermissionError = QueryUnauthorized | QueryMethodNotAllowed | QueryPermissionDenied
 /** Error thrown by FaunaDB when the endpoint had some sort of query agnostic error. */
 export type QueryEndpointError = QueryInternalError | QueryUnavailable
-
-// --------
-//  SOCIAL
-
-export interface Social {
-  /** A reference to the user's actual User document.
-   *  This document cannot actually be read - but this reference serves as the canonical ID for this user.
-   *  Additionally, the actual ID of the `Ref` (not the collection) serves as the URL path for the user. */
-  user: Ref
-  /** A page (a markdown template) specific to the user. Only they can edit it. */
-  authorpage: string
-  /** The nickname for this user. They can change it at any time. */
-  nickname: string
-  /** A very short description for the user.
-   *  It is intended for info like pronouns, as it is always displayed with the user. Optional. */
-  tagline: string
-  /** A more formal, and longer, description for the user. Optional. */
-  bio: string
-}
-
-/** `Comment` objects represent single comments created by users. */
-export interface Comment {
-  /** Reference to the author of the comment. */
-  author: Ref
-  /** General metadata, like current revision and creation date. */
-  meta: {
-    /** Number of revisions (edits) for this comment Starts at 1. */
-    revision: number
-    /** Date when this comment was created. */
-    dateCreated: Date
-    /** Date when this comment was last edited. */
-    dateLastEdited: Date
-  }
-  /** Markdown content of the comment. Must be rendered in order to view. */
-  content: string
-}
-
-// -------
-//  PAGES
-
-/** Tuple representing a user rating on a page. */
-type Rating = [Ref, 1 | -1 | 0]
-
-/** A list of page tags. */
-type Tags = string[]
-
-/** `View` objects represent a particular language variant of a page. */
-export interface View {
-  /** Page title. */
-  title: string
-  /** Page subtitle. */
-  subtitle: string
-  /** Short page description. */
-  description: string
-  /** Markdown page template. Must be rendered to be viewed. */
-  template: string
-}
-
-export interface PageSocial {
-  /** A list of `Rating` objects representing how users have voted on this page. */
-  ratings: Rating[]
-  /** A list of 'Comment' objects, storing how users commented on this page. */
-  comments: string[]
-}
-
-/** Root level object retrieved from the FaunaDB database. Contains everything relevant to a `Page`. */
-export interface Page {
-  /** URL path, starting from root. Is always unique. */
-  path: string
-  /** Metadata - contains things like the current `revision`, edit dates, etc. */
-  meta: {
-    /** Set of users who authored this page and have edit permissions. */
-    authors: Ref[]
-    /** Number of revisions (edits) for this page. Starts at 1. */
-    revision: number
-    /** Date when this page was created. */
-    dateCreated: Date
-    /** Date when this page was last edited. */
-    dateLastEdited: Date
-    /** A list of strings containing meta-contextual labels for a page.
-     *  E.g. a flag like 'cc_validated' could be present within this list.
-     */
-    flags: string[]
-    /** List of strings describing the contents of the article. */
-    tags: Tags
-  }
-  /** Dictionary-like object (e.g `en: {}`) listing all versions of this page.
-   *  Fields denote which language the `View` is for.
-   */
-  locals: {
-    [lang: string]: View
-  }
-}
-
-/** Minimal form of a `Page` object, localized to a language and with no `social` data included. */
-export interface LocalizedPage {
-  /** URL path, starting from root. Is always unique. */
-  path: string
-  /** Version number, used for backwards compatibility handling (if needed) */
-  version: number
-  /** Metadata - contains things like authors, current `revision`, edit dates, etc. */
-  meta: Page['meta']
-  /** Language that this particular localized page is in. */
-  lang: string
-  /** Page title. */
-  title: string
-  /** Page subtitle. */
-  subtitle: string
-  /** Short page description. */
-  description: string
-  /** Markdown page template. Must be rendered to be viewed. */
-  template: string
-}
 
 /** Gets the status code of any error, defaulting to 400.
  *  Has special handling for `FaunaHTTPError`s.
@@ -382,20 +270,24 @@ export function withPage(path: string, lang: string | Expr = qe.PageLang(q.Var('
   const local = q.Select(['locals', q.Var('lang')], q.Var('data'))
   const ql = (expr: Expr) => q.Let(vars, expr)
   return {
+
     /** Requests the entirety of the page. */
-    request: () => User.client.query<Page>(vars.data),
+    request: () => User.client.query<Page.Instance>(vars.data),
+
     /** Requests the localized form of the page. */
-    requestLocalized: () => User.client.query<LocalizedPage>(ql(q.Merge(
+    requestLocalized: () => User.client.query<Page.LocalizedInstance>(ql(q.Merge(
       qe.Filter(q.Var('data'), [
-        'path', 'meta', ['lang', q.Var('lang')]
+        'path', 'metadata', 'history', 'social', ['lang', q.Var('lang')]
       ]),
       qe.Filter(local, [
         'title', 'subtitle', 'description', 'template'
       ])))),
-    // /** Requests just the `social` record. */
-    // requestSocial: () => User.client.query<Page['social']>(ql(q.Select('social', q.Var('data')))),
+
+    /** Requests the `Social` document for the page. */
+    requestSocial: () => User.client.query<Page.Social>(ql(qe.Data(q.Select('social', q.Var('data'))))),
+
     /** Requests the `title`, `subtitle`, and `description` fields. */
-    requestDescription: () => User.client.query<Omit<View, 'template'>>(ql(qe.Filter(local, [
+    requestDescription: () => User.client.query<Omit<Page.View, 'template'>>(ql(qe.Filter(local, [
       'title', 'subtitle', 'description'
     ])))
     // field
