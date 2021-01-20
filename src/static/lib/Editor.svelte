@@ -60,6 +60,7 @@ function getExtensions() {
 
 <script lang="ts">
   // Library Imports
+  import * as API from './modules/api'
   import { onDestroy, onMount } from 'svelte'
   import { spring } from 'svelte/motion'
   import { tnAnime } from './modules/components'

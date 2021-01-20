@@ -264,6 +264,12 @@ export const User = {
   }
 }
 
+export async function createPage(type: string, name: string, lang: string): Promise<Page.Instance> {
+  if (!User.authed) throw new Error()
+  const ref = await User.client.invoke<Ref>('create_page', type, name, lang)
+  return await User.client.query<Page.Instance>(qe.Data(ref))
+}
+
 /** Smart Page API handler function. */
 export function withPage(path: string, lang: string | Expr = qe.PageLang(q.Var('data'))) {
   const vars = { 'data': qe.Data(qe.Search('pages_by_path', path as Expr)), 'lang': lang }

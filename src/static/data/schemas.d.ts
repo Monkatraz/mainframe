@@ -30,9 +30,9 @@ export interface Comment {
     /** The total number of revisions (edits) for this comment. Starts at 1. */
     revision: number
     /** Date when this comment was created. */
-    dateCreated: Date
+    created: Date
     /** Date when this comment was last edited. */
-    dateLastEdited: Date
+    lastEdited: Date
   }
   /** Markdown content of the comment. Must be rendered in order to view. */
   template: string
@@ -88,6 +88,8 @@ export namespace Page {
   /** Contains the 'social' data of a page, such as its ratings and comments.
    *  Its important that this is in a separate document, so that pages only ever update with revisions. */
   export interface Social {
+    /** FDB reference to the `Page` parent instance for the social data. */
+    page: Ref
     /** Ratings data for the page, sorted into the 'up', 'meh', and 'down' pools of users, indicating how they voted.
      *  It's split up this way to make it easy to count the ratings of each type and do calculations with them.
      *  This of course has the tradeoff of making it more difficult to find how a particular user voted. */

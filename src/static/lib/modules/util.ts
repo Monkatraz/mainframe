@@ -15,7 +15,7 @@ export const ENV = {
     // Serverless functions
     LAMBDA: '/api/'
   },
-  HOMEPAGE: '/home'
+  HOMEPAGE: '/admin/home'
 }
 
 /** Browser / User-Agent info. Contains contextual information like normalized mouse position values. */

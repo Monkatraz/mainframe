@@ -1,4 +1,4 @@
-# This file doesn't actually do anything by itself.
+# This file doesn"t actually do anything by itself.
 # It simply contains all the FQL server-side query calls needed to set up the auth system.
 
 # Index for finding a user by their email address. Used for logging in.
@@ -21,6 +21,87 @@ CreateIndex({
     { field: ["ref"] },
     { field: ["data", "path"] }
   ]
+})
+
+CreateFunction({
+  name: "page_proc_path",
+  body: Query(Lambda(
+    "path",
+    Let({ path_cleaned: LowerCase(Trim(Var("path"))) },
+      If(ContainsStrRegex(Var("path_cleaned"),
+        "^\\w+$"
+      ), Var("path_cleaned"), Abort("400"))
+    )
+  )),
+  role: "server"
+})
+
+CreateFunction({
+  name: "create_page",
+  body: Query(Lambda(
+    ["type", "name", "lang"],
+    Let({
+      type_proc: Call(Function("page_proc_path"), Var("type")),
+      name_proc: Call(Function("page_proc_path"), Var("name")),
+      fullpath: Concat(["/", Var("type_proc"), "/", Var("name_proc")], "")
+      },
+      If(Exists(Match(Index("pages_by_path"), Var("fullpath"))),
+        Abort("409"),
+        Let({
+          user: CurrentIdentity(),
+          time: Now(),
+          page: Select("ref", Create(Collection("pages"), {
+            data: {
+              version: 1,
+              path: Var("fullpath"),
+              authors: [Var("user")],
+              metadata: {
+                type: Var("type_proc"),
+                flags: [],
+                attributes: [],
+                warnings: [],
+                context: "foundation",
+                canons: [],
+                tags: []
+              },
+              history: {
+                revision: 1,
+                created: Var("time"),
+                lastEdited: Var("time"),
+                lastAuthor: Var("user")
+              },
+              locals: ToObject([[Var("lang"), {
+                title: "",
+                subtitle: "",
+                description: "",
+                template: ""
+              }]])
+            }
+          })),
+          social: Select("ref", Create(Collection("page_socials"), {
+            data: {
+              ratings: {
+                up: [],
+                meh: [],
+                down: []
+              },
+              comments: []
+            }
+          }))
+        },
+        Do(
+          Update(Var("page"), { data: {
+            social: Var("social")
+          }}),
+          Update(Var("social"), { data: {
+            page: Var("page")
+          }}),
+          Var("page")
+        ))
+      )
+    )
+  )),
+  role: "server"
 })
 
 # fn: (Ref[]) => Social[] // same order
@@ -46,7 +127,7 @@ CreateFunction({
 })
 
 # FaunaDB function to validate email addresses.
-# Yes, FaunaDB can do this. It's hilarious.
+# Yes, FaunaDB can do this. It"s hilarious.
 # Emails are treated as case insensitive by uppercasing them.
 CreateFunction({
   name: "validate_email",
@@ -65,7 +146,7 @@ CreateFunction({
 # It must only consist of only characters matching the `\S` control character.
 # An exception is that space is allowed in order to allow pass phrases.
 # Redundant spaces on the left or right side of the string are trimmed.
-# This should HOPEFULLY allow people who aren't using English keyboards to use their own alphabet.
+# This should HOPEFULLY allow people who aren"t using English keyboards to use their own alphabet.
 CreateFunction({
   name: "validate_password",
   body: Query(Lambda(
@@ -85,7 +166,7 @@ CreateFunction({
   name: "guest_register",
   body: Query(Lambda(
     ["email", "password"],
-    If(Call(Function("validate_email"), Var("email")), 
+    If(Call(Function("validate_email"), Var("email")),
       If(Call(Function("validate_password"), Var("password")),
         If(Exists(Match(Index("users_by_email"), Var("email"))),
           Abort("This email address has already been used."),
@@ -165,7 +246,7 @@ CreateFunction({
           Update(Select("ref", Var("object")), { ttl: TimeAdd(Now(), 7, "day") }),
           null
         )
-        Select('instance', Var("object"))
+        Select("instance", Var("object"))
       )
     )
   )),
