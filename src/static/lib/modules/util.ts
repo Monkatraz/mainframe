@@ -54,7 +54,7 @@ export function animationFrame(): Promise<number> {
 
 // Credit: https://gist.github.com/beaucharman/e46b8e4d03ef30480d7f4db5a78498ca
 // Personally, I think this is one of the more elegant JS throttle functions.
-/** Returns a 'throttled' variant of the given function. 
+/** Returns a 'throttled' variant of the given function.
  *  This function will only be able to execute every `limitMS` ms.
  *  Use to rate-limit functions for performance.
  *  You can have the first call be immediate by providing the third parameter as `true`. */
@@ -73,6 +73,16 @@ export function throttle<T extends WrappedFn<NoReturnVal>>(fn: T, limitMS: numbe
       next()
     }
     if (!timeout) timeout = setTimeout(next, limitMS) as unknown as number
+  }
+}
+
+// Credit: https://gist.github.com/vincentorback/9649034
+/** Returns a 'debounced' variant of the given function. */
+export function debounce<T extends WrappedFn<NoReturnVal>>(fn: T, wait = 1) {
+  let timeout: any
+  return function (this: any, ...args: Parameters<T>) {
+    clearTimeout(timeout)
+    timeout = setTimeout(() => fn.call(this, ...args), wait)
   }
 }
 
