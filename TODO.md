@@ -2,9 +2,7 @@
 
 ### In Progress
 - [ ] Page creation, and updating
-- [ ] Update the account creation and login forms to use forms correctly
 - [ ] Add some sort of `pref` object that handles localStorage shenanigans automatically
-- [ ] Implement `svelte-i18n` and create a basic `en` language mapping
 - [ ] Drafts stored either with `localStorage` (must be serialized) or in the user document
 
 ### Markdown
@@ -18,8 +16,8 @@
 - [ ] Generic cache library
 - [ ] Some sort of script or system for data-backups
 - [ ] Implement Storybook / Something like it
-
-### Users
+- [ ] Implement `svelte-i18n` and create a basic `en` language mapping
+- [ ] Update the account creation and login forms to use forms correctly
 - [ ] Author draft pages that are linkable
 - [ ] Account deletion
 
@@ -44,9 +42,6 @@
 
 #### Editor
 - Single-pane Markdown cheat sheet
-- Path type restrictions
-	- "scp/scp-3685" is illegal (must be a 4 digit number)
-	- Lock out certain number ranges
 
 #### Page Router
 - Vivaldi like loading bar
