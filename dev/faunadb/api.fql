@@ -1,5 +1,5 @@
-# This file doesn"t actually do anything by itself.
-# It simply contains all the FQL server-side query calls needed to set up the auth system.
+# This file doesn't actually do anything by itself.
+# It simply contains all the FQL server-side query calls needed to set up the FDB database.
 
 # Index for finding a user by their email address. Used for logging in.
 CreateIndex({
