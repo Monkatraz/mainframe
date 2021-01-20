@@ -47,6 +47,7 @@
   }
 
   function updateActiveElements() {
+    if (!container) return
     activeElements.clear()
     for (let ln of activelines) {
       // find matches
@@ -82,6 +83,7 @@
   }
 
   function updateHeightMap() {
+    if (!container) return
     heightmap.clear()
     heightlist = []
     const parentRect = container.getBoundingClientRect()
@@ -96,6 +98,7 @@
   }
 
   const update = createIdleQueued(async () => {
+    if (!container) return
     if (morph) await morphMarkdown(template, container)
     else container.innerHTML = (await renderMarkdown(template)).html
     if (details) {
