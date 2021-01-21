@@ -23,10 +23,11 @@
     fill: colvar('hint')
 
   .thumb
-    transition: d 0.25s, fill 0.15s
+    transition: transform 0.25s, fill 0.15s
     fill: currentColor
-  
+
   .toggled .thumb
+    transform: translateX(45%)
     fill: colvar('white')
 
   .slot
@@ -50,10 +51,7 @@
       d='M24 7a2 2 0 0 0-2-2H2a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h20a2 2 0 0 0 2-2V7z'
     />
     <path fill='currentColor' class='thumb'
-      d={toggled
-        ? 'M19 9a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H15a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4z'
-        : 'M9 9a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4z'
-      }
+      d='M9 9a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4z'
     />
     </svg>
   <span class='slot' {...$$restProps}><slot /></span>
