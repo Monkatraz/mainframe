@@ -136,8 +136,8 @@
 <style lang="stylus">
   @require '_lib'
 
-  $hght = calc(100vh - var(--layout-header-height))
-  $hght2 = calc(100vh - 2rem - var(--layout-header-height))
+  $hght = calc(100vh - var(--layout-header-height-edit))
+  $hght2 = calc(100vh - 2rem - var(--layout-header-height-edit))
   $body-w = minmax(0, var(--layout-body-max-width))
   $edit-w = minmax(50%, 1fr)
 
@@ -241,6 +241,9 @@
     top: 1rem
     right: 1rem
     z-index: 10
+
+    +match-media(thin, below)
+      right: 0
 
   .preview-settings
     position: sticky

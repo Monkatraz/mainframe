@@ -6,9 +6,12 @@
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import { onMount } from 'svelte'
+  import Portal from 'svelte-portal/src/Portal.svelte'
+  import Navbar from './components/navbar/Navbar.svelte'
   import Sidebar from './components/sidebar/Sidebar.svelte'
   import Page from './components/Page.svelte'
   import Spinny from './components/Spinny.svelte'
+import UserPanel from './components/UserPanel.svelte'
 
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
@@ -123,6 +126,13 @@
 
 </style>
 
+<!-- User Panel (large screen, not in navbar) -->
+{#if $matchMedia('small', 'up')}
+  <Portal target='#user-panel'>
+    <UserPanel />
+  </Portal>
+{/if}
+
 {#if $router.path === '/edit'}
   <!-- Editor -->
   <div
@@ -139,7 +149,9 @@
 {:else if !inEdit}
   <div class=container out:fade={{duration: 150}} role=presentation>
 
-    <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation/>
+    <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation>
+      <Navbar />
+    </nav>
     <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>
       <Sidebar />
     </aside>

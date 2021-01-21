@@ -11,6 +11,7 @@ export const q = FaunaDB.query
 // Imports
 import { ENV } from './util'
 import type { Social, Page } from '@schemas'
+import { writable } from 'svelte/store'
 
 // ---------
 //  FAUNADB
@@ -183,6 +184,9 @@ class Client {
   }
 }
 
+/** Store that allows for reactive checking of user authed state. */
+export const authed = writable(false)
+
 type ModeGuest = { authed: false, client: Client }
 type ModeUser = {
   authed: true, client: Client
@@ -213,6 +217,7 @@ export const User = {
       social: await User.client.invoke<Social>('socials_of', res.instance),
       client: new Client(res.secret)
     })
+    authed.set(true)
     // handling remember me
     // current strategy does the following:
     //  - sets the TTL on the token to 1 week instead of 1 day
@@ -245,6 +250,7 @@ export const User = {
         social: await User.client.invoke<Social>('socials_of', instance),
         client: new Client(secret)
       })
+      authed.set(true)
       return true
     } catch {
       return false
@@ -257,6 +263,7 @@ export const User = {
     Object.assign(User,
       { authed: false, client: new Client(ENV.API.FDB_PUBLIC) },
       { id: undefined, token: undefined, social: undefined }) // clear out mem. of old values
+    authed.set(false)
     // clear out auto-login data
     sessionStorage.removeItem('user-secret')
     localStorage.removeItem('user-remember')

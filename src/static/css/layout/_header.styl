@@ -13,6 +13,7 @@
 
   // Centered logo
   +match-media(thin, below)
+    overflow: hidden
     grid-kiss:"+-----+ +--------------+ +-----+",
               "|     | |      v       | |     |",
               "|     | | #header_logo | |     |",
@@ -70,9 +71,6 @@
               "+------------------+ ------ ",
               "| > #logo_slogan < |  1rem  ",
               "+------------------+ ------ ",
-              "+------------------+ ------ ",
-              "|                  | 0.5rem ",
-              "+------------------+ ------ ",
               "|       auto       |        "
 
     #logo_emblem
@@ -89,6 +87,20 @@
   background: none
   color: colvar('text')
   z-index: 90
+
+  +match-media(thin, below)
+    display: none
+
+// Compact logo when in edit
+.in-edit
+  +match-media(thin, below)
+    #header
+      display: block
+      height: var(--layout-header-height-edit)
+    #header_logo
+      display: block
+    #logo_slogan, #logo_emblem
+      display: none
 
 // Header Styling
 :root

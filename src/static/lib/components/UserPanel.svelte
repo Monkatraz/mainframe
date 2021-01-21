@@ -1,35 +1,25 @@
 <script lang='ts'>
-  import { User } from './modules/api'
-  import { tnAnime } from './modules/components'
-  import Icon from './components/Icon.svelte'
-  import Toggle from './components/Toggle.svelte'
-  import Dropdown from './components/Dropdown.svelte'
-  import TextInput from './components/TextInput.svelte'
-  import Button from './components/Button.svelte'
-
-  let authed = User.authed
-  function checkAuth() { authed = User.authed }
+  import { User, authed } from '../modules/api'
+  import { tnAnime } from '../modules/components'
+  import Icon from './Icon.svelte'
+  import Toggle from './Toggle.svelte'
+  import Dropdown from './Dropdown.svelte'
+  import TextInput from './TextInput.svelte'
+  import Button from './Button.svelte'
 
   // -- REGISTER
 
   let registerEmail: HTMLInputElement
   let registerPass: HTMLInputElement
 
-  let registerButtonMSG = 'Register'
-
   async function register() {
     if (!registerEmail || !registerPass) return
     if (registerEmail.validity.valid && registerPass.validity.valid) {
-      registerButtonMSG = 'Working...'
       try {
         await User.guestRegister(registerEmail.value, registerPass.value)
-        registerButtonMSG = 'Registered!'
-      } catch {
-        registerButtonMSG = 'Sorry, failed to register.'
-      } finally {
+      } catch {} finally {
         registerEmail.value = ''
         registerPass.value = ''
-        setTimeout(() => registerButtonMSG = 'Register', 5000)
       }
     }
   }
@@ -40,22 +30,14 @@
   let loginPass: HTMLInputElement
   let rememberMe = false
 
-  let loginButtonMSG = 'Login'
-
   async function login() {
     if (!loginEmail || !loginPass) return
     if (loginEmail.validity.valid && loginPass.validity.valid) {
-      loginButtonMSG = 'Working...'
       try {
         await User.login(loginEmail.value, loginPass.value, rememberMe)
-        loginButtonMSG = 'Logged in!'
-      } catch {
-        loginButtonMSG = 'Sorry, login failed.'
-      } finally {
+      } catch {} finally {
         loginEmail.value = ''
         loginPass.value = ''
-        setTimeout(() => loginButtonMSG = 'Login', 5000)
-        checkAuth()
       }
     }
   }
@@ -66,9 +48,7 @@
     if (!authed) return
     try {
       await User.logout()
-    } finally {
-      checkAuth()
-    }
+    } catch {}
   }
 </script>
 
@@ -94,7 +74,7 @@
 
 </style>
 
-{#if !authed}
+{#if !$authed}
   <div class='guest' role='presentation'
     in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
   >
@@ -115,7 +95,7 @@
           info='Between 6 and 32 characters.'
         />
       </form>
-      <div style='margin-top: 0.5rem;'><Button on:click={register} wide primary>{registerButtonMSG}</Button></div>
+      <div style='margin-top: 0.5rem;'><Button on:click={register} wide primary>Register</Button></div>
     </Dropdown>
 
     <span class='or'>or</span>
@@ -136,7 +116,7 @@
         />
       </form>
       <Toggle bind:toggled={rememberMe}>Remember Me</Toggle>
-      <div class='submit'><Button on:click={login} wide primary>{loginButtonMSG}</Button></div>
+      <div class='submit'><Button on:click={login} wide primary>Login</Button></div>
     </Dropdown>
   </div>
 {:else}
