@@ -38,7 +38,6 @@
 - Notifications for users (new replies to their comments etc.)
 - Table of contents to left of article when room is available
 - Signify how the user voted on the article when they comment
-- Some sort of "alert" component that pops up and then fades programmatically
 
 #### Editor
 - Single-pane Markdown cheat sheet
@@ -109,3 +108,4 @@
 - [x] Create data-files in `yaml` and compile with Snowpack to `JSON`
 - [x] Add better page history schema
 - [x] Markdown rendering component (with morphing support/flag)
+- [x] Toasts
