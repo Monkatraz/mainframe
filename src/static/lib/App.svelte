@@ -15,7 +15,7 @@
 
   // kind of hacky, but we don't want esbuild to preload the entire editor
   // so we use a dynamic import string
-  const EditorURL = './Editor.svelte.js'
+  const EditorURL = './components/editor/Editor.svelte.js'
 
   const sideBarReveal = {
     translateX: ['-100%', '0%'],
@@ -113,6 +113,7 @@
 
     +match-media(thin, below)
       position: absolute
+      height: 100%
       top: 0
       left: -100%
 

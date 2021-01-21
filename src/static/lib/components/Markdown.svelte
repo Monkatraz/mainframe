@@ -104,13 +104,13 @@
     if (details) {
       await tick()
       updateHeightMap()
-      if (activelines.size) updateActiveElements()
+      updateActiveElements()
     }
     dispatch('postrender')
   })
 
   $: if (template) update()
-  $: if (details && activelines.size) updateActiveElements()
+  $: if (details && activelines) updateActiveElements()
 
 </script>
 

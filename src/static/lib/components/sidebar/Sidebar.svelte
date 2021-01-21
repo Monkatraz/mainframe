@@ -15,7 +15,6 @@
     hide-scrollbars()
     font-set('display')
 
-
   .sb-buttons
     display: flex
     flex-wrap: wrap

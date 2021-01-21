@@ -67,7 +67,7 @@ export const confinementTheme = EditorView.theme({
 
   '$$focused $cursor': {
     borderLeftColor: accent,
-    transition: 'left 0.1s ease-out, top 0.1s ease-out'
+    transition: 'left 0.05s ease-out, top 0.05s ease-out'
   },
   '$$focused $selectionBackground': {
     backgroundColor: selection

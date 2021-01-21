@@ -1,166 +1,74 @@
-<script context="module">
-import { EditorState, tagExtension } from "@codemirror/state"
-import {
-  EditorView, keymap, ViewPlugin, ViewUpdate,
-  highlightSpecialChars, highlightActiveLine, drawSelection
-} from '@codemirror/view'
-import { history, historyKeymap } from '@codemirror/history'
-import { foldGutter, foldKeymap } from '@codemirror/fold'
-import { indentOnInput } from '@codemirror/language'
-import { lineNumbers } from '@codemirror/gutter'
-import { defaultKeymap } from '@codemirror/commands'
-import { bracketMatching } from '@codemirror/matchbrackets'
-import { closeBrackets, closeBracketsKeymap } from '@codemirror/closebrackets'
-import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
-import { autocompletion, completionKeymap } from '@codemirror/autocomplete'
-import { commentKeymap } from '@codemirror/comment'
-import { rectangularSelection } from '@codemirror/rectangular-selection'
-// Local Extensions
-import { redo } from '@codemirror/history'
-import { indentMore, indentLess, copyLineDown } from '@codemirror/commands'
-import { confinement } from './editor/editor-config'
-import monarchMarkdown from './editor/monarch-markdown'
-
-function getExtensions() {
-  return [
-    lineNumbers(),
-    highlightSpecialChars(),
-    history(),
-    foldGutter(),
-    drawSelection(),
-    EditorState.allowMultipleSelections.of(true),
-    indentOnInput(),
-    bracketMatching(),
-    closeBrackets(),
-    highlightSelectionMatches(),
-    autocompletion(),
-    rectangularSelection(),
-    highlightActiveLine(),
-    keymap.of([
-      ...closeBracketsKeymap,
-      ...defaultKeymap,
-      ...searchKeymap,
-      ...historyKeymap,
-      ...foldKeymap,
-      ...commentKeymap,
-      ...completionKeymap,
-      ...[
-        { key: 'Tab', run: indentMore, preventDefault: true },
-        { key: 'Shift-Tab', run: indentLess, preventDefault: true },
-        { key: 'Mod-Shift-z', run: redo, preventDefault: true },
-        { key: 'Mod-d', run: copyLineDown, preventDefault: true }
-      ]
-    ]),
-    tagExtension('spellcheck', EditorView.contentAttributes.of({ spellcheck: 'false' })),
-    monarchMarkdown.load(),
-    confinement
-  ]
-}
-</script>
-
 <script lang="ts">
   // Library Imports
-  import * as API from './modules/api'
-  import { onDestroy, onMount } from 'svelte'
+  import * as API from '../../modules/api'
+  import { EditorCore } from './editor-core'
+  import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
-  import { tnAnime } from './modules/components'
-  import { createAnimQueued, throttle } from './modules/util'
+  import { tnAnime } from '../../modules/components'
+  import { createAnimQueued, doMatchMedia, throttle } from '../../modules/util'
   // Components
-  import Markdown from './components/Markdown.svelte'
-  import IconButton from './components/IconButton.svelte'
-  import Toggle from './components/Toggle.svelte'
-  import DetailsMenu from './components/DetailsMenu.svelte'
+  import Markdown from '../Markdown.svelte'
+  import IconButton from '../IconButton.svelte'
+  import Toggle from '../Toggle.svelte'
+  import DetailsMenu from '../DetailsMenu.svelte'
 
-  // TODO: add misc. info on topbar like word count and the like
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?
   // TODO: mobile mode
   // TODO: swipe to show preview on mobile
-  // TODO: split the editor+preview into its own component, API is handled by its parent
+
+  let mounted = false
 
   // -- CONTAINER
 
-  let containerClass: 'show-editor' | 'show-both' | 'show-preview' = 'show-both'
-  let editorDarkMode = true
-  let editorSpellCheck = false
-  let editorLivePreview = true
-
-  let previewDarkMode = false
-  let previewActiveLine = true
-
   $: containerClass = editorLivePreview ? 'show-both' : 'show-editor'
-  $: if (preview) updateScroll()
-  $: if (!previewActiveLine) activelines.clear()
-
-  // handle spellcheck
-  $: if(editorView) editorView.dispatch({ reconfigure: {
-    'spellcheck': EditorView.contentAttributes.of({ spellcheck: String(editorSpellCheck) })
-  }})
-
-  // Markdown
-  let template = ''
-  let heightmap: Map<number, number>
-  let heightlist: number[]
-  let activelines: Set<number> = new Set()
 
   // -- EDITOR
 
-  let editor: HTMLElement
-  let editorView: EditorView
+  let editorContainer: HTMLElement
+  const Editor = new EditorCore()
+  const EditorValue = Editor.value
+  const EditorActiveLines = Editor.activeLines
 
   onMount(async () => {
-
-    const updateHandler = ViewPlugin.define(() => {
-      return {
-        update(update: ViewUpdate) {
-          // update html on change
-          if (update.docChanged) { template = update.state.doc.toString() }
-          // get active lines
-          if (update.selectionSet || update.docChanged) {
-            const lines: Set<number> = new Set()
-            for (const r of update.state.selection.ranges) {
-              const lnStart = update.state.doc.lineAt(r.from).number
-              const lnEnd = update.state.doc.lineAt(r.to).number
-              if (lnStart === lnEnd) lines.add(lnStart - 1)
-              else {
-                const diff = lnEnd - lnStart
-                for (let i = 0; i <= diff; i++)
-                  lines.add((lnStart + i) - 1)
-              }
-            }
-            activelines = lines
-          }
-        }
-      }
-    })
-
-    const mergedExtensions = [
-      EditorView.domEventHandlers({
-        'wheel': () => { scrollingWith = 'editor' },
-        'scroll': () => { scrollFromEditor() }
-      }),
-      updateHandler,
-      getExtensions()
-    ]
-
-    editorView = new EditorView({
-      state: EditorState.create({
-        doc: await fetch('/static/misc/md-test.md').then(res => res.text()),
-        extensions: mergedExtensions
-      }),
-      parent: editor
-    })
-
-    template = editorView.state.doc.toString()
-    updateScroll()
-
+    Editor.init(editorContainer, await fetch('/static/misc/md-test.md').then(res => res.text()))
+    mounted = true
   })
 
-  onDestroy(() => { editorView.destroy() })
+  onDestroy(() => Editor.destroy())
 
-  // -- PREVIEW <-> EDITOR
+  // Configuration
+  let editorDarkMode = true
+  let editorGutters = true
+  let editorSpellCheck = false
+  let editorLivePreview = true
+
+  $: if (mounted) Editor.spellcheck = editorSpellCheck
+  $: if (mounted) Editor.lineNumbers = editorGutters
+
+  // defaults on mobile
+  if (doMatchMedia('thin', 'below')) {
+    editorGutters = false
+    editorLivePreview = false
+  }
+
+  // Context
+
+  setContext('editor', Editor)
+
+  // -- PREVIEW
 
   let preview: HTMLDivElement
+
+  // Markdown Component
+  let heightmap: Map<number, number>
+  let heightlist: number[]
+
+  // Configuration
+  let previewDarkMode = false
+  let previewActiveLine = true
+
+  // -- PREVIEW <-> EDITOR
 
   // Scroll Sync.
 
@@ -176,21 +84,16 @@ function getExtensions() {
     scrollFromPreview()
   }, 100)
 
-  /** Returns the scrollTop height of the specified line. */
-  function heightAtLine (line: number) {
-    return editorView.visualLineAt(editorView.state.doc.line(line).from).top
-  }
-
   /** Updates the preview scroll position if the scroll sync. is currently editor based.
    *  Should be called whenever a scrolling event is detected from the editor. */
   const scrollFromEditor = createAnimQueued(() => {
-    if (scrollingWith === 'preview' || !preview || !editorView) return
-    const scrollTop = editorView.scrollDOM.scrollTop
+    if (scrollingWith === 'preview' || !mounted) return
+    const scrollTop = Editor.view.scrollDOM.scrollTop
     editorScrollSpring.set(scrollTop)
     // get top most visible line
-    const domRect = editor.getBoundingClientRect()
-    const pos = editorView.posAtCoords({ x: domRect.x, y: domRect.y })
-    let line = editorView.state.doc.lineAt(pos ?? 1).number - 1
+    const domRect = editorContainer.getBoundingClientRect()
+    const pos = Editor.view.posAtCoords({ x: domRect.x, y: domRect.y })
+    let line = Editor.doc.lineAt(pos ?? 1).number - 1
     // find our line height
     let lineHeight = 0
     let curLine = line
@@ -204,7 +107,7 @@ function getExtensions() {
     // set preview scroll
     if (lineHeight) {
       // fudge value to prevent the preview from getting "sticky"
-      const diff = (scrollTop - heightAtLine(curLine + 1)) * 0.75
+      const diff = (scrollTop - Editor.heightAtLine(curLine + 1)) * 0.75
       previewScrollSpring.set(lineHeight + diff)
     }
   })
@@ -212,7 +115,7 @@ function getExtensions() {
   /** Updates the editor scroll position if the scroll sync. is currently preview based.
    *  Should be called whenever a scrolling event is detected from the preview. */
   const scrollFromPreview = createAnimQueued(() => {
-    if (scrollingWith === 'editor' || !preview || !editorView) return
+    if (scrollingWith === 'editor' || !mounted) return
     const scrollTop = preview.scrollTop
     previewScrollSpring.set(scrollTop)
     // filter for the closest line height
@@ -220,13 +123,13 @@ function getExtensions() {
     if (line !== -1) {
       // fudge to prevent the editor from getting sticky
       const diff = (scrollTop - heightlist[line]) * 0.75
-      editorScrollSpring.set(heightAtLine(line) + diff)
+      editorScrollSpring.set(Editor.heightAtLine(line) + diff)
     }
   })
 
   // updates scroll sync. positions
-  $: if (preview && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
-  $: if (editorView && scrollingWith === 'preview') editorView.scrollDOM.scrollTop = $editorScrollSpring
+  $: if (mounted && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
+  $: if (mounted && scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
 
 </script>
 
@@ -391,6 +294,8 @@ function getExtensions() {
 
     <!-- Left | Editor Pane -->
     <div class=editor-pane
+      on:scroll={scrollFromEditor}
+      on:touchstart={() => scrollingWith = 'editor'} on:wheel={() => scrollingWith = 'editor'}
       in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
@@ -398,17 +303,18 @@ function getExtensions() {
         <DetailsMenu i='fluent:settings-28-filled' label='Editor Settings'>
           <div class='settings-menu'>
             <Toggle bind:toggled={editorDarkMode}>Dark Mode</Toggle>
+            <Toggle bind:toggled={editorGutters}>Gutters</Toggle>
             <Toggle bind:toggled={editorSpellCheck}>Spellcheck</Toggle>
             <Toggle bind:toggled={editorLivePreview}>Live Preview</Toggle>
           </div>
         </DetailsMenu>
       </div>
-      <div class=editor bind:this={editor}/>
+      <div class=editor bind:this={editorContainer}/>
     </div>
 
     <!-- Right | Preview Pane -->
     <div class='preview {previewDarkMode ? 'dark' : 'light'} codetheme-dark' bind:this={preview}
-      on:scroll={scrollFromPreview} 
+      on:scroll={scrollFromPreview}
       on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
       in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 350, easing: 'easeOutQuint' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
@@ -422,7 +328,8 @@ function getExtensions() {
             </div>
           </DetailsMenu>
         </div>
-        <Markdown {template} {activelines} bind:heightmap bind:heightlist details morph />
+        <Markdown details morph bind:heightmap bind:heightlist
+          template={$EditorValue} activelines={previewActiveLine ? $EditorActiveLines : new Set()} />
       {/if}
     </div>
 
