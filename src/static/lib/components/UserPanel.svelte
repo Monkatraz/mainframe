@@ -8,6 +8,8 @@
   import TextInput from './TextInput.svelte'
   import Button from './Button.svelte'
 
+  let busy = false
+
   // -- REGISTER
 
   let registerEmail: HTMLInputElement
@@ -16,12 +18,16 @@
   async function register() {
     if (!registerEmail || !registerPass) return
     if (registerEmail.validity.valid && registerPass.validity.valid) {
+      busy = true
       try {
         await User.guestRegister(registerEmail.value, registerPass.value)
         toast('success', 'Successfully registered! You may now login with your chosen email and password.')
+        registerEmail.value = ''
+        registerPass.value = ''
       } catch {
         toast('danger', 'Failed to register.')
       }
+      busy = false
     }
   }
 
@@ -34,12 +40,14 @@
   async function login() {
     if (!loginEmail || !loginPass) return
     if (loginEmail.validity.valid && loginPass.validity.valid) {
+      busy = true
       try {
         await User.login(loginEmail.value, loginPass.value, rememberMe)
         toast('success', 'Logged in!')
       } catch {
         toast('danger', 'Failed to login. Check your email and password.')
       }
+      busy = false
     }
   }
 
@@ -97,17 +105,19 @@
       <form>
         <TextInput bind:input={registerEmail} on:enter={() => { registerPass.focus() }}
           label='Email' type='email' placeholder='Enter email address...' required
+          disabled={busy}
           autocomplete='username'
           info='Your email is private.'
         />
         <TextInput bind:input={registerPass} on:enter={() => { register() }}
           label='Password' type='password' placeholder='Enter password...' required
+          disabled={busy}
           autocomplete='new-password'
           minLength='6' maxLength='32'
           info='Between 6 and 32 characters.'
         />
       </form>
-      <div style='margin-top: 0.5rem;'><Button on:click={register} wide primary>Register</Button></div>
+      <div style='margin-top: 0.5rem;'><Button on:click={register} disabled={busy} wide primary>Register</Button></div>
     </Dropdown>
 
     {#if $matchMedia('small', 'up')}<span class='or'>or</span>{/if}
@@ -123,16 +133,18 @@
       <form>
         <TextInput bind:input={loginEmail} on:enter={() => { loginPass.focus() }}
           label='Email' type='email' placeholder='Enter email address...' required
+          disabled={busy}
           autocomplete='username'
         />
         <TextInput bind:input={loginPass} on:enter={() => { login() }}
           label='Password' type='password' placeholder='Enter password...' required
+          disabled={busy}
           autocomplete='current-password'
           minLength='6' maxLength='32'
         />
       </form>
       <Toggle bind:toggled={rememberMe}>Remember Me</Toggle>
-      <div class='submit'><Button on:click={login} wide primary>Login</Button></div>
+      <div class='submit'><Button on:click={login} disabled={busy} wide primary>Login</Button></div>
     </Dropdown>
   </div>
 {:else}

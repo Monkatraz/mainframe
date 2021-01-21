@@ -1,6 +1,7 @@
 <script lang='ts'>
   export let wide = false
   export let primary = false
+  export let disabled = false
 </script>
 
 <style lang='stylus'>
@@ -27,6 +28,11 @@
       background: colvar('border', darken 2.5%)
       color: colvar('hint')
 
+
+    &.disabled
+      filter: grayscale(50%)
+      color: colvar('lightgray') !important
+
     &.wide
       width: 100%
 
@@ -44,4 +50,4 @@
 
 </style>
 
-<button on:click class:wide class:primary type='button'><slot /></button>
+<button on:click class:wide class:primary class:disabled {disabled} type='button'><slot /></button>

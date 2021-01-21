@@ -53,6 +53,9 @@
       color: colvar('text-dim')
       opacity: 0.5
 
+    &:disabled
+      background: colvar('border', darken 2.5%)
+
     &:focus
       outline: none
       border-color: colvar('hint', opacity 0.5)
@@ -75,7 +78,7 @@
     pointer-events: none
     user-select: none
 
-  input:not(:placeholder-shown) + .text-icon
+  input:not(:placeholder-shown) + .text-icon, input:disabled + .text-icon
     opacity: 0
 
 </style>
