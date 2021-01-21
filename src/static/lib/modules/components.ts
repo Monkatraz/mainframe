@@ -19,14 +19,16 @@ interface Toast {
   remove: () => void
 }
 
-export const toasts = writable<Map<number, Toast>>(new Map)
+/** A stored `Set` containing the currently visible toasts. */
+export const toasts = writable<Set<Toast>>(new Set())
 
+/** Displays a 'toast' notification to the user. Provide a `time` of `0` to prevent the notification
+ *  from automatically closing. */
 export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: string, time = 5000) {
-  // generate some suitably random ID for the toast
-  // you could use the message string instead - but using a random number lets you repeat toasts
   const id = 100 * Math.random()
-  const remove = () => { toasts.update(cur => { cur.delete(id); return cur }) }
-  toasts.update(cur => cur.set(id, { id, type, message, remove }))
+  const remove = () => { toasts.update(cur => { cur.delete(toastData); return cur }) }
+  const toastData = { id, type, message, remove }
+  toasts.update(cur => cur.add(toastData))
   // delete message after timeout
   if (time) setTimeout(remove, time)
 }

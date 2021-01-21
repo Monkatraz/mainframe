@@ -3,7 +3,7 @@
   import Icon from './Icon.svelte'
   import IconButton from './IconButton.svelte'
 
-  $: listToasts = Array.from($toasts, (val) => val[1])
+  $: listToasts = Array.from($toasts)
 
   const icons = {
     success: 'fluent:checkmark-12-filled',
