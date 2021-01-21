@@ -1,6 +1,7 @@
 <script lang='ts'>
   import { User, authed } from '../modules/api'
   import { tnAnime } from '../modules/components'
+  import { matchMedia } from '../modules/util'
   import Icon from './Icon.svelte'
   import Toggle from './Toggle.svelte'
   import Dropdown from './Dropdown.svelte'
@@ -65,6 +66,10 @@
     &.open
       color: colvar('hint')
 
+    +match-media(small, below)
+      margin-left: 0.5rem
+      font-weight: bolder
+
   .user .log-btn
     color: colvar('text-subtle')
 
@@ -80,7 +85,11 @@
   >
     <Dropdown>
       <span slot='label' class='log-btn' let:open class:open>
-        <Icon i='fluent:add-12-filled' size='1.5rem'/> Create Account
+        {#if $matchMedia('small', 'below')}
+          REGISTER
+        {:else}
+          <Icon i='fluent:add-12-filled' size='1.5rem'/> Create Account
+        {/if}
       </span>
       <form>
         <TextInput bind:input={registerEmail} on:enter={() => { registerPass.focus() }}
@@ -98,11 +107,15 @@
       <div style='margin-top: 0.5rem;'><Button on:click={register} wide primary>Register</Button></div>
     </Dropdown>
 
-    <span class='or'>or</span>
+    {#if $matchMedia('small', 'up')}<span class='or'>or</span>{/if}
 
     <Dropdown>
       <span slot='label' class='log-btn' let:open class:open>
+        {#if $matchMedia('small', 'below')}
+          LOGIN
+        {:else}
         <Icon i='ion:log-in-outline' size='1.5rem'/> Login
+        {/if}
       </span>
       <form>
         <TextInput bind:input={loginEmail} on:enter={() => { loginPass.focus() }}

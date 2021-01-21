@@ -76,7 +76,10 @@
 
   // -- PREVIEW <-> EDITOR
 
+
   // Scroll Sync.
+
+  function canScrollSync() { return mounted && preview && Editor.view && heightmap && heightlist }
 
   /** Denotes whether the editor or the preview is the element the user is scrolling with. */
   let scrollingWith: 'editor' | 'preview' = 'editor'
@@ -93,7 +96,7 @@
   /** Updates the preview scroll position if the scroll sync. is currently editor based.
    *  Should be called whenever a scrolling event is detected from the editor. */
   const scrollFromEditor = createAnimQueued(() => {
-    if (scrollingWith === 'preview' || !mounted) return
+    if (scrollingWith === 'preview' || !canScrollSync()) return
     const scrollTop = Editor.view.scrollDOM.scrollTop
     editorScrollSpring.set(scrollTop)
     // get top most visible line
@@ -121,7 +124,7 @@
   /** Updates the editor scroll position if the scroll sync. is currently preview based.
    *  Should be called whenever a scrolling event is detected from the preview. */
   const scrollFromPreview = createAnimQueued(() => {
-    if (scrollingWith === 'editor' || !mounted) return
+    if (scrollingWith === 'editor' || !canScrollSync()) return
     const scrollTop = preview.scrollTop
     previewScrollSpring.set(scrollTop)
     // filter for the closest line height

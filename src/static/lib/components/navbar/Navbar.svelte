@@ -13,7 +13,8 @@
     flex-wrap: nowrap
     height: 100%
     width: 100%
-    padding: 0 0.25rem
+    padding-left: 0.25rem
+    padding-right: 0.5rem
 
   .spacer
     flex-grow: 1
