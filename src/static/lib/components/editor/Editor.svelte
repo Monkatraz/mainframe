@@ -1,11 +1,11 @@
 <script lang="ts">
   // Library Imports
-  import * as API from '../../modules/api'
   import { EditorCore } from './editor-core'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
   import { tnAnime } from '../../modules/components'
   import { createAnimQueued, doMatchMedia, throttle } from '../../modules/util'
+  import { EditorView } from '@codemirror/view'
   // Components
   import Markdown from '../Markdown.svelte'
   import IconButton from '../IconButton.svelte'
@@ -14,7 +14,6 @@
 
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?
-  // TODO: mobile mode
   // TODO: swipe to show preview on mobile
 
   let mounted = false
@@ -31,7 +30,14 @@
   const EditorActiveLines = Editor.activeLines
 
   onMount(async () => {
-    Editor.init(editorContainer, await fetch('/static/misc/md-test.md').then(res => res.text()))
+    Editor.init(
+      editorContainer,
+      await fetch('/static/misc/md-test.md').then(res => res.text()),
+      [EditorView.domEventHandlers({
+        'wheel': () => { scrollingWith = 'editor' },
+        'scroll': () => { scrollFromEditor() }
+      })]
+    )
     mounted = true
   })
 
@@ -285,7 +291,7 @@
 
     <!-- Top | Settings Bar -->
     <div class=topbar
-      in:tnAnime={{ translateY: ['-150%', '0'], duration: 600, delay: 400, easing: 'easeOutExpo' }}
+      in:tnAnime={{ translateY: ['-150%', '0'], duration: 400, delay: 400, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <div class=topbar-section>
