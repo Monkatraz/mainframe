@@ -42,7 +42,7 @@
     border: solid 0.125rem colvar('border')
     border-radius: 0.5rem
     margin: 0.5rem 0
-    shadow-elevation(6)
+    shadow-elevation(8)
 
     +match-media(thin, below)
       width: 90%

@@ -1,9 +1,13 @@
 <script lang='ts'>
-  import { onMount } from 'svelte';
+  import { onMount } from 'svelte'
+  import Card from './Card.svelte'
 
   export let hover = false
   export let open = false
-  export let width = 'auto'
+  export let title = ''
+  export let subtitle = ''
+  export let dark = false
+  export let light = false
 
   let details: HTMLElement
   let summary: HTMLElement
@@ -50,6 +54,7 @@
 
   summary
     reset-styling(false)
+    display: block
     list-style: none
     user-select: none
     cursor: pointer
@@ -63,15 +68,9 @@
     position: absolute
     top: 100%
     right: 0
-    padding: 0.5rem 0.5rem
-    background: colvar('background')
-    border: solid 0.1rem colvar('border')
-    border-radius: 0.5rem
-    shadow-elevation(2, 0.85)
 
-  details[open]
-    .menu
-      animation: reveal 0.125s 1 0s backwards ease-out
+  details[open] .menu
+    animation: reveal 0.125s 1 0s backwards ease-out
 
 </style>
 
@@ -79,5 +78,7 @@
 
 <details bind:this={details} {...$$restProps}>
   <summary><slot name='label' {open} /></summary>
-  <div style='width: {width};' class=menu><slot {open} /></div>
+  <div class=menu>
+    <Card {title} {subtitle} {dark} {light}><slot {open} /></Card>
+  </div>
 </details>

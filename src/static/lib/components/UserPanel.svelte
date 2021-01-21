@@ -94,7 +94,7 @@
   <div class='guest' role='presentation'
     in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
   >
-    <Dropdown>
+    <Dropdown title='Register'>
       <span slot='label' class='log-btn' let:open class:open>
         {#if $matchMedia('small', 'below')}
           REGISTER
@@ -122,7 +122,7 @@
 
     {#if $matchMedia('small', 'up')}<span class='or'>or</span>{/if}
 
-    <Dropdown>
+    <Dropdown title='Login'>
       <span slot='label' class='log-btn' let:open class:open>
         {#if $matchMedia('small', 'below')}
           LOGIN
