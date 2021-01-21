@@ -4,12 +4,8 @@
   import { renderMarkdown } from '../modules/markdown'
   import { fade } from 'svelte/transition'
   import Spinny from './Spinny.svelte'
-  import IntersectionPoint from './IntersectionPoint.svelte'
-  import ActionsPanel from './ActionsPanel.svelte'
 
   export let loading: Promise<string>
-
-  let hideActionsPanel = true
 
   const pageReveal = {
     opacity: {
@@ -61,12 +57,6 @@
     <div class=rhythm role=presentation in:tnAnime={pageReveal}>
       {@html html}
     </div>
-
-    <IntersectionPoint
-      onEnter={() => hideActionsPanel = true}
-      onExit={() => hideActionsPanel = false}
-      opts={{rootMargin: '400px'}}/>
-    <ActionsPanel bind:hidden={hideActionsPanel}/>
 
   <!-- Page failed to load -->
   {:catch error}
