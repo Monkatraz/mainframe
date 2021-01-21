@@ -18,10 +18,7 @@
     if (registerEmail.validity.valid && registerPass.validity.valid) {
       try {
         await User.guestRegister(registerEmail.value, registerPass.value)
-      } catch {} finally {
-        registerEmail.value = ''
-        registerPass.value = ''
-      }
+      } catch {}
     }
   }
 
@@ -36,10 +33,7 @@
     if (loginEmail.validity.valid && loginPass.validity.valid) {
       try {
         await User.login(loginEmail.value, loginPass.value, rememberMe)
-      } catch {} finally {
-        loginEmail.value = ''
-        loginPass.value = ''
-      }
+      } catch {}
     }
   }
 
