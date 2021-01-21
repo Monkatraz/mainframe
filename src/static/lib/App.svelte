@@ -13,9 +13,6 @@
   import UserPanel from './components/UserPanel.svelte'
   import Toasts from './components/Toasts.svelte'
 
-  // TODO: make a separate 404 page so that its indexed correctly
-  // TODO: set page metadata
-
   // kind of hacky, but we don't want esbuild to preload the entire editor
   // so we use a dynamic import string
   const EditorURL = './components/editor/Editor.svelte.js'

@@ -1,9 +1,8 @@
 @require '_lib'
 
-// TODO: Blockquote, li, ul, ol
+// TODO: Blockquote
 // ? style <i> tags differently from <em>
 // ? style <b> tags differently from <strong>
-// TODO: add <u> tag (error tag)
 
 $text-tags = 'a, p, span, small, h1, h2, h3, h4, h5, h6'
 
@@ -141,7 +140,6 @@ span.critic-metadata
   color: colvar('critic-comment')
   transition: background 0.05s, padding 0.1s, color 0.1s, transform 0.05s, font-size 0.05s
 
-  // TODO: make work on active for mobile
   +on-hover()
     background: colvar('critic-comment')
     color: white

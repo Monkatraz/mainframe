@@ -20,6 +20,9 @@
 - [ ] Update the account creation and login forms to use forms correctly
 - [ ] Author draft pages that are linkable
 - [ ] Account deletion
+- [ ] Make critic comments a bit smarter somehow, they don't work very well on mobile
+- [ ] Separate 404 page so that indexing works correctly
+- [ ] Set page metadata in the `<head>` when loading pages
 
 ### Components
 - [ ] Licensing Widget

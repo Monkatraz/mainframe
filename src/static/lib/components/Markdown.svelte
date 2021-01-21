@@ -6,8 +6,6 @@
 
   const dispatch = createEventDispatcher()
 
-  // TODO: inline mode
-
   export let template = ''
   export let morph = false
   export let details = false
