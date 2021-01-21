@@ -128,8 +128,8 @@
   })
 
   // updates scroll sync. positions
-  $: if (mounted && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
-  $: if (mounted && scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
+  $: if (preview && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
+  $: if (Editor.view && scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
 
 </script>
 
