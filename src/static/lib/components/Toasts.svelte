@@ -87,11 +87,11 @@
 
 </style>
 
-<ul class='toasts'>
+<ul class='toasts' aria-live='polite' aria-relevant='additions'>
   {#each listToasts as {id, type, message, remove} (id)}
     <li class='toast dark {type}'
       in:tnAnime={{ translateX: ['150%', '0'] }}
-      out:tnAnime={{ translateX: '150%', duration: 500, easing: 'easeInExpo' }}
+      out:tnAnime={{ translateX: '150%', duration: 400, easing: 'easeInQuint' }}
     >
       <span class='toast_type'><Icon i={icons[type]} size='100%' /></span>
       {message}
