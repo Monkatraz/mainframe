@@ -1,5 +1,5 @@
 /**
- * @file AnimeJS wrapper for Svelte.
+ * @file Library used by Svelte components.
  * @author Monkatraz
  */
 
@@ -10,6 +10,26 @@ import { roundArrow as TippyRoundArrow } from 'tippy.js'
 // Anime
 import anime, { AnimeParams } from 'animejs'
 import { animationFrame } from './util'
+import { writable } from 'svelte/store'
+
+interface Toast {
+  id: number
+  type: 'success' | 'danger' | 'warning' | 'info'
+  message: string
+  remove: () => void
+}
+
+export const toasts = writable<Map<number, Toast>>(new Map)
+
+export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: string, time = 5000) {
+  // generate some suitably random ID for the toast
+  // you could use the message string instead - but using a random number lets you repeat toasts
+  const id = 100 * Math.random()
+  const remove = () => { toasts.update(cur => { cur.delete(id); return cur }) }
+  toasts.update(cur => cur.set(id, { id, type, message, remove }))
+  // delete message after timeout
+  if (time) setTimeout(remove, time)
+}
 
 const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
   ignoreAttributes: true,

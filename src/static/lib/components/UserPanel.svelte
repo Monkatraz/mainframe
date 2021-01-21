@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { User, authed } from '../modules/api'
-  import { tnAnime } from '../modules/components'
+  import { tnAnime, toast } from '../modules/components'
   import { matchMedia } from '../modules/util'
   import Icon from './Icon.svelte'
   import Toggle from './Toggle.svelte'
@@ -18,7 +18,10 @@
     if (registerEmail.validity.valid && registerPass.validity.valid) {
       try {
         await User.guestRegister(registerEmail.value, registerPass.value)
-      } catch {}
+        toast('success', 'Successfully registered! You may now login with your chosen email and password.')
+      } catch {
+        toast('danger', 'Failed to register.')
+      }
     }
   }
 
@@ -33,7 +36,10 @@
     if (loginEmail.validity.valid && loginPass.validity.valid) {
       try {
         await User.login(loginEmail.value, loginPass.value, rememberMe)
-      } catch {}
+        toast('success', 'Logged in!')
+      } catch {
+        toast('danger', 'Failed to login. Check your email and password.')
+      }
     }
   }
 
@@ -43,7 +49,10 @@
     if (!authed) return
     try {
       await User.logout()
-    } catch {}
+      toast('info', 'Logged out.')
+    } catch {
+      toast('danger', 'Failed to logout - try again in a moment.')
+    }
   }
 </script>
 

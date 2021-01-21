@@ -11,7 +11,8 @@
   import Sidebar from './components/sidebar/Sidebar.svelte'
   import Page from './components/Page.svelte'
   import Spinny from './components/Spinny.svelte'
-import UserPanel from './components/UserPanel.svelte'
+  import UserPanel from './components/UserPanel.svelte'
+  import Toasts from './components/Toasts.svelte'
 
   // TODO: make a separate 404 page so that its indexed correctly
   // TODO: set page metadata
@@ -132,6 +133,12 @@ import UserPanel from './components/UserPanel.svelte'
     <UserPanel />
   </Portal>
 {/if}
+
+<!-- Toasts -->
+<Portal target='#toasts'>
+  <Toasts />
+</Portal>
+
 
 {#if $router.path === '/edit'}
   <!-- Editor -->

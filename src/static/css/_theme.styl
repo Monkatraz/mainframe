@@ -17,9 +17,9 @@
   colvar-set('hint', rgb(50, 150, 255))
 
   // Contextual Colors
-  colvar-set('success', rgb(50, 220, 65))
+  colvar-set('success', rgb(30, 180, 65))
   colvar-set('danger',  rgb(180, 45, 10))
-  colvar-set('warning', rgb(220, 215, 40))
+  colvar-set('warning', rgb(240, 125, 0))
   colvar-set('info',    rgb(20, 125, 205))
 
   // Misc Colors
@@ -157,12 +157,6 @@
 
   --layout-footer-height: 2rem
 
-  --actions-panel-height: 5rem
-  --actions-panel-border-height: 0.5rem
-  --actions-panel-button-height: 2rem
-  --actions-panel-hover-shift: -0.5rem
-  --actions-panel-active-shift: -0.75rem
-
   // Layout variables for smaller devices
   +match-media(thin, below)
     --layout-navbar-height: 3rem
@@ -174,8 +168,6 @@
     --layout-header-height-edit: 3rem
     --layout-top-max-width: 60rem
 
-    --actions-panel-border-height: 1rem
-
   // Variables that probably shouldn't be edited
 
   --layout-header-height-scalefactor: calc(var(--layout-header-height) / 8)
@@ -184,8 +176,6 @@
   --layout-body-centering-factor: calc((50vw - (var(--layout-body-max-width) / 2)) - var(--layout-sidebar-width))
   // Total height of the header + navbar
   --layout-total-header-height: calc(var(--layout-header-height) + var(--layout-navbar-height))
-
-  --actions-panel-total-height: calc(var(--actions-panel-border-height) + var(--actions-panel-button-height) + var(--actions-panel-height))
 
 // Misc. Variables
 :root
