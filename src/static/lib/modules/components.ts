@@ -33,6 +33,27 @@ export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: 
   if (time) setTimeout(remove, time)
 }
 
+export function portal(elem: Element, target: string | Element) {
+
+  const update = (target: string | Element) => {
+    let targetElem: Element | null
+
+    if (typeof target === 'string')
+      targetElem = document.querySelector(target)
+    else targetElem = target
+
+    if (targetElem) targetElem.appendChild(elem)
+    else throw new Error('Invalid portal target!')
+  }
+
+  update(target)
+
+  return {
+    update,
+    destroy() { if (elem.parentElement) elem.parentElement.removeChild(elem) }
+  }
+}
+
 const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
   ignoreAttributes: true,
   theme: 'mainframe',

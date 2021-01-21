@@ -2,11 +2,10 @@
   // Imports
   import * as API from './modules/api'
   import { ENV, sleep, matchMedia } from './modules/util'
-  import { tnAnime } from './modules/components'
+  import { portal, tnAnime } from './modules/components'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import { onMount } from 'svelte'
-  import Portal from 'svelte-portal/src/Portal.svelte'
   import Navbar from './components/navbar/Navbar.svelte'
   import Sidebar from './components/sidebar/Sidebar.svelte'
   import Page from './components/Page.svelte'
@@ -129,15 +128,15 @@
 
 <!-- User Panel (large screen, not in navbar) -->
 {#if $matchMedia('small', 'up')}
-  <Portal target='#user-panel'>
+  <div role='presentation' use:portal={'#user-panel'}>
     <UserPanel />
-  </Portal>
+  </div>
 {/if}
 
 <!-- Toasts -->
-<Portal target='#toasts'>
+<div role='presentation' use:portal={'#toasts'}>
   <Toasts />
-</Portal>
+</div>
 
 
 {#if $router.path === '/edit'}
