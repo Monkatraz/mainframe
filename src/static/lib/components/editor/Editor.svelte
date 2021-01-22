@@ -7,10 +7,7 @@
   import { createAnimQueued, doMatchMedia, throttle } from '../../modules/util'
   import { EditorView } from '@codemirror/view'
   // Components
-  import Markdown from '../Markdown.svelte'
-  import IconButton from '../IconButton.svelte'
-  import Toggle from '../Toggle.svelte'
-  import DetailsMenu from '../DetailsMenu.svelte'
+  import { Markdown, Toggle, DetailsMenu, Button, Card } from '@components'
 
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?
@@ -230,9 +227,9 @@
 
   .topbar-section
     display: flex
-    gap: 0.5rem
+    gap: 0.25rem
     align-items: center
-    padding: 0 0.5rem
+    padding-right: 0.5rem
     border-right: 0.15rem solid colvar('border')
 
   .editor-pane
@@ -298,9 +295,9 @@
       out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <div class=topbar-section>
-        <IconButton i='carbon:document-download' label='Open' size='1.5rem' baseline/>
-        <IconButton i='carbon:save' label='Save Draft' size='1.5rem' baseline/>
-        <IconButton i='carbon:fetch-upload-cloud' label='Publish' size='1.5rem' baseline/>
+        <Button i='carbon:document-download' tip='Open' size='1.5rem' sharp baseline/>
+        <Button i='carbon:save' tip='Save Draft' size='1.5rem' sharp baseline/>
+        <Button i='carbon:fetch-upload-cloud' tip='Publish' size='1.5rem' sharp baseline/>
       </div>
     </div>
 
@@ -312,13 +309,18 @@
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <div class='editor-settings'>
-        <DetailsMenu i='fluent:settings-28-filled' label='Editor Settings'>
-          <div class='settings-menu'>
-            <Toggle bind:toggled={editorDarkMode}>Dark Mode</Toggle>
-            <Toggle bind:toggled={editorGutters}>Gutters</Toggle>
-            <Toggle bind:toggled={editorSpellCheck}>Spellcheck</Toggle>
-            <Toggle bind:toggled={editorLivePreview}>Live Preview</Toggle>
-          </div>
+        <DetailsMenu placement='bottom-end'>
+          <slot slot='summary'>
+            <Button summary i='fluent:settings-28-filled' tip='Editor Settings' floating size='1.5rem' />
+          </slot>
+          <Card>
+            <div class='settings-menu'>
+              <Toggle bind:toggled={editorDarkMode}>Dark Mode</Toggle>
+              <Toggle bind:toggled={editorGutters}>Gutters</Toggle>
+              <Toggle bind:toggled={editorSpellCheck}>Spellcheck</Toggle>
+              <Toggle bind:toggled={editorLivePreview}>Live Preview</Toggle>
+            </div>
+          </Card>
         </DetailsMenu>
       </div>
       <div class=editor bind:this={editorContainer}/>
@@ -333,11 +335,16 @@
     >
       {#if containerClass === 'show-both' || containerClass === 'show-preview'}
         <div class='preview-settings'>
-          <DetailsMenu i='fluent:settings-28-filled' label='Preview Settings'>
-            <div class='settings-menu'>
-              <Toggle bind:toggled={previewDarkMode}>Dark Mode</Toggle>
-              <Toggle bind:toggled={previewActiveLine}>Show Active Line</Toggle>
-            </div>
+          <DetailsMenu placement='bottom-end'>
+            <slot slot='summary'>
+              <Button summary i='fluent:settings-28-filled' tip='Preview Settings' floating size='1.5rem' />
+            </slot>
+            <Card>
+              <div class='settings-menu'>
+                <Toggle bind:toggled={previewDarkMode}>Dark Mode</Toggle>
+                <Toggle bind:toggled={previewActiveLine}>Show Active Line</Toggle>
+              </div>
+            </Card>
           </DetailsMenu>
         </div>
         <Markdown details morph bind:heightmap bind:heightlist

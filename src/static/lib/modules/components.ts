@@ -97,13 +97,13 @@ function parseTipOpts(elem: Element, opts: Partial<TippyProps> | string) {
       if (elem.hasAttribute('aria-label'))
         opts.content = elem.getAttribute('aria-label')!
       else
-        opts.content = '(unknown)'
+        opts.content = ''
     }
   } else {
     if (elem.hasAttribute('aria-label'))
       opts = { content: elem.getAttribute('aria-label')! }
     else
-      opts = { content: '(unknown)' }
+      opts = { content: '' }
   }
   return opts
 }
@@ -113,11 +113,17 @@ export function tip(elem: Element, opts: Partial<TippyProps> | string = '') {
   opts = parseTipOpts(elem, opts)
   const finalOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
   const tp = tippy(elem, finalOpts)
+  const setState = (content: unknown) => {
+    if (!content) tp.disable()
+    else tp.enable()
+  }
+  setState(finalOpts.content)
   return {
     update(opts: Partial<TippyProps> | string = '') {
       opts = parseTipOpts(elem, opts)
       const newOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
       tp.setProps(newOpts)
+      setState(newOpts.content)
     },
     destroy() {
       tp.destroy()

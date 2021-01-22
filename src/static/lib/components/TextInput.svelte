@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { tip } from '../modules/components'
   import { createEventDispatcher } from 'svelte'
-  import Icon from './Icon.svelte'
+  import { Icon } from '@components'
 
   export let label = ''
   export let value = ''

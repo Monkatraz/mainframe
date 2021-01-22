@@ -8,7 +8,7 @@
 ### Markdown
 - [ ] Recreate def-list md-it plugin
 - [ ] Dynamic Svelte components generation
-  
+
 ### General
 - [ ] Integrate ReCaptcha?
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
@@ -26,7 +26,6 @@
 
 ### Components
 - [ ] Licensing Widget
-- [ ] Navbar dropdowns
 - [ ] Search bar component
 - [ ] Rating component
 - [ ] Comments / Discussion Tab Component Thingy
@@ -39,7 +38,6 @@
 ### Random Ideas
 - Automatic repository pages (maybe a Markdown syntax for interfacing with the database)
 - Notifications for users (new replies to their comments etc.)
-- Table of contents to left of article when room is available
 - Signify how the user voted on the article when they comment
 
 #### Editor
@@ -112,3 +110,4 @@
 - [x] Add better page history schema
 - [x] Markdown rendering component (with morphing support/flag)
 - [x] Toasts
+- [x] Navbar dropdowns

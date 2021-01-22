@@ -2,12 +2,7 @@
   import { User, authed } from '../modules/api'
   import { tnAnime, toast } from '../modules/components'
   import { matchMedia } from '../modules/util'
-  import Icon from './Icon.svelte'
-  import Toggle from './Toggle.svelte'
-  import Dropdown from './Dropdown.svelte'
-  import TextInput from './TextInput.svelte'
-  import Button from './Button.svelte'
-import Card from './Card.svelte'
+  import { Icon, Toggle, DetailsMenu, TextInput, Button, Card } from '@components'
 
   let busy = false
 
@@ -67,23 +62,6 @@ import Card from './Card.svelte'
 
 <style lang='stylus'>
   @require '_lib'
-  .log-btn
-    display: flex
-    gap: 0.25rem
-    transition: color 0.15s
-
-    +on-hover()
-      color: colvar('hint')
-
-    &.open
-      color: colvar('hint')
-
-    +match-media(small, below)
-      margin-left: 0.5rem
-      font-weight: bolder
-
-  .user .log-btn
-    color: colvar('text-subtle')
 
   .or
     color: colvar('text-subtle')
@@ -95,14 +73,16 @@ import Card from './Card.svelte'
   <div class='guest' role='presentation'
     in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
   >
-    <Dropdown>
-      <span slot='label' class='log-btn' let:open class:open>
-        {#if $matchMedia('small', 'below')}
-          REGISTER
-        {:else}
-          <Icon i='fluent:add-12-filled' size='1.5rem'/> Create Account
-        {/if}
-      </span>
+    <DetailsMenu placement='bottom-end'>
+      <slot slot='summary'>
+        <Button summary baseline>
+          {#if $matchMedia('small', 'below')}
+            REGISTER
+          {:else}
+            <Icon i='fluent:add-12-filled' size='1.5rem'/> Create Account
+          {/if}
+        </Button>
+      </slot>
       <Card title='Register'>
         <form>
           <TextInput bind:input={registerEmail} on:enter={() => { registerPass.focus() }}
@@ -123,18 +103,20 @@ import Card from './Card.svelte'
           <Button on:click={register} disabled={busy} wide primary>Register</Button>
         </div>
       </Card>
-    </Dropdown>
+    </DetailsMenu>
 
     {#if $matchMedia('small', 'up')}<span class='or'>or</span>{/if}
 
-    <Dropdown>
-      <span slot='label' class='log-btn' let:open class:open>
-        {#if $matchMedia('small', 'below')}
-          LOGIN
-        {:else}
-          <Icon i='ion:log-in-outline' size='1.5rem'/> Login
-        {/if}
-      </span>
+    <DetailsMenu placement='bottom-end'>
+      <slot slot='summary'>
+        <Button summary baseline>
+          {#if $matchMedia('small', 'below')}
+            LOGIN
+          {:else}
+            <Icon i='ion:log-in-outline' size='1.5rem'/> Login
+          {/if}
+        </Button>
+      </slot>
       <Card title='Login'>
         <form>
           <TextInput bind:input={loginEmail} on:enter={() => { loginPass.focus() }}
@@ -154,20 +136,22 @@ import Card from './Card.svelte'
           <Button on:click={login} disabled={busy} wide primary>Login</Button>
         </div>
       </Card>
-    </Dropdown>
+    </DetailsMenu>
   </div>
 {:else}
   <div class='user' role='presentation'
     in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
   >
-    <Dropdown>
-      <span slot='label' class='log-btn' let:open class:open>
-        <span style='margin-right: 0.25rem'>{User.authed ? User.social.nickname : ''}</span>
-        <Icon i='carbon:user-avatar-filled-alt' size='1.75rem'/>
-      </span>
+    <DetailsMenu placement='bottom-end'>
+      <slot slot='summary'>
+        <Button summary baseline>
+          <span style='margin-right: 0.25rem'>{User.authed ? User.social.nickname : ''}</span>
+          <Icon i='carbon:user-avatar-filled-alt' size='1.75rem'/>
+        </Button>
+      </slot>
       <Card>
         <Button on:click={logout} wide>Logout</Button>
       </Card>
-    </Dropdown>
+    </DetailsMenu>
   </div>
 {/if}

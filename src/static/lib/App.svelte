@@ -6,12 +6,7 @@
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import { onMount } from 'svelte'
-  import Navbar from './components/navbar/Navbar.svelte'
-  import Sidebar from './components/sidebar/Sidebar.svelte'
-  import Page from './components/Page.svelte'
-  import Spinny from './components/Spinny.svelte'
-  import UserPanel from './components/UserPanel.svelte'
-  import Toasts from './components/Toasts.svelte'
+  import { Navbar, Sidebar, Page, Spinny, UserPanel, Toasts } from '@components'
 
   // kind of hacky, but we don't want esbuild to preload the entire editor
   // so we use a dynamic import string

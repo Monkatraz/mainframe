@@ -1,8 +1,7 @@
 <script lang='ts'>
   import { tnAnime, toasts } from '../modules/components'
   import { cubicOut } from 'svelte/easing'
-  import Icon from './Icon.svelte'
-  import IconButton from './IconButton.svelte'
+  import { Icon, Button } from '@components'
 
   $: listToasts = Array.from($toasts)
 
@@ -109,7 +108,7 @@
       <span class='toast_type'><Icon i={icons[toast.type]} size='100%' /></span>
       {toast.message}
       <span class='toast_remove'>
-        <IconButton i='ion:close' size='1.5rem' label='Close Notification' baseline on:click={toast.remove}/>
+        <Button i='ion:close' size='1.5rem' tip='Close Notification' baseline on:click={toast.remove}/>
       </span>
     </li>
   {/each}

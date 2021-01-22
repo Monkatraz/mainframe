@@ -1,8 +1,7 @@
 <script lang='ts'>
   import { matchMedia } from '../../modules/util'
-  import { toast } from '../../modules/components'
-  import UserPanel from '../UserPanel.svelte'
-  import IconButton from '../IconButton.svelte'
+  import { UserPanel, Button } from '@components'
+  import DevMenu from './DevMenu.svelte'
 </script>
 
 <style lang='stylus'>
@@ -25,11 +24,12 @@
 </style>
 
 <div class='container' role='presentation'>
-  <IconButton i='fluent:food-toast-16-filled' size='2.5rem' baseline label='Toast!'
-    on:click={() => toast('info', 'Toast!')} />
   {#if $matchMedia('small', 'below')}
-    <IconButton i='entypo:menu' size='2.5rem' baseline label='Show Sidebar' />
+    <Button i='entypo:menu' size='2.5rem' baseline tip='Show Sidebar' />
+    <DevMenu />
     <div class='spacer' aria-hidden />
     <div role='presentation' class='user-panel-container'><UserPanel /></div>
+  {:else}
+    <DevMenu />
   {/if}
 </div>

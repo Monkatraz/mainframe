@@ -3,7 +3,7 @@
   import { tnAnime } from '../modules/components'
   import { renderMarkdown } from '../modules/markdown'
   import { fade } from 'svelte/transition'
-  import Spinny from './Spinny.svelte'
+  import { Spinny } from '@components'
 
   export let loading: Promise<string>
 

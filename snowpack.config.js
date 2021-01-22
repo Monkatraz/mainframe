@@ -46,7 +46,8 @@ module.exports = {
   alias: {
     '@vendor': './public/vendor',
     '@data': './src/static/data',
-    '@schemas': './src/static/data/schemas.d.ts',
+    '@components': './src/static/lib/components/index.ts',
+    '@schemas': './src/static/data/schemas.d.ts'
   },
   routes: [ { src: '.*', dest: '/index.html', match: 'routes' } ],
   optimize: {

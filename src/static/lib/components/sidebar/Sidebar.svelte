@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { tip } from '../../modules/components'
-  import Icon from '../Icon.svelte'
+  import { Icon } from '@components'
   import Link from './Link.svelte'
   import Social from './Social.svelte'
 </script>

@@ -2,11 +2,12 @@
   import Iconify from '@iconify/iconify'
   import type { IconifyIcon } from '@iconify/iconify'
 
-  export let i: string = ''
-  export let size: string = '1em'
+  export let i = ''
+  export let size = '1em'
+  export let margin = '0 0'
 
   let icon: IconifyIcon | null = null
-  let viewBox: string = '0 0 0 0'
+  let viewBox = '0 0 0 0'
 
   $: if (i) {
     if (Iconify.iconExists(i)) icon = Iconify.getIcon(i)
@@ -19,12 +20,12 @@
 <style lang='stylus'>
   svg
     transform: rotate(360deg)
-    vertical-align: -0.135em
+    vertical-align: middle
 </style>
 
 <svg xmlns="http://www.w3.org/2000/svg"
   aria-hidden=true focusable=false
-  width={size} height={size} {viewBox}
+  width={size} height={size} {viewBox} style='margin: {margin}'
   {...$$restProps}
   >
   {@html icon?.body ?? ''}
