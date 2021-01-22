@@ -1,14 +1,11 @@
 <script lang='ts'>
-  import { placement } from '../modules/components'
+  import { placement as popperPlacement } from '../modules/components'
   import { onMount } from 'svelte'
-  import Card from './Card.svelte'
+  import type { Placement } from 'tippy.js';
 
   export let hover = false
   export let open = false
-  export let title = ''
-  export let subtitle = ''
-  export let dark = false
-  export let light = false
+  export let placement: Placement = 'bottom-end'
 
   let details: HTMLElement
   let summary: HTMLElement
@@ -78,7 +75,7 @@
 
 <details bind:this={details} {...$$restProps}>
   <summary bind:this={summary}><slot name='label' {open} /></summary>
-  <div class=menu use:placement={{ when: open && !!summary, pos: 'bottom-end', against: summary }}>
-    <Card {title} {subtitle} {dark} {light}><slot {open} /></Card>
+  <div class=menu use:popperPlacement={{ when: open && !!summary, pos: placement, against: summary }}>
+    <slot {open} />
   </div>
 </details>

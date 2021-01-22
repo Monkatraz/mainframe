@@ -7,6 +7,7 @@
   import Dropdown from './Dropdown.svelte'
   import TextInput from './TextInput.svelte'
   import Button from './Button.svelte'
+import Card from './Card.svelte'
 
   let busy = false
 
@@ -94,7 +95,7 @@
   <div class='guest' role='presentation'
     in:tnAnime={{ opacity: [0,1], easing: 'easeOutExpo' }}
   >
-    <Dropdown title='Register'>
+    <Dropdown>
       <span slot='label' class='log-btn' let:open class:open>
         {#if $matchMedia('small', 'below')}
           REGISTER
@@ -102,27 +103,31 @@
           <Icon i='fluent:add-12-filled' size='1.5rem'/> Create Account
         {/if}
       </span>
-      <form>
-        <TextInput bind:input={registerEmail} on:enter={() => { registerPass.focus() }}
-          label='Email' type='email' placeholder='Enter email address...' required
-          disabled={busy}
-          autocomplete='username'
-          info='Your email is private.'
-        />
-        <TextInput bind:input={registerPass} on:enter={() => { register() }}
-          label='Password' type='password' placeholder='Enter password...' required
-          disabled={busy}
-          autocomplete='new-password'
-          minLength='6' maxLength='32'
-          info='Between 6 and 32 characters.'
-        />
-      </form>
-      <div style='margin-top: 0.5rem;'><Button on:click={register} disabled={busy} wide primary>Register</Button></div>
+      <Card title='Register'>
+        <form>
+          <TextInput bind:input={registerEmail} on:enter={() => { registerPass.focus() }}
+            label='Email' type='email' placeholder='Enter email address...' required
+            disabled={busy}
+            autocomplete='username'
+            info='Your email is private.'
+          />
+          <TextInput bind:input={registerPass} on:enter={() => { register() }}
+            label='Password' type='password' placeholder='Enter password...' required
+            disabled={busy}
+            autocomplete='new-password'
+            minLength='6' maxLength='32'
+            info='Between 6 and 32 characters.'
+          />
+        </form>
+        <div style='margin-top: 0.5rem;'>
+          <Button on:click={register} disabled={busy} wide primary>Register</Button>
+        </div>
+      </Card>
     </Dropdown>
 
     {#if $matchMedia('small', 'up')}<span class='or'>or</span>{/if}
 
-    <Dropdown title='Login'>
+    <Dropdown>
       <span slot='label' class='log-btn' let:open class:open>
         {#if $matchMedia('small', 'below')}
           LOGIN
@@ -130,21 +135,25 @@
           <Icon i='ion:log-in-outline' size='1.5rem'/> Login
         {/if}
       </span>
-      <form>
-        <TextInput bind:input={loginEmail} on:enter={() => { loginPass.focus() }}
-          label='Email' type='email' placeholder='Enter email address...' required
-          disabled={busy}
-          autocomplete='username'
-        />
-        <TextInput bind:input={loginPass} on:enter={() => { login() }}
-          label='Password' type='password' placeholder='Enter password...' required
-          disabled={busy}
-          autocomplete='current-password'
-          minLength='6' maxLength='32'
-        />
-      </form>
-      <Toggle bind:toggled={rememberMe}>Remember Me</Toggle>
-      <div class='submit'><Button on:click={login} disabled={busy} wide primary>Login</Button></div>
+      <Card title='Login'>
+        <form>
+          <TextInput bind:input={loginEmail} on:enter={() => { loginPass.focus() }}
+            label='Email' type='email' placeholder='Enter email address...' required
+            disabled={busy}
+            autocomplete='username'
+          />
+          <TextInput bind:input={loginPass} on:enter={() => { login() }}
+            label='Password' type='password' placeholder='Enter password...' required
+            disabled={busy}
+            autocomplete='current-password'
+            minLength='6' maxLength='32'
+          />
+        </form>
+        <Toggle bind:toggled={rememberMe}>Remember Me</Toggle>
+        <div class='submit'>
+          <Button on:click={login} disabled={busy} wide primary>Login</Button>
+        </div>
+      </Card>
     </Dropdown>
   </div>
 {:else}
@@ -156,7 +165,9 @@
         <span style='margin-right: 0.25rem'>{User.authed ? User.social.nickname : ''}</span>
         <Icon i='carbon:user-avatar-filled-alt' size='1.75rem'/>
       </span>
-      <Button on:click={logout} wide>Logout</Button>
+      <Card>
+        <Button on:click={logout} wide>Logout</Button>
+      </Card>
     </Dropdown>
   </div>
 {/if}
