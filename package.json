@@ -36,6 +36,7 @@
     "@codemirror/state": "^0.17.1",
     "@codemirror/view": "^0.17.5",
     "@iconify/iconify": "^2.0.0-rc.6",
+    "@popperjs/core": "^2.6.0",
     "animejs": "^3.2.1",
     "cm6-monarch": "^0.2.2",
     "dompurify": "^2.2.6",

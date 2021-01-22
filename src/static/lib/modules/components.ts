@@ -4,9 +4,10 @@
  */
 
 // -- Imports
-// Tippy
+// Tippy and Popper
 import tippy, { Props as TippyProps } from 'tippy.js'
 import { roundArrow as TippyRoundArrow } from 'tippy.js'
+import * as Popper from '@popperjs/core'
 // Anime
 import anime, { AnimeParams } from 'animejs'
 import { animationFrame } from './util'
@@ -33,6 +34,8 @@ export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: 
   if (time) setTimeout(remove, time)
 }
 
+/** A Svelte use action that will 'portal' to the given target and append the element to that target.
+ *  The target can either be a direct reference to the element, or a query selector string. */
 export function portal(elem: Element, target: string | Element) {
 
   const update = (target: string | Element) => {
@@ -51,6 +54,30 @@ export function portal(elem: Element, target: string | Element) {
   return {
     update,
     destroy() { if (elem.parentElement) elem.parentElement.removeChild(elem) }
+  }
+}
+
+type PlacementOpts = { when?: boolean, pos: Popper.Placement, against: Element }
+
+export function placement(elem: Element, opts: PlacementOpts) {
+  let instance: Popper.Instance | undefined
+
+  const update = ({ when = true, pos, against }: PlacementOpts) => {
+    if (!when && instance) {
+      instance.destroy()
+      instance = undefined
+    }
+    else if (when && !instance && against)
+      instance = Popper.createPopper(against, elem as HTMLElement, { placement: pos })
+  }
+
+  update(opts)
+
+  return {
+    update,
+    destroy() {
+      if (instance) instance.destroy()
+    }
   }
 }
 

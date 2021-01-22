@@ -1,4 +1,5 @@
 <script lang='ts'>
+  import { placement } from '../modules/components'
   import { onMount } from 'svelte'
   import Card from './Card.svelte'
 
@@ -66,8 +67,7 @@
 
   .menu
     position: absolute
-    top: 100%
-    right: 0
+    transform: scale(0)
 
   details[open] .menu
     animation: reveal 0.125s 1 0s backwards ease-out
@@ -77,8 +77,8 @@
 <svelte:body on:pointerdown={checkClose} />
 
 <details bind:this={details} {...$$restProps}>
-  <summary><slot name='label' {open} /></summary>
-  <div class=menu>
+  <summary bind:this={summary}><slot name='label' {open} /></summary>
+  <div class=menu use:placement={{ when: open && !!summary, pos: 'bottom-end', against: summary }}>
     <Card {title} {subtitle} {dark} {light}><slot {open} /></Card>
   </div>
 </details>
