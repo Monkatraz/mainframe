@@ -1,5 +1,5 @@
-<script lang="ts">
-  import { onMount } from "svelte";
+<script lang='ts'>
+  import { onMount } from 'svelte'
 
   // Props
   export let onEnter: AnyFn = () => undefined
@@ -23,10 +23,10 @@
 
 </script>
 
-<style lang="stylus">
+<style lang='stylus'>
   .intersection-point
     height: 0
     width: 100%
 </style>
 
-<div class=intersection-point bind:this={intersectionElement} role=presentation/>
+<div class='intersection-point' bind:this={intersectionElement} role='presentation'/>

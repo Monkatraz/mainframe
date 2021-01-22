@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import { placement as popperPlacement } from '../modules/components'
+  import { placement as popperPlacement } from '@components'
   import { onMount } from 'svelte'
   import type { Placement } from 'tippy.js';
 
@@ -71,7 +71,7 @@
 
 <details bind:this={details} {...$$restProps}>
   {#if $$slots.summary}<slot name='summary' {open} />{/if}
-  <div class=menu use:popperPlacement={{ when: open && !!summary, pos: placement, against: summary }}>
+  <div class='menu' use:popperPlacement={{ when: open && !!summary, pos: placement, against: summary }}>
     <slot {open} />
   </div>
 </details>

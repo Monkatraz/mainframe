@@ -1,8 +1,9 @@
 <script lang='ts'>
   import { User, authed } from '../modules/api'
-  import { tnAnime, toast } from '../modules/components'
-  import { matchMedia } from '../modules/util'
-  import { Icon, Toggle, DetailsMenu, TextInput, Button, Card } from '@components'
+  import {
+    tnAnime, toast, matchMedia,
+    Icon, Toggle, DetailsMenu, TextInput, Button, Card
+  } from '@components'
 
   let busy = false
 

@@ -1,7 +1,6 @@
 <script lang='ts'>
-  import { tnAnime, toasts } from '../modules/components'
   import { cubicOut } from 'svelte/easing'
-  import { Icon, Button } from '@components'
+  import { tnAnime, toasts, Icon, Button } from '@components'
 
   $: listToasts = Array.from($toasts)
 

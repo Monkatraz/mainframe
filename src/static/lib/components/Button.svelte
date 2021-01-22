@@ -1,6 +1,5 @@
 <script lang='ts'>
-  import { tip as tippy } from '../modules/components'
-  import { Icon } from '@components'
+  import { tip, Icon } from '@components'
 
   // Styling
   export let wide = false
@@ -16,7 +15,8 @@
   // Icon
   export let i = ''
   // Other
-  export let tip: string | undefined = undefined
+  let tipString: string
+  export { tipString as tip }
 
 </script>
 
@@ -116,12 +116,12 @@
 </style>
 
 {#if !summary}
-  <button type='button' on:click {disabled} use:tippy={tip} style='font-size: {size};'
+  <button type='button' on:click {disabled} use:tip={tipString} style='font-size: {size};'
     class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp>
     {#if i}<Icon {i} size='1em' />{:else}<slot />{/if}
   </button>
 {:else}
-  <summary on:click disabled={disabled ? true : undefined} use:tippy={tip} style='font-size: {size};'
+  <summary on:click disabled={disabled ? true : undefined} use:tip={tipString} style='font-size: {size};'
     class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp>
     {#if i}<Icon {i} size='1em' />{:else}<slot />{/if}
   </summary>

@@ -1,6 +1,5 @@
 <script lang='ts'>
-  import { tip } from '../../modules/components'
-  import { Icon } from '@components'
+  import { tip, Icon } from '@components'
   import Link from './Link.svelte'
   import Social from './Social.svelte'
 </script>
@@ -63,12 +62,12 @@
 </style>
 <div class='sb-container' role='presentation'>
 
-  <div class=sb-buttons>
-    <a class=sb-button href='/' aria-label='Home' use:tip><Icon i='entypo:home' size='1.5em'/></a>
-    <a class=sb-button href='/edit'><Icon i='ri:edit-2-fill' size='1.5em'/>Open Editor</a>
+  <div class='sb-buttons'>
+    <a class='sb-button' href='/' aria-label='Home' use:tip><Icon i='entypo:home' size='1.5em'/></a>
+    <a class='sb-button' href='/edit'><Icon i='ri:edit-2-fill' size='1.5em'/>Open Editor</a>
   </div>
 
-  <div class=sb-socials>
+  <div class='sb-socials'>
     <Social label='SCP DeviantArt' 
       href='https://scp-foundation.deviantart.com/'
       src='/static/media/social-deviantart.png' />
@@ -94,26 +93,26 @@
       src='/static/media/social-twitch.png' />
   </div>
 
-  <div class=sb-header>About</div>
+  <div class='sb-header'>About</div>
   <Link href='https://github.com/Monkatraz/mainframe' i='mdi:github'>Source Repository</Link>
   <Link href='http://www.scpwiki.com/' i='@c:scp:logo'>Official SCP Wiki</Link>
   <Link href='/admin/license' i='tabler:copyright'>Licensing</Link>
   <Link href='/admin/contributors' i='clarity:heart-line'>Contributors</Link>
 
-  <div class=sb-header>Resources</div>
+  <div class='sb-header'>Resources</div>
   <Link href='/guide/editor-syntax' i='entypo:code'>Editor Syntax</Link>
   <Link href='/guide/modules' i='ph:stack-simple-bold'>Modules</Link>
   <Link href='/guide/api' i='carbon:cloud-app'>Mainframe API</Link>
 
-  <div class=sb-header>Customization</div>
+  <div class='sb-header'>Customization</div>
   <Link href='/guide/user-themes' i='mdi:palette-outline'>User Themes</Link>
   <Link href='/guide/user-modules' i='ph:stack-bold'>User Modules</Link>
 
-  <div class=sb-header>Test Pages</div>
+  <div class='sb-header'>Test Pages</div>
   <Link href='/test/md' i='ion:logo-markdown' small>Markdown</Link>
   <Link href='/test/loading' i='ion:hourglass' small>Loading Spinner</Link>
 
-  <div class=sb-header>Articles</div>
+  <div class='sb-header'>Articles</div>
   <Link href='/scp/3685' i='ic:round-article' small>SCP-3685</Link>
   <Link href='/scp/173' i='ic:round-article' small>SCP-173</Link>
 </div>

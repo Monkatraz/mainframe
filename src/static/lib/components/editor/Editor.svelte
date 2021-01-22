@@ -3,11 +3,10 @@
   import { EditorCore } from './editor-core'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
-  import { tnAnime } from '../../modules/components'
   import { createAnimQueued, doMatchMedia, throttle } from '../../modules/util'
   import { EditorView } from '@codemirror/view'
   // Components
-  import { Markdown, Toggle, DetailsMenu, Button, Card } from '@components'
+  import { tnAnime, Markdown, Toggle, DetailsMenu, Button, Card } from '@components'
 
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?
@@ -139,7 +138,7 @@
 
 </script>
 
-<style lang="stylus">
+<style lang='stylus'>
   @require '_lib'
 
   $hght = calc(100vh - var(--layout-header-height-edit))
@@ -287,14 +286,14 @@
 <div class='overflow-container {editorDarkMode ? 'dark codetheme-dark' : 'light codetheme-light'}'
   in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
 >
-  <div class="editor-container {containerClass}">
+  <div class='editor-container {containerClass}'>
 
     <!-- Top | Settings Bar -->
-    <div class=topbar
+    <div class='topbar'
       in:tnAnime={{ translateY: ['-150%', '0'], duration: 400, delay: 400, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
-      <div class=topbar-section>
+      <div class='topbar-section'>
         <Button i='carbon:document-download' tip='Open' size='1.5rem' sharp baseline/>
         <Button i='carbon:save' tip='Save Draft' size='1.5rem' sharp baseline/>
         <Button i='carbon:fetch-upload-cloud' tip='Publish' size='1.5rem' sharp baseline/>
@@ -302,7 +301,7 @@
     </div>
 
     <!-- Left | Editor Pane -->
-    <div class=editor-pane
+    <div class='editor-pane'
       on:scroll={scrollFromEditor}
       on:touchstart={() => scrollingWith = 'editor'} on:wheel={() => scrollingWith = 'editor'}
       in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}

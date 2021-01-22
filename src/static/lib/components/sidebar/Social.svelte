@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import { tip } from '../../modules/components'
+  import { tip } from '@components'
   export let href = ''
   export let src = ''
   export let label = ''

@@ -1,6 +1,5 @@
 <script lang='ts'>
-  import { matchMedia } from '../../modules/util'
-  import { UserPanel, Button } from '@components'
+  import { matchMedia, UserPanel, Button } from '@components'
   import DevMenu from './DevMenu.svelte'
 </script>
 

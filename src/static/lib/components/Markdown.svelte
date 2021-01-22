@@ -133,5 +133,5 @@
   {#each Array.from(activeElements) as elem (elem)}
     <div class=active-element transition:fade={{duration: 100}} style={getActiveElementStyle(elem)} />
   {/each}
-  <div bind:this={container} class='rhythm container' role=presentation />
+  <div bind:this={container} class='rhythm container' role='presentation' />
 </div>

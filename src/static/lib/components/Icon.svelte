@@ -24,7 +24,7 @@
 </style>
 
 <svg xmlns="http://www.w3.org/2000/svg"
-  aria-hidden=true focusable=false
+  aria-hidden='true' focusable='false'
   width={size} height={size} {viewBox} style='margin: {margin}'
   {...$$restProps}
   >

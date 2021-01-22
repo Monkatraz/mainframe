@@ -1,6 +1,5 @@
 <script lang='ts'>
-  import { toast } from '../../modules/components'
-  import { Button, Card, DetailsMenu, Icon } from '@components'
+  import { toast, Button, Card, DetailsMenu, Icon } from '@components'
 </script>
 
 <DetailsMenu hover placement='bottom-start'>

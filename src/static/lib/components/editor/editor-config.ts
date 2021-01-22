@@ -1,3 +1,8 @@
+/**
+ * @file Editor theming and misc. configuration module.
+ * @author Monkatraz
+ */
+
 import { EditorView } from '@codemirror/view'
 import type { Extension } from '@codemirror/state'
 import { HighlightStyle, tags as t } from '@codemirror/highlight'

@@ -1,9 +1,8 @@
 <script lang='ts'>
   import { getStatusCode } from '../modules/api'
-  import { tnAnime } from '../modules/components'
   import { renderMarkdown } from '../modules/markdown'
   import { fade } from 'svelte/transition'
-  import { Spinny } from '@components'
+  import { tnAnime, Spinny } from '@components'
 
   export let loading: Promise<string>
 
@@ -47,14 +46,14 @@
     font-size: 2.5em
 </style>
 
-<div role=presentation out:fade={{duration: 100}}>
+<div role='presentation' out:fade={{duration: 100}}>
   {#await loading.then(renderMarkdown)}
 
     <Spinny width=150px top=200px left=50%/>
 
   <!-- Page loaded -->
   {:then { html } }
-    <div class=rhythm role=presentation in:tnAnime={pageReveal}>
+    <div class='rhythm' role='presentation' in:tnAnime={pageReveal}>
       {@html html}
     </div>
 
@@ -62,17 +61,17 @@
   {:catch error}
     {#if getStatusCode(error) === 404 }
       <div class="pgnf rhythm" in:tnAnime={pageReveal}>
-        <div class=pgnf-blackbox>
-          <h1 class=pgnf-header>404</h1>
-          <span class=pgnf-text>PAGE NOT FOUND</span>
+        <div class='pgnf-blackbox'>
+          <h1 class='pgnf-header'>404</h1>
+          <span class='pgnf-text'>PAGE NOT FOUND</span>
         </div><br />
         <h4>The requested page either does not exist or was not found.</h4>
       </div>
     {:else}
-      <div class=rhythm in:tnAnime={pageReveal}>
+      <div class='rhythm' in:tnAnime={pageReveal}>
         <h2>Error Displaying Page</h2>
         <hr>
-        <pre class=code><code>
+        <pre class='code'><code>
 ERR: {error?.name}: {error?.message}
 MSG: {error?.description}
         </code></pre>

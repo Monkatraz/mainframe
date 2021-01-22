@@ -1,3 +1,8 @@
+/**
+ * @file Exports the core Editor API class that is used as the context for the editor.
+ * @author Monkatraz
+ */
+
 import { EditorState, Extension, tagExtension } from "@codemirror/state"
 import {
   EditorView, keymap, ViewPlugin, ViewUpdate,

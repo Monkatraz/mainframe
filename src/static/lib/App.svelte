@@ -1,12 +1,14 @@
 <script lang="ts">
   // Imports
   import * as API from './modules/api'
-  import { ENV, sleep, matchMedia } from './modules/util'
-  import { portal, tnAnime } from './modules/components'
+  import { ENV, sleep } from './modules/util'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import { onMount } from 'svelte'
-  import { Navbar, Sidebar, Page, Spinny, UserPanel, Toasts } from '@components'
+  import {
+    portal, tnAnime, matchMedia,
+    Navbar, Sidebar, Page, Spinny, UserPanel, Toasts
+  } from '@components'
 
   // kind of hacky, but we don't want esbuild to preload the entire editor
   // so we use a dynamic import string

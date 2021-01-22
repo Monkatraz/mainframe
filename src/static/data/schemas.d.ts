@@ -1,3 +1,8 @@
+/**
+ * @file Exports the various types of objects used by Mainframe in its API.
+ * @author Monkatraz
+ */
+
 // Imports for FaunaDB types
 import type { values as v } from 'faunadb'
 type Ref = v.Ref
