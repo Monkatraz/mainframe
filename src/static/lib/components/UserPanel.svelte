@@ -127,7 +127,7 @@
         {#if $matchMedia('small', 'below')}
           LOGIN
         {:else}
-        <Icon i='ion:log-in-outline' size='1.5rem'/> Login
+          <Icon i='ion:log-in-outline' size='1.5rem'/> Login
         {/if}
       </span>
       <form>

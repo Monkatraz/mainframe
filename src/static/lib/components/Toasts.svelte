@@ -1,5 +1,6 @@
 <script lang='ts'>
   import { tnAnime, toasts } from '../modules/components'
+  import { cubicOut } from 'svelte/easing'
   import Icon from './Icon.svelte'
   import IconButton from './IconButton.svelte'
 
@@ -10,6 +11,17 @@
     danger: 'ion:alert',
     warning: 'ph:warning-bold',
     info: 'ion:information'
+  }
+
+  function listTransition(elem: Element, animation: { from: DOMRect, to: DOMRect }, params: any ) {
+    const d = (animation.from.top - animation.to.top)
+
+    return {
+      delay: d > 0 ? 0 : 300,
+      duration: 250,
+      easing: cubicOut,
+      css: (_t: number, u: number) => `top: ${u * d}px`
+    }
   }
 
 </script>
@@ -88,15 +100,16 @@
 </style>
 
 <ul class='toasts' aria-live='polite' aria-relevant='additions'>
-  {#each listToasts as {id, type, message, remove} (id)}
-    <li class='toast dark {type}'
+  {#each listToasts as toast (toast)}
+    <li class='toast dark {toast.type}'
+      animate:listTransition
       in:tnAnime={{ translateX: ['150%', '0'] }}
-      out:tnAnime={{ translateX: '150%', duration: 400, easing: 'easeInQuint' }}
+      out:tnAnime={{ translateX: '150%', duration: 300, easing: 'easeInQuint' }}
     >
-      <span class='toast_type'><Icon i={icons[type]} size='100%' /></span>
-      {message}
+      <span class='toast_type'><Icon i={icons[toast.type]} size='100%' /></span>
+      {toast.message}
       <span class='toast_remove'>
-        <IconButton i='ion:close' size='1.5rem' label='Close Notification' baseline on:click={remove}/>
+        <IconButton i='ion:close' size='1.5rem' label='Close Notification' baseline on:click={toast.remove}/>
       </span>
     </li>
   {/each}

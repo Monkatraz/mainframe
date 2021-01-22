@@ -14,7 +14,6 @@ import { animationFrame } from './util'
 import { writable } from 'svelte/store'
 
 interface Toast {
-  id: number
   type: 'success' | 'danger' | 'warning' | 'info'
   message: string
   remove: () => void
@@ -26,9 +25,8 @@ export const toasts = writable<Set<Toast>>(new Set())
 /** Displays a 'toast' notification to the user. Provide a `time` of `0` to prevent the notification
  *  from automatically closing. */
 export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: string, time = 5000) {
-  const id = 100 * Math.random()
   const remove = () => { toasts.update(cur => { cur.delete(toastData); return cur }) }
-  const toastData = { id, type, message, remove }
+  const toastData = { type, message, remove }
   toasts.update(cur => cur.add(toastData))
   // delete message after timeout
   if (time) setTimeout(remove, time)
@@ -152,7 +150,6 @@ export function tnAnime(elem: Element, opts: AnimeParams) {
     (async () => {
       await animationFrame()
       anime.remove(elem)
-      await animationFrame()
       requestAnimationFrame(anim.play)
     })()
     return {
