@@ -3,7 +3,7 @@
   import { EditorCore } from './editor-core'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
-  import { createAnimQueued, doMatchMedia, throttle } from '../../modules/util'
+  import { createAnimQueued, throttle, Pref } from '../../modules/util'
   import { EditorView } from '@codemirror/view'
   // Components
   import { tnAnime, Markdown, Toggle, DetailsMenu, Button, Card } from '@components'
@@ -14,13 +14,37 @@
 
   let mounted = false
 
-  // -- CONTAINER
+  // -- STATE
 
-  $: containerClass = editorLivePreview ? 'show-both' : 'show-editor'
+  const settings = Pref.wrap('editor-settings', {
+    darkmode: true,
+    gutters: true,
+    spellcheck: false,
+    preview: {
+      enable: true,
+      live: true,
+      darkmode: false,
+      activelines: true
+    }
+  })
+
+  let editorContainer: HTMLElement
+  let preview: HTMLDivElement
+
+  let scrollingWith: 'editor' | 'preview' = 'editor'
+  let previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
+  let editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
+
+  // from Markdown component
+  let heightmap: Map<number, number>
+  let heightlist: number[]
+
+  $: containerClass = settings.preview.enable ? 'show-both' : 'show-editor'
+  $: if (preview && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
+  $: if (mounted && scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
 
   // -- EDITOR
 
-  let editorContainer: HTMLElement
   const Editor = new EditorCore()
   const EditorValue = Editor.value
   const EditorActiveLines = Editor.activeLines
@@ -39,50 +63,16 @@
 
   onDestroy(() => Editor.destroy())
 
-  // Configuration
-  let editorDarkMode = true
-  let editorGutters = true
-  let editorSpellCheck = false
-  let editorLivePreview = true
-
-  $: if (mounted) Editor.spellcheck = editorSpellCheck
-  $: if (mounted) Editor.lineNumbers = editorGutters
-
-  // defaults on mobile
-  if (doMatchMedia('thin', 'below')) {
-    editorGutters = false
-    editorLivePreview = false
-  }
-
-  // Context
+  $: if (mounted) Editor.spellcheck = settings.spellcheck
+  $: if (mounted) Editor.gutters = settings.gutters
 
   setContext('editor', Editor)
 
-  // -- PREVIEW
-
-  let preview: HTMLDivElement
-
-  // Markdown Component
-  let heightmap: Map<number, number>
-  let heightlist: number[]
-
-  // Configuration
-  let previewDarkMode = false
-  let previewActiveLine = true
-
   // -- PREVIEW <-> EDITOR
-
 
   // Scroll Sync.
 
   function canScrollSync() { return mounted && preview && Editor.view && heightmap && heightlist }
-
-  /** Denotes whether the editor or the preview is the element the user is scrolling with. */
-  let scrollingWith: 'editor' | 'preview' = 'editor'
-  /** The spring for the preview's sync. scroll position. */
-  let previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
-  /** The spring for the editor's sync. scroll position. */
-  let editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
 
   const updateScroll = throttle(() => {
     scrollFromEditor()
@@ -131,10 +121,6 @@
       editorScrollSpring.set(Editor.heightAtLine(line) + diff)
     }
   })
-
-  // updates scroll sync. positions
-  $: if (preview && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
-  $: if (Editor.view && scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
 
 </script>
 
@@ -283,7 +269,7 @@
 <!-- some chores to do on resize -->
 <svelte:window on:resize={updateScroll}/>
 
-<div class='overflow-container {editorDarkMode ? 'dark codetheme-dark' : 'light codetheme-light'}'
+<div class='overflow-container {settings.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
   in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
 >
   <div class='editor-container {containerClass}'>
@@ -314,10 +300,10 @@
           </slot>
           <Card>
             <div class='settings-menu'>
-              <Toggle bind:toggled={editorDarkMode}>Dark Mode</Toggle>
-              <Toggle bind:toggled={editorGutters}>Gutters</Toggle>
-              <Toggle bind:toggled={editorSpellCheck}>Spellcheck</Toggle>
-              <Toggle bind:toggled={editorLivePreview}>Live Preview</Toggle>
+              <Toggle bind:toggled={settings.darkmode}>Dark Mode</Toggle>
+              <Toggle bind:toggled={settings.gutters}>Gutters</Toggle>
+              <Toggle bind:toggled={settings.spellcheck}>Spellcheck</Toggle>
+              <Toggle bind:toggled={settings.preview.enable}>Live Preview</Toggle>
             </div>
           </Card>
         </DetailsMenu>
@@ -326,7 +312,7 @@
     </div>
 
     <!-- Right | Preview Pane -->
-    <div class='preview {previewDarkMode ? 'dark' : 'light'} codetheme-dark' bind:this={preview}
+    <div class='preview {settings.preview.darkmode ? 'dark' : 'light'} codetheme-dark' bind:this={preview}
       on:scroll={scrollFromPreview}
       on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
       in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 350, easing: 'easeOutQuint' }}
@@ -340,14 +326,14 @@
             </slot>
             <Card>
               <div class='settings-menu'>
-                <Toggle bind:toggled={previewDarkMode}>Dark Mode</Toggle>
-                <Toggle bind:toggled={previewActiveLine}>Show Active Line</Toggle>
+                <Toggle bind:toggled={settings.preview.darkmode}>Dark Mode</Toggle>
+                <Toggle bind:toggled={settings.preview.activelines}>Show Active Line</Toggle>
               </div>
             </Card>
           </DetailsMenu>
         </div>
         <Markdown details morph bind:heightmap bind:heightlist
-          template={$EditorValue} activelines={previewActiveLine ? $EditorActiveLines : new Set()} />
+          template={$EditorValue} activelines={settings.preview.activelines ? $EditorActiveLines : new Set()} />
       {/if}
     </div>
 

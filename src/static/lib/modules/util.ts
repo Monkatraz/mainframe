@@ -3,6 +3,8 @@
  * @author Monkatraz
  */
 
+import { writable } from 'svelte/store'
+
 /** Contains all "environment" variables.
  *  They're just inlined in the code because that is what Snowpack would've done anyways.
  */
@@ -36,6 +38,68 @@ export namespace Agent {
   window.addEventListener('scroll', () => {
     scroll = document.documentElement.scrollTop / (document.body.scrollHeight - window.innerHeight)
   })
+}
+
+/** Helper user preferences object. */
+export const Pref = {
+  /** Attempt to retrieve the preference with the given name.
+   *  If it isn't found, the fallback value will instead be returned. */
+  get<T>(name: string, fallback: T): T {
+    name = '_user-pref_' + name
+    const storedPreference = localStorage.getItem(name)
+    if (storedPreference) return JSON.parse(storedPreference) as T
+    else return fallback
+  },
+
+  /** Sets the preference with the given name to the given value.
+   *  Passing an empty string will remove the preference from storage. */
+  set<T>(name: string, value: T) {
+    name = '_user-pref_' + name
+    if (!value) localStorage.removeItem(name)
+    else localStorage.setItem(name, JSON.stringify(value))
+    return value
+  },
+
+  /** Returns if the requested preference is available in storage. */
+  has(name: string) {
+    name = '_user-pref_' + name
+    return !!localStorage.getItem(name)
+  },
+
+  /** Returns a writable store that maps to the given preference.
+   *  This works best for primitive values or immutable objects.
+   *  If a mutable, potentially nested, object is desired, use the `wrap` method instead. */
+  bind<T>(name: string, fallback: T) {
+    const store = writable(this.get(name, fallback))
+    return {
+      subscribe: store.subscribe,
+      set: (val: T) => {
+        store.set(val)
+        this.set(name, val)
+      }
+    }
+  },
+
+  /** Retrieves a 'wrapped' proxy object, or creates one if needed.
+   *  Setting items on this object will automatically cause the object to be stored.
+   *  This can be used to store a record of preferences without needing to setup any automatic storage logic. */
+  wrap<T extends PlainObject>(name: string, fallback: T): T {
+    const wrapped = this.get(name, fallback) as T
+    const handler: ProxyHandler<T> = {
+      // handle nested objects by proxying them with the same handler
+      get: (target, prop) => {
+        const val = Reflect.get(target, prop)
+        return typeof val === 'object' ? new Proxy(val, handler) : val
+      },
+      // fire setter function whenever the object has a property set (even recursively)
+      set: (target, prop, val) => {
+        Reflect.set(target, prop, val)
+        this.set(name, wrapped)
+        return true
+      }
+    }
+    return new Proxy(wrapped, handler)
+  }
 }
 
 /**

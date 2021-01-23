@@ -2,7 +2,6 @@
 
 ### In Progress
 - [ ] Page creation, and updating
-- [ ] Add some sort of `pref` object that handles localStorage shenanigans automatically
 - [ ] Drafts stored either with `localStorage` (must be serialized) or in the user document
 
 ### Markdown
@@ -111,3 +110,4 @@
 - [x] Markdown rendering component (with morphing support/flag)
 - [x] Toasts
 - [x] Navbar dropdowns
+- [x] Add some sort of `pref` object that handles localStorage shenanigans automatically

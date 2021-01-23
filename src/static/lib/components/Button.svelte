@@ -15,7 +15,7 @@
   // Icon
   export let i = ''
   // Other
-  let tipString: string
+  let tipString = ''
   export { tipString as tip }
 
 </script>

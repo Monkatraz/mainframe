@@ -1,5 +1,6 @@
 <script lang='ts'>
   import { User, authed } from '../modules/api'
+  import { Pref } from '../modules/util'
   import {
     tnAnime, toast, matchMedia,
     Icon, Toggle, DetailsMenu, TextInput, Button, Card
@@ -32,14 +33,14 @@
 
   let loginEmail: HTMLInputElement
   let loginPass: HTMLInputElement
-  let rememberMe = false
+  let rememberMe = Pref.bind('remember-me', false)
 
   async function login() {
     if (!loginEmail || !loginPass) return
     if (loginEmail.validity.valid && loginPass.validity.valid) {
       busy = true
       try {
-        await User.login(loginEmail.value, loginPass.value, rememberMe)
+        await User.login(loginEmail.value, loginPass.value, $rememberMe)
         toast('success', 'Logged in!')
       } catch {
         toast('danger', 'Failed to login. Check your email and password.')
@@ -132,7 +133,7 @@
             minLength='6' maxLength='32'
           />
         </form>
-        <Toggle bind:toggled={rememberMe}>Remember Me</Toggle>
+        <Toggle bind:toggled={$rememberMe}>Remember Me</Toggle>
         <div class='submit'>
           <Button on:click={login} disabled={busy} wide primary>Login</Button>
         </div>

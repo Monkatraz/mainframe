@@ -148,7 +148,7 @@ export class EditorCore {
     })
   }
 
-  set lineNumbers(state: boolean) {
+  set gutters(state: boolean) {
     this.view.dispatch({
       reconfigure: {
         'hide-gutters': EditorView.editorAttributes.of({ class: state ? '' : 'hide-gutters' })
