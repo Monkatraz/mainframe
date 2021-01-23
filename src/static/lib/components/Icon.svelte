@@ -14,14 +14,8 @@
     else Iconify.loadIcons([i], () => { icon = Iconify.getIcon(i) })
   }
 
-  $: if (icon) viewBox = `${icon.left} ${icon.top} ${icon.width} ${icon.height}`
+  $: if (icon) viewBox = `${icon.left ?? 0} ${icon.top ?? 0} ${icon.width ?? 0} ${icon.height ?? 0}`
 </script>
-
-<style lang='stylus'>
-  svg
-    transform: rotate(360deg)
-    vertical-align: middle
-</style>
 
 <svg xmlns="http://www.w3.org/2000/svg"
   aria-hidden='true' focusable='false'
@@ -30,3 +24,9 @@
   >
   {@html icon?.body ?? ''}
 </svg>
+
+<style lang='stylus'>
+  svg
+    vertical-align: middle
+    transform: rotate(360deg)
+</style>

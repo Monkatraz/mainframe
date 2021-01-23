@@ -19,5 +19,5 @@ Iconify.addIcon('@c:scp:logo', {
 
 
 // init app
-API.User.autologin()
+void API.User.autologin()
 new AppComponent({ target: document.querySelector('#app')!, intro: true })

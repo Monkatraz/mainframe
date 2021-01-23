@@ -159,11 +159,11 @@ vgba(triplet, opacity)
 
 // Terminal style text.
 terminal-text(col = white)
+  color: transparent
+  text-shadow: 0 0 5px rgba(col, 0.5)
   background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), col
   background-size: 100% 2px
   background-clip: text
-  color: transparent
-  text-shadow: 0 0 5px rgba(col, 0.5)
 
 // Makes an object appear higher.
 shadow-elevation(height = 1, boost = 1)
@@ -177,18 +177,17 @@ shadow-elevation(height = 1, boost = 1)
 
 // Adds scroll shadows. Requires usage of backgrounds.
 scroll-shadows(boost = 1, extent = 1, background = colvar('background-light'))
+  background: linear-gradient(background 33%, transparent),
+              linear-gradient(transparent, background 66%) 0 100%,
+              radial-gradient(farthest-side at 50% 0, shadow, rgba(0,0,0,0)),
+              radial-gradient(farthest-side at 50% 100%, shadow, rgba(0,0,0,0)) 0 100%
+  background-repeat: no-repeat
+  background-size: 100% extent1, 100% extent1, 100% extent2, 100% extent2
+  background-attachment: local, local, scroll, scroll
   alphaval = 0.5 * boost
   shadow = rgba(30, 30, 30, alphaval)
   extent1 = 30px * extent
   extent2 = 10px * extent
-  background: 
-    linear-gradient(background 33%, transparent),
-    linear-gradient(transparent, background 66%) 0 100%,
-    radial-gradient(farthest-side at 50% 0, shadow, rgba(0,0,0,0)),
-    radial-gradient(farthest-side at 50% 100%, shadow, rgba(0,0,0,0)) 0 100%
-  background-repeat: no-repeat
-  background-attachment: local, local, scroll, scroll
-  background-size: 100% extent1, 100% extent1, 100% extent2, 100% extent2
 
 // Grid-Kiss Hilarious Stylus Fork
 use('grid-kiss-stylus/grid-kiss.js')
@@ -302,11 +301,11 @@ hide-scrollbars()
 // Hides content visually but not to screen readers.
 hide-visually()
   position: absolute
-  overflow: hidden
-  clip: rect(1px, 1px, 1px, 1px)
   width: 1px
   height: 1px
+  overflow: hidden
   white-space: nowrap
+  clip: rect(1px, 1px, 1px, 1px)
   clip-path: inset(100%)
 
 // Adds ::after and ::before pseudo-elements labeling the element for screen-readers.
@@ -327,12 +326,12 @@ label-for-screenreaders(text)
 reset-styling(useCache = true)
   resetter()
     color: inherit
-    background: none
-    text-decoration: none
     font: inherit
+    text-decoration: none
+    background: none
     &:not(:focus-visible)
-      outline: none
       border: none
+      outline: none
   if useCache
     +cache('reset-styling')
       resetter()

@@ -6,41 +6,38 @@ pre
   max-width: 100%
   margin: 0
   padding: 0
-  contain: content
-
   color: var(--colcode-content)
-  box-shadow: 0 0 0.125rem 0 colvar('border')
-  border-radius: 10px
-
   font-size: 0.875rem
-  text-align: left
   white-space: pre
-  word-break: normal
+  text-align: left
   word-wrap: normal
+  word-break: normal
   tab-size: 4
   hyphens: none
+  border-radius: 10px
+  box-shadow: 0 0 0.125rem 0 colvar('border')
+  contain: content
 
   +match-media(thin, below)
     font-size: 0.75rem
 
   code
     display: block
-    padding: 1.5em 1em
     width: 100%
+    padding: 1.5em 1em
     overflow-x: auto
     background: var(--colcode-background)
-
 
 :not(pre)
   > code
     display: inline-block
+    padding: 0.1em 0.25em
     font-size: 0.9em
     white-space: normal
-    padding: 0.1em 0.25em
     border-radius: 0.2em
   > code[class*=language-], > code.code
-    background: var(--colcode-background)
     color: var(--colcode-content)
+    background: var(--colcode-background)
 
 +prefix-classes('token.')
   .block-comment, .cdata, .comment, .doctype, .prolog
@@ -50,7 +47,7 @@ pre
     color: var(--colcode-punct)
 
   .variable, .parameter
-     color: var(--colcode-ident)
+    color: var(--colcode-ident)
 
   .deleted
     color: var(--colcode-invalid)

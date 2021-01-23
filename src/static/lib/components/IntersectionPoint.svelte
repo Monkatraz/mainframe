@@ -23,10 +23,10 @@
 
 </script>
 
+<div class='intersection-point' bind:this={intersectionElement} role='presentation'/>
+
 <style lang='stylus'>
   .intersection-point
-    height: 0
     width: 100%
+    height: 0
 </style>
-
-<div class='intersection-point' bind:this={intersectionElement} role='presentation'/>

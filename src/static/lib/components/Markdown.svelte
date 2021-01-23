@@ -63,7 +63,7 @@
       if (!activeExclude.includes(elem.tagName) && !hasSiblings(elem, ln))
         activeElements.add(elem)
       // else, use first ancestor that has no siblings of the same line number
-      else while(elem.parentElement && elem.parentElement !== container) {
+      else while (elem.parentElement && elem.parentElement !== container) {
         elem = elem.parentElement
         if (!activeExclude.includes(elem.tagName) && !hasSiblings(elem, ln)) {
           activeElements.add(elem)
@@ -71,7 +71,7 @@
         }
       }
       // add last ancestor to match
-      while(elem.parentElement && elem.parentElement !== container)
+      while (elem.parentElement && elem.parentElement !== container)
         elem = elem.parentElement
       if (elem.parentElement && !activeExclude.includes(elem.tagName))
         activeElements.add(elem)
@@ -85,7 +85,7 @@
     heightmap.clear()
     heightlist = []
     const parentRect = container.getBoundingClientRect()
-    container.querySelectorAll<HTMLElement>('[data-line]').forEach(elem => {
+    container.querySelectorAll<HTMLElement>('[data-line]').forEach((elem) => {
       if (elem.offsetParent === container) {
         const line = parseInt(elem.getAttribute('data-line')!)
         const height = elem.getBoundingClientRect().top - parentRect.top
@@ -112,6 +112,13 @@
 
 </script>
 
+<div class='wrap' role='presentation'>
+  {#each Array.from(activeElements) as elem (elem)}
+    <div class=active-element transition:fade={{duration: 100}} style={getActiveElementStyle(elem)} />
+  {/each}
+  <div bind:this={container} class='rhythm container' role='presentation' />
+</div>
+
 <style lang='stylus'>
   @require '_lib'
 
@@ -120,18 +127,11 @@
 
   .active-element
     position: absolute
-    box-shadow: 0 0 1rem 0.25rem colvar('text-select', opacity 0.075)
-    border-radius: 0.25rem
-    background: colvar('text-select', opacity 0.075)
-    pointer-events: none
-    user-select: none
     z-index: 1
+    background: colvar('text-select', opacity 0.075)
+    border-radius: 0.25rem
+    box-shadow: 0 0 1rem 0.25rem colvar('text-select', opacity 0.075)
+    user-select: none
+    pointer-events: none
 
 </style>
-
-<div class='wrap' role='presentation'>
-  {#each Array.from(activeElements) as elem (elem)}
-    <div class=active-element transition:fade={{duration: 100}} style={getActiveElementStyle(elem)} />
-  {/each}
-  <div bind:this={container} class='rhythm container' role='presentation' />
-</div>

@@ -5,22 +5,23 @@
   export let small = false
 </script>
 
+<a class:small {href}><Icon {i} size={small ? '1.25em' : '2em'}/> <slot /></a>
+
 <style lang='stylus'>
   @require '_lib'
 
   a
     display: flex
-    align-items: center
     gap: 0.75rem
+    align-items: center
     height: 3rem
     padding-left: 1rem
+    font-weight: bolder
+    font-size: 1rem
 
     white-space: nowrap
-    font-set('display')
-    font-size: 1rem
-    font-weight: bolder
-
     transition: background 0.125s
+    font-set('display')
 
     +on-hover()
       background: rgba(255,255,255,0.125)
@@ -31,5 +32,3 @@
     font-weight: 300
 
 </style>
-
-<a class:small {href}><Icon {i} size={small ? '1.25em' : '2em'}/> <slot /></a>

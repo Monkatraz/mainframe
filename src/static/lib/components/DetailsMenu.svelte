@@ -1,7 +1,7 @@
 <script lang='ts'>
   import { placement as popperPlacement } from '@components'
   import { onMount } from 'svelte'
-  import type { Placement } from 'tippy.js';
+  import type { Placement } from 'tippy.js'
 
   export let hover = false
   export let open = false
@@ -45,6 +45,15 @@
 
 </script>
 
+<svelte:body on:pointerdown={checkClose} />
+
+<details bind:this={details} {...$$restProps}>
+  {#if $$slots.summary}<slot name='summary' {open} />{/if}
+  <div class='menu' use:popperPlacement={{ when: open && !!summary, pos: placement, against: summary }}>
+    <slot {open} />
+  </div>
+</details>
+
 <style lang='stylus'>
   @require '_lib'
 
@@ -66,12 +75,3 @@
     animation: reveal 0.125s 1 0s backwards ease-out
 
 </style>
-
-<svelte:body on:pointerdown={checkClose} />
-
-<details bind:this={details} {...$$restProps}>
-  {#if $$slots.summary}<slot name='summary' {open} />{/if}
-  <div class='menu' use:popperPlacement={{ when: open && !!summary, pos: placement, against: summary }}>
-    <slot {open} />
-  </div>
-</details>

@@ -72,6 +72,7 @@ export const Pref = {
   bind<T>(name: string, fallback: T) {
     const store = writable(this.get(name, fallback))
     return {
+      // eslint-disable-next-line @typescript-eslint/unbound-method
       subscribe: store.subscribe,
       set: (val: T) => {
         store.set(val)
@@ -84,7 +85,7 @@ export const Pref = {
    *  Setting items on this object will automatically cause the object to be stored.
    *  This can be used to store a record of preferences without needing to setup any automatic storage logic. */
   wrap<T extends PlainObject>(name: string, fallback: T): T {
-    const wrapped = this.get(name, fallback) as T
+    const wrapped = this.get(name, fallback)
     const handler: ProxyHandler<T> = {
       // handle nested objects by proxying them with the same handler
       get: (target, prop) => {
@@ -106,14 +107,14 @@ export const Pref = {
  * Returns a promise that resolves after the specified number of miliseconds.
  */
 export function sleep(ms: number): Promise<void> {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 /**
  * Creates and returns a promise that resolves when an invokation of `requestAnimationFrame()` fires its callback.
  */
 export function animationFrame(): Promise<number> {
-  return new Promise((resolve) => requestAnimationFrame(resolve))
+  return new Promise(resolve => requestAnimationFrame(resolve))
 }
 
 // Credit: https://gist.github.com/beaucharman/e46b8e4d03ef30480d7f4db5a78498ca
@@ -129,7 +130,7 @@ export function throttle<T extends WrappedFn<NoReturnVal>>(fn: T, limitMS: numbe
   return function (this: any, ...args: Parameters<T>) {
     const callNow = immediate && initialCall
     const next = () => {
-      fn.apply(this, [...args as any])
+      void fn.apply(this, [...args as any])
       timeout = null
     }
     if (callNow) {
@@ -146,7 +147,7 @@ export function debounce<T extends WrappedFn<NoReturnVal>>(fn: T, wait = 1) {
   let timeout: any
   return function (this: any, ...args: Parameters<T>) {
     clearTimeout(timeout)
-    timeout = setTimeout(() => fn.call(this, ...args), wait)
+    timeout = setTimeout(() => void fn.call(this, ...args), wait)
   }
 }
 
@@ -203,6 +204,7 @@ export function createAnimQueued<T extends WrappedFn<NoReturnVal>>(fn: T) {
   return (...args: Parameters<T>): NoReturnVal => {
     if (queued !== true) {
       queued = true
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
       requestAnimationFrame(async () => {
         await fn(...args as any)
         queued = false
@@ -239,14 +241,14 @@ export function createIdleQueued<T extends WrappedFn<NoReturnVal>>(fn: T, timeou
 
 /** Helper function for creating event listeners. */
 export function evtlistener(target: typeof window | typeof document | Element, events: string[], fn: AnyFn, opts: AddEventListenerOptions = {}) {
-  events.forEach(event => {
+  events.forEach((event) => {
     target.addEventListener(event, fn, opts)
   })
 }
 
 /** Helper function for removing event listeners. */
 export function rmEvtlistener(target: typeof window | typeof document | Element, events: string[], fn: AnyFn, opts: AddEventListenerOptions = {}) {
-  events.forEach(event => {
+  events.forEach((event) => {
     target.removeEventListener(event, fn, opts)
   })
 }

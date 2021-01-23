@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang='ts'>
   // Imports
   import * as API from './modules/api'
   import { ENV, sleep } from './modules/util'
@@ -36,6 +36,72 @@
   })
 
 </script>
+
+<!-- User Panel (large screen, not in navbar) -->
+{#if $matchMedia('small', 'up')}
+  <div role='presentation' use:portal={'#user-panel'}>
+    <UserPanel />
+  </div>
+{/if}
+
+<!-- Toasts -->
+<div role='presentation' use:portal={'#toasts'}>
+  <Toasts />
+</div>
+
+
+{#if $router.path === '/edit'}
+  <!-- Editor -->
+  <div
+  out:fade={{ duration: 100, delay: 300 }}
+  on:outroend={async () => { await sleep(50); inEdit = false }}
+  >
+  <!-- Async. loading -->
+    {#await import(EditorURL)}
+      <Spinny width=150px top=50% left=50%/>
+    {:then Editor}
+      <svelte:component this={Editor.default}/>
+    {/await}
+  </div>
+{:else if !inEdit}
+  <div class=container out:fade={{duration: 150}} role=presentation>
+
+    <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation>
+      <Navbar />
+    </nav>
+    <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>
+      <Sidebar />
+    </aside>
+
+    <main class="content" aria-label=Content>
+      {#key $router.path}
+        <Route firstmatch>
+          <!-- Dummy route for the editor -->
+          <Route path='/edit'/>
+
+          <!-- Home Page -->
+          <Route path="/"><Page
+            loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
+          /></Route>
+
+          <!-- Test routes-->
+          <Route path="/test/md"><Page
+            loading={fetch('/static/misc/md-test.md').then(res => res.text())}
+          /></Route>
+
+          <Route path="/test/loading"><Page
+            loading={new Promise(() => {})}
+          /></Route>
+
+          <!-- User Pages -->
+          <Route path="/*"><Page
+            loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
+          /></Route>
+        </Route>
+      {/key}
+    </main>
+  </div>
+{/if}
 
 <style lang="stylus">
   @require '_lib'
@@ -103,85 +169,19 @@
     position: sticky
     top: -1rem
     height: calc(100vh + 1rem)
+    margin-top: -1rem
     background: colvar('accent-1')
     // Buffer overlap on the top
     border-top: solid 1rem colvar('accent-1')
-    margin-top: -1rem
 
     +match-media(thin, below)
       position: absolute
-      height: 100%
       top: 0
       left: -100%
+      height: 100%
 
   .content
     position: relative
     padding: 2rem 0
 
 </style>
-
-<!-- User Panel (large screen, not in navbar) -->
-{#if $matchMedia('small', 'up')}
-  <div role='presentation' use:portal={'#user-panel'}>
-    <UserPanel />
-  </div>
-{/if}
-
-<!-- Toasts -->
-<div role='presentation' use:portal={'#toasts'}>
-  <Toasts />
-</div>
-
-
-{#if $router.path === '/edit'}
-  <!-- Editor -->
-  <div
-  out:fade={{ duration: 100, delay: 300 }}
-  on:outroend={async () => { await sleep(50); inEdit = false }}
-  >
-  <!-- Async. loading -->
-    {#await import(EditorURL)}
-      <Spinny width=150px top=50% left=50%/>
-    {:then Editor}
-      <svelte:component this={Editor.default}/>
-    {/await}
-  </div>
-{:else if !inEdit}
-  <div class=container out:fade={{duration: 150}} role=presentation>
-
-    <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation>
-      <Navbar />
-    </nav>
-    <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>
-      <Sidebar />
-    </aside>
-
-    <main class="content" aria-label=Content>
-      {#key $router.path}
-        <Route firstmatch>
-          <!-- Dummy route for the editor -->
-          <Route path='/edit'/>
-
-          <!-- Home Page -->
-          <Route path="/"><Page
-            loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
-          /></Route>
-
-          <!-- Test routes-->
-          <Route path="/test/md"><Page
-            loading={fetch('/static/misc/md-test.md').then(res => res.text())}
-          /></Route>
-
-          <Route path="/test/loading"><Page
-            loading={new Promise(() => {})}
-          /></Route>
-
-          <!-- User Pages -->
-          <Route path="/*"><Page
-            loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
-          /></Route>
-        </Route>
-      {/key}
-    </main>
-  </div>
-{/if}

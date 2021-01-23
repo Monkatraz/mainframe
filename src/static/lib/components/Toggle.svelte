@@ -3,45 +3,6 @@
   export let small = false
 </script>
 
-<style lang='stylus'>
-  @require '_lib'
-
-  label
-    position: relative
-
-    +on-hover(false)
-      .slot
-        color: colvar('hint')
-
-  .background
-    stroke: colvar('border')
-    stroke-width: 0.125rem
-    fill: transparent
-    transition: fill 0.15s
-
-  .toggled .background
-    fill: colvar('hint')
-
-  .thumb
-    transition: transform 0.25s, fill 0.15s
-    fill: currentColor
-
-  .toggled .thumb
-    transform: translateX(45%)
-    fill: colvar('white')
-
-  .slot
-    transition: color 0.1s
-    margin-left: 0.25em
-
-  input
-    position: absolute
-    top: 0
-    left: 0
-    opacity: 0
-
-</style>
-
 <label class:toggled>
   <input type='checkbox' bind:checked={toggled}>
   <svg xmlns='http://www.w3.org/2000/svg' aria-hidden='true' viewBox='0 0 24 24'
@@ -56,3 +17,42 @@
     </svg>
   <span class='slot' {...$$restProps}><slot /></span>
 </label>
+
+<style lang='stylus'>
+  @require '_lib'
+
+  label
+    position: relative
+
+    +on-hover(false)
+      .slot
+        color: colvar('hint')
+
+  .background
+    transition: fill 0.15s
+    fill: transparent
+    stroke: colvar('border')
+    stroke-width: 0.125rem
+
+  .toggled .background
+    fill: colvar('hint')
+
+  .thumb
+    transition: transform 0.25s, fill 0.15s
+    fill: currentColor
+
+  .toggled .thumb
+    transform: translateX(45%)
+    fill: colvar('white')
+
+  .slot
+    margin-left: 0.25em
+    transition: color 0.1s
+
+  input
+    position: absolute
+    top: 0
+    left: 0
+    opacity: 0
+
+</style>

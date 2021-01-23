@@ -1,4 +1,4 @@
-<script lang="ts">
+<script lang='ts'>
   // Library Imports
   import { EditorCore } from './editor-core'
   import { onDestroy, onMount, setContext } from 'svelte'
@@ -32,8 +32,8 @@
   let preview: HTMLDivElement
 
   let scrollingWith: 'editor' | 'preview' = 'editor'
-  let previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
-  let editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
+  const previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
+  const editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
 
   // from Markdown component
   let heightmap: Map<number, number>
@@ -54,8 +54,8 @@
       editorContainer,
       await fetch('/static/misc/md-test.md').then(res => res.text()),
       [EditorView.domEventHandlers({
-        'wheel': () => { scrollingWith = 'editor' },
-        'scroll': () => { scrollFromEditor() }
+        wheel: () => { scrollingWith = 'editor' },
+        scroll: () => { scrollFromEditor() }
       })]
     )
     mounted = true
@@ -84,11 +84,11 @@
   const scrollFromEditor = createAnimQueued(() => {
     if (scrollingWith === 'preview' || !canScrollSync()) return
     const scrollTop = Editor.view.scrollDOM.scrollTop
-    editorScrollSpring.set(scrollTop)
+    void editorScrollSpring.set(scrollTop)
     // get top most visible line
     const domRect = editorContainer.getBoundingClientRect()
     const pos = Editor.view.posAtCoords({ x: domRect.x, y: domRect.y })
-    let line = Editor.doc.lineAt(pos ?? 1).number - 1
+    const line = Editor.doc.lineAt(pos ?? 1).number - 1
     // find our line height
     let lineHeight = 0
     let curLine = line
@@ -103,7 +103,7 @@
     if (lineHeight) {
       // fudge value to prevent the preview from getting "sticky"
       const diff = (scrollTop - Editor.heightAtLine(curLine + 1)) * 0.75
-      previewScrollSpring.set(lineHeight + diff)
+      void previewScrollSpring.set(lineHeight + diff)
     }
   })
 
@@ -112,159 +112,17 @@
   const scrollFromPreview = createAnimQueued(() => {
     if (scrollingWith === 'editor' || !canScrollSync()) return
     const scrollTop = preview.scrollTop
-    previewScrollSpring.set(scrollTop)
+    void previewScrollSpring.set(scrollTop)
     // filter for the closest line height
     const line = heightlist.findIndex(height => scrollTop < height)
     if (line !== -1) {
       // fudge to prevent the editor from getting sticky
       const diff = (scrollTop - heightlist[line]) * 0.75
-      editorScrollSpring.set(Editor.heightAtLine(line) + diff)
+      void editorScrollSpring.set(Editor.heightAtLine(line) + diff)
     }
   })
 
 </script>
-
-<style lang='stylus'>
-  @require '_lib'
-
-  $hght = calc(100vh - var(--layout-header-height-edit))
-  $hght2 = calc(100vh - 2rem - var(--layout-header-height-edit))
-  $body-w = minmax(0, var(--layout-body-max-width))
-  $edit-w = minmax(50%, 1fr)
-
-  .overflow-container
-    position: relative
-    height: $hght
-    width: 100%
-    background: var(--colcode-background)
-    overflow: hidden
-
-  .editor-container
-    width: 100%
-    box-shadow: 0 0 4rem black
-
-    &.show-both
-      grid-kiss:"+--------------------------------------------------+      ",
-                "| .topbar                                          | 2rem ",
-                "+--------------------------------------------------+      ",
-                "+------------------------+ +-----------------------+      ",
-                "| .editor-pane           | | .preview              |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |$hght2",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "+------------------------+ +-----------------------+      ",
-                "|        $edit-w         | |        $body-w        |      "
-
-    &.show-editor
-      grid-kiss:"+--------------------------------------------------+      ",
-                "| .topbar                                          | 2rem ",
-                "+--------------------------------------------------+      ",
-                "+--------------------------------------------------+      ",
-                "| .editor-pane                                     |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |$hght2",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "+--------------------------------------------------+      ",
-                "| 100%                                             |      "
-
-    &.show-preview
-      grid-kiss:"+--------------------------------------------------+      ",
-                "| .topbar                                          | 2rem ",
-                "+--------------------------------------------------+      ",
-                "+------+ +--------------------------------+ +------+      ",
-                "|      | | > .preview <                   | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |$hght2",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "+------+ +--------------------------------+ +------+      ",
-                "|0.5rem| | auto                           | |0.5rem|      "
-      .editor
-        display: none
-
-  .topbar
-    display: flex
-    background: var(--colcode-background)
-    font-set('display')
-    font-size: 0.9rem
-    line-height: 1.9rem
-    padding: 0.1rem 0.5rem
-    z-index: 10
-    flex-wrap: nowrap
-    white-space: nowrap
-
-  .topbar-section
-    display: flex
-    gap: 0.25rem
-    align-items: center
-    padding-right: 0.5rem
-    border-right: 0.15rem solid colvar('border')
-
-  .editor-pane
-    position: relative
-    z-index: 2
-    overflow: hidden
-    border-right: solid 0.125rem colvar('border')
-    padding-right: 0.25rem
-    background: var(--colcode-background)
-
-  .editor-settings, .preview-settings
-    position: absolute
-    height: 2.5rem
-    width: 2.5rem
-    top: 1rem
-    right: 1rem
-    z-index: 10
-
-    +match-media(thin, below)
-      right: 0
-
-  .preview-settings
-    position: sticky
-    top: 1rem
-    right: 0
-    margin-left: calc(100% - 1.5rem)
-
-  .settings-menu
-    display: flex
-    flex-direction: column
-    width: max-content
-    font-set('display')
-    font-size: 0.9rem
-
-  .editor
-    height: 100%
-
-  .preview
-    position: relative
-    width: var(--layout-body-max-width)
-    max-width: 100%
-    padding: 0 1rem
-    padding-bottom: 100%
-    overflow-y: scroll
-    font-size: 90%
-    z-index: 1
-    box-shadow: inset 0 1rem 0.5rem -1rem rgba(black, 0.25)
-    contain: strict
-
-</style>
 
 <!-- some chores to do on resize -->
 <svelte:window on:resize={updateScroll}/>
@@ -339,3 +197,145 @@
 
   </div>
 </div>
+
+<style lang='stylus'>
+  @require '_lib'
+
+  $hght = calc(100vh - var(--layout-header-height-edit))
+  $hght2 = calc(100vh - 2rem - var(--layout-header-height-edit))
+  $body-w = minmax(0, var(--layout-body-max-width))
+  $edit-w = minmax(50%, 1fr)
+
+  .overflow-container
+    position: relative
+    width: 100%
+    height: $hght
+    overflow: hidden
+    background: var(--colcode-background)
+
+  .editor-container
+    width: 100%
+    box-shadow: 0 0 4rem black
+
+    &.show-both
+      grid-kiss:"+--------------------------------------------------+      ",
+                "| .topbar                                          | 2rem ",
+                "+--------------------------------------------------+      ",
+                "+------------------------+ +-----------------------+      ",
+                "| .editor-pane           | | .preview              |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |$hght2",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "|                        | |                       |      ",
+                "+------------------------+ +-----------------------+      ",
+                "|        $edit-w         | |        $body-w        |      "
+
+    &.show-editor
+      grid-kiss:"+--------------------------------------------------+      ",
+                "| .topbar                                          | 2rem ",
+                "+--------------------------------------------------+      ",
+                "+--------------------------------------------------+      ",
+                "| .editor-pane                                     |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |$hght2",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "|                                                  |      ",
+                "+--------------------------------------------------+      ",
+                "| 100%                                             |      "
+
+    &.show-preview
+      grid-kiss:"+--------------------------------------------------+      ",
+                "| .topbar                                          | 2rem ",
+                "+--------------------------------------------------+      ",
+                "+------+ +--------------------------------+ +------+      ",
+                "|      | | > .preview <                   | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |$hght2",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "|      | |                                | |      |      ",
+                "+------+ +--------------------------------+ +------+      ",
+                "|0.5rem| | auto                           | |0.5rem|      "
+      .editor
+        display: none
+
+  .topbar
+    z-index: 10
+    display: flex
+    flex-wrap: nowrap
+    padding: 0.1rem 0.5rem
+    font-size: 0.9rem
+    line-height: 1.9rem
+    white-space: nowrap
+    background: var(--colcode-background)
+    font-set('display')
+
+  .topbar-section
+    display: flex
+    gap: 0.25rem
+    align-items: center
+    padding-right: 0.5rem
+    border-right: 0.15rem solid colvar('border')
+
+  .editor-pane
+    position: relative
+    z-index: 2
+    padding-right: 0.25rem
+    overflow: hidden
+    background: var(--colcode-background)
+    border-right: solid 0.125rem colvar('border')
+
+  .editor-settings, .preview-settings
+    position: absolute
+    top: 1rem
+    right: 1rem
+    z-index: 10
+    width: 2.5rem
+    height: 2.5rem
+
+    +match-media(thin, below)
+      right: 0
+
+  .preview-settings
+    position: sticky
+    top: 1rem
+    right: 0
+    margin-left: calc(100% - 1.5rem)
+
+  .settings-menu
+    display: flex
+    flex-direction: column
+    width: max-content
+    font-set('display')
+    font-size: 0.9rem
+
+  .editor
+    height: 100%
+
+  .preview
+    position: relative
+    z-index: 1
+    width: var(--layout-body-max-width)
+    max-width: 100%
+    padding: 0 1rem
+    padding-bottom: 100%
+    overflow-y: scroll
+    font-size: 90%
+    box-shadow: inset 0 1rem 0.5rem -1rem rgba(black, 0.25)
+    contain: strict
+
+</style>

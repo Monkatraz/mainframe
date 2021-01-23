@@ -22,6 +22,8 @@
 - [ ] Make critic comments a bit smarter somehow, they don't work very well on mobile
 - [ ] Separate 404 page so that indexing works correctly
 - [ ] Set page metadata in the `<head>` when loading pages
+- [ ] Support specificity in the language modes for pages
+  - e.g. if there is no `en-us` local, but there is `en`, it will pick that one
 
 ### Components
 - [ ] Licensing Widget

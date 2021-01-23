@@ -44,8 +44,8 @@ s
 
 // Highlighted text.
 mark
-  background: colvar('text-highlight')
   color: inherit
+  background: colvar('text-highlight')
 
 // -- TABLES
 
@@ -54,8 +54,8 @@ table
   width: max-content
   max-width: 100%
   overflow: hidden
-  empty-cells: hide
   table-layout: fixed
+  empty-cells: hide
 
 th
   font-weight: bolder
@@ -79,8 +79,8 @@ tr
 
 .content a
   &[href]
-    transition: color 0.05s, text-decoration-color 0.1s
     text-decoration: currentColor underline 0.1em
+    transition: color 0.05s, text-decoration-color 0.1s
 
   // Styles external links.
   &[href*='//']:not([href*='mainframe.vercel.app']):not([href*='localhost'])
@@ -109,44 +109,44 @@ label
 
 // Inserted text. {++ ++}
 ins
-  background: colvar('critic-inserted', opacity 0.25)
   text-decoration: underline colvar('critic-inserted') 0.125em
+  background: colvar('critic-inserted', opacity 0.25)
   text-decoration-skip-ink: none
 
 // Deleted text. {-- --}
 del
-  background: colvar('critic-deleted', opacity 0.25)
   text-decoration: underline colvar('critic-deleted') 0.125em
+  background: colvar('critic-deleted', opacity 0.25)
   text-decoration-skip-ink: none
 
 // Substitution arrow. ~>
 span.critic-sub-arrow
-  background: colvar('critic-sub-arrow', opacity 0.25)
   padding: 0 0.5em
+  background: colvar('critic-sub-arrow', opacity 0.25)
 
 // Highlighted text. {== ==}
 mark.critic-highlighted
-  background: colvar('critic-highlighted', opacity 0.25)
   text-decoration: underline colvar('critic-highlighted') 0.125em
+  background: colvar('critic-highlighted', opacity 0.25)
   text-decoration-skip-ink: none
 
 // Comment metadata. {>> <<}
 span.critic-metadata
   position: absolute
-  font-size: 70%
-  transform: translate(-50%, 100%)
   z-index: 1
-  text-decoration: underline colvar('critic-comment') 0.125em
   color: colvar('critic-comment')
+  font-size: 70%
+  text-decoration: underline colvar('critic-comment') 0.125em
+  transform: translate(-50%, 100%)
   transition: background 0.05s, padding 0.1s, color 0.1s, transform 0.05s, font-size 0.05s
 
   +on-hover()
-    background: colvar('critic-comment')
-    color: white
     padding: 0.1em 0.25em
+    color: white
     font-size: 100%
-    transform: translate(-50%, 50%)
+    background: colvar('critic-comment')
     border-radius: 0.25em
+    transform: translate(-50%, 50%)
 
 // -- A11Y
 
@@ -177,8 +177,8 @@ ins
   display: initial
 
 [aria-hidden="false" i][hidden]:not(:focus)
-  clip: rect(0, 0, 0, 0)
   position: absolute
+  clip: rect(0, 0, 0, 0)
 
 // Prevent VoiceOver from ignoring list semantics in Safari.
 nav li::before

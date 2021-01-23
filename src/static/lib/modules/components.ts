@@ -25,7 +25,7 @@ export const toasts = writable<Set<Toast>>(new Set())
 /** Displays a 'toast' notification to the user. Provide a `time` of `0` to prevent the notification
  *  from automatically closing. */
 export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: string, time = 5000) {
-  const remove = () => { toasts.update(cur => { cur.delete(toastData); return cur }) }
+  const remove = () => { toasts.update((cur) => { cur.delete(toastData); return cur }) }
   const toastData = { type, message, remove }
   toasts.update(cur => cur.add(toastData))
   // delete message after timeout
@@ -91,20 +91,10 @@ const DEFAULT_TIPPY_OPTS: Partial<TippyProps> = {
 
 function parseTipOpts(elem: Element, opts: Partial<TippyProps> | string) {
   if (opts) {
-    if (typeof opts === 'string')
-      opts = { content: opts }
-    else if (!opts.content) {
-      if (elem.hasAttribute('aria-label'))
-        opts.content = elem.getAttribute('aria-label')!
-      else
-        opts.content = ''
-    }
-  } else {
-    if (elem.hasAttribute('aria-label'))
-      opts = { content: elem.getAttribute('aria-label')! }
-    else
-      opts = { content: '' }
+    if (typeof opts === 'string') opts = { content: opts }
+    else if (!opts.content) opts.content = elem.getAttribute('aria-label') ?? ''
   }
+  else opts = { content: elem.getAttribute('aria-label') ?? '' }
   return opts
 }
 
@@ -151,9 +141,9 @@ const TNANIME_FORCED_OPTS: AnimeParams = {
 export function tnAnime(elem: Element, opts: AnimeParams) {
   const safeOpts = { ...opts, ...TNANIME_FORCED_OPTS, targets: elem }
   return () => {
-    const anim = anime(safeOpts);
+    const anim = anime(safeOpts)
     // makes sure that the animation doesn't conflict on top of other ones
-    (async () => {
+    void (async () => {
       await animationFrame()
       anime.remove(elem)
       requestAnimationFrame(anim.play)

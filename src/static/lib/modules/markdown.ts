@@ -38,8 +38,8 @@ const RENDER_TIMEOUT = 10000
  *
  *  The render occurs in a web worker due to performance considerations.
  */
-export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownResult> => {
-  return new Promise((resolve, reject) => {
+export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownResult> =>
+  new Promise((resolve, reject) => {
     const perfTotal = performance.now()
     // Timeout reject scenario
     const rejectTimer = setTimeout(() => {
@@ -48,7 +48,7 @@ export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownRe
     }, RENDER_TIMEOUT)
     // Set the worker to resolve the promise
     renderWorker.onmessage = (evt) => {
-      // clear the timer so we don't pointlessly restart the worker
+    // clear the timer so we don't pointlessly restart the worker
       clearTimeout(rejectTimer)
       // if the evt.data is a string it is a casted error
       if (typeof evt.data === 'string') reject(evt.data)
@@ -65,52 +65,49 @@ export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownRe
     }
     // everything's ready, send message to worker
     renderWorker.postMessage(raw)
-  })
-})
+  }))
 
 /** Safely renders a given Markdown string and then updates the given node with the resultant HTML.
  *  This is _much_ faster than updating the entire DOM node at once.
  *
  *  Like `renderMarkdown`, the rendering process itself occurs within a web-worker for higher performance.
- *  Also, again like `renderMarkdown`, this function can safely be called multiple times. 
+ *  Also, again like `renderMarkdown`, this function can safely be called multiple times.
  *  It will only render one request at a time.
  */
-export const morphMarkdown = createLock((raw: string, node: Node) => {
-  return new Promise((resolve, reject) => {
-    // Timeout reject scenario
-    const rejectTimer = setTimeout(() => {
-      reject(new Error('Render timed out.'))
-      restartRenderWorker()
-    }, RENDER_TIMEOUT)
+export const morphMarkdown = createLock((raw: string, node: Node) => new Promise((resolve, reject) => {
+  // Timeout reject scenario
+  const rejectTimer = setTimeout(() => {
+    reject(new Error('Render timed out.'))
+    restartRenderWorker()
+  }, RENDER_TIMEOUT)
 
-    renderWorker.onmessage = (evt) => {
-      clearTimeout(rejectTimer)
-      // if the evt.data is a string it is a casted error
-      if (typeof evt.data === 'string') reject(evt.data)
+  renderWorker.onmessage = (evt) => {
+    clearTimeout(rejectTimer)
+    // if the evt.data is a string it is a casted error
+    if (typeof evt.data === 'string') reject(evt.data)
 
-      morphdom(node, '<div>' + evt.data.html + '</div>', {
-        childrenOnly: true,
-        onBeforeNodeAdded: function (toEl) {
-          // Don't sanitize if it's just a raw text node
-          if (toEl.nodeType === 3) return toEl
-          return DOMPurify.sanitize(toEl, { IN_PLACE: true }) as unknown as Node
-        },
-        onBeforeElUpdated: function (fromEl, toEl) {
-          if (fromEl.isEqualNode(toEl)) return false
-          DOMPurify.sanitize(toEl, { IN_PLACE: true })
-          return true
-        }
-      })
+    morphdom(node, `<div>${evt.data.html as string}</div>`, {
+      childrenOnly: true,
+      onBeforeNodeAdded: function (toEl) {
+        // Don't sanitize if it's just a raw text node
+        if (toEl.nodeType === 3) return toEl
+        return DOMPurify.sanitize(toEl, { IN_PLACE: true }) as unknown as Node
+      },
+      onBeforeElUpdated: function (fromEl, toEl) {
+        if (fromEl.isEqualNode(toEl)) return false
+        DOMPurify.sanitize(toEl, { IN_PLACE: true })
+        return true
+      }
+    })
 
-      resolve({
-        perf: evt.data.perf,
-        cacheSize: evt.data.cacheSize
-      })
-    }
-    // everything's ready, send message to worker
-    renderWorker.postMessage(raw)
-  })
-})
+    resolve({
+      perf: evt.data.perf,
+      cacheSize: evt.data.cacheSize
+    })
+  }
+  // everything's ready, send message to worker
+  renderWorker.postMessage(raw)
+}))
 
 // -- DOMPURIFY
 

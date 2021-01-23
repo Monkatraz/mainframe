@@ -4,13 +4,13 @@
  */
 
 // FaunaDB
-import FaunaDB, { Expr, values as v, errors as e } from 'faunadb'
+import FaunaDB, { Expr, errors as e, values as v } from 'faunadb'
 // FDB types bug requires that I get a separate non-imported obj for the actual errors
 const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
+import type { Page, Social } from '@schemas'
 import { ENV } from './util'
-import type { Social, Page } from '@schemas'
 import { writable } from 'svelte/store'
 
 // ---------
@@ -98,7 +98,7 @@ export const qe = {
   },
 
   /** `if: then, elseif: then, finally: exhausted` mapping.
-   *  @example 
+   *  @example
    * qe.IfMap(q.Abort('Object is not an object or array!'), [
    * [q.isObject(SomeObj), q.Select('yes', SomeObj)],
    * [q.isArray(SomeObj), q.Select(0, SomeObj)]
@@ -106,15 +106,14 @@ export const qe = {
    */
   IfMap(exhausted: Expr, conditionals: [condition: Expr, then: Expr][]) {
     // Work from the deepest node to the highest node
-    const reducer = (acc: Expr, conditional: [condition: Expr, then: Expr]) =>
-      q.If(conditional[0], conditional[1], acc)
+    const reducer = (acc: Expr, conditional: [condition: Expr, then: Expr]) => q.If(conditional[0], conditional[1], acc)
     return conditionals.reverse().reduce(reducer, exhausted)
   },
 
   /** Returns the fields of the specified array/object. */
   Fields(obj: Expr) {
     // Reduces `[id, value]` pair to just `id`
-    const lambda = q.Lambda(((keyvalue) => q.Select(0, keyvalue)))
+    const lambda = q.Lambda((keyvalue => q.Select(0, keyvalue)))
     return qe.IfMap(q.Abort('400'), [
       [q.IsObject(obj), q.Map(q.ToArray(obj), lambda)],
       [q.IsArray(obj), obj]
@@ -136,9 +135,9 @@ export const qe = {
   PageLang(obj: Expr) {
     return q.Let(
       {
-        'langs': qe.Fields(q.Select('locals', obj)),
-        'intersect': q.Intersection(User.preferences.langs, q.Var('langs')),
-        'lang': q.If(q.Not(q.IsEmpty(q.Var('intersect'))),
+        langs: qe.Fields(q.Select('locals', obj)),
+        intersect: q.Intersection(User.preferences.langs, q.Var('langs')),
+        lang: q.If(q.Not(q.IsEmpty(q.Var('intersect'))),
           q.Select(0, q.Var('intersect')),
           q.Select(0, q.Var('langs'))
         )
@@ -159,7 +158,7 @@ export const qe = {
       // Key list format
       else filterObj[key] = q.Select(key, q.Var('fdobj'))
     })
-    return q.Let({ 'fdobj': obj }, filterObj)
+    return q.Let({ fdobj: obj }, filterObj)
   }
 }
 
@@ -167,7 +166,7 @@ class Client {
   private client!: FaunaDB.Client
   public query!: FaunaDB.Client['query']
   public paginate!: FaunaDB.Client['paginate']
-  constructor (key: string) {
+  constructor(key: string) {
     if (key === '') return
     this.client = new FaunaDB.Client({
       secret: key,
@@ -279,7 +278,7 @@ export async function createPage(type: string, name: string, lang: string): Prom
 
 /** Smart Page API handler function. */
 export function withPage(path: string, lang: string | Expr = qe.PageLang(q.Var('data'))) {
-  const vars = { 'data': qe.Data(qe.Search('pages_by_path', path as Expr)), 'lang': lang }
+  const vars = { data: qe.Data(qe.Search('pages_by_path', path as Expr)), lang: lang }
   const local = q.Select(['locals', q.Var('lang')], q.Var('data'))
   const ql = (expr: Expr) => q.Let(vars, expr)
   return {

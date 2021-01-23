@@ -21,31 +21,6 @@
   }
 </script>
 
-<style lang='stylus'>
-  @require '_lib'
-
-  // 404 / page not found
-  .pgnf
-    text-align: center
-
-  .pgnf-blackbox
-    background: black
-    border-radius: 10px
-    padding-top: 1rem
-    padding-bottom: 2rem
-    shadow-elevation(8px)
-
-  .pgnf-header, .pgnf-text
-    terminal-text()
-    font-set('mono')
-
-  .pgnf-header
-    font-size: 5em
-
-  .pgnf-text
-    font-size: 2.5em
-</style>
-
 <div role='presentation' out:fade={{duration: 100}}>
   {#await loading.then(renderMarkdown)}
 
@@ -79,3 +54,28 @@ MSG: {error?.description}
     {/if}
   {/await}
 </div>
+
+<style lang='stylus'>
+  @require '_lib'
+
+  // 404 / page not found
+  .pgnf
+    text-align: center
+
+  .pgnf-blackbox
+    padding-top: 1rem
+    padding-bottom: 2rem
+    background: black
+    border-radius: 10px
+    shadow-elevation(8px)
+
+  .pgnf-header, .pgnf-text
+    terminal-text()
+    font-set('mono')
+
+  .pgnf-header
+    font-size: 5em
+
+  .pgnf-text
+    font-size: 2.5em
+</style>

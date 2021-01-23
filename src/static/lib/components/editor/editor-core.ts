@@ -3,16 +3,16 @@
  * @author Monkatraz
  */
 
-import { EditorState, Extension, tagExtension } from "@codemirror/state"
+import { EditorState, Extension, tagExtension } from '@codemirror/state'
 import {
-  EditorView, keymap, ViewPlugin, ViewUpdate,
-  highlightSpecialChars, highlightActiveLine, drawSelection
+  EditorView, ViewPlugin, ViewUpdate, drawSelection,
+  highlightActiveLine, highlightSpecialChars, keymap
 } from '@codemirror/view'
 import { history, historyKeymap } from '@codemirror/history'
 import { foldGutter, foldKeymap } from '@codemirror/fold'
 import { indentOnInput } from '@codemirror/language'
 import { lineNumbers } from '@codemirror/gutter'
-import { defaultKeymap } from '@codemirror/commands'
+import { defaultKeymap, defaultTabBinding } from '@codemirror/commands'
 import { bracketMatching } from '@codemirror/matchbrackets'
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/closebrackets'
 import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
@@ -21,7 +21,7 @@ import { commentKeymap } from '@codemirror/comment'
 import { rectangularSelection } from '@codemirror/rectangular-selection'
 // Local Extensions
 import { redo } from '@codemirror/history'
-import { indentMore, indentLess, copyLineDown } from '@codemirror/commands'
+import { copyLineDown, indentLess, indentMore } from '@codemirror/commands'
 import { confinement } from './editor-config'
 import monarchMarkdown from './monarch-markdown'
 // Misc.
@@ -61,11 +61,10 @@ function getExtensions() {
       ...commentKeymap,
       ...completionKeymap,
       ...[
-        { key: 'Tab', run: indentMore, preventDefault: true },
-        { key: 'Shift-Tab', run: indentLess, preventDefault: true },
         { key: 'Mod-Shift-z', run: redo, preventDefault: true },
         { key: 'Mod-d', run: copyLineDown, preventDefault: true }
-      ]
+      ],
+      defaultTabBinding
     ]),
     hideGuttersTheme,
     monarchMarkdown.load(),
@@ -91,29 +90,27 @@ export class EditorCore {
       this.value.set(doFn())
     }, 50)
 
-    const updateHandler = ViewPlugin.define(() => {
-      return {
-        update: (update: ViewUpdate) => {
-          // update store on change
-          if (update.docChanged) { updateValue(() => update.state.doc.toString()) }
-          // get active lines
-          if (update.selectionSet || update.docChanged) {
-            const lines: Set<number> = new Set()
-            for (const r of update.state.selection.ranges) {
-              const lnStart = update.state.doc.lineAt(r.from).number
-              const lnEnd = update.state.doc.lineAt(r.to).number
-              if (lnStart === lnEnd) lines.add(lnStart - 1)
-              else {
-                const diff = lnEnd - lnStart
-                for (let i = 0; i <= diff; i++)
-                  lines.add((lnStart + i) - 1)
-              }
+    const updateHandler = ViewPlugin.define(() => ({
+      update: (update: ViewUpdate) => {
+        // update store on change
+        if (update.docChanged) { updateValue(() => update.state.doc.toString()) }
+        // get active lines
+        if (update.selectionSet || update.docChanged) {
+          const lines: Set<number> = new Set()
+          for (const r of update.state.selection.ranges) {
+            const lnStart = update.state.doc.lineAt(r.from).number
+            const lnEnd = update.state.doc.lineAt(r.to).number
+            if (lnStart === lnEnd) lines.add(lnStart - 1)
+            else {
+              const diff = lnEnd - lnStart
+              for (let i = 0; i <= diff; i++)
+                lines.add((lnStart + i) - 1)
             }
-            this.activeLines.set(lines)
           }
+          this.activeLines.set(lines)
         }
       }
-    })
+    }))
 
     this.view = new EditorView({
       parent,
@@ -143,7 +140,7 @@ export class EditorCore {
   set spellcheck(state: boolean) {
     this.view.dispatch({
       reconfigure: {
-        'spellcheck': EditorView.contentAttributes.of({ spellcheck: String(state) })
+        spellcheck: EditorView.contentAttributes.of({ spellcheck: String(state) })
       }
     })
   }

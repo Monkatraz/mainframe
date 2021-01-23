@@ -16,7 +16,7 @@ function resolveSwipe([x1, y1]: Point, [x2, y2]: Point): SwipeEvent {
   const diff = [y1 - y2, x1 - x2]
   const diffAbs = diff.map(Math.abs)
   const axis = diffAbs[1] > diffAbs[0] ? 1 : 0
-  const dir = SWIPE_DIRECTIONS[(axis * 2) + (diff[axis] < 0 as any)]
+  const dir = SWIPE_DIRECTIONS[(axis * 2) + +(diff[axis] < 0)]
   //                                ^               ^  get direction via sign (+ = up|left, - = down|right)
   //                                ^ this is either 0 or 2, as axis is either 0 or 1
   return [dir, diffAbs[axis]]
@@ -78,7 +78,7 @@ export function onSwipe(target: HTMLElement, inOpts: Partial<onSwipeOpts> = {}) 
   // State variables
   let ID = -1 // If -1 we do not have a pointer event chain running (we are waiting to see a gesture)
   let start: Point
-  let timeout: number | undefined = undefined
+  let timeout: number | undefined
 
   /** Disables the event listeners and resets the state. */
   const disable = () => {

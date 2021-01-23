@@ -10,13 +10,11 @@ import { createMonarchLanguage } from 'cm6-monarch'
 // TODO: color decorators for #color col|
 // TODO: accept replacement / deletion / addition actions
 
-const open = (name: string) => {
-  return { token: '@rematch', next: '@' + name, parser: { open: name[0].toUpperCase() + name.substr(1) } }
-}
+const open = (name: string) =>
+  ({ token: '@rematch', next: '@' + name, parser: { open: name[0].toUpperCase() + name.substr(1) } })
 
-const close = (name: string) => {
-  return { token: '@rematch', next: '@pop', parser: { close: name[0].toUpperCase() + name.substr(1) } }
-}
+const close = (name: string) =>
+  ({ token: '@rematch', next: '@pop', parser: { close: name[0].toUpperCase() + name.substr(1) } })
 
 export default createMonarchLanguage({
   name: 'markdown',
@@ -27,21 +25,16 @@ export default createMonarchLanguage({
   configure: {
     props: [
       foldNodeProp.add({
-        "Container": (tree, state) => {
-          return { from: Math.min(tree.from + 20, state.doc.lineAt(tree.from).to), to: tree.to - 1 }
-        },
-        "Table": (tree, state) => {
-          return { from: state.doc.lineAt(tree.from).to, to: tree.to - 1 }
-        },
-        "CodeBlock": (tree, state) => {
-          return { from: state.doc.lineAt(tree.from).to, to: tree.to }
-        },
-        "HeadingSection": (tree, state) => {
-          return { from: state.doc.lineAt(tree.from).to, to: tree.to - 2 }
-        },
-        "BlockComment": (tree) => {
-          return { from: tree.from, to: tree.to }
-        }
+        Container: (tree, state) =>
+          ({ from: Math.min(tree.from + 20, state.doc.lineAt(tree.from).to), to: tree.to - 1 }),
+        Table: (tree, state) =>
+          ({ from: state.doc.lineAt(tree.from).to, to: tree.to - 1 }),
+        CodeBlock: (tree, state) =>
+          ({ from: state.doc.lineAt(tree.from).to, to: tree.to }),
+        HeadingSection: (tree, state) =>
+          ({ from: state.doc.lineAt(tree.from).to, to: tree.to - 2 }),
+        BlockComment: tree =>
+          ({ from: tree.from, to: tree.to })
       })
     ]
   },
@@ -102,7 +95,7 @@ export default createMonarchLanguage({
         [/@s(?:@containers\s*)+/, open('container')],
 
         // Generic Paragraphs
-        [/@s(?!@blocks)[^\s]/, open('paragraph')],
+        [/@s(?!@blocks)[^\s]/, open('paragraph')]
 
       ],
       // inline level elements
@@ -205,7 +198,7 @@ export default createMonarchLanguage({
         [/\/\*([^]+)\*\//, 'blockComment'],
         [/<!--([^]+)-->/, 'blockComment'],
         [/\/\*/, { token: 'blockComment', next: '@comment_block', parser: { open: 'BlockComment' } }],
-        [/<!--/, { token: 'blockComment', next: '@comment_html', parser: { open: 'BlockComment' } }],
+        [/<!--/, { token: 'blockComment', next: '@comment_html', parser: { open: 'BlockComment' } }]
       ],
       comment_block: [
         [/\*\//, { token: 'blockComment', next: '@pop', parser: { close: 'BlockComment' } }],
@@ -224,7 +217,7 @@ export default createMonarchLanguage({
           ['propertyName', 'operator', 'string']
         ],
         [/\w+/, 'propertyName'],
-        [/\/?>/, 'bracket', '@pop'],
+        [/\/?>/, 'bracket', '@pop']
       ],
 
       // blocks / containers

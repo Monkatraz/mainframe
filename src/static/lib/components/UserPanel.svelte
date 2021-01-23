@@ -33,7 +33,7 @@
 
   let loginEmail: HTMLInputElement
   let loginPass: HTMLInputElement
-  let rememberMe = Pref.bind('remember-me', false)
+  const rememberMe = Pref.bind('remember-me', false)
 
   async function login() {
     if (!loginEmail || !loginPass) return
@@ -61,15 +61,6 @@
     }
   }
 </script>
-
-<style lang='stylus'>
-  @require '_lib'
-
-  .or
-    color: colvar('text-subtle')
-    margin: 0 0.25rem
-
-</style>
 
 {#if !$authed}
   <div class='guest' role='presentation'
@@ -157,3 +148,12 @@
     </DetailsMenu>
   </div>
 {/if}
+
+<style lang='stylus'>
+  @require '_lib'
+
+  .or
+    margin: 0 0.25rem
+    color: colvar('text-subtle')
+
+</style>

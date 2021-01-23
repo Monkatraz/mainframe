@@ -1,290 +1,290 @@
 .katex
-  font normal 1.21em KaTeX_Main, Times New Roman, serif
-  line-height 1.2
-  text-indent 0
-  text-rendering auto
-  border-color currentColor
+  font: normal 1.21em KaTeX_Main, Times New Roman, serif
+  line-height: 1.2
+  text-indent: 0
+  text-rendering: auto
+  border-color: currentColor
   *
-    -ms-high-contrast-adjust none !important
+    -ms-high-contrast-adjust: none !important
   .katex-version
     &::after
-      content "0.12.0"
+      content: "0.12.0"
   .katex-mathml
-    position absolute
-    clip rect(1px, 1px, 1px, 1px)
-    padding 0
-    border 0
-    height 1px
-    width 1px
-    overflow hidden
+    position: absolute
+    width: 1px
+    height: 1px
+    padding: 0
+    overflow: hidden
+    border: 0
+    clip: rect(1px, 1px, 1px, 1px)
   .katex-html
     & > .newline
-      display block
+      display: block
   .base
-    position relative
-    display inline-block
-    white-space nowrap
-    width min-content
+    position: relative
+    display: inline-block
+    width: min-content
+    white-space: nowrap
   .strut
-    display inline-block
+    display: inline-block
   .textbf
-    font-weight bold
+    font-weight: bold
   .textit
-    font-style italic
+    font-style: italic
   .textrm
-    font-family KaTeX_Main
+    font-family: KaTeX_Main
   .textsf
-    font-family KaTeX_SansSerif
+    font-family: KaTeX_SansSerif
   .texttt
-    font-family KaTeX_Typewriter
+    font-family: KaTeX_Typewriter
   .mathnormal
-    font-family KaTeX_Math
-    font-style italic
+    font-family: KaTeX_Math
+    font-style: italic
   .mathit
-    font-family KaTeX_Main
-    font-style italic
+    font-family: KaTeX_Main
+    font-style: italic
   .mathrm
-    font-style normal
+    font-style: normal
   .mathbf
-    font-family KaTeX_Main
-    font-weight bold
+    font-weight: bold
+    font-family: KaTeX_Main
   .boldsymbol
-    font-family KaTeX_Math
-    font-weight bold
-    font-style italic
+    font-weight: bold
+    font-family: KaTeX_Math
+    font-style: italic
   .amsrm
-    font-family KaTeX_AMS
+    font-family: KaTeX_AMS
   .mathcal
-    font-family KaTeX_Caligraphic
+    font-family: KaTeX_Caligraphic
   .mathtt
-    font-family KaTeX_Typewriter
+    font-family: KaTeX_Typewriter
   .mainrm
-    font-family KaTeX_Main
-    font-style normal
+    font-family: KaTeX_Main
+    font-style: normal
   .vlist-t
-    display inline-table
-    table-layout fixed
-    border-collapse collapse
+    display: inline-table
+    table-layout: fixed
+    border-collapse: collapse
   .vlist-r
-    display table-row
+    display: table-row
   .vlist
-    display table-cell
-    vertical-align bottom
-    position relative
+    position: relative
+    display: table-cell
+    vertical-align: bottom
     & > span
-      display block
-      height 0
-      position relative
+      position: relative
+      display: block
+      height: 0
       & > span
-        display inline-block
+        display: inline-block
       & > .pstrut
-        overflow hidden
-        width 0
+        width: 0
+        overflow: hidden
   .vlist-t2
-    margin-right -2px
+    margin-right: -2px
   .vlist-s
-    display table-cell
-    vertical-align bottom
-    font-size 1px
-    width 2px
-    min-width 2px
+    display: table-cell
+    width: 2px
+    min-width: 2px
+    font-size: 1px
+    vertical-align: bottom
   .vbox
-    display inline-flex
-    flex-direction column
-    align-items baseline
+    display: inline-flex
+    flex-direction: column
+    align-items: baseline
   .hbox
-    display inline-flex
-    flex-direction row
-    width 100%
+    display: inline-flex
+    flex-direction: row
+    width: 100%
   .thinbox
-    display inline-flex
-    flex-direction row
-    width 0
-    max-width 0
+    display: inline-flex
+    flex-direction: row
+    width: 0
+    max-width: 0
   .msupsub
-    text-align left
+    text-align: left
   .mfrac
     & > span
       & > span
-        text-align center
+        text-align: center
     .frac-line
-      display inline-block
-      width 100%
-      border-bottom-style solid
+      display: inline-block
+      width: 100%
+      border-bottom-style: solid
   .mspace
-    display inline-block
+    display: inline-block
   .llap
     & > .inner
-      right 0
+      right: 0
   .clap
     & > .inner
       & > span
-        margin-left -50%
-        margin-right 50%
+        margin-right: 50%
+        margin-left: -50%
   .rule
-    display inline-block
-    border solid 0
-    position relative
+    position: relative
+    display: inline-block
+    border: solid 0
   .hdashline
-    display inline-block
-    width 100%
-    border-bottom-style dashed
+    display: inline-block
+    width: 100%
+    border-bottom-style: dashed
   .sqrt
     & > .root
-      margin-left 0.27777778em
-      margin-right -0.55555556em
+      margin-right: -0.55555556em
+      margin-left: 0.27777778em
   .delimsizing
     &.size1
-      font-family KaTeX_Size1
+      font-family: KaTeX_Size1
     &.size2
-      font-family KaTeX_Size2
+      font-family: KaTeX_Size2
     &.size3
-      font-family KaTeX_Size3
+      font-family: KaTeX_Size3
     &.size4
-      font-family KaTeX_Size4
+      font-family: KaTeX_Size4
     &.mult
       .delim-size1
         & > span
-          font-family KaTeX_Size1
+          font-family: KaTeX_Size1
       .delim-size4
         & > span
-          font-family KaTeX_Size4
+          font-family: KaTeX_Size4
   .nulldelimiter
-    display inline-block
-    width 0.12em
+    display: inline-block
+    width: 0.12em
   .delimcenter
-    position relative
+    position: relative
   .op-symbol
-    position relative
+    position: relative
     &.small-op
-      font-family KaTeX_Size1
+      font-family: KaTeX_Size1
     &.large-op
-      font-family KaTeX_Size2
+      font-family: KaTeX_Size2
   .op-limits
     & > .vlist-t
-      text-align center
+      text-align: center
   .accent
     & > .vlist-t
-      text-align center
+      text-align: center
     .accent-body
-      position relative
+      position: relative
       &:not(.accent-full)
-        width 0
+        width: 0
   .overlay
-    display block
+    display: block
   .mtable
     .vertical-separator
-      display inline-block
-      min-width 1px
+      display: inline-block
+      min-width: 1px
     .arraycolsep
-      display inline-block
+      display: inline-block
     .col-align-c
       & > .vlist-t
-        text-align center
+        text-align: center
     .col-align-l
       & > .vlist-t
-        text-align left
+        text-align: left
     .col-align-r
       & > .vlist-t
-        text-align right
+        text-align: right
   .svg-align
-    text-align left
+    text-align: left
   svg
-    display block
-    position absolute
-    width 100%
-    height inherit
-    fill currentColor
-    stroke currentColor
-    fill-rule nonzero
-    fill-opacity 1
-    stroke-width 1
-    stroke-linecap butt
-    stroke-linejoin miter
-    stroke-miterlimit 4
-    stroke-dasharray none
-    stroke-dashoffset 0
-    stroke-opacity 1
+    position: absolute
+    display: block
+    width: 100%
+    height: inherit
+    fill: currentColor
+    fill-rule: nonzero
+    stroke: currentColor
+    fill-opacity: 1
+    stroke-width: 1
+    stroke-linecap: butt
+    stroke-linejoin: miter
+    stroke-miterlimit: 4
+    stroke-dasharray: none
+    stroke-dashoffset: 0
+    stroke-opacity: 1
     path
-      stroke none
+      stroke: none
   img
-    border-style none
-    min-width 0
-    min-height 0
-    max-width none
-    max-height none
+    min-width: 0
+    max-width: none
+    min-height: 0
+    max-height: none
+    border-style: none
   .stretchy
-    width 100%
-    display block
-    position relative
-    overflow hidden
+    position: relative
+    display: block
+    width: 100%
+    overflow: hidden
   .hide-tail
-    width 100%
-    position relative
-    overflow hidden
+    position: relative
+    width: 100%
+    overflow: hidden
   .halfarrow-left
-    position absolute
-    left 0
-    width 50.2%
-    overflow hidden
+    position: absolute
+    left: 0
+    width: 50.2%
+    overflow: hidden
   .halfarrow-right
-    position absolute
-    right 0
-    width 50.2%
-    overflow hidden
+    position: absolute
+    right: 0
+    width: 50.2%
+    overflow: hidden
   .brace-left
-    position absolute
-    left 0
-    width 25.1%
-    overflow hidden
+    position: absolute
+    left: 0
+    width: 25.1%
+    overflow: hidden
   .brace-center
-    position absolute
-    left 25%
-    width 50%
-    overflow hidden
+    position: absolute
+    left: 25%
+    width: 50%
+    overflow: hidden
   .brace-right
-    position absolute
-    right 0
-    width 25.1%
-    overflow hidden
+    position: absolute
+    right: 0
+    width: 25.1%
+    overflow: hidden
   .x-arrow-pad
-    padding 0 0.5em
+    padding: 0 0.5em
   .boxpad
-    padding 0 0.3em 0 0.3em
+    padding: 0 0.3em 0 0.3em
   .cancel-pad
-    padding 0 0.2em 0 0.2em
+    padding: 0 0.2em 0 0.2em
   .cancel-lap
-    margin-left -0.2em
-    margin-right -0.2em
+    margin-right: -0.2em
+    margin-left: -0.2em
   .sout
-    border-bottom-style solid
-    border-bottom-width 0.08em
+    border-bottom-width: 0.08em
+    border-bottom-style: solid
 
   .mathbb,
   .textbb
-    font-family KaTeX_AMS
+    font-family: KaTeX_AMS
 
   .mathfrak,
   .textfrak
-    font-family KaTeX_Fraktur
+    font-family: KaTeX_Fraktur
 
   .mathscr,
   .textscr
-    font-family KaTeX_Script
+    font-family: KaTeX_Script
 
   .mathsf,
   .textsf
-    font-family KaTeX_SansSerif
+    font-family: KaTeX_SansSerif
 
   .mathboldsf,
   .textboldsf
-    font-family KaTeX_SansSerif
-    font-weight bold
+    font-weight: bold
+    font-family: KaTeX_SansSerif
 
   .mathitsf,
   .textitsf
-    font-family KaTeX_SansSerif
-    font-style italic
+    font-family: KaTeX_SansSerif
+    font-style: italic
 
   .mfrac .frac-line,
   .overline .overline-line,
@@ -292,34 +292,34 @@
   .hline,
   .hdashline,
   .rule
-    min-height 1px
+    min-height: 1px
 
   .llap,
   .rlap,
   .clap
-    width 0
-    position relative
+    position: relative
+    width: 0
 
   .llap > .inner,
   .rlap > .inner,
   .clap > .inner
-    position absolute
+    position: absolute
 
   .llap > .fix,
   .rlap > .fix,
   .clap > .fix
-    display inline-block
+    display: inline-block
 
   .rlap > .inner,
   .clap > .inner
-    left 0
+    left: 0
 
   .overline .overline-line,
   .underline .underline-line,
   .hline
-    display inline-block
-    width 100%
-    border-bottom-style solid
+    display: inline-block
+    width: 100%
+    border-bottom-style: solid
 
   .sizing, .fontsize-ensurer
     $last-num = 1
@@ -336,35 +336,35 @@
 
   .stretchy::before,
   .stretchy::after
-    content ""
+    content: ""
 
   .x-arrow,
   .mover,
   .munder
-    text-align center
+    text-align: center
 
   .fbox,
   .fcolorbox
-    box-sizing border-box
-    border 0.04em solid
+    box-sizing: border-box
+    border: 0.04em solid
 
 .katex-display
-  display block
-  margin 1em 0
-  text-align center
+  display: block
+  margin: 1em 0
+  text-align: center
   & > .katex
-    display block
-    text-align center
-    white-space nowrap
+    display: block
+    white-space: nowrap
+    text-align: center
     & > .katex-html
-      display block
-      position relative
+      position: relative
+      display: block
       & > .tag
-        position absolute
-        right 0
+        position: absolute
+        right: 0
   &.leqno > .katex > .katex-html > .tag
-    left 0
-    right auto
+    right: auto
+    left: 0
   &.fleqn > .katex
-      text-align left
-      padding-left 2em
+    padding-left: 2em
+    text-align: left

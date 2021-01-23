@@ -9,7 +9,7 @@ import MDDefLists from 'markdown-it-deflist'
 import katex from 'katex'
 // Import Prism
 import type { } from 'prismjs' // haha uhh don't question this
-import "@vendor/prism.js"
+import '@vendor/prism.js'
 const Prism = self.Prism
 // Used for md-it extensions
 import type StateInline from 'markdown-it/lib/rules_inline/state_inline'
@@ -71,8 +71,8 @@ import ParserInline from 'markdown-it/lib/parser_inline'
 // inline:
 // /  -> <i>
 // _  -> <em>
-//\*  -> <b>
-//\** -> <strong>
+// \*  -> <b>
+// \** -> <strong>
 // __ -> <u>
 // ^  -> <sup>
 // ~  -> <sub>
@@ -194,7 +194,7 @@ function roughSizeOfObject(object: any) {
 function cache<T extends WrappedFn<any>>(fn: T, id: string): ReturnType<T> {
   const hash = quickHash(id)
   if (mdCache.has(hash)) {
-    const result = mdCache.get(hash) as any
+    const result = mdCache.get(hash)
     // This usually clears the cache at about 300-700kb.
     // Which really, is just not a large amount of memory to be using for this.
     if (mdCache.size > 512) {
@@ -204,7 +204,7 @@ function cache<T extends WrappedFn<any>>(fn: T, id: string): ReturnType<T> {
     }
     return result
   } else {
-    const result = fn() as any
+    const result = fn()
 
     let doCache = true
     // some basic checks to avoid caching stupidly huge objects
@@ -242,13 +242,13 @@ const synExt = [
     ['/', 'i'], ['_', 'em'],
     ['*', 'b'], ['**', 'strong'],
     ['__', 'u']
-  ].map((arr) => syntaxWrap({ symb: arr[0], tag: arr[1], strict: true })),
+  ].map(arr => syntaxWrap({ symb: arr[0], tag: arr[1], strict: true })),
 
   ...[
     ['--', 's'],
     ['^', 'sup'], ['~', 'sub'],
     ['==', 'mark']
-  ].map((arr) => syntaxWrap({ symb: arr[0], tag: arr[1] })),
+  ].map(arr => syntaxWrap({ symb: arr[0], tag: arr[1] })),
 
   // Comments
   syntaxBlock({ symb: ['/*', '*/'], render: () => '' }),
@@ -279,11 +279,11 @@ const synExt = [
   // Katex
   syntaxWrap({
     symb: '$', ignoreFlanking: true,
-    render: (str) => cache(() => katex.renderToString(str, { throwOnError: false }), str + '##KATEX##')
+    render: str => cache(() => katex.renderToString(str, { throwOnError: false }), str + '##KATEX##')
   }),
   syntaxBlock({
     symb: ['$$$', '$$$'],
-    render: (str) => cache(() => katex.renderToString(str, { throwOnError: false }), str + '##KATEX##')
+    render: str => cache(() => katex.renderToString(str, { throwOnError: false }), str + '##KATEX##')
   }),
 
   // Inline Elements | #elem param param|text|#
@@ -297,14 +297,14 @@ const synExt = [
   ]), {
     after: 'image',
     parse: {
-      'type': (state, name, tokenIR, idx, tokens) => {
+      type: (state, name, tokenIR, idx, tokens) => {
         const token = state.tokens[state.tokens.length - 1] // start span token
         switch (tokenIR.text) {
           case 'font': {
             let family = '', weight = '', size = ''
             for (const param of tokens) if (param.type === 'param') {
               if (/^(\d{3}|bolder|lighter|bold|light)$/.test(param.text)) weight = param.text
-              else if (param.text.match(/^[\d.]+?(%|\w{2,})$/)) size = param.text
+              else if (/^[\d.]+?(%|\w{2,})$/.test(param.text)) size = param.text
               else family = param.text
             }
             token.attrSet('style', inlineStyle({ 'font-weight': weight, 'font-size': size }))
@@ -333,11 +333,11 @@ const synExt = [
   ]), {
     after: 'escape',
     parse: {
-      'lang': (state, name, tokenIR) => {
+      lang: (state, name, tokenIR) => {
         state.push(name, 'code', 1)
           .attrSet('class', `code language-${tokenIR.text}`)
       },
-      'code': (state, name, tokenIR, idx, tokens) => {
+      code: (state, name, tokenIR, idx, tokens) => {
         const lang = tokens[idx - 2].text
         const token = state.push('fence-inline', 'code', 0)
         token.info = lang
@@ -353,7 +353,7 @@ const synExt = [
   },
 
   // Escaping text
-  syntaxWrap({ symb: '@@', ignoreFlanking: true, render: (str) => str }),
+  syntaxWrap({ symb: '@@', ignoreFlanking: true, render: str => str }),
 
   // Imported plugins.
   MDMultiMDTables,
@@ -515,7 +515,7 @@ function parserChain(chain: ChainRule[]) {
   chainIR.regex = RegExp(regex)
 
   return (src: string) => {
-    const match = src.match(chainIR.regex)
+    const match = chainIR.regex.exec(src)
     const tokens: ChainToken[] = []
     if (!match || match.index !== 0) return false
     const length = match.shift()?.length ?? 0 // removes the 'total result'

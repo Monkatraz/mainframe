@@ -1,11 +1,12 @@
+/* eslint-disable quote-props */
 /**
  * @file Editor theming and misc. configuration module.
  * @author Monkatraz
  */
 
+import { HighlightStyle, tags as t } from '@codemirror/highlight'
 import { EditorView } from '@codemirror/view'
 import type { Extension } from '@codemirror/state'
-import { HighlightStyle, tags as t } from '@codemirror/highlight'
 import monarchMarkdown from './monarch-markdown'
 
 // Confinement Theme
@@ -225,7 +226,7 @@ export const confinementHighlightStyle = HighlightStyle.define(
   // Markup
   {
     tag: [t.link],
-    color: link,
+    color: link
   },
   {
     tag: t.url,
@@ -249,7 +250,7 @@ export const confinementHighlightStyle = HighlightStyle.define(
   { tag: mt.mark, background: important, color: 'black' },
   // critical markup
   { tag: mt.criticHighlight, color: highlight },
-  { tag: mt.criticComment, color: note },
+  { tag: mt.criticComment, color: note }
 )
 
 export const confinement: Extension = [confinementTheme, confinementHighlightStyle]

@@ -1,14 +1,14 @@
 @require '_lib'
 
 .tippy-box[data-theme~='mainframe']
+  color: colvar('con-text')
+  font-size: 0.875rem
   background-color: colvar('con-background')
   border-color: colvar('con-border')
   border-width: 0.075rem
   border-radius: 0.25rem
-  color: colvar('con-text')
-  font-size: 0.875rem
-  transition-timing-function: ease-out
   filter: drop-shadow(0 0 5px rgba(black, 0.25))
+  transition-timing-function: ease-out
 
   .tippy-svg-arrow
     color: colvar('con-background')
@@ -16,12 +16,12 @@
 
 .tippy-box
   position: relative
-  background-color: #333
-  color: #fff
-  border-radius: 4px
-  border 1px solid #333
+  color: #FFF
   font-size: 14px
   line-height: 1.4
+  background-color: #333
+  border: 1px solid #333
+  border-radius: 4px
   outline: 0
   transition-property: transform, visibility, opacity
 
@@ -30,41 +30,41 @@
 
 .tippy-content
   position: relative
-  padding: 5px 9px
   z-index: 1
+  padding: 5px 9px
 
 .tippy-box[data-animation=fade][data-state=hidden]
   opacity: 0
 
 .tippy-box[data-animation=scale][data-state=hidden]
-  transform: scale(.5)
+  transform: scale(0.5)
   opacity: 0
 
 .tippy-box[data-inertia][data-state=visible]
-  transition-timing-function: cubic-bezier(.54,1.5,.38,1.11)
+  transition-timing-function: cubic-bezier(0.54,1.5,0.38,1.11)
 
 .tippy-arrow
   width: 16px
   height: 16px
   color: #333
   &:before
-    content: ''
     position: absolute
     border-color: transparent
     border-style: solid
+    content: ''
   &:after
-    content: ''
-    z-index: -1
     position: absolute
+    z-index: -1
     border-color: transparent
     border-style: solid
+    content: ''
 
 .tippy-svg-arrow
   position: absolute
   width: 16px
   height: 16px
-  fill: currentColor
   text-align: initial
+  fill: currentColor
 
   > svg
     position: absolute
@@ -120,17 +120,17 @@
   > .tippy-arrow
     right: 0
     &:before
+      right: -8px
       border-width: 8px 0 8px 8px
       border-left-color: inherit
-      right: -8px
       transform-origin: center left
 
   > .tippy-svg-arrow
     right: 0
     &:after, > svg
-      transform: rotate(90deg)
       top: calc(50% - 3px)
       left: 11px
+      transform: rotate(90deg)
     > svg:first-child:not(:last-child)
       left: 12px
 
@@ -150,8 +150,8 @@
   > .tippy-svg-arrow
     left: 0
     &:after, > svg
-      transform: rotate(-90deg)
       top: calc(50% - 3px)
       right: 11px
+      transform: rotate(-90deg)
     > svg:first-child:not(:last-child)
       right: 12px

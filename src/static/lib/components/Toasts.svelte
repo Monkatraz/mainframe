@@ -11,7 +11,7 @@
     info: 'ion:information'
   }
 
-  function listTransition(elem: Element, animation: { from: DOMRect, to: DOMRect }, params: any ) {
+  function listTransition(elem: Element, animation: { from: DOMRect, to: DOMRect }, params: any) {
     const d = (animation.from.top - animation.to.top)
 
     return {
@@ -24,34 +24,50 @@
 
 </script>
 
+<ul class='toasts' aria-live='polite' aria-relevant='additions'>
+  {#each listToasts as toast (toast)}
+    <li class='toast dark {toast.type}'
+      animate:listTransition
+      in:tnAnime={{ translateX: ['150%', '0'] }}
+      out:tnAnime={{ translateX: '150%', duration: 300, easing: 'easeInQuint' }}
+    >
+      <span class='toast_type'><Icon i={icons[toast.type]} size='100%' /></span>
+      {toast.message}
+      <span class='toast_remove'>
+        <Button i='ion:close' size='1.5rem' tip='Close Notification' baseline on:click={toast.remove}/>
+      </span>
+    </li>
+  {/each}
+</ul>
+
 <style lang='stylus'>
   @require '_lib'
 
   .toasts
-    display: flex
-    align-items: flex-end
-    flex-direction: column
     position: absolute
-    bottom: 0
     right: 0
+    bottom: 0
+    display: flex
+    flex-direction: column
+    align-items: flex-end
     margin: 2rem
     padding: 0
 
     +match-media(thin, below)
-      width: 100%
       align-items: center
+      width: 100%
       margin: 1rem 0
 
   .toast
     position: relative
-    list-style: none
     width: fit-content
     min-width: 20rem
     max-width: 500px
+    margin: 0.5rem 0
     padding: 0.5rem 3rem
+    list-style: none
     border: solid 0.125rem colvar('border')
     border-radius: 0.5rem
-    margin: 0.5rem 0
     shadow-elevation(8)
 
     +match-media(thin, below)
@@ -60,13 +76,13 @@
       max-width: none
 
   .toast_type, .toast_remove
+    position: absolute
+    top: 0
     display: flex
     align-items: center
     justify-items: center
-    position: absolute
-    top: 0
-    height: 100%
     width: 2.25rem
+    height: 100%
     padding: 0 0.25rem
 
   .toast_type
@@ -96,19 +112,3 @@
       background: colvar('info')
 
 </style>
-
-<ul class='toasts' aria-live='polite' aria-relevant='additions'>
-  {#each listToasts as toast (toast)}
-    <li class='toast dark {toast.type}'
-      animate:listTransition
-      in:tnAnime={{ translateX: ['150%', '0'] }}
-      out:tnAnime={{ translateX: '150%', duration: 300, easing: 'easeInQuint' }}
-    >
-      <span class='toast_type'><Icon i={icons[toast.type]} size='100%' /></span>
-      {toast.message}
-      <span class='toast_remove'>
-        <Button i='ion:close' size='1.5rem' tip='Close Notification' baseline on:click={toast.remove}/>
-      </span>
-    </li>
-  {/each}
-</ul>
