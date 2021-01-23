@@ -28,34 +28,34 @@ const mainThread = () => {
 
   return autoPreprocessConfig => {
     return (src, filename) => {
-      console.log(`Main: Asking worker to preprocess ${filename}`)
+      // console.log(`Main: Asking worker to preprocess ${filename}`)
       worker.postMessage({
         src,
         filename,
         autoPreprocessConfig,
       })
 
-      console.log('Main: Locking thread to wait for worker')
+      // console.log('Main: Locking thread to wait for worker')
       const waitResult = Atomics.wait(isDoneView, 0, 0, 5000)
       Atomics.store(isDoneView, 0, 0)
-      console.log(`Main: Unlocked: ${waitResult}`)
+      // console.log(`Main: Unlocked: ${waitResult}`)
 
       const textDecoder = new TextDecoder()
       const decoded = textDecoder.decode(dataView.subarray(0, dataLengthView[0])) // prettier-ignore
 
       try {
         const result = JSON.parse(decoded)
-        console.log('Main: Finished')
+        // console.log('Main: Finished')
         lastResult = result
         return result
       } catch (error) {
-        console.log('Main: No result obtained; finished with last result')
+        // console.log('Main: No result obtained; finished with last result')
         return lastResult
       } finally {
         if (isRunningWithinCli) {
           clearTimeout(timeout)
           timeout = setTimeout(() => {
-            console.log('Main: Forcing exit')
+            // console.log('Main: Forcing exit')
             process.exit(0)
           }, 1000)
         }
@@ -66,14 +66,14 @@ const mainThread = () => {
 
 const workerThread = () => {
   parentPort.on('message', async ({ src, filename, autoPreprocessConfig }) => {
-    console.log(`Worker: Preprocessing ${filename}`)
+    // console.log(`Worker: Preprocessing ${filename}`)
 
     const result = await preprocess({
       src,
       filename,
       autoPreprocessConfig,
     }).catch(error => {
-      console.log('Worker: Failed to preprocess:', error)
+      // console.log('Worker: Failed to preprocess:', error)
       return null
     })
 
