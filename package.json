@@ -8,8 +8,8 @@
   "scripts": {
     "dev": "snowpack dev",
     "build": "snowpack build",
-    "lint:sl": "stylelint src/**/*.styl --custom-syntax stylelint-plugin-stylus/custom-syntax || true",
-    "lint:es": "eslint src/ || true",
+    "lint:sl": "stylelint src/**/*.styl --custom-syntax stylelint-plugin-stylus/custom-syntax || echo 'done'",
+    "lint:es": "eslint src/ || echo 'done'",
     "postinstall": "patch-package",
     "test": "echo \"Mainframe does not currently include a test runner.\""
   },
