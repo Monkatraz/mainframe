@@ -14,7 +14,7 @@
     "test": "echo \"Mainframe does not currently include a test runner.\""
   },
   "browserslist": [
-    "> 1%",
+    "> 2%",
     "last 2 versions",
     "Firefox ESR",
     "not dead",

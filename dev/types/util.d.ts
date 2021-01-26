@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-invalid-void-type */
 /**
  * @file Misc. type declarations for the project.
  * @author Monkatraz
@@ -27,16 +28,12 @@ export declare global {
   /** All JS primitive values. */
   type Primitive = string | number | bigint | boolean | symbol | null | undefined
   /** _Strictly_ represents a `{ 'key': value }` object, including functions properties. */
-  interface PlainObject {
-    [x: string]: Primitive | object
-  }
-  interface LazyObject {
-    [x: string]: Promiseable<Primitive | object>
-  }
+  type PlainObject = Record<string, Primitive | Record<string, unknown>>
+  type LazyObject = Record<string, Promiseable<Primitive | Record<string, unknown>>>
   /** Represents a generic `Class` constructor. */
   type Class<T = unknown, Arguments extends any[] = any[]> = new (...arguments_: Arguments) => T
   /** Any without the fuss. Represents nearly all data objects. Doesn't include undefined or null. */
-  type Data = string | number | bigint | boolean | symbol | DataObject | Array<Data>
+  type Data = string | number | bigint | boolean | symbol | DataObject | Data[]
 
   /** Create a type that represents either the value or the value wrapped in `PromiseLike`. */
   type Promisable<T> = T | PromiseLike<T>
@@ -45,7 +42,7 @@ export declare global {
   type JSONObject = { [Key in string]?: JSONValue }
 
   /** Matches a JSON array. */
-  type JSONArray = Array<JSONValue>
+  type JSONArray = JSONValue[]
 
   /** Matches any valid JSON value. */
   type JSONValue = string | number | boolean | null | JSONObject | JSONArray
@@ -54,8 +51,6 @@ export declare global {
 
   // Fixes import.meta.env for Snowpack
   interface ImportMeta {
-    env: {
-      [index: string]: string
-    }
+    env: Record<string, string>
   }
 }

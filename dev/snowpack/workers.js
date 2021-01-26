@@ -7,13 +7,13 @@ module.exports = function (snowpackConfig, pluginOptions) {
       input: ['.worker.ts'],
       output: ['.js']
     },
-    config (config) {
+    config(config) {
       // hacks!!! basically just putting our plugin at the start
       const plugin = config.plugins.pop()
       config.plugins.unshift(plugin)
     },
 
-    async load ({ filePath = '' }) {
+    async load({ filePath = '' }) {
       const result = await esbuild.build({
         entryPoints: [filePath],
         bundle: true,

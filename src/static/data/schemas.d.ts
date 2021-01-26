@@ -135,9 +135,7 @@ export namespace Page {
     social: Ref
     /** Dictionary-like object (e.g `en: {}`) listing all versions of this page.
      *  Fields denote which language the `View` is for. */
-    locals: {
-      [lang: string]: View
-    }
+    locals: Record<string, View>
   }
 
   /** Minimal form of a page instance, localized to a specific language. */

@@ -1,3 +1,4 @@
+/* eslint-disable */
 'use strict';
 
 // https://github.com/Sxxov/eslint-svelte3-preprocess

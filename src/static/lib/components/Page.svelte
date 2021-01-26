@@ -21,7 +21,7 @@
   }
 </script>
 
-<div role='presentation' out:fade={{duration: 100}}>
+<div role='presentation' out:fade={{ duration: 100 }}>
   {#await loading.then(renderMarkdown)}
 
     <Spinny width=150px top=200px left=50%/>

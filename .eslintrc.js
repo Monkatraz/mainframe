@@ -1,7 +1,15 @@
 const eslintSveltePreprocess = require('./dev/eslint-svelte-preprocess')
 
-function useDefault (type, rules) {
+function useDefault(type, rules) {
   return Object.assign({}, ...rules.map(rule => ({ [rule]: type })))
+}
+
+function prefixKeys(prefix, obj) {
+  const mappedObj = {}
+  for (const key in obj) {
+    mappedObj[prefix + key] = obj[key]
+  }
+  return mappedObj
 }
 
 const rules = {
@@ -9,30 +17,26 @@ const rules = {
   code: {
     ...useDefault('error', [
       'eqeqeq',
-      'dot-notation',
       'yoda',
       'prefer-rest-params',
       'prefer-spread',
-      'sort-imports',
       'symbol-description',
       'template-curly-spacing',
       'prefer-numeric-literals',
       'no-useless-rename',
       'no-useless-computed-key',
-      'no-useless-constructor',
       'no-useless-concat',
+      '@typescript-eslint/no-useless-constructor',
       'no-undef-init',
       'no-throw-literal',
       'default-case-last',
-      'default-param-last',
-      'require-await',
       'wrap-iife'
     ]),
     'sort-imports': ['error', {
-      'ignoreCase': false,
-      'ignoreDeclarationSort': true,
-      'ignoreMemberSort': true,
-      'allowSeparatedGroups': true
+      ignoreCase: false,
+      ignoreDeclarationSort: true,
+      ignoreMemberSort: true,
+      allowSeparatedGroups: true
     }],
     'prefer-arrow-callback': ['error', { allowNamedFunctions: true }]
   },
@@ -44,17 +48,15 @@ const rules = {
       'no-eval',
       'no-implied-eval',
       'no-var',
-      'no-script-url',
+      'no-script-url'
     ])
   },
 
   style: {
-    ...useDefault('error', [
+    ...useDefault('warn', [
       'block-spacing',
-      'comma-dangle',
       'comma-style',
       'computed-property-spacing',
-      'func-call-spacing',
       'keyword-spacing',
       'new-parens',
       'no-lonely-if',
@@ -69,42 +71,85 @@ const rules = {
       'spaced-comment',
       'switch-colon-spacing',
       'template-tag-spacing',
+      'template-curly-spacing',
       'arrow-body-style',
       'arrow-spacing'
     ]),
-    'indent': ['error', 2, { SwitchCase: 1 }],
-    'key-spacing': ['error', { mode: 'minimum' }],
-    'object-curly-spacing': ['error', 'always'],
-    'quote-props': ['error', 'consistent-as-needed'],
-    'quotes': ['error', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
-    'semi': ['error', 'never'],
-    'space-before-function-paren': ['error', { anonymous: 'always', named: 'never', asyncArrow: 'always' }],
-    'space-infix-ops': ['error', { 'int32Hint': true }],
-    'arrow-parens': ['error', 'as-needed', { requireForBlockBody: true }]
+    ...prefixKeys('@typescript-eslint/', {
+      ...useDefault('warn', [
+        'comma-dangle',
+        'func-call-spacing'
+      ]),
+      'quotes': ['warn', 'single', { avoidEscape: true, allowTemplateLiterals: true }],
+      'semi': ['warn', 'never'],
+      'space-infix-ops': ['warn', { int32Hint: true }],
+      'space-before-function-paren': ['warn', { anonymous: 'always', named: 'never', asyncArrow: 'always' }]
+    }),
+    'object-curly-spacing': ['warn', 'always'],
+    'indent': ['warn', 2, { SwitchCase: 1 }],
+    'key-spacing': ['warn', { mode: 'minimum' }],
+    'quote-props': ['warn', 'consistent-as-needed'],
+    'arrow-parens': ['warn', 'as-needed', { requireForBlockBody: true }]
   },
 
   typescript: {
-    ...useDefault('off', [
-      // loosening type checking
-      '@typescript-eslint/no-explicit-any',
-      '@typescript-eslint/ban-types',
+    ...prefixKeys('@typescript-eslint/', {
+      // code
+      ...useDefault('error', [
+        'ban-types',
+        'no-invalid-void-type',
+        'no-misused-new',
+        'no-non-null-asserted-optional-chain',
+        'no-require-imports',
+        'no-this-alias',
+        'no-extra-non-null-assertion',
+        'no-unnecessary-type-constraint',
+        'prefer-as-const',
+        'prefer-enum-initializers',
+        'prefer-for-of',
+        'prefer-namespace-keyword',
+        'prefer-optional-chain',
+        'prefer-regexp-exec',
+        'no-inferrable-types'
+      ]),
+      'triple-slash-reference': ['error', { types: 'prefer-import' }],
+      // style
+      ...useDefault('warn', [
+        'adjacent-overload-signatures',
+        'array-type',
+        'consistent-indexed-object-style',
+        'no-confusing-non-null-assertion',
+        'type-annotation-spacing'
+      ]),
+      'class-literal-property-style': ['warn', 'fields']
+    })
+  },
 
-      // loosening unsafe - mainly due to inconsistencies between the typescript compiler and eslint
-      '@typescript-eslint/no-unsafe-member-access',
-      '@typescript-eslint/no-unsafe-assignment',
-      '@typescript-eslint/no-unsafe-call',
-      '@typescript-eslint/no-unsafe-return',
-
-      '@typescript-eslint/no-non-null-assertion',
-      '@typescript-eslint/explicit-module-boundary-types',
-      '@typescript-eslint/no-unused-vars',
-      '@typescript-eslint/no-namespace',
-      '@typescript-eslint/restrict-plus-operands'
+  typechecked: {
+    // code
+    ...useDefault('error', [
+      'no-misused-promises',
+      'no-floating-promises',
+      'require-await',
+      'no-unnecessary-boolean-literal-compare',
+      'no-unnecessary-condition',
+      'no-unnecessary-type-assertion',
+      'no-confusing-void-expression',
+      'no-unnecessary-qualifier',
+      'no-unnecessary-type-arguments',
+      'non-nullable-type-assertion-style',
+      'prefer-includes',
+      'prefer-nullish-coalescing'
+    ]),
+    // style
+    ...useDefault('warn', [
+      'dot-notation'
     ])
   }
 }
 
-const mainRules = { ...rules.code, ...rules.restrict, ...rules.style, ...rules.typescript }
+const baseRules = { ...rules.code, ...rules.restrict, ...rules.style }
+const typeRules = { ...rules.typescript, ...rules.typeChecked }
 
 const tsConfig = {
   env: { browser: true, es2021: true },
@@ -115,26 +160,19 @@ const tsConfig = {
     project: 'tsconfig.json'
   },
   extends: [
-    "eslint:recommended",
-    "plugin:compat/recommended",
-    "plugin:@typescript-eslint/recommended",
-    "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    'plugin:compat/recommended'
   ],
-  rules: mainRules,
+  rules: { ...baseRules, ...typeRules }
 }
 
 module.exports = {
-  ignorePatterns: ['**/node_modules/**', './build/**'],
-  env: { browser: true, es2021: true },
+  ignorePatterns: ['**/node_modules/**'],
   overrides: [
     // JavaScript (Node)
     {
       files: ['*.js'],
-      extends: ['eslint:recommended'],
       env: { es2021: true, node: true },
-      rules: {
-        'no-unused-vars': 'off'
-      }
+      rules: baseRules
     },
     // TypeScript (Browser)
     {
@@ -150,7 +188,7 @@ module.exports = {
       ...tsConfig,
       settings: {
         'svelte3/preprocess': eslintSveltePreprocess(),
-        'svelte3/ignore-styles': () => true,
+        'svelte3/ignore-styles': () => true
       }
     }
   ]

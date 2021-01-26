@@ -15,8 +15,8 @@
   <svg aria-hidden='true' class='spinny'
     {width} viewBox='0 -50 120 70' xmlns='http://www.w3.org/2000/svg'
     style={cssText + 'transform: translate(-50%, -50%)'}
-    in:tnAnime={{scale: [0, 1], opacity: { value: 1, delay: 20, easing: 'easeOutQuad', duration: 200}}}
-    out:tnAnime={{scale: 0.8, opacity: 0, easing: 'easeOutQuad', duration: 100}}
+    in:tnAnime={{ scale: [0, 1], opacity: { value: 1, delay: 20, easing: 'easeOutQuad', duration: 200 } }}
+    out:tnAnime={{ scale: 0.8, opacity: 0, easing: 'easeOutQuad', duration: 100 }}
     >
     <style>
       @keyframes load-wave {

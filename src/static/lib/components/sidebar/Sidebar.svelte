@@ -12,11 +12,11 @@
   </div>
 
   <div class='sb-socials'>
-    <Social label='SCP DeviantArt' 
+    <Social label='SCP DeviantArt'
       href='https://scp-foundation.deviantart.com/'
       src='/static/media/social-deviantart.png' />
 
-    <Social label='SCP Facebook' 
+    <Social label='SCP Facebook'
       href='https://www.facebook.com/scpfoundation'
       src='/static/media/social-facebook.png' />
 

@@ -432,7 +432,7 @@ onmessage = (evt) => {
 
 // -- UTILITY FUNCTIONS
 
-function inlineStyle(obj: { [prop: string]: string }) {
+function inlineStyle(obj: Record<string, string>) {
   const props = []
   for (const prop in obj) if (obj[prop]) props.push(`${prop}: ${obj[prop]}`)
   return props.join(';')
@@ -652,10 +652,7 @@ function syntaxLine(opts: { symb: string, tag?: string, render?: (contents: stri
 
 interface SyntaxChainOpts {
   after?: string
-  parse?: {
-    [K: string]:
-    (state: StateInline, name: string, token: ChainToken, idx: number, tokens: ChainToken[]) => void
-  }
+  parse?: Record<string, (state: StateInline, name: string, token: ChainToken, idx: number, tokens: ChainToken[]) => void>
 }
 
 // TODO: render func.

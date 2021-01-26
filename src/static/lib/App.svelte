@@ -64,7 +64,7 @@
     {/await}
   </div>
 {:else if !inEdit}
-  <div class=container out:fade={{duration: 150}} role=presentation>
+  <div class=container out:fade={{ duration: 150 }} role=presentation>
 
     <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation>
       <Navbar />
@@ -81,7 +81,7 @@
 
           <!-- Home Page -->
           <Route path="/"><Page
-            loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({template}) => template)}
+            loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({ template }) => template)}
           /></Route>
 
           <!-- Test routes-->
@@ -95,7 +95,7 @@
 
           <!-- User Pages -->
           <Route path="/*"><Page
-            loading={API.withPage($router.path).requestLocalized().then(({template}) => template)}
+            loading={API.withPage($router.path).requestLocalized().then(({ template }) => template)}
           /></Route>
         </Route>
       {/key}

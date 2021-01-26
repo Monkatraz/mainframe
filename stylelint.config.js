@@ -13,6 +13,6 @@ module.exports = {
     'stylus/pythonic': 'always',
     'stylus/selector-list-comma': 'always',
     'stylus/semicolon': 'never',
-    'stylus/single-line-comment': 'always',
+    'stylus/single-line-comment': 'always'
   }
 }

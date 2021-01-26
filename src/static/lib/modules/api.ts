@@ -36,7 +36,7 @@ export type DataValue = string | number | boolean | null | DataObject | DataArra
 /** Represents any FaunaDB data Object. */
 export type DataObject = { [Key in string]?: DataValue }
 /** Represents any FaunaDB data Array or Set. */
-export type DataArray = Array<DataValue>
+export type DataArray = DataValue[]
 /** FaunaDB document, as retrieved from a reference (`Ref`). */
 export type Document = v.Document
 
@@ -148,7 +148,7 @@ export const qe = {
 
   /** Filters an input FDB-side obj. using arrays of key names. */
   Filter(obj: Expr, filter: (string | [string, (string | Expr)[] | Expr])[]) {
-    const filterObj: { [K: string]: Expr } = {}
+    const filterObj: Record<string, Expr> = {}
     filter.forEach((key) => {
       // [key, Expr | []] format
       if (key instanceof Array) {
