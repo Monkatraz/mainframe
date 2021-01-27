@@ -186,6 +186,29 @@ class Client {
 /** Store that allows for reactive checking of user authed state. */
 export const authed = writable(false)
 
+/** Helper object for handling the storage of the user's secret and 'Remember me' status. */
+const secretHandler = {
+  get storage() { return this.remember ? localStorage : sessionStorage },
+
+  get remember() { return !!localStorage.getItem('user-remember') },
+  set remember(state: boolean) { this.set(state, this.secret) },
+
+  get secret() { return this.storage.getItem('user-secret') ?? '' },
+  set secret(sec: string) { this.set(this.remember, sec) },
+
+  clear() {
+    localStorage.removeItem('user-remember')
+    localStorage.removeItem('user-secret')
+    sessionStorage.removeItem('user-secret')
+  },
+
+  set(remember: boolean, secret: string) {
+    this.clear()
+    if (remember) localStorage.setItem('remember', 'true')
+    if (secret) this.storage.setItem('user-secret', secret)
+  }
+}
+
 type ModeGuest = { authed: false, client: Client }
 type ModeUser = {
   authed: true, client: Client
@@ -223,23 +246,13 @@ export const User = {
     //  - stores the token in localStorage instead of sessionStorage
     //  - enables a behavior where the token can be 'refreshed'
     //    which sets the token's expiration to the next week
-    if (remember) {
-      sessionStorage.removeItem('user-secret')
-      localStorage.setItem('user-remember', 'true')
-      localStorage.setItem('user-secret', res.secret)
-    } else {
-      sessionStorage.setItem('user-secret', res.secret)
-      localStorage.removeItem('user-remember')
-      localStorage.removeItem('user-secret')
-    }
+    secretHandler.set(remember, res.secret)
   },
   /** Attempts to automatically log the user in.
    *  Returns whether or not this was successful. */
   async autologin() {
     if (User.authed) throw new Error()
-    const secret = localStorage.getItem('user-remember') ?
-      localStorage.getItem('user-secret') :
-      sessionStorage.getItem('user-secret')
+    const secret = secretHandler.secret
     if (!secret) return false
     try {
       const instance = await this.client.invoke<Ref>('auto_login', secret)
@@ -264,9 +277,7 @@ export const User = {
       { id: undefined, token: undefined, social: undefined }) // clear out mem. of old values
     authed.set(false)
     // clear out auto-login data
-    sessionStorage.removeItem('user-secret')
-    localStorage.removeItem('user-remember')
-    localStorage.removeItem('user-secret')
+    secretHandler.clear()
   }
 }
 
