@@ -8,8 +8,8 @@
 // This causes overpadding at the top and bottom of text nodes.
 rhythm-set-text-bounds(auto = true)
   lh = s('(1em * var(--rhythm-baseline))')
-  fh-relative = 'calc((%s - 1rem * var(--font-cap)) *  -0.5)' % lh
-  fh-actual = 'calc((%s - 1em * var(--font-cap)) * -0.5)' % lh
+  fh-relative = 'calc(((%s - 1rem * var(--font-cap)) *  -0.5) + var(--rhythm-baseline-unit-row))' % lh
+  fh-actual = 'calc(((%s - 1em * var(--font-cap)) * -0.5) + var(--rhythm-baseline-unit-row))' % lh
 
   margin-top: fh-relative unless auto
   margin-top: fh-actual if auto
@@ -34,27 +34,27 @@ $heading-tags = 'h1, h2, h3, h4, h5, h6'
   --rhythm-baseline-unit: calc(var(--rhythm-reference-font-size) * var(--rhythm-baseline))
   --rhythm-baseline-unit-row: calc(var(--rhythm-baseline-unit) / 2)
 
-  &, {$nest-tags}
+  position: relative
+  line-height: var(--rhythm-baseline)
+
+  > *
+    margin-top: var(--rhythm-baseline-unit-row)
+    margin-bottom: var(--rhythm-baseline-unit-row)
+
+  // Line-height correction
+  {$block-tags}
     position: relative
-    display: flex
-    flex-direction: column
-    row-gap: var(--rhythm-baseline-unit)
-    line-height: var(--rhythm-baseline)
+    width: 100%
+    line-height: inherit
+    rhythm-set-text-bounds()
 
-    // Line-height correction
-    +select-listed('>', $block-tags)
+  +select-listed('>', $section-tags)
+    padding-top: var(--rhythm-baseline-unit-row)
+
+  // Shifts <hr>s up when in front of a heading
+  +select-listed('>', $heading-tags)
+    + hr
       position: relative
+      top: calc(var(--rhythm-baseline-unit-row) * 0.25)
       width: 100%
-      line-height: inherit
-      rhythm-set-text-bounds()
-
-    +select-listed('>', $section-tags)
-      padding-top: var(--rhythm-baseline-unit-row)
-
-    // Shifts <hr>s up when in front of a heading
-    +select-listed('>', $heading-tags)
-      + hr
-        position: relative
-        top: calc(var(--rhythm-baseline-unit-row) * 0.25)
-        width: 100%
-        margin-top: calc(var(--rhythm-baseline-unit) * -0.75)
+      margin-top: calc(var(--rhythm-baseline-unit) * -0.25)
