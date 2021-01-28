@@ -86,7 +86,7 @@ const rules = {
       'space-before-function-paren': ['warn', { anonymous: 'always', named: 'never', asyncArrow: 'always' }]
     }),
     'object-curly-spacing': ['warn', 'always'],
-    'indent': ['warn', 2, { SwitchCase: 1 }],
+    // 'indent': ['warn', 2, { SwitchCase: 1 }],
     'key-spacing': ['warn', { mode: 'minimum' }],
     'quote-props': ['warn', 'consistent-as-needed'],
     'arrow-parens': ['warn', 'as-needed', { requireForBlockBody: true }]
