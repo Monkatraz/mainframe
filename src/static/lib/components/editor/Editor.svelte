@@ -6,7 +6,7 @@
   import { createAnimQueued, throttle, Pref } from '../../modules/util'
   import { EditorView } from '@codemirror/view'
   // Components
-  import { tnAnime, Markdown, Toggle, DetailsMenu, Button, Card } from '@components'
+  import { tnAnime, focusGroup, Markdown, Toggle, DetailsMenu, Button, Card } from '@components'
 
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?
@@ -137,7 +137,7 @@
       in:tnAnime={{ translateY: ['-150%', '0'], duration: 400, delay: 400, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
-      <div class='topbar-section'>
+      <div class='topbar-section' use:focusGroup={'horizontal'}>
         <Button i='carbon:document-download' tip='Open' size='1.5rem' sharp baseline/>
         <Button i='carbon:save' tip='Save Draft' size='1.5rem' sharp baseline/>
         <Button i='carbon:fetch-upload-cloud' tip='Publish' size='1.5rem' sharp baseline/>
@@ -157,7 +157,7 @@
             <Button summary i='fluent:settings-28-filled' tip='Editor Settings' floating size='1.5rem' />
           </slot>
           <Card>
-            <div class='settings-menu'>
+            <div class='settings-menu' use:focusGroup={'vertical'}>
               <Toggle bind:toggled={settings.darkmode}>Dark Mode</Toggle>
               <Toggle bind:toggled={settings.gutters}>Gutters</Toggle>
               <Toggle bind:toggled={settings.spellcheck}>Spellcheck</Toggle>
@@ -183,7 +183,7 @@
               <Button summary i='fluent:settings-28-filled' tip='Preview Settings' floating size='1.5rem' />
             </slot>
             <Card>
-              <div class='settings-menu'>
+              <div class='settings-menu' use:focusGroup={'vertical'}>
                 <Toggle bind:toggled={settings.preview.darkmode}>Dark Mode</Toggle>
                 <Toggle bind:toggled={settings.preview.activelines}>Show Active Line</Toggle>
               </div>

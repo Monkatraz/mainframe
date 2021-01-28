@@ -1,7 +1,7 @@
 <script lang='ts'>
-  import { placement as popperPlacement } from '@components'
   import { onMount } from 'svelte'
   import type { Placement } from 'tippy.js'
+  import { getFoci, keyHandle, placement as popperPlacement } from '@components'
 
   export let hover = false
   export let open = false
@@ -18,6 +18,11 @@
     // all checks failed
     details.toggleAttribute('open', false)
   }
+
+  const keyHandler = [
+    { key: 'Escape', do() { details.toggleAttribute('open', false) } },
+    { key: 'ArrowDown', do() { if (document.activeElement === summary) getFoci(details)[0]?.focus() } }
+  ]
 
   onMount(() => {
 
@@ -47,7 +52,7 @@
 
 <svelte:body on:pointerdown={checkClose} />
 
-<details bind:this={details} {...$$restProps}>
+<details bind:this={details} use:keyHandle={keyHandler} {...$$restProps}>
   {#if $$slots.summary}<slot name='summary' {open} />{/if}
   <div class='menu' use:popperPlacement={{ when: open && !!summary, pos: placement, against: summary }}>
     <slot {open} />

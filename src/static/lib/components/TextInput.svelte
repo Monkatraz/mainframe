@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { createEventDispatcher } from 'svelte'
-  import { tip, Icon } from '@components'
+  import { keyHandle, tip, Icon } from '@components'
 
   export let label = ''
   export let value = ''
@@ -9,6 +9,8 @@
   export let input: HTMLInputElement = null as unknown as HTMLInputElement
 
   const dispatch = createEventDispatcher()
+
+  const keyHandler = [{ key: 'Enter', preventDefault: true, do() { dispatch('enter') } }]
 
   function handleEnter(evt: KeyboardEvent) {
     if (evt.key === 'Enter') {
@@ -28,8 +30,7 @@
       </span>
     {/if}
   </div>
-  <input bind:this={input} bind:value
-    on:keydown={handleEnter}
+  <input bind:this={input} bind:value use:keyHandle={keyHandler}
     {...$$restProps}
   ><span role='presentation' class='text-icon' />
 </label>

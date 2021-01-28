@@ -27,7 +27,7 @@
     padding: 0.5rem
     font-size: 1rem
     background: colvar('background')
-    border: colvar('border')
+    border: solid 0.075rem colvar('border')
     border-radius: 0.5rem
     contain: content
     shadow-elevation(8)

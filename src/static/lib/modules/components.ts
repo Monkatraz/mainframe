@@ -63,6 +63,7 @@ export function createID(prefix = '') {
 
 type PlacementOpts = { when?: boolean, pos: Popper.Placement, against: Element }
 
+/** Svelte use function that uses Popper to place the element relative to another element. */
 export function placement(elem: Element, opts: PlacementOpts) {
   let instance: Popper.Instance | undefined
 
@@ -79,9 +80,90 @@ export function placement(elem: Element, opts: PlacementOpts) {
 
   return {
     update,
-    destroy() {
-      if (instance) instance.destroy()
-    }
+    destroy() { if (instance) instance.destroy() }
+  }
+}
+
+export interface KeyHandler {
+  key: string
+  preventDefault?: boolean
+  do?: AnyFn
+}
+
+/** Utility Svelte use function to handle key press events for the element. */
+export function keyHandle(elem: Element, handlers: KeyHandler[]) {
+  const handler = (evt: KeyboardEvent) => {
+    handlers.forEach((handler) => {
+      if (evt.key === handler.key) {
+        if (handler.preventDefault) evt.preventDefault()
+        if (handler.do) handler.do()
+      }
+    })
+  }
+  elem.addEventListener('keydown', handler as any)
+  return {
+    update(newHandlers: KeyHandler[]) { handlers = newHandlers },
+    destroy() { elem.removeEventListener('keydown', handler as any) }
+  }
+}
+
+// https://zellwk.com/blog/keyboard-focusable-elements/
+/** Returns a list of elements that can be reasonably expected
+ *  as programatically focusable directly under the given element. */
+export function getFoci(elem: Element) {
+  return Array.from(elem.querySelectorAll<HTMLElement>(
+    'a, button, input, textarea, select, details, [tabindex]'))
+    .filter(el => !el.hasAttribute('disabled'))
+    .filter(el => el.getAttribute('tabindex') !== '-1')
+}
+
+/** Svelte use function for automatically handling directional key focus movement.
+ *  All elements underneath this one that are focusable with a non-negative tabindex will be
+ *  cycled through with the arrow keys.
+ *  The `dir` parameter determines which pair of arrow keys will be used. */
+export function focusGroup(elem: Element, dir: 'vertical' | 'horizontal') {
+
+  const keys = ['ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'End', 'Home']
+
+  const handler = (evt: KeyboardEvent) => {
+
+    if (!keys.includes(evt.key)) return
+
+    const focus = document.activeElement as HTMLElement
+    if (!focus) return
+
+    const foci = getFoci(elem)
+    if (!foci.length) return
+
+    // maps every element to its index
+    const fociMap = new Map<HTMLElement, number>()
+    foci.map((el, i) => fociMap.set(el, i))
+
+    const didArrow =
+      (dir === 'vertical' && (evt.key === 'ArrowUp' || evt.key === 'ArrowDown')) ||
+      (dir === 'horizontal' && (evt.key === 'ArrowLeft' || evt.key === 'ArrowRight'))
+
+    const arrowDir = evt.key === 'ArrowUp' || evt.key === 'ArrowLeft' ? -1 : 1
+
+    // modulo of next position (even -1) and array length causes the value to "wrap"
+    // JS handles negative modulo weirdly so we don't use the operator directly
+    const len = foci.length
+    if (didArrow && fociMap.has(focus))
+      foci[(((fociMap.get(focus)! + arrowDir) % len) + len) % len].focus()
+    else if (evt.key === 'Home') foci[0].focus()
+    else if (evt.key === 'End') foci[len - 1].focus()
+    else return
+
+    // if we passed a key check we can be here
+    evt.preventDefault()
+  }
+
+  // typescript doesn't handle keydown correctly for some reason?
+  elem.addEventListener('keydown', handler as any)
+
+  return {
+    update(newDir: 'vertical' | 'horizontal') { dir = newDir },
+    destroy() { elem.removeEventListener('keydown', handler as any) }
   }
 }
 
@@ -121,9 +203,7 @@ export function tip(elem: Element, opts: Partial<TippyProps> | string = '') {
       tp.setProps(newOpts)
       setState(newOpts.content)
     },
-    destroy() {
-      tp.destroy()
-    }
+    destroy() { tp.destroy() }
   }
 }
 

@@ -29,13 +29,13 @@
 <span class='tab_button' class:selected use:portal={buttons} role='presentation'>
   <Button baseline sharp wide active={selected} on:click={selectThis}
     id={buttonID} aria-controls={panelID}
-    aria-selected={String(selected)} tabindex={selected ? -1 : 0}>
+    aria-selected={String(selected)}>
     <slot name='button'/>
   </Button>
 </span>
 
 <div class='tab_panel' use:portal={panels} hidden={!selected}
-  id={panelID} aria-labelledby={buttonID}>
+  id={panelID} aria-labelledby={buttonID} tabindex='0'>
   <slot />
 </div>
 
@@ -62,6 +62,7 @@
       opacity: 1
 
   .tab_panel
+    outline: none
     animation: reveal 0.125s 0s 1 backwards ease-out
 
 </style>

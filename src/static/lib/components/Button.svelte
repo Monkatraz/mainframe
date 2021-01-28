@@ -21,13 +21,15 @@
 </script>
 
 {#if !summary}
-  <button type='button' on:click {disabled} use:tip={tipString} style='font-size: {size};'
+  <button type='button' {disabled} style='font-size: {size};'
+    on:click use:tip={tipString}
     class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp
     {...$$restProps}>
     {#if i}<Icon {i} size='1em' />{:else}<slot />{/if}
   </button>
 {:else}
-  <summary on:click disabled={disabled ? true : undefined} use:tip={tipString} style='font-size: {size};'
+  <summary disabled={disabled ? true : undefined} style='font-size: {size};'
+    on:click use:tip={tipString}
     class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp
     {...$$restProps}>
     {#if i}<Icon {i} size='1em' />{:else}<slot />{/if}
