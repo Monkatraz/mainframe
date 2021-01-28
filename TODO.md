@@ -3,6 +3,8 @@
 ### In Progress
 - [ ] Page creation, and updating
 - [ ] Drafts stored either with `localStorage` (must be serialized) or in the user document
+- [ ] Rename 'User' to 'Account' and rename 'Social' to 'User'
+- [ ] Context menu actions for editor
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin
@@ -47,7 +49,7 @@
 #### Page Router
 - Vivaldi like loading bar
 - Top right fixed spinner for page route changes
-	
+
 #### Keyboard Arrow Key Utility Grid Function Thingy
 - List of arrays
 - Elements or flow characters
@@ -113,3 +115,4 @@
 - [x] Toasts
 - [x] Navbar dropdowns
 - [x] Add some sort of `pref` object that handles localStorage shenanigans automatically
+- [x] Tabs

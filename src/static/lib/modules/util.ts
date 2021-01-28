@@ -103,6 +103,15 @@ export const Pref = {
   }
 }
 
+// https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0#gistcomment-2694461
+/** Very quickly generates a (non-secure) hash from the given string. */
+export function hash(s: string) {
+  let h = 0
+  for (const c of s)
+    h = Math.imul(31, h) + c.charCodeAt(0) | 0
+  return h
+}
+
 /**
  * Returns a promise that resolves after the specified number of miliseconds.
  */

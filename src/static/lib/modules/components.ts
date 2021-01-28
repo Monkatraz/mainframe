@@ -10,7 +10,7 @@ import { roundArrow as TippyRoundArrow } from 'tippy.js'
 import * as Popper from '@popperjs/core'
 // Anime
 import anime, { AnimeParams } from 'animejs'
-import { animationFrame } from './util'
+import { hash, animationFrame } from './util'
 import { writable } from 'svelte/store'
 
 interface Toast {
@@ -53,6 +53,12 @@ export function portal(elem: Element, target: string | Element) {
     update,
     destroy() { if (elem.parentElement) elem.parentElement.removeChild(elem) }
   }
+}
+
+/** Simple utility function for generating an ID, with the intended usage being HTML element IDs.*/
+export function createID(prefix = '') {
+  const suffix = hash(Math.random() * 100 + prefix)
+  return prefix + '-' + suffix
 }
 
 type PlacementOpts = { when?: boolean, pos: Popper.Placement, against: Element }

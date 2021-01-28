@@ -22,12 +22,14 @@
 
 {#if !summary}
   <button type='button' on:click {disabled} use:tip={tipString} style='font-size: {size};'
-    class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp>
+    class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp
+    {...$$restProps}>
     {#if i}<Icon {i} size='1em' />{:else}<slot />{/if}
   </button>
 {:else}
   <summary on:click disabled={disabled ? true : undefined} use:tip={tipString} style='font-size: {size};'
-    class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp>
+    class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp
+    {...$$restProps}>
     {#if i}<Icon {i} size='1em' />{:else}<slot />{/if}
   </summary>
 {/if}
@@ -124,5 +126,10 @@
     &.floating.icon
       transform: scale(1)
       opacity: 1
+
+  // click only, so not using active class
+  button:active, summary:active
+    &.baseline
+      background: colvar('border', darken 2.5%)
 
 </style>

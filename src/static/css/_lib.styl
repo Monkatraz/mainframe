@@ -176,7 +176,7 @@ shadow-elevation(height = 1, boost = 1)
     box-shadow: none
 
 // Adds scroll shadows. Requires usage of backgrounds.
-scroll-shadows(boost = 1, extent = 1, background = colvar('background-light'))
+scroll-shadows(boost = 1, extent = 1, background = colvar('background'))
   background: linear-gradient(background 33%, transparent),
               linear-gradient(transparent, background 66%) 0 100%,
               radial-gradient(farthest-side at 50% 0, shadow, rgba(0,0,0,0)),
@@ -219,6 +219,20 @@ grid-kiss()
     else
       grid-kiss-zone(zones)
 
+// Misc. Block Functions
+
+overlay()
+  position: relative unless @position
+  &::after
+    position: absolute
+    top: 0
+    left: 0
+    z-index: 1
+    width: 100%
+    height: 100%
+    content: ''
+    pointer-events: none
+    {block}
 
 // Selection Functions
 
@@ -243,7 +257,7 @@ select-listed(prefix = '', selectors...)
 // Media Functions
 
 // +match-media(size, inclusivity)
-// size: any-in: ['narrow', 'thin', 'small', 'normal', 'wide'] 
+// size: any-in: ['narrow', 'thin', 'small', 'normal', 'wide']
 // inclusivity: any-in: ['only', 'up', 'below']
 // Sizes, by default, will match like so:
 //    narrow: < 400px (small phones)
@@ -260,7 +274,7 @@ match-media(size, inclusivity)
 // +has-only-touch()
 // For touch devices - regardless of size.
 // Any features where you intend it to be for 'mobile' should probably use this instead.
-// The exception is for the 'size' of readable content. 
+// The exception is for the 'size' of readable content.
 // Making things easier to read should be based off screen size.
 has-only-touch()
   @media (pointer: coarse)
@@ -282,7 +296,7 @@ uses-reduced-motion()
 on-hover(notWithActive = true)
   @media (any-hover: hover), (hover: hover)
     if notWithActive
-      &:hover:not(:active) 
+      &:hover:not(:active)
         {block}
     else
       &:hover

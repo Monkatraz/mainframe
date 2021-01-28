@@ -7,7 +7,7 @@
   import { onMount } from 'svelte'
   import {
     portal, tnAnime, matchMedia,
-    Navbar, Sidebar, Page, Spinny, UserPanel, Toasts
+    Navbar, Sidebar, Page, Spinny, UserPanel, Toasts, DevPage
   } from '@components'
 
   // kind of hacky, but we don't want esbuild to preload the entire editor
@@ -88,6 +88,10 @@
           <Route path="/test/md"><Page
             loading={fetch('/static/misc/md-test.md').then(res => res.text())}
           /></Route>
+
+          <Route path="/test/components">
+            <DevPage />
+          </Route>
 
           <Route path="/test/loading"><Page
             loading={new Promise(() => {})}

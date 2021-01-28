@@ -53,6 +53,7 @@
   <Link href='/guide/user-modules' i='ph:stack-bold'>User Modules</Link>
 
   <div class='sb-header'>Test Pages</div>
+  <Link href='/test/components' i='ic:round-view-module' small>Components</Link>
   <Link href='/test/md' i='ion:logo-markdown' small>Markdown</Link>
   <Link href='/test/loading' i='ion:hourglass' small>Loading Spinner</Link>
 
