@@ -3,7 +3,7 @@
  * @author Monkatraz
  */
 
-import { EditorState, Extension, tagExtension } from '@codemirror/state'
+import { EditorState, Extension } from '@codemirror/state'
 import {
   EditorView, ViewPlugin, ViewUpdate, drawSelection,
   highlightActiveLine, highlightSpecialChars, keymap
@@ -21,7 +21,7 @@ import { commentKeymap } from '@codemirror/comment'
 import { rectangularSelection } from '@codemirror/rectangular-selection'
 // Local Extensions
 import { redo } from '@codemirror/history'
-import { copyLineDown, indentLess, indentMore } from '@codemirror/commands'
+import { copyLineDown } from '@codemirror/commands'
 import { confinement } from './editor-config'
 import monarchMarkdown from './monarch-markdown'
 // Misc.

@@ -11,7 +11,7 @@
     info: 'ion:information'
   }
 
-  function listTransition(elem: Element, animation: { from: DOMRect, to: DOMRect }, params: any) {
+  function listTransition(elem: Element, animation: { from: DOMRect, to: DOMRect }) {
     const d = (animation.from.top - animation.to.top)
 
     return {

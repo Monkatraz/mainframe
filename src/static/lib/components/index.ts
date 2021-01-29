@@ -29,4 +29,4 @@ export { default as UserPanel } from './UserPanel.svelte'
 // -- Component Function Library
 
 export * from '../modules/components'
-export { matchMedia } from '../modules/util'
+export * from '../modules/state'

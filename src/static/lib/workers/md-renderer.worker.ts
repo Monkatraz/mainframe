@@ -56,7 +56,7 @@ import ParserInline from 'markdown-it/lib/parser_inline'
 
 // available symbols:
 // inline: ++ | ~~ | % | ,, | @[]
-// block: ::: | :-- :--: --: | = | < | >
+// block: ::: | :-- :--: --: | = | < | > | +++
 
 // comments
 // '//'
@@ -101,6 +101,7 @@ import ParserInline from 'markdown-it/lib/parser_inline'
 // ? #<tag> attrs|...|#
 
 // basic blocks
+// ? collapsible +++ summary -> details
 // ? easy line break | ___
 // ? | left side column
 // ? nestable MD tags

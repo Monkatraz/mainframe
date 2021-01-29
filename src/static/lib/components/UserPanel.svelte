@@ -1,8 +1,7 @@
 <script lang='ts'>
   import { User, authed } from '../modules/api'
-  import { Pref } from '../modules/util'
   import {
-    tnAnime, toast, matchMedia,
+    tnAnime, toast, matchMedia, Pref,
     Icon, Toggle, DetailsMenu, TextInput, Button, Card
   } from '@components'
 

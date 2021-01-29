@@ -1,12 +1,12 @@
 <script lang='ts'>
   // Imports
   import * as API from './modules/api'
-  import { ENV, sleep } from './modules/util'
+  import { sleep } from './modules/util'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import { onMount } from 'svelte'
   import {
-    portal, tnAnime, matchMedia,
+    portal, tnAnime, matchMedia, ENV,
     Navbar, Sidebar, Page, Spinny, UserPanel, Toasts, DevPage
   } from '@components'
 

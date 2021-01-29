@@ -3,10 +3,13 @@
   import { EditorCore } from './editor-core'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
-  import { createAnimQueued, throttle, Pref } from '../../modules/util'
+  import { createAnimQueued, throttle } from '../../modules/util'
   import { EditorView } from '@codemirror/view'
   // Components
-  import { tnAnime, focusGroup, Markdown, Toggle, DetailsMenu, Button, Card } from '@components'
+  import {
+    tnAnime, Pref, focusGroup,
+    Markdown, Toggle, DetailsMenu, Button, Card
+  } from '@components'
 
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?

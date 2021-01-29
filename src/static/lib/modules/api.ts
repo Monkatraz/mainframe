@@ -10,7 +10,7 @@ const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
 import type { Page, Social } from '@schemas'
-import { Pref, ENV } from './util'
+import { Pref, ENV } from './state'
 import { writable } from 'svelte/store'
 
 // ---------
