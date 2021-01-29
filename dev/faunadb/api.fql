@@ -126,8 +126,6 @@ CreateFunction({
   role: "server"
 })
 
-# FaunaDB function to validate email addresses.
-# Yes, FaunaDB can do this. It"s hilarious.
 # Emails are treated as case insensitive by uppercasing them.
 CreateFunction({
   name: "validate_email",
@@ -159,11 +157,8 @@ CreateFunction({
   role: "server"
 })
 
-# Create user function.
-# No email validation yet, unfortunately.
-# Have to hook up to an email service.
 CreateFunction({
-  name: "guest_register",
+  name: "auth_register",
   body: Query(Lambda(
     ["email", "password"],
     If(Call(Function("validate_email"), Var("email")),
@@ -213,21 +208,28 @@ CreateFunction({
   role: "server"
 })
 
-# Login function.
-# The actual login function is unavailable to users, so they must go through this function.
 CreateFunction({
-  name: "guest_login",
+  name: "auth_login",
   body: Query(Lambda(
     ["email", "password", "remember"],
-    Login(
-      Match(Index("users_by_email"), Var("email")),
-      {
-        password: Var("password"),
-        ttl: If(Var("remember"), TimeAdd(Now(), 7, "day"), TimeAdd(Now(), 1, "day")),
-        data: {
-          remember: Var("remember")
-        }
-      }
+    Let({
+        match: Match(Index("users_by_email"), Var("email")),
+        user: If(IsNonEmpty(Var("match")),
+          Login(Var("match"), { password: Var("password"), ttl: TimeAdd(Now(), 1, "day") }),
+          Abort("401")
+        ),
+        session: If(Var("remember"),
+          Create(Tokens(), {
+            ttl: TimeAdd(Now(), 7, "day"),
+            instance: Select("ref", Create(Collection("sessions"), {
+              ttl: TimeAdd(Now(), 7, "day"),
+              data: { user: Select("ref", Get(Var("match"))) }
+            }))
+          }),
+          null
+        )
+      },
+      { user: Var("user"), session: Var("session")  }
     )
   )),
   role: "server"
@@ -235,18 +237,47 @@ CreateFunction({
 
 # Handles automatically logging in when using "Remember Me".
 CreateFunction({
-  name: "auto_login",
+  name: "auth_login_auto",
   body: Query(Lambda(
-    ["secret"],
-    Let(
-      { object: KeyFromSecret(Var("secret")) },
-      Do(
-        If(
-          Select(["data", "remember"], Get(Select("ref", Var("object")))),
-          Update(Select("ref", Var("object")), { ttl: TimeAdd(Now(), 7, "day") }),
-          null
-        )
-        Select("instance", Var("object"))
+    ["id", "secret"],
+    Let({ ref: Ref(Collection("sessions"), Var("id")) },
+      If(Exists(Var("ref")),
+        Let({
+            token: KeyFromSecret(Var("secret")),
+            session: Get(Var("ref"))
+          },
+          Do(
+            If(Equals(Select("instance", Var("token")), Var("ref")), null, Abort("401")),
+            Update(Select("ref", Var("token")), { ttl: TimeAdd(Now(), 7, "day") }),
+            Update(Var("ref"), { ttl: TimeAdd(Now(), 7, "day") }),
+            Create(Tokens(), {
+              ttl: TimeAdd(Now(), 1, "day"),
+              instance: Select(["data", "user"], Var("session"))
+            })
+          )
+        ),
+        false
+      )
+    )
+  )),
+  role: "server"
+})
+
+CreateFunction({
+  name: "auth_end_session",
+  body: Query(Lambda(
+    ["id", "secret"],
+    Let({ ref: Ref(Collection("sessions"), Var("id")) },
+      If(Exists(Var("ref")),
+        Let({ token: KeyFromSecret(Var("secret")) },
+          Do(
+            If(Equals(Select("instance", Var("token")), Var("ref")), null, Abort("401")),
+            Delete(Select("ref", Var("token"))),
+            Delete(Var("ref")),
+            true
+          )
+        ),
+        false
       )
     )
   )),

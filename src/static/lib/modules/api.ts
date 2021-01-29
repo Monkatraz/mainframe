@@ -10,7 +10,7 @@ const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
 // Imports
 import type { Page, Social } from '@schemas'
-import { ENV } from './util'
+import { Pref, ENV } from './util'
 import { writable } from 'svelte/store'
 
 // ---------
@@ -183,37 +183,51 @@ class Client {
   }
 }
 
+interface TokenInstance {
+  ref: Ref
+  instance: Ref
+  secret: string
+}
+
+interface LoginResult {
+  user: TokenInstance
+  session?: TokenInstance
+}
+
+type Session = { id: string, secret: string } | null
+
+type ModeGuest = {
+  authed: false
+  client: Client
+}
+
+type ModeUser = {
+  authed: true
+  id: Ref
+  social: Social
+  client: Client
+}
+
 /** Store that allows for reactive checking of user authed state. */
 export const authed = writable(false)
 
-/** Helper object for handling the storage of the user's secret and 'Remember me' status. */
-const secretHandler = {
-  get storage() { return this.remember ? localStorage : sessionStorage },
-
-  get remember() { return !!localStorage.getItem('user-remember') },
-  set remember(state: boolean) { this.set(state, this.secret) },
-
-  get secret() { return this.storage.getItem('user-secret') ?? '' },
-  set secret(sec: string) { this.set(this.remember, sec) },
-
-  clear() {
-    localStorage.removeItem('user-remember')
-    localStorage.removeItem('user-secret')
-    sessionStorage.removeItem('user-secret')
-  },
-
-  set(remember: boolean, secret: string) {
-    this.clear()
-    if (remember) localStorage.setItem('remember', 'true')
-    if (secret) this.storage.setItem('user-secret', secret)
-  }
+async function setUserMode(state: boolean, token?: TokenInstance) {
+  // Assigns are used here for type wizardy shenanigans
+  if (state && token) Object.assign(User, {
+    authed: true,
+    id: token.ref,
+    social: await User.client.invoke<Social>('socials_of', token.instance),
+    client: new Client(token.secret)
+  })
+  else Object.assign(User, {
+    authed: false,
+    id: undefined,
+    social: undefined,
+    client: new Client(ENV.API.FDB_PUBLIC)
+  })
+  authed.set(!!(state && token))
 }
 
-type ModeGuest = { authed: false, client: Client }
-type ModeUser = {
-  authed: true, client: Client
-  id: Ref, token: string, social: Social
-}
 /** Represents the current user. */
 export const User = {
   // type wizardy that allows for `User.authed` type narrowing without nested objects being needed
@@ -222,62 +236,45 @@ export const User = {
   preferences: {
     langs: ['en']
   },
+
   /** Creates an account registration event. Does not sign the guest in. */
   async guestRegister(email: string, password: string) {
     if (User.authed) throw new Error()
-    await User.client.invoke<Ref>('guest_register', email, password)
+    await User.client.invoke<Ref>('auth_register', email, password)
   },
+
   /** Signs an unsigned guest in using the provided credentials. */
   async login(email: string, password: string, remember = false) {
     if (User.authed) throw new Error()
-    const res = await User.client
-      .invoke<{ instance: Ref, secret: string }>('guest_login', email, password, remember)
-    // Assigns is used here for cleanliness and also because type wizardy
-    Object.assign(User, {
-      authed: true,
-      id: res.instance, token: res.secret,
-      social: await User.client.invoke<Social>('socials_of', res.instance),
-      client: new Client(res.secret)
-    })
-    authed.set(true)
-    // handling remember me
-    // current strategy does the following:
-    //  - sets the TTL on the token to 1 week instead of 1 day
-    //  - stores the token in localStorage instead of sessionStorage
-    //  - enables a behavior where the token can be 'refreshed'
-    //    which sets the token's expiration to the next week
-    secretHandler.set(remember, res.secret)
+    const { user, session } = await User.client.invoke<LoginResult>('auth_login', email, password, remember)
+    await setUserMode(true, user)
+    if (remember && session) Pref.set('user-session', { id: session.instance.id, secret: session.secret })
   },
+
   /** Attempts to automatically log the user in.
    *  Returns whether or not this was successful. */
   async autologin() {
     if (User.authed) throw new Error()
-    const secret = secretHandler.secret
-    if (!secret) return false
+    const session = Pref.get<Session>('user-session', null)
+    if (!session) return false
     try {
-      const instance = await this.client.invoke<Ref>('auto_login', secret)
-      Object.assign(User, {
-        authed: true,
-        id: instance, token: secret,
-        social: await User.client.invoke<Social>('socials_of', instance),
-        client: new Client(secret)
-      })
-      authed.set(true)
+      const user = await this.client.invoke<TokenInstance | null>('auth_login_auto', session.id, session.secret)
+      if (!user) return false
+      await setUserMode(true, user)
       return true
     } catch {
       return false
     }
   },
+
   /** Signs out a signed in user. */
   async logout() {
     if (!User.authed) throw new Error()
+    const session = Pref.get<Session>('user-session', null)
+    if (session) await User.client.invoke('auth_end_session', session.id, session.secret)
     await User.client.query(q.Logout(false))
-    Object.assign(User,
-      { authed: false, client: new Client(ENV.API.FDB_PUBLIC) },
-      { id: undefined, token: undefined, social: undefined }) // clear out mem. of old values
-    authed.set(false)
-    // clear out auto-login data
-    secretHandler.clear()
+    await setUserMode(false)
+    Pref.set('user-session', '')
   }
 }
 
