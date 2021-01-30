@@ -49,6 +49,7 @@
     "markdown-it-deflist": "^2.1.0",
     "markdown-it-multimd-table": "^4.0.3",
     "morphdom": "^2.6.1",
+    "threads": "^1.6.3",
     "tippy.js": "^6.2.7"
   },
   "devDependencies": {

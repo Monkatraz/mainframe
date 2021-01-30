@@ -2,6 +2,8 @@
  * @file Serves as the asynchronous markdown-it render worker for Mainframe.
  * @author Monkatraz
  */
+// Worker Handler
+import { expose, Transfer } from 'threads'
 // Imports
 import MarkdownIt from 'markdown-it'
 import MDMultiMDTables from 'markdown-it-multimd-table'
@@ -417,19 +419,36 @@ const renderer = new MarkdownIt({
 })
 synExt.map(renderer.use, renderer)
 
-onmessage = (evt) => {
-  const perf = performance.now()
-  try {
-    const html = renderer.render(evt.data)
-    postMessage({
-      html,
-      perf: performance.now() - perf,
-      cacheSize: mdCache.size
-    })
-  } catch (err) {
-    postMessage(String(err))
-  }
+interface TypedArray extends ArrayBuffer { buffer: ArrayBufferLike }
+type RawMarkdown = string | ArrayBuffer | TypedArray
+
+const decoder = new TextDecoder()
+const encoder = new TextEncoder()
+const transfer = (buffer: RawMarkdown) => {
+  if (typeof buffer === 'string')    return Transfer(encoder.encode(buffer).buffer)
+  if ('buffer' in buffer)            return Transfer(buffer.buffer)
+  if (buffer instanceof ArrayBuffer) return Transfer(buffer)
+  throw new TypeError('Expected a string, ArrayBuffer, or Uint8Array!')
 }
+const decode = (buffer: ArrayBuffer) => decoder.decode(buffer)
+
+// see `modules/markdown.ts` for docs. and type definitions
+// this just implements the MarkdownWorker interface found there
+expose({
+
+  render(buffer: ArrayBuffer) {
+    const str = decode(buffer)
+    return transfer(renderer.render(str))
+  },
+
+  highlight(buffer: ArrayBuffer, lang: string) {
+    const str = decode(buffer)
+    if (lang in Prism.languages)
+      return transfer(Prism.highlight(str, Prism.languages[lang], lang))
+    else throw new Error('Invalid language!')
+  }
+
+})
 
 // -- UTILITY FUNCTIONS
 

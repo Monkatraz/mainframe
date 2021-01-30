@@ -93,7 +93,7 @@ export class EditorCore {
     const updateHandler = ViewPlugin.define(() => ({
       update: (update: ViewUpdate) => {
         // update store on change
-        if (update.docChanged) { updateValue(() => update.state.doc.toString()) }
+        if (update.docChanged) { updateValue(() => this.doc.toString()) }
         // get active lines
         if (update.selectionSet || update.docChanged) {
           const lines: Set<number> = new Set()

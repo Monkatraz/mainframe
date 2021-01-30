@@ -3,111 +3,89 @@
  * @author Monkatraz
  */
 // Imports
-import { createLock } from './util'
+import { spawn, Transfer, Thread, Worker } from 'threads'
+import type { ModuleThread, TransferDescriptor } from 'threads'
+import { createLock, sleep } from './util'
 import DOMPurify from 'dompurify'
 import morphdom from 'morphdom'
 
 // -- RENDER WORKER
 
-let renderWorker: Worker
-/** Effectively restarts the Markdown renderer.
- *  It does this by terminating the previous instance and creating a new one. */
-function restartRenderWorker() {
-  if (renderWorker) renderWorker.terminate()
-  renderWorker = new Worker(new URL('../workers/md-renderer.js', import.meta.url), {
-    name: 'md-renderer',
-    credentials: 'same-origin',
-    type: 'classic'
-  })
-}
-// init. worker on first load
-restartRenderWorker()
+interface MarkdownWorker {
+  /** Renders the given encoded string and returns an HTML buffer. */
+  render: (buffer: TransferDescriptor<ArrayBuffer>) => Promise<ArrayBuffer>
 
-export interface RenderMarkdownResult {
-  html: string
-  perf: {
-    sanitize: number
-    parse: number
-    cacheSize: number
-  }
+  /** Highlights (using Prism) the given encoded raw source and returns an HTML buffer. */
+  highlight: (buffer: TransferDescriptor<ArrayBuffer>, lang: string) => Promise<ArrayBuffer>
+
+  // required due to a type bug
+  [key: string]: any
+}
+
+const WORKER_URL = new URL('../workers/md-renderer.js', import.meta.url) as any
+const WORKER_SETTINGS: WorkerOptions = {
+  name: 'md-renderer',
+  credentials: 'same-origin',
+  type: 'classic'
+}
+
+let renderWorker: ModuleThread<MarkdownWorker> = await spawn<MarkdownWorker>(new Worker(WORKER_URL, WORKER_SETTINGS))
+
+/** Restarts the Markdown renderer. Used if the worker times out during a render call. */
+async function restartRenderWorker() {
+  if (renderWorker) await Thread.terminate(renderWorker)
+  renderWorker = await spawn<MarkdownWorker>(new Worker(WORKER_URL, WORKER_SETTINGS))
 }
 
 const RENDER_TIMEOUT = 10000
+
+interface TypedArray extends ArrayBuffer { buffer: ArrayBufferLike }
+export type RawMarkdown = string | ArrayBuffer | TypedArray
+
+const decoder = new TextDecoder()
+const encoder = new TextEncoder()
+const transfer = (buffer: RawMarkdown) => {
+  if (typeof buffer === 'string')    return Transfer(encoder.encode(buffer).buffer)
+  if ('buffer' in buffer)            return Transfer(buffer.buffer)
+  if (buffer instanceof ArrayBuffer) return Transfer(buffer)
+  throw new TypeError('Expected a string, ArrayBuffer, or Uint8Array!')
+}
+const decode = (buffer: ArrayBuffer) => decoder.decode(buffer)
+
 /** Safely renders (async) the given Markdown string.
  *  Calling this function multiple times is safe - it will render one request at a time.
  *
- *  The render occurs in a web worker due to performance considerations.
- */
-export const renderMarkdown = createLock((raw: string): Promise<RenderMarkdownResult> =>
-  new Promise((resolve, reject) => {
-    const perfTotal = performance.now()
-    // Timeout reject scenario
-    const rejectTimer = setTimeout(() => {
-      reject(new Error('Render timed out.'))
-      restartRenderWorker()
-    }, RENDER_TIMEOUT)
-    // Set the worker to resolve the promise
-    renderWorker.onmessage = (evt) => {
-    // clear the timer so we don't pointlessly restart the worker
-      clearTimeout(rejectTimer)
-      // if the evt.data is a string it is a casted error
-      if (typeof evt.data === 'string') reject(evt.data)
-      // unfortunately DOMPurify requires a reference to Window and Window.document
-      // so we have to purify here, I would've liked to have done it in the worker
-      resolve({
-        html: DOMPurify.sanitize(evt.data.html as string),
-        perf: {
-          sanitize: performance.now() - perfTotal,
-          parse: evt.data.perf,
-          cacheSize: evt.data.cacheSize
-        }
-      })
-    }
-    // everything's ready, send message to worker
-    renderWorker.postMessage(raw)
-  }))
+ *  The render occurs in a web worker due to performance considerations. */
+export const renderMarkdown = createLock(async (raw: string) => {
+  const buffer = await Promise.race([renderWorker.render(transfer(raw)), sleep(RENDER_TIMEOUT)])
+  if (!buffer) {
+    restartRenderWorker()
+    throw new Error('Render timed out.')
+  }
+  return decode(buffer)
+})
 
 /** Safely renders a given Markdown string and then updates the given node with the resultant HTML.
  *  This is _much_ faster than updating the entire DOM node at once.
  *
  *  Like `renderMarkdown`, the rendering process itself occurs within a web-worker for higher performance.
  *  Also, again like `renderMarkdown`, this function can safely be called multiple times.
- *  It will only render one request at a time.
- */
-export const morphMarkdown = createLock((raw: string, node: Node) => new Promise((resolve, reject) => {
-  // Timeout reject scenario
-  const rejectTimer = setTimeout(() => {
-    reject(new Error('Render timed out.'))
-    restartRenderWorker()
-  }, RENDER_TIMEOUT)
-
-  renderWorker.onmessage = (evt) => {
-    clearTimeout(rejectTimer)
-    // if the evt.data is a string it is a casted error
-    if (typeof evt.data === 'string') reject(evt.data)
-
-    morphdom(node, `<div>${evt.data.html as string}</div>`, {
-      childrenOnly: true,
-      onBeforeNodeAdded: function (toEl) {
-        // Don't sanitize if it's just a raw text node
-        if (toEl.nodeType === 3) return toEl
-        return DOMPurify.sanitize(toEl, { IN_PLACE: true }) as unknown as Node
-      },
-      onBeforeElUpdated: function (fromEl, toEl) {
-        if (fromEl.isEqualNode(toEl)) return false
-        DOMPurify.sanitize(toEl, { IN_PLACE: true })
-        return true
-      }
-    })
-
-    resolve({
-      perf: evt.data.perf,
-      cacheSize: evt.data.cacheSize
-    })
-  }
-  // everything's ready, send message to worker
-  renderWorker.postMessage(raw)
-}))
+ *  It will only render one request at a time. */
+export const morphMarkdown = createLock(async (raw: string, node: Node): Promise<void> => {
+  morphdom(node, `<div>${await renderMarkdown(raw)}</div>`, {
+    childrenOnly: true,
+    onBeforeNodeAdded: function (toEl) {
+      // Don't sanitize if it's just a raw text node
+      if (toEl.nodeType !== 3) DOMPurify.sanitize(toEl, { IN_PLACE: true })
+      return toEl
+    },
+    onBeforeElUpdated: function (fromEl, toEl) {
+      if (fromEl.isEqualNode(toEl)) return false
+      DOMPurify.sanitize(toEl, { IN_PLACE: true })
+      return true
+    }
+  })
+})
 
 // -- DOMPURIFY
 

@@ -98,7 +98,7 @@
   const update = createIdleQueued(async () => {
     if (!container) return
     if (morph) await morphMarkdown(template, container)
-    else container.innerHTML = (await renderMarkdown(template)).html
+    else container.innerHTML = await renderMarkdown(template)
     if (details) {
       await tick()
       updateHeightMap()

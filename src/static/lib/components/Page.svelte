@@ -27,7 +27,7 @@
     <Spinny width=150px top=200px left=50%/>
 
   <!-- Page loaded -->
-  {:then { html } }
+  {:then html}
     <div class='rhythm' role='presentation' in:tnAnime={pageReveal}>
       {@html html}
     </div>
