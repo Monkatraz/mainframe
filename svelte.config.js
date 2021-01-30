@@ -11,6 +11,7 @@ module.exports = {
     }
   }),
   compilerOptions: {
-    css: true
+    css: true,
+    immutable: true
   }
 }

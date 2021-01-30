@@ -19,15 +19,15 @@ interface Toast {
   remove: () => void
 }
 
-/** A stored `Set` containing the currently visible toasts. */
+/** A stored immutable `Set` containing the currently visible toasts. */
 export const toasts = writable<Set<Toast>>(new Set())
 
 /** Displays a 'toast' notification to the user. Provide a `time` of `0` to prevent the notification
  *  from automatically closing. */
 export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: string, time = 5000) {
-  const remove = () => { toasts.update((cur) => { cur.delete(toastData); return cur }) }
+  const remove = () => { toasts.update((cur) => { cur.delete(toastData); return new Set(cur) }) }
   const toastData = { type, message, remove }
-  toasts.update(cur => cur.add(toastData))
+  toasts.update(cur => new Set(cur.add(toastData)))
   // delete message after timeout
   if (time) setTimeout(remove, time)
 }
@@ -207,23 +207,12 @@ export function tip(elem: Element, opts: Partial<TippyProps> | string = '') {
   }
 }
 
-/** Creates a function that will play an animejs animation. Specifically for use with Svelte `use:fn`. */
-export function usAnime(opts: AnimeParams) {
-  return (elem: Element) => {
-    anime({
-      targets: elem,
-      ...opts
-    })
-  }
-}
-
 const TNANIME_FORCED_OPTS: AnimeParams = {
   autoplay: false,
   loop: false
 }
 /** Creates a transition function using animejs.
- *  Use with `in:fn` and `out:fn`, as this function can't tell direction.
-*/
+ *  Use with `in:fn` and `out:fn`, as this function can't tell direction. */
 export function tnAnime(elem: Element, opts: AnimeParams) {
   const safeOpts = { ...opts, ...TNANIME_FORCED_OPTS, targets: elem }
   return () => {
@@ -238,14 +227,5 @@ export function tnAnime(elem: Element, opts: AnimeParams) {
       delay: anim.delay,
       duration: anim.duration
     }
-  }
-}
-
-/** Function for running an Anime animation on an event. */
-export function evAnime(opts: AnimeParams) {
-  return (event: Event) => {
-    if (!event?.target) return
-    const safeOpts = { ...opts, targets: event.target, autoplay: true }
-    return anime(safeOpts)
   }
 }

@@ -6,6 +6,8 @@
 
 import { writable } from 'svelte/store'
 
+// -- CONSTANTS
+
 /** Contains all "environment" variables.
  *  They're just inlined in the code because that is what Snowpack would've done anyways. */
 export const ENV = {
@@ -19,6 +21,8 @@ export const ENV = {
   },
   HOMEPAGE: '/admin/home'
 }
+
+// -- AGENT / CONTEXT
 
 /** Browser / User-Agent info. Contains contextual information like normalized mouse position values. */
 export namespace Agent {
@@ -40,11 +44,13 @@ export namespace Agent {
   })
 }
 
+// -- PREFERENCES
+
 /** Helper user preferences object. */
 export const Pref = {
   /** Attempt to retrieve the preference with the given name.
    *  If it isn't found, the fallback value will instead be returned. */
-  get<T>(name: string, fallback: T): T {
+  get<T extends JSONValue>(name: string, fallback: T): T {
     name = '_user-pref_' + name
     const storedPreference = localStorage.getItem(name)
     if (storedPreference) return JSON.parse(storedPreference) as T
@@ -53,7 +59,7 @@ export const Pref = {
 
   /** Sets the preference with the given name to the given value.
    *  Passing an empty string will remove the preference from storage. */
-  set<T>(name: string, value: T) {
+  set<T extends JSONValue>(name: string, value: T) {
     name = '_user-pref_' + name
     if (!value) localStorage.removeItem(name)
     else localStorage.setItem(name, JSON.stringify(value))
@@ -66,16 +72,14 @@ export const Pref = {
     return !!localStorage.getItem(name)
   },
 
-  /** Returns a writable store that maps to the given preference.
-   *  This works best for primitive values or immutable objects.
-   *  If a mutable, potentially nested, object is desired, use the `wrap` method instead. */
-  bind<T>(name: string, fallback: T) {
+  /** Returns a writable store that maps to the given preference. */
+  bind<T extends JSONValue>(name: string, fallback: T) {
     const store = writable(this.get(name, fallback))
     return {
       // eslint-disable-next-line @typescript-eslint/unbound-method
       subscribe: store.subscribe,
       set: (val: T) => {
-        store.set(val)
+        store.set(typeof val === 'object' ? { ...val as any } : val)
         this.set(name, val)
       }
     }
@@ -83,8 +87,8 @@ export const Pref = {
 
   /** Retrieves a 'wrapped' proxy object, or creates one if needed.
    *  Setting items on this object will automatically cause the object to be stored.
-   *  This can be used to store a record of preferences without needing to setup any automatic storage logic. */
-  wrap<T extends PlainObject>(name: string, fallback: T): T {
+   *  This can be used to store a record of preferences without needing to use an observable store. */
+  wrap<T extends JSONObject>(name: string, fallback: T): T {
     const wrapped = this.get(name, fallback)
     const handler: ProxyHandler<T> = {
       // handle nested objects by proxying them with the same handler
@@ -103,8 +107,7 @@ export const Pref = {
   }
 }
 
-// ---------------
-//  MEDIA QUERIES
+// -- MEDIA QUERIES
 
 const sizeMap = new Map()
 const sizes = ['narrow', 'thin', 'small', 'normal', 'wide'] as const
@@ -117,8 +120,7 @@ sizes.forEach((size: string, i) => {
 })
 
 /** Contains the media queries for the window size breakpoints.
- *  Narrow is not included as it is the default size if none of the others are valid.
- */
+ *  Narrow is not included as it is the default size if none of the others are valid. */
 const sizeQueries = {
   thin: window.matchMedia('(min-width: 400px)'),
   small: window.matchMedia('(min-width: 800px)'),
@@ -148,11 +150,7 @@ for (const size in sizeQueries) {
   sizeQueries[size as keyof typeof sizeQueries].addEventListener('change', updateSize)
 }
 
-/**
- * Checks if the specified size matches against the inclusivity operator.
- * For example: matches('narrow', 'only')
- * This will be true only if we're entirely with the bounds of 'narrow'. */
-export function doMatchMedia(
+function doMatchMedia(
   size: 'narrow' | 'thin' | 'small' | 'normal' | 'wide',
   inclusivity: 'only' | 'up' | 'below' = 'only') {
   // Our size map means this function is relatively simple.
@@ -168,8 +166,9 @@ export function doMatchMedia(
   }
 }
 
-// Media query Svelte store
-
+/** Reactive function that checks if the specified size matches against the inclusivity operator.
+ *  For example: matches('narrow', 'only')
+ *  This will be true only if we're entirely with the bounds of 'narrow'. */
 export const matchMedia = {
   subscribe(fn: (match: typeof doMatchMedia) => void) {
     fn(doMatchMedia)

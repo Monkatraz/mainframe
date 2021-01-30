@@ -6,18 +6,12 @@
   export let value = ''
   export let required = false
   export let info = ''
-  export let input: HTMLInputElement = null as unknown as HTMLInputElement
+  export let input: HTMLInputElement | null = null
 
   const dispatch = createEventDispatcher()
 
   const keyHandler = [{ key: 'Enter', preventDefault: true, do() { dispatch('enter') } }]
 
-  function handleEnter(evt: KeyboardEvent) {
-    if (evt.key === 'Enter') {
-      evt.preventDefault()
-      dispatch('enter')
-    }
-  }
 </script>
 
 

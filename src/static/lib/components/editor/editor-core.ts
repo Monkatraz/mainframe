@@ -25,7 +25,7 @@ import { copyLineDown } from '@codemirror/commands'
 import { confinement } from './editor-config'
 import monarchMarkdown from './monarch-markdown'
 // Misc.
-import { Writable, writable } from 'svelte/store'
+import { writable } from 'svelte/store'
 import { debounce } from '../../modules/util'
 
 const hideGuttersTheme = EditorView.theme({
@@ -72,42 +72,47 @@ function getExtensions() {
   ]
 }
 
+interface EditorStore {
+  value: string
+  activeLines: Set<number>
+}
+
 export class EditorCore {
   // state
   parent!: Element
   view!: EditorView
   get state() { return this.view.state }
   get doc() { return this.view.state.doc }
-  // reactive stores
-  activeLines: Writable<Set<number>> = writable(new Set())
-  value: Writable<string> = writable('')
+  // reactive store accessed values
+  store = writable<EditorStore>({ value: '', activeLines: new Set() })
+  subscribe = this.store.subscribe
 
   init(parent: Element, doc: string, extensions: Extension[] = []) {
 
     this.parent = parent
 
-    const updateValue = debounce((doFn: () => string) => {
-      this.value.set(doFn())
+    const updateValue = debounce(() => {
+      this.store.update(cur => ({ ...cur, value: this.doc.toString() }))
     }, 50)
 
     const updateHandler = ViewPlugin.define(() => ({
       update: (update: ViewUpdate) => {
         // update store on change
-        if (update.docChanged) { updateValue(() => this.doc.toString()) }
+        if (update.docChanged) { updateValue() }
         // get active lines
         if (update.selectionSet || update.docChanged) {
-          const lines: Set<number> = new Set()
+          const activeLines: Set<number> = new Set()
           for (const r of update.state.selection.ranges) {
             const lnStart = update.state.doc.lineAt(r.from).number
             const lnEnd = update.state.doc.lineAt(r.to).number
-            if (lnStart === lnEnd) lines.add(lnStart - 1)
+            if (lnStart === lnEnd) activeLines.add(lnStart - 1)
             else {
               const diff = lnEnd - lnStart
               for (let i = 0; i <= diff; i++)
-                lines.add((lnStart + i) - 1)
+                activeLines.add((lnStart + i) - 1)
             }
           }
-          this.activeLines.set(lines)
+          this.store.update(cur => ({ ...cur, activeLines }))
         }
       }
     }))
@@ -124,14 +129,12 @@ export class EditorCore {
       })
     })
 
-    updateValue(() => this.doc.toString())
+    updateValue()
   }
 
   destroy() {
     this.view.destroy()
   }
-
-  // configuration
 
   heightAtLine(line: number) {
     return this.view.visualLineAt(this.doc.line(line).from).top
