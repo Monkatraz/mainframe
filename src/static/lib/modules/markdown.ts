@@ -65,7 +65,7 @@ export const renderMarkdown = createLock(async (raw: string) => {
     await restartRenderWorker()
     throw new Error('Render timed out.')
   }
-  return decode(buffer)
+  return DOMPurify.sanitize(decode(buffer))
 })
 
 /** Safely renders a given Markdown string and then updates the given node with the resultant HTML.
