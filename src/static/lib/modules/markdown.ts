@@ -29,13 +29,15 @@ const WORKER_SETTINGS: WorkerOptions = {
   type: 'classic'
 }
 
-let renderWorker: ModuleThread<MarkdownWorker> = await spawn<MarkdownWorker>(new Worker(WORKER_URL, WORKER_SETTINGS))
+let renderWorker: ModuleThread<MarkdownWorker>
 
 /** Restarts the Markdown renderer. Used if the worker times out during a render call. */
 async function restartRenderWorker() {
   if (renderWorker) await Thread.terminate(renderWorker)
   renderWorker = await spawn<MarkdownWorker>(new Worker(WORKER_URL, WORKER_SETTINGS))
 }
+
+const starting = restartRenderWorker()
 
 const RENDER_TIMEOUT = 10000
 
@@ -57,9 +59,10 @@ const decode = (buffer: ArrayBuffer) => decoder.decode(buffer)
  *
  *  The render occurs in a web worker due to performance considerations. */
 export const renderMarkdown = createLock(async (raw: string) => {
+  if (!renderWorker) await starting
   const buffer = await Promise.race([renderWorker.render(transfer(raw)), sleep(RENDER_TIMEOUT)])
   if (!buffer) {
-    restartRenderWorker()
+    await restartRenderWorker()
     throw new Error('Render timed out.')
   }
   return decode(buffer)
