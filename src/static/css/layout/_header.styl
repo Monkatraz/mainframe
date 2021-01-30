@@ -121,7 +121,7 @@
   box-shadow: 0 3px 5px rgba(0,0,0,0.5)
 
   // Background color layer
-  &::before 
+  &::before
     position: absolute
     top: 0
     left: 0
@@ -137,13 +137,12 @@
 #header_logo
   z-index: 1
   color: white
-  filter: none
-  transition: filter 0.1s
+  border-radius: 1rem
+  transition: background 0.1s
 
   +on-hover()
-    filter: drop-shadow(0 0 5px white)
+    background: rgba(white, 0.125)
 
-  // Simple click effect
   &:active
     filter: brightness(80%)
     transition: filter 0s
