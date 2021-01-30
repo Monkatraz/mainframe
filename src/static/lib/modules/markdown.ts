@@ -94,13 +94,17 @@ export const morphMarkdown = createLock(async (raw: string, node: Node): Promise
 
 DOMPurify.addHook('afterSanitizeAttributes', (node) => {
   if (node instanceof HTMLAnchorElement) {
+
     // Makes '#' id links work correctly
-    if (node.hash) node.setAttribute('href', location.origin + location.pathname + node.hash)
+    if (node.hash && node.hostname === location.hostname)
+      node.setAttribute('href', location.origin + location.pathname + node.hash)
+
     // makes external links open with no referrer and in another tab
     if (!node.hostname || node.hostname !== location.hostname) {
       node.setAttribute('target', '_blank')
       node.setAttribute('rel', 'noreferrer noopener')
     }
+
     return
   }
   // changes resource http links to https (not perfect, but it's just a simple measure)

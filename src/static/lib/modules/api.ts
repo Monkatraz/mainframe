@@ -3,12 +3,9 @@
  * @author Monkatraz
  */
 
-// FaunaDB
 import FaunaDB, { Expr, errors as e, values as v } from 'faunadb'
-// FDB types bug requires that I get a separate non-imported obj for the actual errors
 const FDBErrors = FaunaDB.errors
 export const q = FaunaDB.query
-// Imports
 import type { Page, Social } from '@schemas'
 import { Pref, ENV } from './state'
 import { writable } from 'svelte/store'
@@ -19,13 +16,11 @@ import { writable } from 'svelte/store'
 // Values
 /** Database variant of the JS `Date` class. Use the `date()` method to convert a `FaunaDate` into a JS `Date`.
  *  @example
- * q.Date('1970-01-01')
- */
+ * q.Date('1970-01-01') */
 export type FaunaDate = v.FaunaDate
 /** FaunaDB internal timestamp (aka `ts`) object. Usually used for data history. Use the `date()` method to get a `Date` class version of a FaunaDB `Timestamp`.
  * @example
- * q.Time('1970-01-01T00:00:00Z')
- */
+ * q.Time('1970-01-01T00:00:00Z') */
 export type Timestamp = v.FaunaTime
 /** Denotes a Base64-encoded string representing a byte array. */
 export type Bytes = v.Bytes
@@ -70,8 +65,7 @@ export type QueryPermissionError = QueryUnauthorized | QueryMethodNotAllowed | Q
 export type QueryEndpointError = QueryInternalError | QueryUnavailable
 
 /** Gets the status code of any error, defaulting to 400.
- *  Has special handling for `FaunaHTTPError`s.
- */
+ *  Has special handling for `FaunaHTTPError`s. */
 export function getStatusCode(err: Error) {
   if (err instanceof FDBErrors.FaunaHTTPError) {
     const code = err.requestResult.statusCode
@@ -88,8 +82,7 @@ export function getStatusCode(err: Error) {
 
 /** FaunaDB JS FQL driver extension.
  *  All functions within map to valid FaunaDB JS driver functions.
- *  AKA these functions do not map to database-side UDF functions.
-*/
+ *  AKA these functions do not map to database-side UDF functions. */
 export const qe = {
 
   /** Retrieves the `data` field of a document, using its reference. */
@@ -102,8 +95,7 @@ export const qe = {
    * qe.IfMap(q.Abort('Object is not an object or array!'), [
    * [q.isObject(SomeObj), q.Select('yes', SomeObj)],
    * [q.isArray(SomeObj), q.Select(0, SomeObj)]
-   * ])
-   */
+   * ]) */
   IfMap(exhausted: Expr, conditionals: [condition: Expr, then: Expr][]) {
     // Work from the deepest node to the highest node
     const reducer = (acc: Expr, conditional: [condition: Expr, then: Expr]) => q.If(conditional[0], conditional[1], acc)

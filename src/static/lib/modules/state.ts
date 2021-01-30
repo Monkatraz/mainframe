@@ -150,29 +150,28 @@ for (const size in sizeQueries) {
   sizeQueries[size as keyof typeof sizeQueries].addEventListener('change', updateSize)
 }
 
-function doMatchMedia(
-  size: 'narrow' | 'thin' | 'small' | 'normal' | 'wide',
-  inclusivity: 'only' | 'up' | 'below' = 'only') {
-  // Our size map means this function is relatively simple.
-  // Larger sizes have their mapped integer higher than the previous.
-  // We can use this to compare curSize to our specified size.
-  switch (inclusivity) {
-    case 'only':
-      return curSize === size
-    case 'up':
-      return sizeMap.get(curSize) >= sizeMap.get(size)
-    case 'below':
-      return sizeMap.get(curSize) < sizeMap.get(size)
-  }
-}
+type MediaSize = 'narrow' | 'thin' | 'small' | 'normal' | 'wide'
+type MediaInclusivity = 'only' | 'up' | 'below'
 
-/** Reactive function that checks if the specified size matches against the inclusivity operator.
- *  For example: matches('narrow', 'only')
- *  This will be true only if we're entirely with the bounds of 'narrow'. */
+/** Reactive function (store) that checks if the specified size matches against the inclusivity operator. */
 export const matchMedia = {
-  subscribe(fn: (match: typeof doMatchMedia) => void) {
-    fn(doMatchMedia)
-    const eventFn = () => { fn(doMatchMedia) }
+  /** Checks if the specified size matches against the inclusivity operator. */
+  call(size: MediaSize, inclusivity: MediaInclusivity) {
+    // Our size map means this function is relatively simple.
+    // Larger sizes have their mapped integer higher than the previous.
+    // We can use this to compare curSize to our specified size.
+    switch (inclusivity) {
+      case 'only':
+        return curSize === size
+      case 'up':
+        return sizeMap.get(curSize) >= sizeMap.get(size)
+      case 'below':
+        return sizeMap.get(curSize) < sizeMap.get(size)
+    }
+  },
+  subscribe(fn: (match: (size: MediaSize, inclusivity: MediaInclusivity) => boolean) => void) {
+    fn(this.call)
+    const eventFn = () => { fn(this.call) }
     window.addEventListener('MF_MediaSizeChanged', eventFn)
     return () => window.removeEventListener('MF_MediaSizeChanged', eventFn)
   }

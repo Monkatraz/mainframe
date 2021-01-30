@@ -4,11 +4,8 @@
  */
 
 // -- Imports
-// Tippy and Popper
-import tippy, { Props as TippyProps } from 'tippy.js'
-import { roundArrow as TippyRoundArrow } from 'tippy.js'
+import tippy, { Props as TippyProps, roundArrow as TippyRoundArrow  } from 'tippy.js'
 import * as Popper from '@popperjs/core'
-// Anime
 import anime, { AnimeParams } from 'animejs'
 import { hash, animationFrame } from './util'
 import { writable } from 'svelte/store'
@@ -183,25 +180,23 @@ function parseTipOpts(elem: Element, opts: Partial<TippyProps> | string) {
     else if (!opts.content) opts.content = elem.getAttribute('aria-label') ?? ''
   }
   else opts = { content: elem.getAttribute('aria-label') ?? '' }
-  return opts
+  return { ...DEFAULT_TIPPY_OPTS, ...opts }
 }
 
 /** Creates a Tippy tooltip instance for the element. */
 export function tip(elem: Element, opts: Partial<TippyProps> | string = '') {
   opts = parseTipOpts(elem, opts)
-  const finalOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
-  const tp = tippy(elem, finalOpts)
+  const tp = tippy(elem, opts)
   const setState = (content: unknown) => {
     if (!content) tp.disable()
     else tp.enable()
   }
-  setState(finalOpts.content)
+  setState(opts.content)
   return {
     update(opts: Partial<TippyProps> | string = '') {
       opts = parseTipOpts(elem, opts)
-      const newOpts = { ...DEFAULT_TIPPY_OPTS, ...opts }
-      tp.setProps(newOpts)
-      setState(newOpts.content)
+      tp.setProps(opts)
+      setState(opts.content)
     },
     destroy() { tp.destroy() }
   }

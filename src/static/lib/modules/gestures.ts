@@ -56,8 +56,7 @@ const ONSWIPE_DEFAULT_OPTS: onSwipeOpts = {
 /** Starts an event listener that will recognize swipes on the specified element.
  *  Works natively with Svelte elements, if used as an `use:onSwipe` action.
  *  For basic usage, provide `direction` and `callback` properties in the options object.
- *  @example `use:onSwipe={{ callback: callback, direction: 'up' }}`
- */
+ *  @example `use:onSwipe={{ callback: callback, direction: 'up' }}` */
 export function onSwipe(target: HTMLElement, inOpts: Partial<onSwipeOpts> = {}) {
   let opts: onSwipeOpts
   /** Updates the currently set options for the swipe recognizer. */

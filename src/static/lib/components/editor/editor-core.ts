@@ -73,20 +73,33 @@ function getExtensions() {
 }
 
 interface EditorStore {
+  /** The current 'value' (content) of the editor. */
   value: string
+  /** The lines currently being interacted with by the user.
+   *  This includes all selected lines, the line the cursor is present on, etc. */
   activeLines: Set<number>
 }
 
 export class EditorCore {
-  // state
+
+  /** The element the editor is attached to. */
   parent!: Element
+
+  /** The CodeMirror `EditorView` instance the editor interacts with the DOM with. */
   view!: EditorView
+
+  /** The CodeMirror `EditorState` the editor has currently.
+   *  The state is immutable and is replaced as the editor updates. */
   get state() { return this.view.state }
+
+  /** The `Text` object of the editor's current state. */
   get doc() { return this.view.state.doc }
-  // reactive store accessed values
+
+  /** A store that allows access to certain reactive values. */
   store = writable<EditorStore>({ value: '', activeLines: new Set() })
   subscribe = this.store.subscribe
 
+  /** Starts the editor. */
   init(parent: Element, doc: string, extensions: Extension[] = []) {
 
     this.parent = parent
@@ -132,14 +145,17 @@ export class EditorCore {
     updateValue()
   }
 
+  /** Destroys the editor. Usage of the editor object after destruction is obviously not recommended. */
   destroy() {
     this.view.destroy()
   }
 
+  /** Returns the scroll-offset from the top of the editor for the specified line. */
   heightAtLine(line: number) {
     return this.view.visualLineAt(this.doc.line(line).from).top
   }
 
+  /** Whether or not the browser's spellchecker is enabled for the editor. */
   set spellcheck(state: boolean) {
     this.view.dispatch({
       reconfigure: {
@@ -148,6 +164,7 @@ export class EditorCore {
     })
   }
 
+  /** Whether or not the line-numbers and associated gutter panel is shown. */
   set gutters(state: boolean) {
     this.view.dispatch({
       reconfigure: {
