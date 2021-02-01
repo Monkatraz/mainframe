@@ -3,13 +3,15 @@
   import { EditorCore } from './editor-core'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
-  import { createAnimQueued, throttle } from '../../modules/util'
+  import { createAnimQueued, throttle, waitFor } from '../../modules/util'
+  import { previewMarkdownHTML } from '../../modules/markdown'
   import { EditorView } from '@codemirror/view'
   // Components
   import {
-    tnAnime, Pref, focusGroup,
-    Markdown, Toggle, DetailsMenu, Button, Card
+    tnAnime, Pref, focusGroup, onLoad,
+    Markdown, Toggle, DetailsMenu, Button, Card, TextInput, TabControl, Tab
   } from '@components'
+  import EditorBlock from './EditorBlock.svelte'
 
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?
@@ -49,9 +51,11 @@
   // -- EDITOR
 
   const Editor = new EditorCore()
+  const activeLines = Editor.activeLines
 
   onMount(async () => {
-    Editor.init(
+    await waitFor(() => !!editorContainer)
+    await Editor.init(
       editorContainer,
       await fetch('/static/misc/md-test.md').then(res => res.text()),
       [EditorView.domEventHandlers({
@@ -89,7 +93,11 @@
     // get top most visible line
     const domRect = editorContainer.getBoundingClientRect()
     const pos = Editor.view.posAtCoords({ x: domRect.x, y: domRect.y })
-    const line = Editor.doc.lineAt(pos ?? 1).number - 1
+    if (pos === 0) {
+      void previewScrollSpring.set(0)
+      return
+    }
+    const line = Editor.doc.lineAt(pos ?? 0).number
     // find our line height
     let lineHeight = 0
     let curLine = line
@@ -103,7 +111,7 @@
     // set preview scroll
     if (lineHeight) {
       // fudge value to prevent the preview from getting "sticky"
-      const diff = (scrollTop - Editor.heightAtLine(curLine + 1)) * 0.75
+      const diff = scrollTop - Editor.heightAtLine(curLine + 1)
       void previewScrollSpring.set(lineHeight + diff)
     }
   })
@@ -132,19 +140,6 @@
   in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
 >
   <div class='editor-container {containerClass}'>
-
-    <!-- Top | Settings Bar -->
-    <div class='topbar'
-      in:tnAnime={{ translateY: ['-150%', '0'], duration: 400, delay: 400, easing: 'easeOutExpo' }}
-      out:tnAnime={{ translateY: '-150%', duration: 200, delay: 50, easing: 'easeInExpo' }}
-    >
-      <div class='topbar-section' use:focusGroup={'horizontal'}>
-        <Button i='carbon:document-download' tip='Open' size='1.5rem' sharp baseline/>
-        <Button i='carbon:save' tip='Save Draft' size='1.5rem' sharp baseline/>
-        <Button i='carbon:fetch-upload-cloud' tip='Publish' size='1.5rem' sharp baseline/>
-      </div>
-    </div>
-
     <!-- Left | Editor Pane -->
     <div class='editor-pane'
       on:scroll={scrollFromEditor}
@@ -152,6 +147,16 @@
       in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
+      <div class='topbar' use:focusGroup={'horizontal'}>
+        <div class='topbar-section'>
+          <span class='topbar-label'>Draft</span>
+          <TextInput bind:value={$Editor.draft.name} thin placeholder='Draft name...' />
+          <Button i='carbon:save' tip='Save Draft Locally' size='1.5rem' baseline
+            on:click={() => Editor.saveLocally()}/>
+          <Button i='carbon:data-base' tip='Manage Drafts' size='1.5rem' baseline/>
+        </div>
+      </div>
+
       <div class='editor-settings'>
         <DetailsMenu placement='bottom-end'>
           <slot slot='summary'>
@@ -162,22 +167,23 @@
               <Toggle bind:toggled={$settings.darkmode}>Dark Mode</Toggle>
               <Toggle bind:toggled={$settings.gutters}>Gutters</Toggle>
               <Toggle bind:toggled={$settings.spellcheck}>Spellcheck</Toggle>
-              <Toggle bind:toggled={$settings.preview.enable}>Live Preview</Toggle>
+              <Toggle bind:toggled={$settings.preview.enable}>Preview Pane</Toggle>
             </div>
           </Card>
         </DetailsMenu>
       </div>
+
       <div class=editor bind:this={editorContainer}/>
+
     </div>
 
     <!-- Right | Preview Pane -->
-    <div class='preview {$settings.preview.darkmode ? 'dark' : 'light'} codetheme-dark' bind:this={preview}
-      on:scroll={scrollFromPreview}
-      on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
+    <div class='preview-pane {$settings.preview.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
       in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 350, easing: 'easeOutQuint' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
       {#if containerClass === 'show-both' || containerClass === 'show-preview'}
+
         <div class='preview-settings'>
           <DetailsMenu placement='bottom-end'>
             <slot slot='summary'>
@@ -191,8 +197,27 @@
             </Card>
           </DetailsMenu>
         </div>
-        <Markdown details morph bind:heightmap bind:heightlist
-          template={$Editor.value} activelines={$settings.preview.activelines ? $Editor.activeLines : new Set()} />
+
+        <TabControl noborder contain compact conditional>
+          <Tab>
+            <slot slot='button'><span style='font-size: 0.9em'>Result</span></slot>
+            <div class='preview codetheme-dark' bind:this={preview}
+              on:scroll={scrollFromPreview}
+              on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
+            >
+              <Markdown details morph bind:heightmap bind:heightlist
+                on:firstrender={() => preview.scrollTop = $previewScrollSpring}
+                template={$Editor.value} activelines={$settings.preview.activelines ? $activeLines : new Set()}
+              />
+            </div>
+          </Tab>
+          <Tab>
+            <slot slot='button'><span style='font-size: 0.9em'>HTML Output</span></slot>
+            <div class='preview-html'>
+              <EditorBlock content={previewMarkdownHTML($Editor.value)} lang='html' />
+            </div>
+          </Tab>
+        </TabControl>
       {/if}
     </div>
 
@@ -203,7 +228,6 @@
   @require '_lib'
 
   $hght = calc(100vh - var(--layout-header-height-edit))
-  $hght2 = calc(100vh - 2rem - var(--layout-header-height-edit))
   $body-w = minmax(0, var(--layout-body-max-width))
   $edit-w = minmax(50%, 1fr)
 
@@ -216,61 +240,60 @@
 
   .editor-container
     width: 100%
-    box-shadow: 0 0 4rem black
 
     &.show-both
-      grid-kiss:"+--------------------------------------------------+      ",
-                "| .topbar                                          | 2rem ",
-                "+--------------------------------------------------+      ",
-                "+------------------------+ +-----------------------+      ",
-                "| .editor-pane           | | .preview              |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |$hght2",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "|                        | |                       |      ",
-                "+------------------------+ +-----------------------+      ",
-                "|        $edit-w         | |        $body-w        |      "
+      grid-kiss:"+------------------------+ +-----------------------+       ",
+                "| .editor-pane           | | .preview-pane         |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       | $hght ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "|                        | |                       |       ",
+                "+------------------------+ +-----------------------+       ",
+                "|        $edit-w         | |        $body-w        |       "
 
     &.show-editor
-      grid-kiss:"+--------------------------------------------------+      ",
-                "| .topbar                                          | 2rem ",
-                "+--------------------------------------------------+      ",
-                "+--------------------------------------------------+      ",
-                "| .editor-pane                                     |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |$hght2",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "|                                                  |      ",
-                "+--------------------------------------------------+      ",
-                "| 100%                                             |      "
+      grid-kiss:"+--------------------------------------------------+       ",
+                "| .editor-pane                                     |       ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "|                                                  | $hght ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "|                                                  |       ",
+                "+--------------------------------------------------+       ",
+                "| 100%                                             |       "
 
     &.show-preview
-      grid-kiss:"+--------------------------------------------------+      ",
-                "| .topbar                                          | 2rem ",
-                "+--------------------------------------------------+      ",
-                "+------+ +--------------------------------+ +------+      ",
-                "|      | | > .preview <                   | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |$hght2",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "|      | |                                | |      |      ",
-                "+------+ +--------------------------------+ +------+      ",
-                "|0.5rem| | auto                           | |0.5rem|      "
+      grid-kiss:"+------+ +--------------------------------+ +------+       ",
+                "|      | | > .preview-pane <              | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      | $hght ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "|      | |                                | |      |       ",
+                "+------+ +--------------------------------+ +------+       ",
+                "|0.5rem| | $body-w                        | |0.5rem|       "
       .editor
         display: none
 
@@ -280,7 +303,6 @@
     flex-wrap: nowrap
     padding: 0.1rem 0.5rem
     font-size: 0.9rem
-    line-height: 1.9rem
     white-space: nowrap
     background: var(--colcode-background)
     font-set('display')
@@ -289,8 +311,13 @@
     display: flex
     gap: 0.25rem
     align-items: center
-    padding-right: 0.5rem
+    margin-right: 0.25rem
+    padding-right: 0.25rem
     border-right: 0.15rem solid colvar('border')
+
+  .topbar-label
+    margin-right: 0.25rem
+    color: colvar('text-subtle')
 
   .editor-pane
     position: relative
@@ -298,11 +325,17 @@
     padding-right: 0.25rem
     overflow: hidden
     background: var(--colcode-background)
-    border-right: solid 0.125rem colvar('border')
+
+  .preview-pane
+    position: relative
+    z-index: 1
+    overflow: hidden
+    background: var(--colcode-background)
+    border-left: solid 0.125rem colvar('border')
 
   .editor-settings, .preview-settings
     position: absolute
-    top: 1rem
+    top: 3rem
     right: 1rem
     z-index: 10
     width: 2.5rem
@@ -310,12 +343,6 @@
 
     +match-media(thin, below)
       right: 0
-
-  .preview-settings
-    position: sticky
-    top: 1rem
-    right: 0
-    margin-left: calc(100% - 1.5rem)
 
   .settings-menu
     display: flex
@@ -327,16 +354,19 @@
   .editor
     height: 100%
 
-  .preview
+  .preview, .preview-html
     position: relative
     z-index: 1
-    width: var(--layout-body-max-width)
-    max-width: 100%
+    height: 100%
+    contain: strict
+
+  .preview
     padding: 0 1rem
     padding-bottom: 100%
     overflow-y: scroll
-    font-size: 90%
-    box-shadow: inset 0 1rem 0.5rem -1rem rgba(black, 0.25)
-    contain: strict
+    --font-content-size: 0.75
+
+  .preview-html
+    padding: 0 0.5rem
 
 </style>

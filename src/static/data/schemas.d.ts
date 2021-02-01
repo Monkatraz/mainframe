@@ -121,7 +121,7 @@ export namespace Page {
 
   /** Root level object retrieved from the FaunaDB database. Contains everything relevant to a page. */
   export interface Instance {
-    /** Version number, used for backwards compatibility handling (if needed) */
+    /** Version number, used for backwards compatibility handling (if needed). */
     version: number
     /** URL path, starting from root. Is always unique. */
     path: string
@@ -140,7 +140,7 @@ export namespace Page {
 
   /** Minimal form of a page instance, localized to a specific language. */
   export interface LocalizedInstance {
-    /** Version number, used for backwards compatibility handling (if needed) */
+    /** Version number, used for backwards compatibility handling (if needed). */
     version: number
     /** URL path, starting from root. Is always unique. */
     path: string
@@ -162,5 +162,26 @@ export namespace Page {
     description: string
     /** Markdown page template. Must be rendered to be viewed. */
     template: string
+  }
+
+  /** Special page instance type for usage by the editor. */
+  export interface LocalDraft {
+    /** Unique name given for the draft (local to the host author). */
+    name: string
+    /** Version number, used for backwards compatibility handling (if needed). */
+    version: number
+    /** Metadata - contains tags and other context-related things. */
+    metadata: Metadata
+    /** Dictionary-like object (e.g `en: {}`) listing all versions of this draft.
+     *  Fields denote which language the `View` is for. */
+    locals: Record<string, View>
+  }
+
+  /** Special page instance type for usage by the authors with web-saved drafts. */
+  export interface Draft extends LocalDraft{
+    /** Host author for the draft. */
+    author: Ref
+    /** Set of users that are allowed to edit this draft, in addition to the author. */
+    editors: Ref[]
   }
 }

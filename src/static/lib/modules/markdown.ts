@@ -15,6 +15,9 @@ interface MarkdownWorker {
   /** Renders the given encoded string and returns an HTML buffer. */
   render: (buffer: TransferDescriptor<ArrayBuffer>) => Promise<ArrayBuffer>
 
+  /** Renders the given encoded string but returns a well formatted and indented HTML preview. */
+  previewHTML: (buffer: TransferDescriptor<ArrayBuffer>) => Promise<ArrayBuffer>
+
   /** Highlights (using Prism) the given encoded raw source and returns an HTML buffer. */
   highlight: (buffer: TransferDescriptor<ArrayBuffer>, lang: string) => Promise<ArrayBuffer>
 
@@ -88,6 +91,30 @@ export const morphMarkdown = createLock(async (raw: string, node: Node): Promise
       return true
     }
   })
+})
+
+/** Returns a formatted HTML output preview of a Markdown render.
+ *  Like `renderMarkdown`, this is performed within a web-worker and can safely be called multiple times. */
+export const previewMarkdownHTML = createLock(async (raw: string) => {
+  if (!renderWorker) await starting
+  const buffer = await Promise.race([renderWorker.previewHTML(transfer(raw)), sleep(RENDER_TIMEOUT)])
+  if (!buffer) {
+    await restartRenderWorker()
+    throw new Error('Render timed out.')
+  }
+  return DOMPurify.sanitize(decode(buffer))
+})
+
+/** Syntax highlights the given chunk of code+language using Prism.
+ *  Like `renderMarkdown`, this is performed within a web-worker and can safely be called multiple times. */
+export const highlight = createLock(async (code: string, lang: string) => {
+  if (!renderWorker) await starting
+  const buffer = await Promise.race([renderWorker.highlight(transfer(code), lang), sleep(RENDER_TIMEOUT)])
+  if (!buffer) {
+    await restartRenderWorker()
+    throw new Error('Render timed out.')
+  }
+  return decode(buffer)
 })
 
 // -- DOMPURIFY

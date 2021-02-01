@@ -8,25 +8,10 @@ import tippy, { Props as TippyProps, roundArrow as TippyRoundArrow  } from 'tipp
 import * as Popper from '@popperjs/core'
 import anime, { AnimeParams } from 'animejs'
 import { hash, animationFrame } from './util'
-import { writable } from 'svelte/store'
 
-interface Toast {
-  type: 'success' | 'danger' | 'warning' | 'info'
-  message: string
-  remove: () => void
-}
-
-/** A stored immutable `Set` containing the currently visible toasts. */
-export const toasts = writable<Set<Toast>>(new Set())
-
-/** Displays a 'toast' notification to the user. Provide a `time` of `0` to prevent the notification
- *  from automatically closing. */
-export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: string, time = 5000) {
-  const remove = () => { toasts.update((cur) => { cur.delete(toastData); return new Set(cur) }) }
-  const toastData = { type, message, remove }
-  toasts.update(cur => new Set(cur.add(toastData)))
-  // delete message after timeout
-  if (time) setTimeout(remove, time)
+/** Tiny helper Svelte use action for executing a callback when the element is loaded. */
+export function onLoad(elem: Element, cb: AnyFn) {
+  cb(elem)
 }
 
 /** A Svelte use action that will 'portal' to the given target and append the element to that target.

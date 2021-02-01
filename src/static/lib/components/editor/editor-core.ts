@@ -6,7 +6,7 @@
 import { EditorState, Extension } from '@codemirror/state'
 import {
   EditorView, ViewPlugin, ViewUpdate, drawSelection,
-  highlightActiveLine, highlightSpecialChars, keymap
+  highlightActiveLine, highlightSpecialChars, keymap, Decoration, DecorationSet
 } from '@codemirror/view'
 import { history, historyKeymap } from '@codemirror/history'
 import { foldGutter, foldKeymap } from '@codemirror/fold'
@@ -20,13 +20,18 @@ import { autocompletion, completionKeymap } from '@codemirror/autocomplete'
 import { commentKeymap } from '@codemirror/comment'
 import { rectangularSelection } from '@codemirror/rectangular-selection'
 // Local Extensions
+import { RangeSetBuilder } from '@codemirror/rangeset'
+import type { Line } from '@codemirror/text'
 import { redo } from '@codemirror/history'
 import { copyLineDown } from '@codemirror/commands'
 import { confinement } from './editor-config'
 import monarchMarkdown from './monarch-markdown'
 // Misc.
-import { writable } from 'svelte/store'
+import type { Page } from '@schemas'
+import * as API from '../../modules/api'
+import { toast, LocalDrafts } from '../../modules/state'
 import { debounce } from '../../modules/util'
+import { writable } from 'svelte/store'
 
 const hideGuttersTheme = EditorView.theme({
   '$.hide-gutters $gutters': {
@@ -36,6 +41,49 @@ const hideGuttersTheme = EditorView.theme({
     paddingLeft: '0.5rem'
   }
 })
+
+const WHITESPACE_REGEX = /^\s+/
+
+function indentDeco(view: EditorView) {
+  // get every line of the visible ranges
+  const lines = new Set<Line>()
+  for (const { from, to } of view.visibleRanges) {
+    for (let pos = from; pos <= to;) {
+      let line = view.state.doc.lineAt(pos)
+      lines.add(line)
+      pos = line.to + 1
+    }
+  }
+
+  // get the indentation of every line
+  // and create an offset hack decoration if it has any
+  const tabInSpaces = ' '.repeat(view.state.facet(EditorState.tabSize))
+  const builder = new RangeSetBuilder<Decoration>()
+  for (const line of lines) {
+    // there is almost certainly a much better way to do this
+    const WS = WHITESPACE_REGEX.exec(line.text)?.[0]
+    const col = WS?.replaceAll('\t', tabInSpaces).length
+    if (col) builder.add(line.from, line.from, Decoration.line({
+      attributes: { style: `padding-left: ${col}ch; text-indent: -${col}ch` }
+    }))
+  }
+
+  return builder.finish()
+}
+
+export const indentHack = ViewPlugin.fromClass(
+  class {
+    decorations: DecorationSet
+    constructor(view: EditorView) {
+      this.decorations = indentDeco(view)
+    }
+    update(update: ViewUpdate) {
+      if (update.docChanged || update.viewportChanged)
+        this.decorations = indentDeco(update.view)
+    }
+  },
+  { decorations: v => v.decorations }
+)
 
 function getExtensions() {
   return [
@@ -52,6 +100,8 @@ function getExtensions() {
     autocompletion(),
     rectangularSelection(),
     highlightActiveLine(),
+    EditorView.lineWrapping,
+    indentHack,
     keymap.of([
       ...closeBracketsKeymap,
       ...defaultKeymap,
@@ -72,12 +122,106 @@ function getExtensions() {
   ]
 }
 
+type SourceOrigin = { path: string } | { draft: string, user: API.Ref } | { local: string }
+
+async function resolvePath(source: SourceOrigin): Promise<Page.LocalDraft | undefined> {
+  if ('path' in source) {
+    try {
+      const { version, metadata, locals } = await API.withPage(source.path).request()
+      return { name: source.path, version, metadata, locals }
+    } catch {}
+  }
+  // TODO: web-drafts
+  if ('draft' in source) { throw new Error('not implemented') }
+  if ('local' in source) {
+    const name = source.local
+    if (await LocalDrafts.has(name))
+      return await LocalDrafts.get(name)
+  }
+}
+
+class EditorDraft {
+
+  page: Page.LocalDraft
+
+  // -- CONVINENCE GETTERS AND SETTERS
+
+  get name() { return this.page.name }
+  set name(val: string) { this.page.name = val }
+
+  get version() { return this.page.version }
+  set version(val: number) { this.page.version = val }
+
+  get metadata() { return this.page.metadata }
+  set metadata(val: Page.Metadata) { this.page.metadata = val }
+
+  lang: string
+  get locals() { return Object.keys(this.page.locals) }
+  get local() { return this.page.locals[this.lang] }
+  set local(val: Page.View) { this.page.locals[this.lang] = val }
+
+  get title() { return this.local.title }
+  set title(val: string) { this.local.title = val }
+
+  get subtitle() { return this.local.subtitle }
+  set subtitle(val: string) { this.local.subtitle = val }
+
+  get description() { return this.local.description }
+  set description(val: string) { this.local.description = val }
+
+  get template() { return this.local.template }
+  set template(val: string) { this.local.template = val }
+
+  // -- INIT
+
+  constructor() {
+    // default value
+    this.page = {
+      name: '',
+      version: 1,
+      metadata: {
+        type: 'scp',
+        flags: [],
+        attributes: [],
+        warnings: [],
+        context: 'foundation',
+        canons: [],
+        tags: []
+      },
+      locals: {
+        en: {
+          title: '',
+          subtitle: '',
+          description: '',
+          template: ''
+        }
+      }
+    }
+    this.lang = 'en'
+  }
+
+  // -- API
+
+  /** Static method that creates an EditorPage using the specified source. */
+  static async from(source?: SourceOrigin | string) {
+    const instance = new EditorDraft()
+    if (!source) return instance
+    if (typeof source === 'string') {
+      instance.template = source
+      return instance
+    }
+    const result = await resolvePath(source)
+    if (result) instance.page = result
+    instance.lang = instance.locals[0]
+    return instance
+  }
+}
+
 interface EditorStore {
+  /** The current draft state. */
+  draft: EditorDraft
   /** The current 'value' (content) of the editor. */
   value: string
-  /** The lines currently being interacted with by the user.
-   *  This includes all selected lines, the line the cursor is present on, etc. */
-  activeLines: Set<number>
 }
 
 export class EditorCore {
@@ -95,23 +239,35 @@ export class EditorCore {
   /** The `Text` object of the editor's current state. */
   get doc() { return this.view.state.doc }
 
-  /** A store that allows access to certain reactive values. */
-  store = writable<EditorStore>({ value: '', activeLines: new Set() })
+  /** The local draft instance that is currently being edited. */
+  draft!: EditorDraft
+
+  /** A store that allows reactive access to editor state. */
+  store = writable<EditorStore>({ draft: new EditorDraft(), value: '' })
   subscribe = this.store.subscribe
+  set = this.store.set
+
+  /** The lines currently being interacted with by the user.
+   *  This includes all selected lines, the line the cursor is present on, etc. */
+  activeLines = writable(new Set<number>())
 
   /** Starts the editor. */
-  init(parent: Element, doc: string, extensions: Extension[] = []) {
+  async init(parent: Element, source: string | SourceOrigin, extensions: Extension[] = []) {
+
+    this.draft = await EditorDraft.from(source)
 
     this.parent = parent
 
-    const updateValue = debounce(() => {
-      this.store.update(cur => ({ ...cur, value: this.doc.toString() }))
+    const doDraftUpdate = debounce(() => {
+      const value = this.doc.toString()
+      this.draft.template = value
+      this.store.update(cur => ({ ...cur, value }))
     }, 50)
 
     const updateHandler = ViewPlugin.define(() => ({
       update: (update: ViewUpdate) => {
         // update store on change
-        if (update.docChanged) { updateValue() }
+        if (update.docChanged) { doDraftUpdate() }
         // get active lines
         if (update.selectionSet || update.docChanged) {
           const activeLines: Set<number> = new Set()
@@ -125,11 +281,12 @@ export class EditorCore {
                 activeLines.add((lnStart + i) - 1)
             }
           }
-          this.store.update(cur => ({ ...cur, activeLines }))
+          this.activeLines.set(activeLines)
         }
       }
     }))
 
+    const doc = this.draft.template
     this.view = new EditorView({
       parent,
       state: EditorState.create({
@@ -142,13 +299,31 @@ export class EditorCore {
       })
     })
 
-    updateValue()
+    this.refreshStore()
   }
 
   /** Destroys the editor. Usage of the editor object after destruction is obviously not recommended. */
   destroy() {
     this.view.destroy()
   }
+
+  refreshStore() {
+    this.store.update(cur => ({
+      draft: this.draft,
+      value: this.doc.toString()
+    }))
+  }
+
+  // -- SAVING
+
+  async saveLocally() {
+    if (!this.draft.name) return false
+    await LocalDrafts.put(this.draft.page)
+    toast('success', 'Saved!')
+    return true
+  }
+
+  // -- MISC.
 
   /** Returns the scroll-offset from the top of the editor for the specified line. */
   heightAtLine(line: number) {

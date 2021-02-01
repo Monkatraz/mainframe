@@ -9,7 +9,7 @@
   export let floating = false
   export let sharp = false
   export let active = false
-  export let size = '1rem'
+  export let size = '1em'
   // Summary Mode
   export let summary = false
   // Icon
@@ -96,6 +96,9 @@
       align-items: center
       justify-content: center
       padding: 0.25rem 0.25rem
+
+      &.baseline
+        padding: 0
 
     +on-hover()
       color: colvar('hint')

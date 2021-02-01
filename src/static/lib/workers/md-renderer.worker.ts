@@ -9,6 +9,7 @@ import MarkdownIt from 'markdown-it'
 import MDMultiMDTables from 'markdown-it-multimd-table'
 import MDDefLists from 'markdown-it-deflist'
 import katex from 'katex'
+import fmtHTML from 'html-prettify'
 // Import Prism
 import type { } from 'prismjs' // haha uhh don't question this
 import '@vendor/prism.js'
@@ -403,20 +404,36 @@ const synExt = [
 
 ]
 
+// -- PRISM
+
+Prism.plugins.NormalizeWhitespace.setDefaults({
+	'remove-trailing': false,
+	'remove-indent': false,
+	'left-trim': true,
+	'right-trim': true,
+	'indent': 0,
+	'tabs-to-spaces': 4
+})
+
+const nw = Prism.plugins.NormalizeWhitespace
+
+function prismHighlight(code: string, lang: string) {
+  const id = code + '##LANG:' + lang + '##'
+  if (lang in Prism.languages)
+    return cache(() => Prism.highlight(nw.normalize(code), Prism.languages[lang], lang), id)
+  else return ''
+}
+
 // -- EXPORT RENDERER
 
-// let exportTokens: any
-// const tunnelTokens = (tokens: StateCore['tokens']) => exportTokens = tokens
 const renderer = new MarkdownIt({
-  html: true, linkify: true, typographer: true,
-  // Hooks up Prism to our renderer
-  highlight(str, lang, attrs) {
-    const id = str + '##LANG:' + lang + '##'
-    if (lang in Prism.languages)
-      return cache(() => Prism.highlight(str, Prism.languages[lang], lang), id)
-    else return ''
-  }
+  html: true,
+  linkify: true,
+  typographer: true,
+  breaks: true,
+  highlight: prismHighlight
 })
+
 synExt.map(renderer.use, renderer)
 
 interface TypedArray extends ArrayBuffer { buffer: ArrayBufferLike }
@@ -441,11 +458,17 @@ expose({
     return transfer(renderer.render(str))
   },
 
+  previewHTML(buffer: ArrayBuffer) {
+    const str = decode(buffer)
+    let html = renderer.render(str)
+    html = html.replaceAll(/ data\-line=".*?"/g, '')
+    html = fmtHTML(html)
+    return transfer(html)
+  },
+
   highlight(buffer: ArrayBuffer, lang: string) {
     const str = decode(buffer)
-    if (lang in Prism.languages)
-      return transfer(Prism.highlight(str, Prism.languages[lang], lang))
-    else throw new Error('Invalid language!')
+    return transfer(prismHighlight(str, lang))
   }
 
 })

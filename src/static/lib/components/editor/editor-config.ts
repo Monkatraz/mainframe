@@ -13,34 +13,35 @@ import monarchMarkdown from './monarch-markdown'
 
 const
   background = 'var(--colcode-background)',
-  border = 'var(--colcode-border)',
-  accent = 'var(--colcode-accent)',
-  selection = 'var(--colcode-selection)',
-  text = 'var(--colcode-content)',
-  comment = 'var(--colcode-comment)',
-  doc = 'var(--colcode-commentdoc)',
-  punct = 'var(--colcode-punct)',
-  operator = 'var(--colcode-operator)',
-  keyword = 'var(--colcode-keyword)',
-  logical = 'var(--colcode-logical)',
-  string = 'var(--colcode-string)',
-  entity = 'var(--colcode-entity)',
-  type = 'var(--colcode-type)',
-  ident = 'var(--colcode-ident)',
-  func = 'var(--colcode-function)',
-  constant = 'var(--colcode-constant)',
-  property = 'var(--colcode-property)',
-  tag = 'var(--colcode-tag)',
-  classes = 'var(--colcode-class)',
-  attr = 'var(--colcode-attribute)',
-  link = 'var(--colcode-link)',
-  invalid = 'var(--colcode-invalid)',
-  inserted = 'var(--colcode-inserted)',
-  changed = 'var(--colcode-changed)',
-  important = 'var(--colcode-important)',
-  highlight = 'var(--colcode-highlight)',
-  note = 'var(--colcode-note)',
-  special = 'var(--colcode-special)'
+  hover      = 'var(--colcode-hover)'     ,
+  border     = 'var(--colcode-border)'    ,
+  accent     = 'var(--colcode-accent)'    ,
+  selection  = 'var(--colcode-selection)' ,
+  text       = 'var(--colcode-content)'   ,
+  comment    = 'var(--colcode-comment)'   ,
+  doc        = 'var(--colcode-commentdoc)',
+  punct      = 'var(--colcode-punct)'     ,
+  operator   = 'var(--colcode-operator)'  ,
+  keyword    = 'var(--colcode-keyword)'   ,
+  logical    = 'var(--colcode-logical)'   ,
+  string     = 'var(--colcode-string)'    ,
+  entity     = 'var(--colcode-entity)'    ,
+  type       = 'var(--colcode-type)'      ,
+  ident      = 'var(--colcode-ident)'     ,
+  func       = 'var(--colcode-function)'  ,
+  constant   = 'var(--colcode-constant)'  ,
+  property   = 'var(--colcode-property)'  ,
+  tag        = 'var(--colcode-tag)'       ,
+  classes    = 'var(--colcode-class)'     ,
+  attr       = 'var(--colcode-attribute)' ,
+  link       = 'var(--colcode-link)'      ,
+  invalid    = 'var(--colcode-invalid)'   ,
+  inserted   = 'var(--colcode-inserted)'  ,
+  changed    = 'var(--colcode-changed)'   ,
+  important  = 'var(--colcode-important)' ,
+  highlight  = 'var(--colcode-highlight)' ,
+  note       = 'var(--colcode-note)'      ,
+  special    = 'var(--colcode-special)'
 
 export const confinementTheme = EditorView.theme({
   $: {
@@ -64,7 +65,6 @@ export const confinementTheme = EditorView.theme({
   },
 
   $content: {
-    whiteSpace: 'pre-wrap',
     paddingBottom: '70vh',
     maxWidth: '45rem',
     lineHeight: '18px',
@@ -75,13 +75,6 @@ export const confinementTheme = EditorView.theme({
     borderLeftColor: accent,
     transition: 'left 0.05s ease-out, top 0.05s ease-out'
   },
-  '$$focused $selectionBackground': {
-    backgroundColor: selection
-  },
-  '$line': {
-    '& ::selection': { color: 'inherit !important' },
-    '&::selection': { color: 'inherit !important' }
-  },
 
   '$$focused $cursorLayer': {
     animation: 'cubic-bezier(0.95, 0, 0.05, 1) cm-blink 1.2s infinite'
@@ -90,27 +83,31 @@ export const confinementTheme = EditorView.theme({
   '@keyframes cm-blink': { '0%': {}, '50%': { opacity: '0' }, '100%': {} },
   '@keyframes cm-blink2': { '0%': {}, '50%': { opacity: '0' }, '100%': {} },
 
+  '$$focused $selectionBackground': { backgroundColor: selection },
+  '$selectionBackground': { backgroundColor: selection },
+  $activeLine: { background: hover },
+  $selectionMatch: { backgroundColor: selection },
+  $searchMatch: {
+    backgroundColor: selection,
+    borderRadius: '0.125rem'
+  },
+  '$searchMatch.selected': {
+    backgroundColor: selection,
+    boxShadow: `0 0 0 0.075rem ${accent}`
+  },
+
+  $line: {
+    '& ::selection': { color: 'inherit !important' },
+    '&::selection': { color: 'inherit !important' }
+  },
+
   $panels: { backgroundColor: background, color: text },
   '$panels.top': { borderBottom: `2px solid ${border}` },
   '$panels.bottom': { borderTop: `2px solid ${border}` },
 
-  $searchMatch: {
-    backgroundColor: '#72a1ff59',
-    outline: `1px solid ${accent}`
-  },
-  '$searchMatch.selected': {
-    backgroundColor: '#6199ff2f'
-  },
-
-  $activeLine: {
-    background: background,
-    filter: 'brightness(102.5%)'
-  },
-  $selectionMatch: { backgroundColor: '#aafe661a' },
-
   '$matchingBracket, $nonmatchingBracket': {
-    backgroundColor: '#bad0f847',
-    outline: '1px solid #515a6b'
+    backgroundColor: hover,
+    outline: `1px solid ${selection}`
   },
 
   $gutters: {

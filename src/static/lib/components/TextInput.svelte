@@ -7,6 +7,9 @@
   export let required = false
   export let info = ''
   export let input: HTMLInputElement | null = null
+  // styling
+  export let noborder = false
+  export let thin = false
 
   const dispatch = createEventDispatcher()
 
@@ -16,17 +19,20 @@
 
 
 <label>
-  <div role='presentation'>
-    <span class='label'>{label}</span>
-    {#if required}
-      <span class='required' use:tip={'This field is required.'}>
-        <Icon i='fa-solid:asterisk' size='0.5em' />
-      </span>
-    {/if}
-  </div>
+  {#if label}
+    <div role='presentation'>
+      <span class='label'>{label}</span>
+      {#if required}
+        <span class='required' use:tip={'This field is required.'}>
+          <Icon i='fa-solid:asterisk' size='0.5em' />
+        </span>
+      {/if}
+    </div>
+  {/if}
   <input bind:this={input} bind:value use:keyHandle={keyHandler}
+    class:thin class:noborder
     {...$$restProps}
-  ><span role='presentation' class='text-icon' />
+  ><span role='presentation' class='text-icon' class:thin />
 </label>
 
 {#if info}
@@ -62,6 +68,14 @@
     box-shadow: inset 0.2em 0 0 -0.1em transparent
     transition: border 0.1s, box-shadow 0.1s
 
+    &.thin
+      height: 2em
+      padding-top: 0
+      padding-bottom: 0
+
+    &.noborder
+      border: none
+
     &::placeholder
       color: colvar('text-dim')
       opacity: 0.5
@@ -81,15 +95,23 @@
 
   .text-icon
     position: absolute
-    width: 1.25em
-    height: 1.25em
+    display: inline-block
+    width: 2.125em
+    height: 2.125em
     background-color: colvar('text-dim')
-    transform: translate(-1.75em, 0.5em)
+    transform: translateX(-2em)
     opacity: 0.5
     transition: opacity 0.1s
     user-select: none
     pointer-events: none
     mask-image: var(--icon-text-input)
+    mask-repeat: no-repeat
+    mask-size: 1.25em
+    mask-position: center
+
+    &.thin
+      width: 2em
+      height: 2em
 
   input:not(:placeholder-shown) + .text-icon, input:disabled + .text-icon
     opacity: 0

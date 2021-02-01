@@ -4,7 +4,9 @@
  * @author Monkatraz
  */
 
+import { IDBPDatabase, DBSchema, openDB } from 'idb/with-async-ittr'
 import { writable } from 'svelte/store'
+import type { Page } from '@schemas'
 
 // -- CONSTANTS
 
@@ -42,6 +44,101 @@ export namespace Agent {
   window.addEventListener('scroll', () => {
     scroll = document.documentElement.scrollTop / (document.body.scrollHeight - window.innerHeight)
   })
+}
+
+// -- TOASTS
+
+interface Toast {
+  type: 'success' | 'danger' | 'warning' | 'info'
+  message: string
+  remove: () => void
+}
+
+/** A stored immutable `Set` containing the currently visible toasts. */
+export const toasts = writable<Set<Toast>>(new Set())
+
+/** Displays a 'toast' notification to the user. Provide a `time` of `0` to prevent the notification
+ *  from automatically closing. */
+export function toast(type: 'success' | 'danger' | 'warning' | 'info', message: string, time = 5000) {
+  const remove = () => { toasts.update((cur) => { cur.delete(toastData); return new Set(cur) }) }
+  const toastData = { type, message, remove }
+  toasts.update(cur => new Set(cur.add(toastData)))
+  // delete message after timeout
+  if (time) setTimeout(remove, time)
+}
+
+// -- DRAFT DATABASE
+
+/** Namespace for the LocalDrafts IndexDB database. */
+export namespace LocalDrafts {
+
+  interface DraftDatabase extends DBSchema {
+    drafts: {
+      key: string
+      value: Page.LocalDraft
+      indexes: {
+        name: string
+      }
+    }
+  }
+
+  let db: IDBPDatabase<DraftDatabase>
+
+  // init
+  const ready = (async () => {
+    db = await openDB<DraftDatabase>('Local_Drafts', 1, {
+      upgrade(db) {
+        const store = db.createObjectStore('drafts', {
+          keyPath: 'name'
+        })
+        store.createIndex('name', 'name')
+      }
+    })
+  })()
+
+  /** Gets a page by its name. Throws if the page does not exist. */
+  export async function get(name: string) {
+    await ready
+    const result = await db.get('drafts', name)
+    if (!result) throw new Error('No such page in database!')
+    return result
+  }
+
+  /** Returns whether or not the page specified by name exists already. */
+  export async function has(name: string) {
+    await ready
+    return !!(await db.getKey('drafts', name))
+  }
+
+  /** Returns the names of all drafts currently in the database. */
+  export async function currentDrafts() {
+    await ready
+    return await db.getAllKeysFromIndex('drafts', 'name')
+  }
+
+  /** Adds a page. Returns the name of the page. Throws if the page already exists. */
+  export async function add(page: Page.LocalDraft) {
+    await ready
+    if (!page.name) throw new Error('Invalid page name!')
+    return await db.add('drafts', page)
+  }
+
+  /** Adds a page, overwriting if needed. Returns the name of the page. */
+  export async function put(page: Page.LocalDraft) {
+    await ready
+    const name = page.name
+    if (!name) throw new Error('Invalid page name!')
+    return await db.put('drafts', page)
+  }
+
+  /** Removes a page by name. Throws if the page does not exist. */
+  export async function remove(name: string) {
+    await ready
+    const idx = await db.getKey('drafts', name)
+    if (!idx) throw new Error('No such page in database!')
+    await db.delete('drafts', idx)
+  }
+
 }
 
 // -- PREFERENCES

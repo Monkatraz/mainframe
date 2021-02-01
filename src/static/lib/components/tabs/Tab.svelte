@@ -10,11 +10,11 @@
 
   interface Tabs {
     buttons?: HTMLElement
-    panels?: HTMLElement
     key: Writable<any>
+    conditional: boolean
   }
 
-  const { buttons, panels, key } = getContext<Required<Tabs>>('tabs')
+  const { buttons, key, conditional } = getContext<Required<Tabs>>('tabs')
 
   let selected = false
   $: selected = $key === id
@@ -34,9 +34,9 @@
   </Button>
 </span>
 
-<div class='tab_panel' use:portal={panels} hidden={!selected}
+<div class='tab_panel' hidden={!selected}
   id={panelID} aria-labelledby={buttonID} tabindex='0'>
-  <slot />
+  {#if selected || !conditional}<slot />{/if}
 </div>
 
 

@@ -2,9 +2,9 @@
 
 ### In Progress
 - [ ] Page creation, and updating
-- [ ] Drafts stored either with `localStorage` (must be serialized) or in the user document
+- [ ] Author draft pages that are linkable
 - [ ] Rename 'User' to 'Account' and rename 'Social' to 'User'
-- [ ] Context menu actions for editor
+- [ ] Go thorugh components and give decently scoped names so that they can be themed
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin
@@ -15,12 +15,9 @@
   - Potentially prevent provision of a public API token if the user cannot pass a background ReCaptcha
   - Force passing a ReCaptcha when registering
 - [ ] Generic cache library
-- [ ] Some sort of script or system for data-backups
-- [ ] Implement Storybook / Something like it
 - [ ] Implement `svelte-i18n` and create a basic `en` language mapping
 - [ ] Update the account creation and login forms to use forms correctly
-- [ ] Author draft pages that are linkable
-- [ ] Account deletion
+- [ ] Account settings
 - [ ] Make critic comments a bit smarter somehow, they don't work very well on mobile
 - [ ] Separate 404 page so that indexing works correctly
 - [ ] Set page metadata in the `<head>` when loading pages
@@ -45,16 +42,6 @@
 
 #### Editor
 - Single-pane Markdown cheat sheet
-
-#### Page Router
-- Vivaldi like loading bar
-- Top right fixed spinner for page route changes
-
-#### Keyboard Arrow Key Utility Grid Function Thingy
-- List of arrays
-- Elements or flow characters
-		- Use characters like '<' and the like to denote how a downwards / upwards key press navigates to
-- Wrap elements in a div that binds their flow axis in some particular direction?
 
 ### Done
 - [x] Create private database
@@ -116,3 +103,4 @@
 - [x] Navbar dropdowns
 - [x] Add some sort of `pref` object that handles localStorage shenanigans automatically
 - [x] Tabs
+- [x] Drafts stored either with `localStorage` (must be serialized)

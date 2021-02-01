@@ -16,6 +16,8 @@
 
   let container: HTMLElement
 
+  let isFirstRender = true
+
   const activeExclude = ['TBODY', 'THEAD', 'CODE']
   let activeElements: Set<Element> = new Set()
 
@@ -104,7 +106,9 @@
       updateHeightMap()
       updateActiveElements()
     }
+    if (isFirstRender) dispatch('firstrender')
     dispatch('postrender')
+    isFirstRender = false
   })
 
   $: if (template) update()
