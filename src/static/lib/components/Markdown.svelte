@@ -1,5 +1,5 @@
 <script lang='ts'>
-  import { renderMarkdown, morphMarkdown } from '../modules/markdown'
+  import { Markdown } from '../modules/workers'
   import { createIdleQueued } from '../modules/util'
   import { createEventDispatcher, tick } from 'svelte'
   import { fade } from 'svelte/transition'
@@ -99,8 +99,8 @@
 
   const update = createIdleQueued(async () => {
     if (!container) return
-    if (morph) await morphMarkdown(template, container)
-    else container.innerHTML = await renderMarkdown(template)
+    if (morph) await Markdown.morphNode(template, container)
+    else container.innerHTML = await Markdown.render(template)
     if (details) {
       await tick()
       updateHeightMap()

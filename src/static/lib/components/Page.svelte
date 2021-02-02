@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { getStatusCode } from '../modules/api'
-  import { renderMarkdown } from '../modules/markdown'
+  import { Markdown } from '../modules/workers'
   import { fade } from 'svelte/transition'
   import { tnAnime, Spinny } from '@components'
 
@@ -22,7 +22,7 @@
 </script>
 
 <div role='presentation' out:fade={{ duration: 100 }}>
-  {#await loading.then(renderMarkdown)}
+  {#await loading.then(Markdown.render)}
 
     <Spinny width=150px top=200px left=50%/>
 

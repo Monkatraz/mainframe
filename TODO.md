@@ -104,3 +104,4 @@
 - [x] Add some sort of `pref` object that handles localStorage shenanigans automatically
 - [x] Tabs
 - [x] Drafts stored either with `localStorage` (must be serialized)
+- [x] Generic worker handler

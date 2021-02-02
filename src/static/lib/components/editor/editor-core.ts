@@ -308,10 +308,10 @@ export class EditorCore {
   }
 
   refreshStore() {
-    this.store.update(cur => ({
+    this.store.set({
       draft: this.draft,
       value: this.doc.toString()
-    }))
+    })
   }
 
   // -- SAVING

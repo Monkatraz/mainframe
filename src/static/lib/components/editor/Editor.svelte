@@ -4,12 +4,13 @@
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
   import { createAnimQueued, throttle, waitFor } from '../../modules/util'
-  import { previewMarkdownHTML } from '../../modules/markdown'
+  import { Markdown } from '../../modules/workers'
   import { EditorView } from '@codemirror/view'
   // Components
   import {
-    tnAnime, Pref, focusGroup, onLoad,
-    Markdown, Toggle, DetailsMenu, Button, Card, TextInput, TabControl, Tab
+    tnAnime, Pref, focusGroup,
+    Markdown as MarkdownComponent,
+    Toggle, DetailsMenu, Button, Card, TextInput, TabControl, Tab
   } from '@components'
   import EditorBlock from './EditorBlock.svelte'
 
@@ -205,7 +206,7 @@
               on:scroll={scrollFromPreview}
               on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
             >
-              <Markdown details morph bind:heightmap bind:heightlist
+              <MarkdownComponent details morph bind:heightmap bind:heightlist
                 on:firstrender={() => preview.scrollTop = $previewScrollSpring}
                 template={$Editor.value} activelines={$settings.preview.activelines ? $activeLines : new Set()}
               />
@@ -214,7 +215,7 @@
           <Tab>
             <slot slot='button'><span style='font-size: 0.9em'>HTML Output</span></slot>
             <div class='preview-html'>
-              <EditorBlock content={previewMarkdownHTML($Editor.value)} lang='html' />
+              <EditorBlock content={Markdown.render($Editor.value, true)} lang='html' />
             </div>
           </Tab>
         </TabControl>

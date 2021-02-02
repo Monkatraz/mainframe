@@ -437,32 +437,24 @@ const renderer = new MarkdownIt({
 synExt.map(renderer.use, renderer)
 
 interface TypedArray extends ArrayBuffer { buffer: ArrayBufferLike }
-type RawMarkdown = string | ArrayBuffer | TypedArray
+type TransferInput = string | ArrayBuffer | TypedArray
 
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
-const transfer = (buffer: RawMarkdown) => {
+const transfer = (buffer: TransferInput) => {
   if (typeof buffer === 'string')    return Transfer(encoder.encode(buffer).buffer)
   if ('buffer' in buffer)            return Transfer(buffer.buffer)
   if (buffer instanceof ArrayBuffer) return Transfer(buffer)
-  throw new TypeError('Expected a string, ArrayBuffer, or Uint8Array!')
+  throw new TypeError('Expected a string, ArrayBuffer, or typed array!')
 }
 const decode = (buffer: ArrayBuffer) => decoder.decode(buffer)
-
-// see `modules/markdown.ts` for docs. and type definitions
-// this just implements the MarkdownWorker interface found there
+// see `modules/workers.ts` for docs. and type definitions
 expose({
 
-  render(buffer: ArrayBuffer) {
-    const str = decode(buffer)
-    return transfer(renderer.render(str))
-  },
-
-  previewHTML(buffer: ArrayBuffer) {
+  render(buffer: ArrayBuffer, pretty = false) {
     const str = decode(buffer)
     let html = renderer.render(str)
-    html = html.replaceAll(/ data\-line=".*?"/g, '')
-    html = fmtHTML(html)
+    if (pretty) html = fmtHTML(html.replaceAll(/ data\-line=".*?"/g, ''))
     return transfer(html)
   },
 
