@@ -3,7 +3,8 @@
  * @author Monkatraz
  */
 // Worker Handler
-import { expose, Transfer } from 'threads'
+import { expose } from 'threads'
+import { transfer, decode } from './_worker_lib'
 // Imports
 import MarkdownIt from 'markdown-it'
 import MDMultiMDTables from 'markdown-it-multimd-table'
@@ -436,19 +437,6 @@ const renderer = new MarkdownIt({
 
 synExt.map(renderer.use, renderer)
 
-interface TypedArray extends ArrayBuffer { buffer: ArrayBufferLike }
-type TransferInput = string | ArrayBuffer | TypedArray
-
-const decoder = new TextDecoder()
-const encoder = new TextEncoder()
-const transfer = (buffer: TransferInput) => {
-  if (typeof buffer === 'string')    return Transfer(encoder.encode(buffer).buffer)
-  if ('buffer' in buffer)            return Transfer(buffer.buffer)
-  if (buffer instanceof ArrayBuffer) return Transfer(buffer)
-  throw new TypeError('Expected a string, ArrayBuffer, or typed array!')
-}
-const decode = (buffer: ArrayBuffer) => decoder.decode(buffer)
-// see `modules/workers.ts` for docs. and type definitions
 expose({
 
   render(buffer: ArrayBuffer, pretty = false) {

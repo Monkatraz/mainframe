@@ -3,26 +3,12 @@
  * @author Monkatraz
  */
 // Imports
-import { spawn, Transfer, Thread, Worker } from 'threads'
+import { spawn, Thread, Worker } from 'threads'
 import type { ModuleThread } from 'threads'
+import { transfer, decode } from '../workers/_worker_lib'
 import { sleep } from './util'
 import DOMPurify from 'dompurify'
 import morphdom from 'morphdom'
-
-// -- MESSAGE TRANSFER & RESPONSE DECODING
-
-interface TypedArray extends ArrayBuffer { buffer: ArrayBufferLike }
-type TransferInput = string | ArrayBuffer | TypedArray
-
-const decoder = new TextDecoder()
-const encoder = new TextEncoder()
-const transfer = (buffer: TransferInput) => {
-  if (typeof buffer === 'string')    return Transfer(encoder.encode(buffer).buffer)
-  if ('buffer' in buffer)            return Transfer(buffer.buffer)
-  if (buffer instanceof ArrayBuffer) return Transfer(buffer)
-  throw new TypeError('Expected a string, ArrayBuffer, or typed array!')
-}
-const decode = (buffer: ArrayBuffer) => decoder.decode(buffer)
 
 // -- WORKER MODULE
 
@@ -115,6 +101,22 @@ export namespace Prism {
   export async function highlight(code: string, lang: string) {
     const result = await module.invoke<ArrayBuffer>(() => module.worker.highlight(transfer(code), lang))
     return decode(result)
+  }
+}
+
+export namespace YAML {
+  const module = new WorkerModule('yaml', '../workers/yaml.js')
+
+  /** Parses a YAML source and returns an equivalent JSON object. */
+  export async function parse<T = JSONObject>(src: string) {
+    const result = await module.invoke<T>(() => module.worker.parse(transfer(src)))
+    return result
+  }
+
+  /** Serializes an object into a YAML string. */
+  export async function serialize(obj: JSONObject) {
+    const result = await module.invoke<string>(() => module.worker.serialize(obj))
+    return result
   }
 }
 
