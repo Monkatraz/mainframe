@@ -3,14 +3,10 @@ const esbuild = require('esbuild')
 module.exports = function (snowpackConfig, pluginOptions) {
   return {
     name: 'compiler-workers',
+
     resolve: {
-      input: ['.worker.ts'],
-      output: ['.js']
-    },
-    config(config) {
-      // hacks!!! basically just putting our plugin at the start
-      const plugin = config.plugins.pop()
-      config.plugins.unshift(plugin)
+      input: ['.bundle.ts', '.bundle.js'],
+      output: ['.bundle.js']
     },
 
     async load({ filePath = '' }) {
@@ -21,9 +17,11 @@ module.exports = function (snowpackConfig, pluginOptions) {
         sourcemap: true,
         outdir: './',
         outbase: './',
+        format: 'esm',
         write: false
       })
-      return { '.js': { code: result.outputFiles[1].text, map: result.outputFiles[0].text } }
+      const ret = { code: result.outputFiles[1].text, map: result.outputFiles[0].text }
+      return { '.bundle.js': ret }
     }
   }
 }

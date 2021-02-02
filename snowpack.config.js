@@ -11,31 +11,13 @@ module.exports = {
     polyfillNode: false,
     packageLookupFields: [ 'svelte' ],
     rollup: {
-      dedupe: [
-        '@codemirror/autocomplete',
-        '@codemirror/closebrackets',
-        '@codemirror/commands',
-        '@codemirror/comment',
-        '@codemirror/fold',
-        '@codemirror/gutter',
-        '@codemirror/highlight',
-        '@codemirror/history',
-        '@codemirror/language',
-        '@codemirror/language-data',
-        '@codemirror/matchbrackets',
-        '@codemirror/rectangular-selection',
-        '@codemirror/search',
-        '@codemirror/state',
-        '@codemirror/view',
-        'lezer',
-        'lezer-tree'
-      ],
       plugins: [ require('rollup-plugin-node-polyfills')() ]
     }
   },
   devOptions: {
     open: 'none',
-    output: 'stream'
+    output: 'stream',
+    hmr: false
   },
   buildOptions: {
     out: 'build',

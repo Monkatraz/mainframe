@@ -1,21 +1,10 @@
 <script lang='ts'>
-  import { EditorState, tagExtension } from '@codemirror/state'
-  import { drawSelection, EditorView } from '@codemirror/view'
-  import { LanguageDescription } from '@codemirror/language'
-  import { languages } from '@codemirror/language-data'
-  import { confinement } from './editor-config'
+  import {
+    EditorState, EditorView, tagExtension,
+    LanguageDescription, languages,
+    getNoEditExtensions
+  } from './codemirror.bundle'
   import { onDestroy, onMount } from 'svelte'
-  import { indentHack } from './editor-core'
-
-  function getExtensions() {
-    return [
-      drawSelection(),
-      EditorView.editable.of(false),
-      EditorView.lineWrapping,
-      indentHack,
-      confinement
-    ]
-  }
 
   export let content: string | Promise<string>
   export let lang = ''
@@ -48,7 +37,7 @@
       state: EditorState.create({
         doc: await getDoc(),
         extensions: [
-          ...getExtensions(),
+          ...getNoEditExtensions(),
           tagExtension('current-lang', await getLang() ?? [])
         ]
       })

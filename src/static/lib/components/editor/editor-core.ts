@@ -3,124 +3,17 @@
  * @author Monkatraz
  */
 
-import { EditorState, Extension } from '@codemirror/state'
 import {
-  EditorView, ViewPlugin, ViewUpdate, drawSelection,
-  highlightActiveLine, highlightSpecialChars, keymap, Decoration, DecorationSet
-} from '@codemirror/view'
-import { history, historyKeymap } from '@codemirror/history'
-import { foldGutter, foldKeymap } from '@codemirror/fold'
-import { indentOnInput } from '@codemirror/language'
-import { lineNumbers } from '@codemirror/gutter'
-import { defaultKeymap, defaultTabBinding } from '@codemirror/commands'
-import { bracketMatching } from '@codemirror/matchbrackets'
-import { closeBrackets, closeBracketsKeymap } from '@codemirror/closebrackets'
-import { highlightSelectionMatches, searchKeymap } from '@codemirror/search'
-import { autocompletion, completionKeymap } from '@codemirror/autocomplete'
-import { commentKeymap } from '@codemirror/comment'
-import { rectangularSelection } from '@codemirror/rectangular-selection'
-// Local Extensions
-import { RangeSetBuilder } from '@codemirror/rangeset'
-import type { Line } from '@codemirror/text'
-import { redo } from '@codemirror/history'
-import { copyLineDown } from '@codemirror/commands'
-import { confinement } from './editor-config'
-import monarchMarkdown from './monarch-markdown'
+  EditorState, Extension,
+  EditorView, ViewPlugin, ViewUpdate,
+  getExtensions
+} from './codemirror.bundle'
 // Misc.
 import type { Page } from '@schemas'
 import * as API from '../../modules/api'
 import { toast, LocalDrafts } from '../../modules/state'
 import { debounce } from '../../modules/util'
 import { writable } from 'svelte/store'
-
-const hideGuttersTheme = EditorView.theme({
-  '$.hide-gutters $gutters': {
-    display: 'none !important'
-  },
-  '$.hide-gutters $content': {
-    paddingLeft: '0.5rem'
-  }
-})
-
-const WHITESPACE_REGEX = /^\s+/
-
-function indentDeco(view: EditorView) {
-  // get every line of the visible ranges
-  const lines = new Set<Line>()
-  for (const { from, to } of view.visibleRanges) {
-    for (let pos = from; pos <= to;) {
-      let line = view.state.doc.lineAt(pos)
-      lines.add(line)
-      pos = line.to + 1
-    }
-  }
-
-  // get the indentation of every line
-  // and create an offset hack decoration if it has any
-  const tabInSpaces = ' '.repeat(view.state.facet(EditorState.tabSize))
-  const builder = new RangeSetBuilder<Decoration>()
-  for (const line of lines) {
-    // there is almost certainly a much better way to do this
-    const WS = WHITESPACE_REGEX.exec(line.text)?.[0]
-    const col = WS?.replaceAll('\t', tabInSpaces).length
-    if (col) builder.add(line.from, line.from, Decoration.line({
-      attributes: { style: `padding-left: ${col}ch; text-indent: -${col}ch` }
-    }))
-  }
-
-  return builder.finish()
-}
-
-export const indentHack = ViewPlugin.fromClass(
-  class {
-    decorations: DecorationSet
-    constructor(view: EditorView) {
-      this.decorations = indentDeco(view)
-    }
-    update(update: ViewUpdate) {
-      if (update.docChanged || update.viewportChanged)
-        this.decorations = indentDeco(update.view)
-    }
-  },
-  { decorations: v => v.decorations }
-)
-
-function getExtensions() {
-  return [
-    lineNumbers(),
-    highlightSpecialChars(),
-    history(),
-    foldGutter(),
-    drawSelection(),
-    EditorState.allowMultipleSelections.of(true),
-    indentOnInput(),
-    bracketMatching(),
-    closeBrackets(),
-    highlightSelectionMatches(),
-    autocompletion(),
-    rectangularSelection(),
-    highlightActiveLine(),
-    EditorView.lineWrapping,
-    indentHack,
-    keymap.of([
-      ...closeBracketsKeymap,
-      ...defaultKeymap,
-      ...searchKeymap,
-      ...historyKeymap,
-      ...foldKeymap,
-      ...commentKeymap,
-      ...completionKeymap,
-      ...[
-        { key: 'Mod-Shift-z', run: redo, preventDefault: true },
-        { key: 'Mod-d', run: copyLineDown, preventDefault: true }
-      ],
-      defaultTabBinding
-    ]),
-    hideGuttersTheme,
-    monarchMarkdown.load(),
-    confinement
-  ]
-}
 
 type SourceOrigin = { path: string } | { draft: string, user: API.Ref } | { local: string }
 

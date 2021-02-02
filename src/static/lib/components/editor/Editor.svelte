@@ -1,11 +1,11 @@
 <script lang='ts'>
   // Library Imports
   import { EditorCore } from './editor-core'
+  import { EditorView } from './codemirror.bundle'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
   import { createAnimQueued, throttle, waitFor } from '../../modules/util'
   import { Markdown } from '../../modules/workers'
-  import { EditorView } from '@codemirror/view'
   // Components
   import {
     tnAnime, Pref, focusGroup,
