@@ -3,7 +3,7 @@
     EditorState, EditorView, tagExtension,
     LanguageDescription, languages,
     getNoEditExtensions
-  } from './codemirror.bundle'
+  } from './codemirror-bundle-'
   import { onDestroy, onMount } from 'svelte'
 
   export let content: string | Promise<string>

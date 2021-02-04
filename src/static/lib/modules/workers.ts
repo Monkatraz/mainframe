@@ -65,7 +65,7 @@ class WorkerModule {
 // -- WORKERS
 
 export namespace Markdown {
-  const module = new WorkerModule('md-renderer', '../workers/md-renderer.bundle.js', { persist: true })
+  const module = new WorkerModule('md-renderer', '../workers/md-renderer-bundle-.js', { persist: true })
 
   /** Safely renders (async) the given Markdown string into HTML.
    *  Passing `true` for the `pretty` parameter formats and indents the output HTML. */
@@ -95,7 +95,7 @@ export namespace Markdown {
 }
 
 export namespace Prism {
-  const module = new WorkerModule('prism', '../workers/md-renderer.bundle.js')
+  const module = new WorkerModule('prism', '../workers/md-renderer-bundle-.js')
 
   /** Returns a syntax highlighted HTML string. */
   export async function highlight(code: string, lang: string) {
@@ -105,7 +105,7 @@ export namespace Prism {
 }
 
 export namespace YAML {
-  const module = new WorkerModule('yaml', '../workers/yaml.bundle.js')
+  const module = new WorkerModule('yaml', '../workers/yaml-bundle-.js')
 
   /** Parses a YAML source and returns an equivalent JSON object. */
   export async function parse<T = JSONObject>(src: string) {

@@ -7,7 +7,7 @@ import {
   EditorState, Extension,
   EditorView, ViewPlugin, ViewUpdate,
   getExtensions
-} from './codemirror.bundle'
+} from './codemirror-bundle-'
 // Misc.
 import type { Page } from '@schemas'
 import * as API from '../../modules/api'

@@ -1,7 +1,7 @@
 <script lang='ts'>
   // Library Imports
   import { EditorCore } from './editor-core'
-  import { EditorView } from './codemirror.bundle'
+  import { EditorView } from './codemirror-bundle-'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
   import { createAnimQueued, throttle, waitFor } from '../../modules/util'
