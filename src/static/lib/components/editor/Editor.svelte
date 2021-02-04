@@ -149,9 +149,9 @@
       in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
-      <div class='topbar' use:focusGroup={'horizontal'}>
+      <div class='topbar fs-display divide-x-1' use:focusGroup={'horizontal'}>
         <div class='topbar-section'>
-          <span class='topbar-label'>Draft</span>
+          <span class='mr-2 tx-subtle'>Draft</span>
           <TextInput bind:value={$Editor.draft.name} thin placeholder='Draft name...' />
           <Button i='carbon:save' tip='Save Draft Locally' size='1.5rem' baseline
             on:click={() => Editor.saveLocally()}/>
@@ -205,7 +205,7 @@
 
         <TabControl noborder contain compact conditional>
           <Tab>
-            <slot slot='button'><span style='font-size: 0.9em'>Result</span></slot>
+            <slot slot='button'><span class='fs-sm'>Result</span></slot>
             <div class='preview codetheme-dark' bind:this={preview}
               on:scroll={scrollFromPreview}
               on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
@@ -217,7 +217,7 @@
             </div>
           </Tab>
           <Tab>
-            <slot slot='button'><span style='font-size: 0.9em'>HTML Output</span></slot>
+            <slot slot='button'><span class='fs-sm'>HTML Output</span></slot>
             <div class='preview-html'>
               <EditorBlock content={Markdown.render($Editor.value, true)} lang='html' />
             </div>
@@ -306,23 +306,16 @@
     z-index: 10
     display: flex
     flex-wrap: nowrap
-    padding: 0.1rem 0.5rem
-    font-size: 0.9rem
+    padding: 0.125rem 0.5rem
+    font-size: 0.875rem
     white-space: nowrap
     background: var(--colcode-background)
-    font-set('display')
 
   .topbar-section
     display: flex
     gap: 0.25rem
     align-items: center
-    margin-right: 0.25rem
-    padding-right: 0.25rem
-    border-right: 0.15rem solid colvar('border')
-
-  .topbar-label
-    margin-right: 0.25rem
-    color: colvar('text-subtle')
+    padding: 0 0.25rem
 
   .editor-pane
     position: relative
@@ -354,7 +347,7 @@
     flex-direction: column
     width: max-content
     font-set('display')
-    font-size: 0.9rem
+    font-size: 0.875rem
 
   .editor
     height: 100%

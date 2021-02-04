@@ -16,12 +16,12 @@
 
 </script>
 
-<div class='ed-st'>
-  <div class='ed-st-row fs-mono'>
+<div class='ed-st fs-mono tx-dim'>
+  <div class='ed-st-row'>
     <span>CHARS <span>{$Editor.value.length}</span></span>
     <span>WORDS <span>{wordCount($Editor.value)}</span></span>
   </div>
-  <div class='ed-st-row fs-mono'>
+  <div class='ed-st-row'>
     <span>BYTES <span>{Math.round(byteCount($Editor.value) / 1000)}KB</span></span>
   </div>
 </div>
@@ -39,7 +39,6 @@
 
     > span
       margin: 0rem 0.25rem
-      color: colvar('text-dim')
 
       > span
         color: colvar('text-subtle')

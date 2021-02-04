@@ -1,4 +1,102 @@
 @require '_lib'
 
+$spacings = (1 0.125) (2 0.25) (3 0.5) (4 0.875) (5 1) (6 1.25) (7 1.5) (8 1.875) (9 1.925) (10 2)
+
 .hide-focus
   outline: none
+
+.pos-relative
+  position: relative
+
+// fs-font
+for $font in 'sans' 'display' 'serif' 'mono' 'handwriting' 'cursive'
+  {'.fs-' + $font}
+    font-set($font)
+
+// fs-size
+for $idx in ('xs' 0.75rem) ('sm' 0.875rem) ('base' 1rem) ('lg' 1.125rem) ('xl' 1.25rem)
+  {'.fs-' + $idx[0]}
+    font-size: unquote('calc(%s * var(--font-content-size, 1))' % $idx[1])
+
+// fs-weight
+for $weight in lighter normal bolder bold 100 200 300 400 500 600 700 800 900
+  {'.fs-' + $weight}
+    font-weight: $weight
+
+// tx-color
+.tx-normal
+  color: colvar('text')
+for $color in 'subtle' 'dim' 'highlight' 'select'
+  {'.tx-' + $color}
+    color: colvar('text-' + $color)
+
+// shadow-height
+for $idx in 1..8
+  {'.shadow-' + $idx}
+    shadow-elevation($idx)
+
+// .space-y-size
+for $idx in $spacings
+  $val = 1rem * $idx[1]
+  {'.space-y-' + $idx[0]}
+    space-y($val)
+
+// .space-x-size
+for $idx in $spacings
+  $val = 1rem * $idx[1]
+  {'.space-x-' + $idx[0]}
+    space-x($val)
+
+.divide-y-1
+  divide-y(solid 0.075rem colvar('border'))
+.divide-y-2
+  divide-y(solid 0.125rem colvar('border'))
+
+.divide-x-1
+  divide-x(solid 0.075rem colvar('border'))
+.divide-x-2
+  divide-x(solid 0.125rem colvar('border'))
+
+// margin classes (uses tailwind syntax)
+for $idx in $spacings
+  $val = 1rem * $idx[1]
+
+  {'.m-' + $idx[0]}
+    margin: $val
+
+  {'.mx-' + $idx[0]}
+    margin-right: $val
+    margin-left: $val
+
+  {'.my-' + $idx[0]}
+    margin-top: $val
+    margin-bottom: $val
+
+  for $type in '.mt-' '.mb-' '.ml-' '.mr-'
+    {$type + $idx[0]}
+      margin-top: $val if $type is '.mt-'
+      margin-bottom: $val if $type is '.mb-'
+      margin-left: $val if $type is '.ml-'
+      margin-right: $val if $type is '.mr-'
+
+// padding classes (uses tailwind syntax)
+for $idx in $spacings
+  $val = 1rem * $idx[1]
+
+  {'.p-' + $idx[0]}
+    margin: $val
+
+  {'.px-' + $idx[0]}
+    margin-right: $val
+    margin-left: $val
+
+  {'.py-' + $idx[0]}
+    margin-top: $val
+    margin-bottom: $val
+
+  for $type in '.pt-' '.pb-' '.pl-' '.pr-'
+    {$type + $idx[0]}
+      margin-top: $val if $type is '.pt-'
+      margin-bottom: $val if $type is '.pb-'
+      margin-left: $val if $type is '.pl-'
+      margin-right: $val if $type is '.pr-'

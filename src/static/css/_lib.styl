@@ -165,6 +165,26 @@ terminal-text(col = white)
   background-size: 100% 2px
   background-clip: text
 
+// Spacing properties, causes child elements to be spaced apart evenly.
+space-y(spacing)
+  & > * + *
+    margin-top: spacing
+    margin-bottom: spacing
+
+space-x(spacing)
+  & > * + *
+    margin-right: spacing
+    margin-left: spacing
+
+// Divide properties, for putting borders inbetween adjacent child elements.
+divide-y(args...)
+  & > * + *
+    border-top: args
+
+divide-x(args...)
+  & > * + *
+    border-left: args
+
 // Makes an object appear higher.
 shadow-elevation(height = 1, boost = 1)
   boost = (boost * (unit(height,'') / 8))

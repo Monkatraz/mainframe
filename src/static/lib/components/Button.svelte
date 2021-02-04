@@ -92,7 +92,7 @@
         transition: transform 0.125s, color 0.125s, opacity 0.125s
 
     &.icon
-      display: flex
+      display: inline-flex
       align-items: center
       justify-content: center
       padding: 0.25rem 0.25rem

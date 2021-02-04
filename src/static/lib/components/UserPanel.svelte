@@ -91,13 +91,13 @@
             info='Between 6 and 32 characters.'
           />
         </form>
-        <div style='margin-top: 0.5rem;'>
+        <div class='mt-3'>
           <Button on:click={register} disabled={busy} wide primary>Register</Button>
         </div>
       </Card>
     </DetailsMenu>
 
-    {#if $matchMedia('small', 'up')}<span class='or'>or</span>{/if}
+    {#if $matchMedia('small', 'up')}<span class='tx-subtle mx-2'>or</span>{/if}
 
     <DetailsMenu placement='bottom-end'>
       <slot slot='summary'>
@@ -137,7 +137,7 @@
     <DetailsMenu placement='bottom-end'>
       <slot slot='summary'>
         <Button summary baseline>
-          <span style='margin-right: 0.25rem'>{User.authed ? User.social.nickname : ''}</span>
+          <span class='mr-2'>{User.authed ? User.social.nickname : ''}</span>
           <Icon i='carbon:user-avatar-filled-alt' size='1.75rem'/>
         </Button>
       </slot>
@@ -147,12 +147,3 @@
     </DetailsMenu>
   </div>
 {/if}
-
-<style lang='stylus'>
-  @require '_lib'
-
-  .or
-    margin: 0 0.25rem
-    color: colvar('text-subtle')
-
-</style>
