@@ -16,8 +16,7 @@ module.exports = {
   },
   devOptions: {
     open: 'none',
-    output: 'stream',
-    hmr: false
+    output: 'stream'
   },
   buildOptions: {
     out: 'build',

@@ -13,6 +13,7 @@
     Toggle, DetailsMenu, Button, Card, TextInput, TabControl, Tab
   } from '@components'
   import EditorBlock from './EditorBlock.svelte'
+  import Stats from './Stats.svelte'
 
   // TODO: cheatsheet
   // TODO: allow adjusting line-wrap?
@@ -155,6 +156,9 @@
           <Button i='carbon:save' tip='Save Draft Locally' size='1.5rem' baseline
             on:click={() => Editor.saveLocally()}/>
           <Button i='carbon:data-base' tip='Manage Drafts' size='1.5rem' baseline/>
+        </div>
+        <div class='topbar-section'>
+          <Stats />
         </div>
       </div>
 
