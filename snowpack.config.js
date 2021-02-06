@@ -8,11 +8,8 @@ module.exports = {
     }
   },
   packageOptions: {
-    polyfillNode: false,
-    packageLookupFields: [ 'svelte' ],
-    rollup: {
-      plugins: [ require('rollup-plugin-node-polyfills')() ]
-    }
+    polyfillNode: true,
+    packageLookupFields: [ 'svelte' ]
   },
   devOptions: {
     open: 'none',
