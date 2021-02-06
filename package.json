@@ -63,6 +63,7 @@
     "css-mquery-packer": "^1.2.4",
     "esbuild": "^0.8.42",
     "postcss": "^8.2.4",
+    "punycode": "^2.1.1",
     "snowpack": "^3.0.11",
     "sort-css-media-queries": "^1.5.2",
     "stylus": "^0.54.8",
