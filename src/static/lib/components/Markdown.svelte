@@ -19,7 +19,7 @@
   let isFirstRender = true
 
   const activeExclude = ['TBODY', 'THEAD', 'CODE']
-  let activeElements: Set<Element> = new Set()
+  let activeElements: Element[] = []
 
   function hasSiblings(elem: Element, ln: number) {
     if (!elem.parentElement) return false
@@ -48,7 +48,7 @@
 
   function updateActiveElements() {
     if (!container) return
-    activeElements.clear()
+    const active = new Set<Element>()
     for (let ln of activelines) {
       // find matches
       let elems = container.querySelectorAll(`[data-line="${ln}"]`)
@@ -63,12 +63,12 @@
 
       // if our direct match has no siblings, highlight it
       if (!activeExclude.includes(elem.tagName) && !hasSiblings(elem, ln))
-        activeElements.add(elem)
+        active.add(elem)
       // else, use first ancestor that has no siblings of the same line number
       else while (elem.parentElement && elem.parentElement !== container) {
         elem = elem.parentElement
         if (!activeExclude.includes(elem.tagName) && !hasSiblings(elem, ln)) {
-          activeElements.add(elem)
+          active.add(elem)
           break
         }
       }
@@ -76,10 +76,10 @@
       while (elem.parentElement && elem.parentElement !== container)
         elem = elem.parentElement
       if (elem.parentElement && !activeExclude.includes(elem.tagName))
-        activeElements.add(elem)
+        active.add(elem)
     }
     // inform svelte of the value change
-    activeElements = activeElements
+    activeElements = Array.from(active)
   }
 
   function updateHeightMap() {
@@ -88,7 +88,7 @@
     heightlist = []
     const parentRect = container.getBoundingClientRect()
     container.querySelectorAll<HTMLElement>('[data-line]').forEach((elem) => {
-      if (elem.offsetParent === container) {
+      if (elem.parentElement === container) {
         const line = parseInt(elem.getAttribute('data-line')!)
         const height = elem.getBoundingClientRect().top - parentRect.top
         heightmap.set(line, height)
@@ -116,17 +116,17 @@
 
 </script>
 
-<div class='wrap' role='presentation'>
-  {#each Array.from(activeElements) as elem (elem)}
+<div class='md-wrap' role='presentation'>
+  {#each activeElements as elem (elem)}
     <div class=active-element transition:fade={{ duration: 100 }} style={getActiveElementStyle(elem)} />
   {/each}
-  <div bind:this={container} class='rhythm container' role='presentation' />
+  <div bind:this={container} class:hidden={isFirstRender} class='rhythm md-container' role='presentation' />
 </div>
 
 <style lang='stylus'>
   @require '_lib'
 
-  .wrap
+  .md-wrap
     contain: content
 
   .active-element
@@ -137,5 +137,13 @@
     box-shadow: 0 0 1rem 0.25rem colvar('text-select', opacity 0.075)
     user-select: none
     pointer-events: none
+
+  .md-container
+    opacity: 1
+    transition: opacity 0.1s ease-out
+
+    &.hidden
+      opacity: 0
+
 
 </style>

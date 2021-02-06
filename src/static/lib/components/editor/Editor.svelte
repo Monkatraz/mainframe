@@ -1,39 +1,21 @@
 <script lang='ts'>
-  // Library Imports
-  import { EditorCore } from './editor-core'
+  import { settings, EditorCore } from './editor-core'
   import { EditorView } from './codemirror-bundle-'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
-  import { createAnimQueued, throttle, waitFor } from '../../modules/util'
+  import { createAnimQueued, throttle } from '../../modules/util'
   import { Markdown } from '../../modules/workers'
-  // Components
   import {
-    tnAnime, Pref, focusGroup,
+    matchMedia, tnAnime, focusGroup, onSwipe,
     Markdown as MarkdownComponent,
-    Toggle, DetailsMenu, Button, Card, TextInput, TabControl, Tab
+    Toggle, DetailsMenu, Button, Card, TabControl, Tab
   } from '@components'
   import EditorBlock from './EditorBlock.svelte'
-  import Stats from './Stats.svelte'
-
-  // TODO: cheatsheet
-  // TODO: allow adjusting line-wrap?
-  // TODO: swipe to show preview on mobile
-
-  let mounted = false
+  import Topbar from './Topbar.svelte'
 
   // -- STATE
 
-  const settings = Pref.bind('editor-settings', {
-    darkmode: true,
-    gutters: true,
-    spellcheck: false,
-    preview: {
-      enable: true,
-      live: true,
-      darkmode: false,
-      activelines: true
-    }
-  })
+  let mounted = false
 
   let editorContainer: HTMLElement
   let preview: HTMLDivElement
@@ -46,9 +28,16 @@
   let heightmap: Map<number, number>
   let heightlist: number[]
 
-  $: containerClass = $settings.preview.enable ? 'show-both' : 'show-editor'
+  $: small = $matchMedia('thin', 'below')
+  $: containerClass = $settings.preview.enable ? 'show-preview' : 'show-editor'
   $: if (preview && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
   $: if (mounted && scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
+
+  // set defaults when opening on mobile
+  $: if (small && mounted) {
+    $settings.preview.enable = false
+    $settings.gutters = false
+  }
 
   // -- EDITOR
 
@@ -56,7 +45,6 @@
   const activeLines = Editor.activeLines
 
   onMount(async () => {
-    await waitFor(() => !!editorContainer)
     await Editor.init(
       editorContainer,
       await fetch('/static/misc/md-test.md').then(res => res.text()),
@@ -140,6 +128,12 @@
 
 <div class='overflow-container {$settings.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
   in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
+  use:onSwipe={{
+    condition: () => small,
+    direction: $settings.preview.enable ? 'right' : 'left',
+    threshold: 70,
+    callback: () => $settings.preview.enable = !$settings.preview.enable
+  }}
 >
   <div class='editor-container {containerClass}'>
     <!-- Left | Editor Pane -->
@@ -149,18 +143,7 @@
       in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
-      <div class='topbar fs-display divide-x-1' use:focusGroup={'horizontal'}>
-        <div class='topbar-section'>
-          <span class='mr-2 tx-subtle'>Draft</span>
-          <TextInput bind:value={$Editor.draft.name} thin placeholder='Draft name...' />
-          <Button i='carbon:save' tip='Save Draft Locally' size='1.5rem' baseline
-            on:click={() => Editor.saveLocally()}/>
-          <Button i='carbon:data-base' tip='Manage Drafts' size='1.5rem' baseline/>
-        </div>
-        <div class='topbar-section'>
-          <Stats />
-        </div>
-      </div>
+      <Topbar/>
 
       <div class='editor-settings'>
         <DetailsMenu placement='bottom-end'>
@@ -172,7 +155,6 @@
               <Toggle bind:toggled={$settings.darkmode}>Dark Mode</Toggle>
               <Toggle bind:toggled={$settings.gutters}>Gutters</Toggle>
               <Toggle bind:toggled={$settings.spellcheck}>Spellcheck</Toggle>
-              <Toggle bind:toggled={$settings.preview.enable}>Preview Pane</Toggle>
             </div>
           </Card>
         </DetailsMenu>
@@ -187,7 +169,7 @@
       in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 350, easing: 'easeOutQuint' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
-      {#if containerClass === 'show-both' || containerClass === 'show-preview'}
+      {#if containerClass === 'show-preview' || small}
 
         <div class='preview-settings'>
           <DetailsMenu placement='bottom-end'>
@@ -205,7 +187,7 @@
 
         <TabControl noborder contain compact conditional>
           <Tab>
-            <slot slot='button'><span class='fs-sm'>Result</span></slot>
+            <span slot='button' class='fs-sm'>Result</span>
             <div class='preview codetheme-dark' bind:this={preview}
               on:scroll={scrollFromPreview}
               on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
@@ -217,7 +199,7 @@
             </div>
           </Tab>
           <Tab>
-            <slot slot='button'><span class='fs-sm'>HTML Output</span></slot>
+            <span slot='button' class='fs-sm'>HTML Output</span>
             <div class='preview-html'>
               <EditorBlock content={Markdown.render($Editor.value, true)} lang='html' />
             </div>
@@ -225,8 +207,18 @@
         </TabControl>
       {/if}
     </div>
-
   </div>
+  {#if small}
+    <div class='panel-selector fs-display'
+      in:tnAnime={{ translateY: ['100%', '0'], duration: 400, delay: 300, easing: 'easeOutExpo' }}
+      out:tnAnime={{ translateY: '100%', duration: 200, delay: 50, easing: 'easeInExpo' }}
+    >
+      <Toggle bind:toggled={$settings.preview.enable}>
+        <slot slot='before'>Editor</slot>
+        Preview
+      </Toggle>
+    </div>
+  {/if}
 </div>
 
 <style lang='stylus'>
@@ -243,92 +235,97 @@
     overflow: hidden
     background: var(--colcode-background)
 
-  .editor-container
+  // Small screen handling
+  +match-media(thin, below)
+    .editor-pane, .preview-pane
+      position: absolute
+      top: 0
+      left: 0
+      width: 100%
+      height: 100%
+      transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1)
+
+    .editor, .preview, .preview-html
+      transition: visibility 1s
+
+    .editor-container
+      &.show-preview .editor-pane
+        left: -100%
+        .editor
+          visibility: hidden
+
+      &.show-editor .preview-pane
+        left: 100%
+        .preview, .preview-html
+          visibility: hidden
+
+  .panel-selector
+    position: absolute
+    bottom: 0
+    left: 0
+    z-index: 99
+    display: flex
+    justify-content: center
     width: 100%
+    height: 2rem
+    background: colvar('background')
+    border-top: solid 0.125rem colvar('border')
 
-    &.show-both
-      grid-kiss:"+------------------------+ +-----------------------+       ",
-                "| .editor-pane           | | .preview-pane         |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       | $hght ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "|                        | |                       |       ",
-                "+------------------------+ +-----------------------+       ",
-                "|        $edit-w         | |        $body-w        |       "
+  .editor-container
+    position: relative
+    width: 100%
+    height: 100%
 
-    &.show-editor
-      grid-kiss:"+--------------------------------------------------+       ",
-                "| .editor-pane                                     |       ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "|                                                  | $hght ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "|                                                  |       ",
-                "+--------------------------------------------------+       ",
-                "| 100%                                             |       "
+    +match-media(thin, up)
+      &.show-preview
+        grid-kiss:"+------------------------+ +-----------------------+      ",
+                  "| .editor-pane           | | .preview-pane         |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       | 100% ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "|                        | |                       |      ",
+                  "+------------------------+ +-----------------------+      ",
+                  "|        $edit-w         | |        $body-w        |      "
 
-    &.show-preview
-      grid-kiss:"+------+ +--------------------------------+ +------+       ",
-                "|      | | > .preview-pane <              | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      | $hght ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "|      | |                                | |      |       ",
-                "+------+ +--------------------------------+ +------+       ",
-                "|0.5rem| | $body-w                        | |0.5rem|       "
-      .editor
-        display: none
+      &.show-editor
+        grid-kiss:"+--------------------------------------------------+      ",
+                  "| .editor-pane                                     |      ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "|                                                  | 100% ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "|                                                  |      ",
+                  "+--------------------------------------------------+      ",
+                  "| 100%                                             |      "
 
-  .topbar
-    z-index: 10
-    display: flex
-    flex-wrap: nowrap
-    padding: 0.125rem 0.5rem
-    font-size: 0.875rem
-    white-space: nowrap
+  .editor-pane, .preview-pane
+    position: relative
+    overflow: hidden
     background: var(--colcode-background)
-
-  .topbar-section
-    display: flex
-    gap: 0.25rem
-    align-items: center
-    padding: 0 0.25rem
 
   .editor-pane
-    position: relative
     z-index: 2
+    display: flex
+    flex-direction: column
     padding-right: 0.25rem
-    overflow: hidden
-    background: var(--colcode-background)
 
   .preview-pane
-    position: relative
     z-index: 1
-    overflow: hidden
-    background: var(--colcode-background)
     border-left: solid 0.125rem colvar('border')
 
   .editor-settings, .preview-settings
@@ -350,19 +347,22 @@
     font-size: 0.875rem
 
   .editor
-    height: 100%
+    overflow: hidden
 
   .preview, .preview-html
     position: relative
     z-index: 1
     height: 100%
     contain: strict
+    touch-action: pan-y pinch-zoom
 
   .preview
     padding: 0 1rem
     padding-bottom: 100%
     overflow-y: scroll
-    --font-content-size: 0.75
+
+    +match-media(thin, up)
+      --font-content-size: 0.75
 
   .preview-html
     padding: 0 0.5rem

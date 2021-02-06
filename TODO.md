@@ -3,8 +3,7 @@
 ### In Progress
 - [ ] Page creation, and updating
 - [ ] Author draft pages that are linkable
-- [ ] Rename 'User' to 'Account' and rename 'Social' to 'User'
-- [ ] Go thorugh components and give decently scoped names so that they can be themed
+- [ ] Go through components and give decently scoped names so that they can be themed
 
 ### Markdown
 - [ ] Recreate def-list md-it plugin
@@ -105,3 +104,4 @@
 - [x] Tabs
 - [x] Drafts stored either with `localStorage` (must be serialized)
 - [x] Generic worker handler
+- [x] Editor mobile support

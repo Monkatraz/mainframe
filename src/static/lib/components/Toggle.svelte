@@ -11,6 +11,7 @@
 <label class:toggled>
   <input type='checkbox' bind:checked={toggled} use:keyHandle={keyHandler} {...$$restProps}>
   <span class='wrapper' role='presentation'>
+    {#if $$slots.before}<span class='slot-before'><slot name='before' /></span>{/if}
     <svg xmlns='http://www.w3.org/2000/svg' aria-hidden='true' viewBox='0 0 24 24'
       width={small ? '1.5em' : '2em'} height={small ? '1.5em' : '2em'}
       >
@@ -21,7 +22,7 @@
         d='M9 9a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4z'
       />
       </svg>
-    <span class='slot'><slot /></span>
+    <span class='slot-after'><slot /></span>
   </span>
 </label>
 
@@ -34,6 +35,10 @@
     +on-hover(false)
       .slot
         color: colvar('hint')
+
+  .wrapper
+    display: flex
+    align-items: center
 
   .background
     transition: fill 0.15s
@@ -52,8 +57,12 @@
     transform: translateX(45%)
     fill: colvar('white')
 
-  .slot
-    margin-left: 0.25em
+  .slot-before
+    margin-right: 0.5em
+    transition: color 0.1s
+
+  .slot-after
+    margin-left: 0.5em
     transition: color 0.1s
 
   input

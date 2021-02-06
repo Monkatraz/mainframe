@@ -48,12 +48,17 @@
 
 </script>
 
-<div role='presentation' bind:this={container} />
+<div role='presentation' class:hidden={!view} bind:this={container} />
 
 <style lang='stylus'>
   @require '_lib'
 
   div
     height: 100%
+    opacity: 1
+    transition: opacity 0.1s ease-out
+
+    &.hidden
+      opacity: 0
 
 </style>

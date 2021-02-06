@@ -147,7 +147,7 @@ export namespace LocalDrafts {
 export const Pref = {
   /** Attempt to retrieve the preference with the given name.
    *  If it isn't found, the fallback value will instead be returned. */
-  get<T extends JSONValue>(name: string, fallback: T): T {
+  get<T = JSONValue>(name: string, fallback: T): T {
     name = '_user-pref_' + name
     const storedPreference = localStorage.getItem(name)
     if (storedPreference) return JSON.parse(storedPreference) as T
@@ -156,7 +156,7 @@ export const Pref = {
 
   /** Sets the preference with the given name to the given value.
    *  Passing an empty string will remove the preference from storage. */
-  set<T extends JSONValue>(name: string, value: T) {
+  set<T = JSONValue>(name: string, value: T) {
     name = '_user-pref_' + name
     if (!value) localStorage.removeItem(name)
     else localStorage.setItem(name, JSON.stringify(value))
@@ -170,7 +170,7 @@ export const Pref = {
   },
 
   /** Returns a writable store that maps to the given preference. */
-  bind<T extends JSONValue>(name: string, fallback: T) {
+  bind<T = JSONValue>(name: string, fallback: T) {
     const store = writable(this.get(name, fallback))
     return {
       // eslint-disable-next-line @typescript-eslint/unbound-method
@@ -266,9 +266,9 @@ export const matchMedia = {
         return sizeMap.get(curSize) < sizeMap.get(size)
     }
   },
-  subscribe(fn: (match: (size: MediaSize, inclusivity: MediaInclusivity) => boolean) => void) {
-    fn(this.call)
-    const eventFn = () => { fn(this.call) }
+  subscribe(sub: (match: (size: MediaSize, inclusivity: MediaInclusivity) => boolean) => void) {
+    sub(this.call)
+    const eventFn = () => { sub((s, i) => this.call(s, i)) }
     window.addEventListener('MF_MediaSizeChanged', eventFn)
     return () => window.removeEventListener('MF_MediaSizeChanged', eventFn)
   }

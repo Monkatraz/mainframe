@@ -8,6 +8,43 @@ $spacings = (1 0.125) (2 0.25) (3 0.5) (4 0.875) (5 1) (6 1.25) (7 1.5) (8 1.875
 .pos-relative
   position: relative
 
+// display types
+for $type in block inline-block inline flex inline-flex grid inline-grid contents
+  {'.' + $type}
+    display: $type
+
+// flex types
+for $type in row column row-reverse column-reverse
+  {'.flex-' + $type + ', ' + '.inline-flex-' + $type}
+    display: flex
+    flex-direction: $type
+
+.flex-grow
+  flex-grow: 1
+
+$alignment-content = ('start' flex-start) ('end' flex-end) ('center' center) ('between' space-between) ('around' space-around) ('evenly' space-evenly)
+
+$alignment-items = ('start' flex-start) ('end' flex-end) ('center' center) ('baseline' baseline) ('stretch' stretch)
+
+for $idx in $alignment-content
+  {'.justify-' + $idx[0]}
+    justify-content: $idx[1]
+
+for $idx in $alignment-items
+  {'.align-' + $idx[0]}
+    align-items: $idx[1]
+
+// gap-size
+for $idx in $spacings
+  $val = 1rem * $idx[1]
+  {'.gap-' + $idx[0]}
+    gap: $val
+
+// leading
+for $idx in ('none' 0) ('tight' 1.25) ('snug' 1.375) ('normal' 1.5) ('relaxed' 1.625) ('loose' 2)
+  {'.leading-' + $idx[0]}
+    line-height: $idx[1]
+
 // fs-font
 for $font in 'sans' 'display' 'serif' 'mono' 'handwriting' 'cursive'
   {'.fs-' + $font}
@@ -15,8 +52,10 @@ for $font in 'sans' 'display' 'serif' 'mono' 'handwriting' 'cursive'
 
 // fs-size
 for $idx in ('xs' 0.75rem) ('sm' 0.875rem) ('base' 1rem) ('lg' 1.125rem) ('xl' 1.25rem)
-  {'.fs-' + $idx[0]}
-    font-size: unquote('calc(%s * var(--font-content-size, 1))' % $idx[1])
+  {':not(.rhythm) .fs-' + $idx[0]}
+    font-size: $idx[1]
+  {'.rhythm .fs-' + $idx[0]}
+    font-size: unquote('calc(%s * var(--font-content-size))' % $idx[1])
 
 // fs-weight
 for $weight in lighter normal bolder bold 100 200 300 400 500 600 700 800 900
@@ -35,15 +74,11 @@ for $idx in 1..8
   {'.shadow-' + $idx}
     shadow-elevation($idx)
 
-// .space-y-size
+// .space-dir-size
 for $idx in $spacings
   $val = 1rem * $idx[1]
   {'.space-y-' + $idx[0]}
     space-y($val)
-
-// .space-x-size
-for $idx in $spacings
-  $val = 1rem * $idx[1]
   {'.space-x-' + $idx[0]}
     space-x($val)
 
@@ -56,6 +91,10 @@ for $idx in $spacings
   divide-x(solid 0.075rem colvar('border'))
 .divide-x-2
   divide-x(solid 0.125rem colvar('border'))
+
+// width
+.w-full
+  width: 100%
 
 // margin classes (uses tailwind syntax)
 for $idx in $spacings
@@ -84,19 +123,19 @@ for $idx in $spacings
   $val = 1rem * $idx[1]
 
   {'.p-' + $idx[0]}
-    margin: $val
+    padding: $val
 
   {'.px-' + $idx[0]}
-    margin-right: $val
-    margin-left: $val
+    padding-right: $val
+    padding-left: $val
 
   {'.py-' + $idx[0]}
-    margin-top: $val
-    margin-bottom: $val
+    padding-top: $val
+    padding-bottom: $val
 
   for $type in '.pt-' '.pb-' '.pl-' '.pr-'
     {$type + $idx[0]}
-      margin-top: $val if $type is '.pt-'
-      margin-bottom: $val if $type is '.pb-'
-      margin-left: $val if $type is '.pl-'
-      margin-right: $val if $type is '.pr-'
+      padding-top: $val if $type is '.pt-'
+      padding-bottom: $val if $type is '.pb-'
+      padding-left: $val if $type is '.pl-'
+      padding-right: $val if $type is '.pr-'

@@ -441,7 +441,8 @@ const confinementTheme = EditorView.theme({
     fontWeight: '400',
     position: 'relative',
     overflowX: 'auto',
-    zIndex: 0
+    zIndex: 0,
+    touchAction: 'pan-y pinch-zoom'
   },
 
   $content: {

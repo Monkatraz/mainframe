@@ -30,3 +30,4 @@ export { default as UserPanel } from './UserPanel.svelte'
 
 export * from '../modules/components'
 export * from '../modules/state'
+export * from '../modules/gestures'

@@ -10,16 +10,16 @@ export type SwipeDirection = 'up' | 'down' | 'left' | 'right'
 const SWIPE_DIRECTIONS: SwipeDirection[] = ['up', 'down', 'left', 'right']
 
 /** Represents a _potential_ swipe, using a direction and (px) distance. */
-type SwipeEvent = [dir: SwipeDirection, dist: number]
+type SwipeEvent = [dir: SwipeDirection, dist: number, diff: Point]
 function resolveSwipe([x1, y1]: Point, [x2, y2]: Point): SwipeEvent {
   // on these vars: 0 is vertical, 1 is horizontal
-  const diff = [y1 - y2, x1 - x2]
+  const diff: Point = [y1 - y2, x1 - x2]
   const diffAbs = diff.map(Math.abs)
   const axis = diffAbs[1] > diffAbs[0] ? 1 : 0
   const dir = SWIPE_DIRECTIONS[(axis * 2) + +(diff[axis] < 0)]
   //                                ^               ^  get direction via sign (+ = up|left, - = down|right)
   //                                ^ this is either 0 or 2, as axis is either 0 or 1
-  return [dir, diffAbs[axis]]
+  return [dir, diffAbs[axis], diff]
 }
 
 export interface onSwipeOpts {
@@ -94,7 +94,7 @@ export function onSwipe(target: HTMLElement, inOpts: Partial<onSwipeOpts> = {}) 
 
     // Init. and start gesture recognition
     if (evt.type === 'pointerdown') {
-      if (opts.condition?.()) return
+      if (opts.condition && !opts.condition()) return
       evtlistener(document, events, handler, { passive: true })
       ID = evt.pointerId
       start = [evt.clientX, evt.clientY]

@@ -1,20 +1,19 @@
 <script lang='ts'>
   import { tip, Icon } from '@components'
 
-  // Styling
+  export let summary = false
+  export let i = ''
+  export let disabled = false
+  export let active = false
+
   export let wide = false
   export let primary = false
-  export let disabled = false
   export let baseline = false
+  export let compact = false
   export let floating = false
   export let sharp = false
-  export let active = false
   export let size = '1em'
-  // Summary Mode
-  export let summary = false
-  // Icon
-  export let i = ''
-  // Other
+
   let tipString = ''
   export { tipString as tip }
 
@@ -23,14 +22,16 @@
 {#if !summary}
   <button type='button' {disabled} style='font-size: {size};'
     on:click use:tip={tipString}
-    class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp
+    class:icon={i} class:active class:disabled
+    class:wide class:primary class:baseline class:compact class:floating class:sharp
     {...$$restProps}>
     {#if i}<Icon {i} size='1em' />{:else}<slot />{/if}
   </button>
 {:else}
   <summary disabled={disabled ? true : undefined} style='font-size: {size};'
     on:click use:tip={tipString}
-    class:wide class:primary class:disabled class:baseline class:active class:icon={i} class:floating class:sharp
+    class:icon={i} class:active class:disabled
+    class:wide class:primary class:baseline class:compact class:floating class:sharp
     {...$$restProps}>
     {#if i}<Icon {i} size='1em' />{:else}<slot />{/if}
   </summary>
@@ -80,6 +81,9 @@
       padding: 0.25rem 0.25rem
       background: none
       shadow-elevation(0)
+
+    &.compact
+      padding: 0.125rem 0.25rem
 
     &.floating
       background: none

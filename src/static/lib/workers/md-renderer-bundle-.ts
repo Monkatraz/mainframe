@@ -36,7 +36,6 @@ import ParserInline from 'markdown-it/lib/parser_inline'
 // If you are worried about the performance of this renderer, don't be.
 // The main bottlenecks will be when the DOM is updated, and not the renderer.
 
-// TODO: nicer line break behavior? may not be easy to implement
 // TODO: autoconvert wiki links
 // TODO: anchors on headings
 // TODO: compare Wikidot typography replacements vs markdown-it

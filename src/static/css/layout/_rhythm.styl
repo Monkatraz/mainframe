@@ -34,7 +34,6 @@ $heading-tags = 'h1, h2, h3, h4, h5, h6'
   --rhythm-baseline-unit: calc(var(--rhythm-reference-font-size) * var(--rhythm-baseline))
   --rhythm-baseline-unit-row: calc(var(--rhythm-baseline-unit) / 2)
 
-  position: relative
   line-height: var(--rhythm-baseline)
 
   > *
@@ -43,7 +42,6 @@ $heading-tags = 'h1, h2, h3, h4, h5, h6'
 
   // Line-height correction
   {$block-tags}
-    position: relative
     width: 100%
     line-height: inherit
     rhythm-set-text-bounds()

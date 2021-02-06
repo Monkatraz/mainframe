@@ -11,9 +11,31 @@ import {
 // Misc.
 import type { Page } from '@schemas'
 import * as API from '../../modules/api'
-import { toast, LocalDrafts } from '../../modules/state'
+import { Pref, LocalDrafts } from '../../modules/state'
 import { debounce } from '../../modules/util'
 import { writable } from 'svelte/store'
+
+interface EditorSettings {
+  darkmode: boolean
+  gutters: boolean
+  spellcheck: boolean
+  preview: {
+    enable: boolean
+    darkmode: boolean
+    activelines: boolean
+  }
+}
+
+export const settings = Pref.bind<EditorSettings>('editor-settings', {
+  darkmode: true,
+  gutters: true,
+  spellcheck: false,
+  preview: {
+    enable: true,
+    darkmode: false,
+    activelines: true
+  }
+})
 
 type SourceOrigin = { path: string } | { draft: string, user: API.Ref } | { local: string }
 
@@ -111,6 +133,8 @@ class EditorDraft {
 }
 
 interface EditorStore {
+  /** The current document of the editor. */
+  doc: EditorState['doc']
   /** The current draft state. */
   draft: EditorDraft
   /** The current 'value' (content) of the editor. */
@@ -122,21 +146,21 @@ export class EditorCore {
   /** The element the editor is attached to. */
   parent!: Element
 
-  /** The CodeMirror `EditorView` instance the editor interacts with the DOM with. */
-  view!: EditorView
-
   /** The CodeMirror `EditorState` the editor has currently.
    *  The state is immutable and is replaced as the editor updates. */
-  get state() { return this.view.state }
+  state = EditorState.create()
 
   /** The `Text` object of the editor's current state. */
   get doc() { return this.view.state.doc }
 
-  /** The local draft instance that is currently being edited. */
+  /** The CodeMirror `EditorView` instance the editor interacts with the DOM with. */
+  view!: EditorView
+
+  /** The local draft instance that is being edited. */
   draft!: EditorDraft
 
   /** A store that allows reactive access to editor state. */
-  store = writable<EditorStore>({ draft: new EditorDraft(), value: '' })
+  store = writable<EditorStore>({ doc: this.state.doc, draft: new EditorDraft(), value: '' })
   subscribe = this.store.subscribe
   set = this.store.set
 
@@ -151,16 +175,12 @@ export class EditorCore {
 
     this.parent = parent
 
-    const doDraftUpdate = debounce(() => {
-      const value = this.doc.toString()
-      this.draft.template = value
-      this.store.update(cur => ({ ...cur, value }))
-    }, 50)
+    const updateState = debounce(() => this.refresh(), 50)
 
     const updateHandler = ViewPlugin.define(() => ({
       update: (update: ViewUpdate) => {
         // update store on change
-        if (update.docChanged) { doDraftUpdate() }
+        if (update.docChanged) { updateState() }
         // get active lines
         if (update.selectionSet || update.docChanged) {
           const activeLines: Set<number> = new Set()
@@ -192,7 +212,7 @@ export class EditorCore {
       })
     })
 
-    this.refreshStore()
+    this.refresh()
   }
 
   /** Destroys the editor. Usage of the editor object after destruction is obviously not recommended. */
@@ -200,10 +220,14 @@ export class EditorCore {
     this.view.destroy()
   }
 
-  refreshStore() {
+  refresh() {
+    this.state = this.view.state
+    const value = this.doc.toString()
+    this.draft.template = value
     this.store.set({
+      doc: this.doc,
       draft: this.draft,
-      value: this.doc.toString()
+      value: value
     })
   }
 
@@ -212,7 +236,6 @@ export class EditorCore {
   async saveLocally() {
     if (!this.draft.name) return false
     await LocalDrafts.put(this.draft.page)
-    toast('success', 'Saved!')
     return true
   }
 
