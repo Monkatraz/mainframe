@@ -3,7 +3,6 @@
   import { EditorView } from './codemirror-bundle-'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
-  import { createAnimQueued, throttle } from '../../modules/util'
   import { Markdown } from '../../modules/workers'
   import {
     matchMedia, tnAnime, focusGroup, onSwipe,
@@ -23,6 +22,7 @@
   let scrollingWith: 'editor' | 'preview' = 'editor'
   const previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
   const editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
+  $: if ($previewScrollSpring || $editorScrollSpring) scrollSync(true)
 
   // from Markdown component
   let heightmap: Map<number, number>
@@ -30,8 +30,6 @@
 
   $: small = $matchMedia('thin', 'below')
   $: containerClass = $settings.preview.enable ? 'show-preview' : 'show-editor'
-  $: if (preview && scrollingWith === 'editor') preview.scrollTop = $previewScrollSpring
-  $: if (mounted && scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
 
   // set defaults when opening on mobile
   $: if (small && mounted) {
@@ -49,8 +47,9 @@
       editorContainer,
       await fetch('/static/misc/md-test.md').then(res => res.text()),
       [EditorView.domEventHandlers({
+        touchstart: () => { scrollingWith = 'editor' },
         wheel: () => { scrollingWith = 'editor' },
-        scroll: () => { scrollFromEditor() }
+        scroll: () => { scrollSync() }
       })]
     )
     mounted = true
@@ -65,66 +64,62 @@
 
   // -- PREVIEW <-> EDITOR
 
-  // Scroll Sync.
-
-  function canScrollSync() { return mounted && preview && Editor.view && heightmap && heightlist }
-
-  const updateScroll = throttle(() => {
-    scrollFromEditor()
-    scrollFromPreview()
-  }, 100)
-
-  /** Updates the preview scroll position if the scroll sync. is currently editor based.
-   *  Should be called whenever a scrolling event is detected from the editor. */
-  const scrollFromEditor = createAnimQueued(() => {
-    if (scrollingWith === 'preview' || !canScrollSync()) return
-    const scrollTop = Editor.view.scrollDOM.scrollTop
-    void editorScrollSpring.set(scrollTop)
-    // get top most visible line
-    const domRect = editorContainer.getBoundingClientRect()
-    const pos = Editor.view.posAtCoords({ x: domRect.x, y: domRect.y })
-    if (pos === 0) {
-      void previewScrollSpring.set(0)
-      return
+  const measure = {
+    key: 'scroll-sync',
+    read() {
+      if (scrollingWith === 'editor') {
+        const scrollTop = Editor.view.scrollDOM.scrollTop
+        editorScrollSpring.set(scrollTop)
+        // get top most visible line
+        const pos = Editor.view.visualLineAtHeight(scrollTop, 0).from
+        if (pos === 0) {
+          previewScrollSpring.set(0)
+          return
+        }
+        const line = Editor.doc.lineAt(pos ?? 0).number
+        // find our line height
+        let lineHeight = 0
+        let curLine = line
+        // check if we have our line or not
+        if (heightmap.has(line)) lineHeight = heightmap.get(line)!
+        // no? get closest line before this one
+        else for (;curLine > 0; curLine--) if (heightmap.has(curLine)) {
+          lineHeight = heightmap.get(curLine)!
+          break
+        }
+        // set preview scroll
+        if (lineHeight) {
+          // fudge value to prevent the preview from getting "sticky"
+          const diff = scrollTop - Editor.heightAtLine(curLine + 1)
+          previewScrollSpring.set(lineHeight + diff)
+        }
+      } else {
+        const scrollTop = preview.scrollTop
+        previewScrollSpring.set(scrollTop)
+        // filter for the closest line height
+        const line = heightlist.findIndex(height => scrollTop < height)
+        if (line !== -1) {
+          // fudge to prevent the editor from getting sticky
+          const diff = (scrollTop - heightlist[line]) * 0.75
+          editorScrollSpring.set(Editor.heightAtLine(line) + diff)
+        }
+      }
+    },
+    write() {
+      if (scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
+      else preview.scrollTop = $previewScrollSpring
     }
-    const line = Editor.doc.lineAt(pos ?? 0).number
-    // find our line height
-    let lineHeight = 0
-    let curLine = line
-    // check if we have our line or not
-    if (heightmap.has(line)) lineHeight = heightmap.get(line)!
-    // no? get closest line before this one
-    else for (;curLine > 0; curLine--) if (heightmap.has(curLine)) {
-      lineHeight = heightmap.get(curLine)!
-      break
-    }
-    // set preview scroll
-    if (lineHeight) {
-      // fudge value to prevent the preview from getting "sticky"
-      const diff = scrollTop - Editor.heightAtLine(curLine + 1)
-      void previewScrollSpring.set(lineHeight + diff)
-    }
-  })
+  }
 
-  /** Updates the editor scroll position if the scroll sync. is currently preview based.
-   *  Should be called whenever a scrolling event is detected from the preview. */
-  const scrollFromPreview = createAnimQueued(() => {
-    if (scrollingWith === 'editor' || !canScrollSync()) return
-    const scrollTop = preview.scrollTop
-    void previewScrollSpring.set(scrollTop)
-    // filter for the closest line height
-    const line = heightlist.findIndex(height => scrollTop < height)
-    if (line !== -1) {
-      // fudge to prevent the editor from getting sticky
-      const diff = (scrollTop - heightlist[line]) * 0.75
-      void editorScrollSpring.set(Editor.heightAtLine(line) + diff)
-    }
-  })
+  function scrollSync(writeOnly = false) {
+    if (!(mounted && preview && Editor.view && heightmap && heightlist)) return
+    Editor.view.requestMeasure(writeOnly ? { read() {}, write: measure.write } : measure)
+  }
 
 </script>
 
 <!-- some chores to do on resize -->
-<svelte:window on:resize={updateScroll}/>
+<svelte:window on:resize={() => scrollSync()}/>
 
 <div class='overflow-container {$settings.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
   in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
@@ -138,8 +133,6 @@
   <div class='editor-container {containerClass}'>
     <!-- Left | Editor Pane -->
     <div class='editor-pane'
-      on:scroll={scrollFromEditor}
-      on:touchstart={() => scrollingWith = 'editor'} on:wheel={() => scrollingWith = 'editor'}
       in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
@@ -189,7 +182,7 @@
           <Tab>
             <span slot='button' class='fs-sm'>Result</span>
             <div class='preview codetheme-dark' bind:this={preview}
-              on:scroll={scrollFromPreview}
+              on:scroll={() => scrollSync()}
               on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
             >
               <MarkdownComponent details morph bind:heightmap bind:heightlist
