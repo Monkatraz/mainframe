@@ -21,9 +21,11 @@ export { default as IntersectionPoint } from './IntersectionPoint.svelte'
 export { default as Markdown } from './Markdown.svelte'
 export { default as Page } from './Page.svelte'
 export { default as Spinny } from './Spinny.svelte'
+export { default as SubHeader } from './SubHeader.svelte'
 export { default as TextInput } from './TextInput.svelte'
 export { default as Toasts } from './Toasts.svelte'
 export { default as Toggle } from './Toggle.svelte'
+export { default as Transition } from './Transition.svelte'
 export { default as UserPanel } from './UserPanel.svelte'
 
 // -- Component Function Library

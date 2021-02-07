@@ -7,7 +7,7 @@
   import {
     matchMedia, tnAnime, focusGroup, onSwipe,
     Markdown as MarkdownComponent,
-    Toggle, DetailsMenu, Button, Card, TabControl, Tab
+    SubHeader, Toggle, DetailsMenu, Button, Card, TabControl, Tab
   } from '@components'
   import EditorBlock from './EditorBlock.svelte'
   import Topbar from './Topbar.svelte'
@@ -30,8 +30,6 @@
 
   $: small = $matchMedia('thin', 'below')
   $: containerClass = $settings.preview.enable ? 'show-preview' : 'show-editor'
-
-  $: if (mounted) console.log(small)
 
   // set defaults when opening on mobile
   $: if (small && mounted) {
@@ -123,8 +121,10 @@
 <!-- some chores to do on resize -->
 <svelte:window on:resize={() => scrollSync()}/>
 
+<SubHeader>Editor</SubHeader>
+
 <div class='overflow-container {$settings.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
-  in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750, delay: 150 }}
+  in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750 }}
   use:onSwipe={{
     condition: () => small,
     direction: $settings.preview.enable ? 'right' : 'left',
@@ -135,7 +135,7 @@
   <div class='editor-container {containerClass}'>
     <!-- Left | Editor Pane -->
     <div class='editor-pane'
-      in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, delay: 300, easing: 'easeOutExpo' }}
+      in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <Topbar/>
@@ -161,7 +161,7 @@
 
     <!-- Right | Preview Pane -->
     <div class='preview-pane {$settings.preview.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
-      in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, delay: 350, easing: 'easeOutQuint' }}
+      in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, easing: 'easeOutQuint' }}
       out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
       {#if containerClass === 'show-preview' || small}
@@ -205,7 +205,7 @@
   </div>
   {#if small}
     <div class='panel-selector fs-display'
-      in:tnAnime={{ translateY: ['100%', '0'], duration: 400, delay: 300, easing: 'easeOutExpo' }}
+      in:tnAnime={{ translateY: ['100%', '0'], duration: 400, easing: 'easeOutExpo' }}
       out:tnAnime={{ translateY: '100%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <Toggle bind:toggled={$settings.preview.enable}>
@@ -239,6 +239,7 @@
       width: 100%
       height: 100%
       transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1)
+      will-change: left
 
     .editor, .preview, .preview-html
       transition: visibility 1s

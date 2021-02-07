@@ -91,15 +91,46 @@
   +match-media(thin, below)
     display: none
 
+#header
+  transition: height 0.25s
+
 // Compact logo when in edit
 .in-edit
+  #header
+    height: var(--layout-header-height-edit)
+    background: colvar('background')
+    mix-blend-mode: none
+    grid-kiss:"+------+ +--------------+ +---------------+ +------+",
+              "|      | |       v      | |      v        | |      |",
+              "|      | | #header_logo | | > #user-panel | |      |",
+              "|      | |       ^      | |      ^        | |      |",
+              "+------+ +--------------+ +---------------+ +------+",
+              "| 1rem | |     auto     | |      auto     | | 1rem |"
+
+    &::before
+      display: none
+
+  #user-panel
+    margin-top: 0
+
+  #header_logo
+    display: flex
+    align-items: center
+    padding: 0.25rem
+
+  #logo_title
+    font-size: 2rem
+
+  #logo_emblem
+    width: 3rem
+    height: 3rem
+    margin-right: 0.5rem
+
+  #logo_slogan
+    display: none
+
   +match-media(thin, below)
     #header
-      display: block
-      height: var(--layout-header-height-edit)
-    #header_logo
-      display: block
-    #logo_slogan, #logo_emblem
       display: none
 
 // Header Styling

@@ -1,13 +1,12 @@
 <script lang='ts'>
   // Imports
   import * as API from './modules/api'
-  import { sleep } from './modules/util'
   import { Route, router } from 'tinro'
   import { fade } from 'svelte/transition'
   import { onMount } from 'svelte'
   import {
     portal, tnAnime, matchMedia, ENV,
-    Navbar, Sidebar, Page, Spinny, UserPanel, Toasts, DevPage
+    Transition, Navbar, Sidebar, Page, Spinny, UserPanel, Toasts, DevPage
   } from '@components'
 
   // kind of hacky, but we don't want esbuild to preload the entire editor
@@ -27,9 +26,8 @@
     delay: 50
   }
 
-  let inEdit = false
-  $: if ($router.path.startsWith('/edit')) inEdit = true
-  $: document.documentElement.classList.toggle('in-edit', inEdit)
+  let transitionState: boolean
+  $: document.documentElement.classList.toggle('in-edit', transitionState)
 
   onMount(() => {
     document.documentElement.classList.add('loaded')
@@ -49,63 +47,61 @@
   <Toasts />
 </div>
 
+<Transition condition={$router.path === '/edit'} bind:state={transitionState}>
+  <slot slot='true'>
+    <!-- Editor -->
+    <div out:fade={{ duration: 100, delay: 300 }}>
+      {#await import(EditorURL)}
+        <Spinny width=150px top=50% left=50%/>
+      {:then Editor}
+        <svelte:component this={Editor.default}/>
+      {/await}
+    </div>
+  </slot>
+  <slot slot='false'>
+    <div class=container out:fade={{ duration: 150 }} role=presentation>
 
-{#if $router.path === '/edit'}
-  <!-- Editor -->
-  <div
-  out:fade={{ duration: 100, delay: 300 }}
-  on:outroend={async () => { await sleep(50); inEdit = false }}
-  >
-  <!-- Async. loading -->
-    {#await import(EditorURL)}
-      <Spinny width=150px top=50% left=50%/>
-    {:then Editor}
-      <svelte:component this={Editor.default}/>
-    {/await}
-  </div>
-{:else if !inEdit}
-  <div class=container out:fade={{ duration: 150 }} role=presentation>
+      <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation>
+        <Navbar />
+      </nav>
+      <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>
+        <Sidebar />
+      </aside>
 
-    <nav class='navbar dark' in:tnAnime={navBarReveal} aria-label=Navigation>
-      <Navbar />
-    </nav>
-    <aside class='sidebar dark' in:tnAnime={sideBarReveal} aria-label=Sidebar>
-      <Sidebar />
-    </aside>
+      <main class="content" aria-label=Content>
+        {#key $router.path}
+          <Route firstmatch>
+            <!-- Dummy route for the editor -->
+            <Route path='/edit'/>
 
-    <main class="content" aria-label=Content>
-      {#key $router.path}
-        <Route firstmatch>
-          <!-- Dummy route for the editor -->
-          <Route path='/edit'/>
+            <!-- Home Page -->
+            <Route path="/"><Page
+              loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({ template }) => template)}
+            /></Route>
 
-          <!-- Home Page -->
-          <Route path="/"><Page
-            loading={API.withPage(ENV.HOMEPAGE).requestLocalized().then(({ template }) => template)}
-          /></Route>
+            <!-- Test routes-->
+            <Route path="/test/md"><Page
+              loading={fetch('/static/misc/md-test.md').then(res => res.text())}
+            /></Route>
 
-          <!-- Test routes-->
-          <Route path="/test/md"><Page
-            loading={fetch('/static/misc/md-test.md').then(res => res.text())}
-          /></Route>
+            <Route path="/test/components">
+              <DevPage />
+            </Route>
 
-          <Route path="/test/components">
-            <DevPage />
+            <Route path="/test/loading"><Page
+              loading={new Promise(() => {})}
+            /></Route>
+
+            <!-- User Pages -->
+            <Route path="/*"><Page
+              loading={API.withPage($router.path).requestLocalized().then(({ template }) => template)}
+            /></Route>
           </Route>
-
-          <Route path="/test/loading"><Page
-            loading={new Promise(() => {})}
-          /></Route>
-
-          <!-- User Pages -->
-          <Route path="/*"><Page
-            loading={API.withPage($router.path).requestLocalized().then(({ template }) => template)}
-          /></Route>
-        </Route>
-      {/key}
-    </main>
-  </div>
-{/if}
+        {/key}
+      </main>
+    </div>
+  </slot>
+</Transition>
 
 <style lang="stylus">
   @require '_lib'

@@ -74,6 +74,7 @@
 
   .menu
     position: absolute
+    z-index: 99
     transform: scale(0)
 
   details[open] .menu
