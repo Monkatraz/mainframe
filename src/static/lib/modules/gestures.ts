@@ -27,13 +27,18 @@ export interface onSwipeOpts {
    *  Return true to enable recognition, return false to disable recognition. */
   condition?: () => boolean
   /** Function to call upon the user swiping. */
-  callback: () => void
+  callback: (target: HTMLElement, current: SwipeEvent) => void
   /** Function that, if provided, is called on the 'pointermove' event and given the current swipe state. */
-  onMoveCallback?: (current: SwipeEvent) => void
+  onMoveCallback?: (target: HTMLElement, current: SwipeEvent) => void
+  /** Function that is called if a potential swipe failed. */
+  onCancel?: (target: HTMLElement, current: SwipeEvent) => void
   /** Swipe direction to recognize. */
   direction: SwipeDirection
   /** Minimum distance in pixels needed for a swipe to count. */
   threshold: number
+  /** Minimum distance needed for the swipe recognition to be started.
+   *  This is so a pointer can placed down, be still, and then finally swipe and still have it recognized. */
+  minThreshold: number
   /** If true, the swipe will be recognized even if the user hasn't lifted their pointer yet. */
   immediate?: boolean
   /** If true, the CSS `touch-action` property will be set to none for you. */
@@ -41,16 +46,13 @@ export interface onSwipeOpts {
   /** Duration of time (in miliseconds) after movement has begun that a swipe will be recognized.
    *  Pass `0` or `false` to have no timeout. */
   timeout?: number | false
-  /** Minimum distance needed for the timeout to be started.
-   *  This is so a pointer can placed down, be still, and then finally swipe and still have it recognized. */
-  timeoutThreshold: number
 }
 const ONSWIPE_DEFAULT_OPTS: onSwipeOpts = {
   callback: () => null,
   direction: 'up',
   immediate: true,
-  timeoutThreshold: 10,
   threshold: 35,
+  minThreshold: 10,
   timeout: 250
 }
 /** Starts an event listener that will recognize swipes on the specified element.
@@ -104,15 +106,23 @@ export function onSwipe(target: HTMLElement, inOpts: Partial<onSwipeOpts> = {}) 
       const current = resolveSwipe(start, [evt.clientX, evt.clientY])
       const swipeValid = current[0] === opts.direction && current[1] > opts.threshold
       // Execute callback if valid && immediate mode or if the gesture ended with 'pointerup'
-      if (swipeValid && (
-        (evt.type === 'pointermove' && opts.immediate) || evt.type === 'pointerup')) { disable(); opts.callback() }
+      if (swipeValid && ((evt.type === 'pointermove' && opts.immediate) || evt.type === 'pointerup')) {
+          disable()
+          opts.callback(target, current)
+        }
       // Cancel gesture if invalid && gesture ended/cancelled
-      else if (evt.type === 'pointerup' || evt.type === 'pointercancel') disable()
+      else if (evt.type === 'pointerup' || evt.type === 'pointercancel') {
+        if (opts.onCancel) opts.onCancel(target, current)
+        disable()
+      }
       // The gesture has not been ended and is still running
       else {
-        if (opts.onMoveCallback) opts.onMoveCallback(current)
+        if (opts.onMoveCallback && current[1] > opts.minThreshold) opts.onMoveCallback(target, current)
         // Start the recognition timeout if we have moved the pointer enough and it hasn't already been started
-        if (opts.timeout && !timeout && current[1] > opts.timeoutThreshold) { setTimeout(disable, opts.timeout) }
+        if (opts.timeout && !timeout && current[1] > opts.minThreshold) { setTimeout(() => {
+          if (opts.onCancel) opts.onCancel(target, current)
+          disable()
+        }, opts.timeout) }
       }
     }
   }

@@ -19,6 +19,9 @@
   let editorContainer: HTMLElement
   let preview: HTMLDivElement
 
+  let editorPane: HTMLElement
+  let previewPane: HTMLElement
+
   let scrollingWith: 'editor' | 'preview' = 'editor'
   const previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
   const editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
@@ -127,13 +130,29 @@
   use:onSwipe={{
     condition: () => small,
     direction: $settings.preview.enable ? 'right' : 'left',
-    threshold: 70,
-    callback: () => $settings.preview.enable = !$settings.preview.enable
+    threshold: 120,
+    immediate: false,
+    timeout: false,
+    callback: (_) => {
+      $settings.preview.enable = !$settings.preview.enable
+      editorPane.style.transform = ''
+      previewPane.style.transform = ''
+    },
+    onMoveCallback: (_, [ dir, dist, diff ]) => {
+      const state = $settings.preview.enable
+      editorPane.style.transform = `translateX(calc(${state ? '-100% + ' : ''}${-diff[1]}px))`
+      previewPane.style.transform = `translateX(calc(${!state ? '100% + ' : ''}${-diff[1]}px))`
+    },
+    onCancel: () => {
+      editorPane.style.transform = ''
+      previewPane.style.transform = ''
+    }
   }}
 >
   <div class='editor-container {containerClass}'>
     <!-- Left | Editor Pane -->
     <div class='editor-pane'
+      bind:this={editorPane}
       in:tnAnime={small ? undefined : { translateX: ['-200%', '0'], duration: 800, easing: 'easeOutExpo' }}
       out:tnAnime={small ? undefined : { translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
@@ -160,6 +179,7 @@
 
     <!-- Right | Preview Pane -->
     <div class='preview-pane {$settings.preview.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
+      bind:this={previewPane}
       in:tnAnime={small ? undefined : { translateX: ['-300%', '0'], duration: 900, easing: 'easeOutQuint' }}
       out:tnAnime={small ? undefined : { translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
@@ -252,14 +272,10 @@
 
     .editor-container
       &.show-preview .editor-pane
-        transform: translateX(-100%) !important
-        .editor
-          visibility: hidden
+        transform: translateX(-100%)
 
       &.show-editor .preview-pane
-        transform: translateX(100%) !important
-        .preview, .preview-html
-          visibility: hidden
+        transform: translateX(100%)
 
   .panel-selector
     position: fixed
