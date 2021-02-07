@@ -9,6 +9,7 @@
     Markdown as MarkdownComponent,
     SubHeader, Toggle, DetailsMenu, Button, Card, TabControl, Tab
   } from '@components'
+  import type { onSwipeOpts } from '@components'
   import EditorBlock from './EditorBlock.svelte'
   import Topbar from './Topbar.svelte'
 
@@ -18,9 +19,6 @@
 
   let editorContainer: HTMLElement
   let preview: HTMLDivElement
-
-  let editorPane: HTMLElement
-  let previewPane: HTMLElement
 
   let scrollingWith: 'editor' | 'preview' = 'editor'
   const previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
@@ -42,7 +40,7 @@
 
   // -- EDITOR
 
-  const Editor = new EditorCore()
+  const Editor = new EditorCore() // @hmr:keep
   const activeLines = Editor.activeLines
 
   onMount(async () => {
@@ -119,6 +117,31 @@
     Editor.view.requestMeasure(writeOnly ? { read() {}, write: measure.write } : measure)
   }
 
+  // -- SWIPING
+
+  function swipeCancel(elem: HTMLElement) {
+    elem.style.transform = ''
+    elem.style.transition = ''
+  }
+
+  const swipeHandler: Partial<onSwipeOpts> = {
+    condition: () => small,
+    threshold: 70,
+    immediate: false,
+    timeout: false,
+    callback: (elem) => {
+      $settings.preview.enable = !$settings.preview.enable
+      swipeCancel(elem)
+    },
+    onMoveCallback: (elem, [ dir, dist, diff ]) => {
+      const state = $settings.preview.enable
+      elem.style.transition = 'none'
+      elem.style.transform = `translateX(calc(${state ? '-100% + ' : ''}${-diff[1]}px))`
+    },
+    onCancel: swipeCancel
+  }
+
+  // @hmr:reset
 </script>
 
 <!-- some chores to do on resize -->
@@ -126,33 +149,12 @@
 
 <SubHeader>Editor</SubHeader>
 
-<div class='overflow-container {$settings.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
-  use:onSwipe={{
-    condition: () => small,
-    direction: $settings.preview.enable ? 'right' : 'left',
-    threshold: 120,
-    immediate: false,
-    timeout: false,
-    callback: (_) => {
-      $settings.preview.enable = !$settings.preview.enable
-      editorPane.style.transform = ''
-      previewPane.style.transform = ''
-    },
-    onMoveCallback: (_, [ dir, dist, diff ]) => {
-      const state = $settings.preview.enable
-      editorPane.style.transform = `translateX(calc(${state ? '-100% + ' : ''}${-diff[1]}px))`
-      previewPane.style.transform = `translateX(calc(${!state ? '100% + ' : ''}${-diff[1]}px))`
-    },
-    onCancel: () => {
-      editorPane.style.transform = ''
-      previewPane.style.transform = ''
-    }
-  }}
->
-  <div class='editor-container {containerClass}'>
+<div class='overflow-container {$settings.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'>
+  <div class='editor-container {containerClass}'
+    use:onSwipe={{ ...swipeHandler, direction: $settings.preview.enable ? 'right' : 'left' }}
+  >
     <!-- Left | Editor Pane -->
     <div class='editor-pane'
-      bind:this={editorPane}
       in:tnAnime={small ? undefined : { translateX: ['-200%', '0'], duration: 800, easing: 'easeOutExpo' }}
       out:tnAnime={small ? undefined : { translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
@@ -179,7 +181,6 @@
 
     <!-- Right | Preview Pane -->
     <div class='preview-pane {$settings.preview.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
-      bind:this={previewPane}
       in:tnAnime={small ? undefined : { translateX: ['-300%', '0'], duration: 900, easing: 'easeOutQuint' }}
       out:tnAnime={small ? undefined : { translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
@@ -261,21 +262,23 @@
     .editor-pane, .preview-pane
       position: absolute
       top: 0
-      left: 0
       width: 100%
       height: 100%
-      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)
-      will-change: transform
+
+    .editor-pane
+      left: 0
+
+    .preview-pane
+      left: 100%
 
     .editor, .preview, .preview-html
       transition: visibility 1s
 
     .editor-container
-      &.show-preview .editor-pane
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)
+      will-change: transform
+      &.show-preview
         transform: translateX(-100%)
-
-      &.show-editor .preview-pane
-        transform: translateX(100%)
 
   .panel-selector
     position: fixed
@@ -372,7 +375,6 @@
     z-index: 1
     height: 100%
     contain: strict
-    touch-action: pan-y pinch-zoom
 
   .preview
     padding: 0 1rem
