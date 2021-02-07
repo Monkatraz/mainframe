@@ -263,7 +263,7 @@ export const matchMedia = {
       case 'up':
         return sizeMap.get(curSize) >= sizeMap.get(size)
       case 'below':
-        return sizeMap.get(curSize) < sizeMap.get(size)
+        return sizeMap.get(curSize) <= sizeMap.get(size)
     }
   },
   subscribe(sub: (match: (size: MediaSize, inclusivity: MediaInclusivity) => boolean) => void) {

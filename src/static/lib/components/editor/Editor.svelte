@@ -31,6 +31,8 @@
   $: small = $matchMedia('thin', 'below')
   $: containerClass = $settings.preview.enable ? 'show-preview' : 'show-editor'
 
+  $: if (mounted) console.log(small)
+
   // set defaults when opening on mobile
   $: if (small && mounted) {
     $settings.preview.enable = false
@@ -253,7 +255,7 @@
           visibility: hidden
 
   .panel-selector
-    position: absolute
+    position: fixed
     bottom: 0
     left: 0
     z-index: 99
@@ -269,7 +271,7 @@
     width: 100%
     height: 100%
 
-    +match-media(thin, up)
+    +match-media(small, up)
       &.show-preview
         grid-kiss:"+------------------------+ +-----------------------+      ",
                   "| .editor-pane           | | .preview-pane         |      ",
