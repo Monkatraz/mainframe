@@ -124,7 +124,6 @@
 <SubHeader>Editor</SubHeader>
 
 <div class='overflow-container {$settings.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
-  in:tnAnime={{ opacity: [0, 1], easing: 'easeOutExpo', duration: 750 }}
   use:onSwipe={{
     condition: () => small,
     direction: $settings.preview.enable ? 'right' : 'left',
@@ -135,8 +134,8 @@
   <div class='editor-container {containerClass}'>
     <!-- Left | Editor Pane -->
     <div class='editor-pane'
-      in:tnAnime={{ translateX: ['-200%', '0'], duration: 800, easing: 'easeOutExpo' }}
-      out:tnAnime={{ translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
+      in:tnAnime={small ? undefined : { translateX: ['-200%', '0'], duration: 800, easing: 'easeOutExpo' }}
+      out:tnAnime={small ? undefined : { translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <Topbar/>
 
@@ -161,8 +160,8 @@
 
     <!-- Right | Preview Pane -->
     <div class='preview-pane {$settings.preview.darkmode ? 'dark codetheme-dark' : 'light codetheme-light'}'
-      in:tnAnime={{ translateX: ['-300%', '0'], duration: 900, easing: 'easeOutQuint' }}
-      out:tnAnime={{ translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
+      in:tnAnime={small ? undefined : { translateX: ['-300%', '0'], duration: 900, easing: 'easeOutQuint' }}
+      out:tnAnime={small ? undefined : { translateX: '-300%', duration: 150, easing: 'easeInQuint' }}
     >
       {#if containerClass === 'show-preview' || small}
 
@@ -223,12 +222,19 @@
   $body-w = minmax(0, var(--layout-body-max-width))
   $edit-w = minmax(50%, 1fr)
 
+  @keyframes reveal
+    from
+      opacity: 0
+    to
+      opacity: 1
+
   .overflow-container
     position: relative
     width: 100%
     height: $hght
     overflow: hidden
     background: var(--colcode-background)
+    animation: reveal 0.25s 1 0s backwards ease-out
 
   // Small screen handling
   +match-media(thin, below)
@@ -238,20 +244,20 @@
       left: 0
       width: 100%
       height: 100%
-      transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1)
-      will-change: left
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)
+      will-change: transform
 
     .editor, .preview, .preview-html
       transition: visibility 1s
 
     .editor-container
       &.show-preview .editor-pane
-        left: -100%
+        transform: translateX(-100%) !important
         .editor
           visibility: hidden
 
       &.show-editor .preview-pane
-        left: 100%
+        transform: translateX(100%) !important
         .preview, .preview-html
           visibility: hidden
 

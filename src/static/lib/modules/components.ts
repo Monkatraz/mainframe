@@ -194,6 +194,7 @@ const TNANIME_FORCED_OPTS: AnimeParams = {
 /** Creates a transition function using animejs.
  *  Use with `in:fn` and `out:fn`, as this function can't tell direction. */
 export function tnAnime(elem: Element, opts: AnimeParams) {
+  if (!opts) return () => ({})
   const safeOpts = { ...opts, ...TNANIME_FORCED_OPTS, targets: elem }
   return () => {
     const anim = anime(safeOpts)
