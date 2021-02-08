@@ -5,35 +5,84 @@
 // Imports
 import { evtlistener, rmEvtlistener } from './util'
 
-/** Represents the valid swipe directions. */
-export type SwipeDirection = 'up' | 'down' | 'left' | 'right'
-const SWIPE_DIRECTIONS: SwipeDirection[] = ['up', 'down', 'left', 'right']
+type GestureTypes = 'start' | 'move' | 'end' | 'cancel'
 
-/** Represents a _potential_ swipe, using a direction and (px) distance. */
-type SwipeEvent = [dir: SwipeDirection, dist: number, diff: Point]
-function resolveSwipe([x1, y1]: Point, [x2, y2]: Point): SwipeEvent {
-  // on these vars: 0 is vertical, 1 is horizontal
-  const diff: Point = [y1 - y2, x1 - x2]
-  const diffAbs = diff.map(Math.abs)
-  const axis = diffAbs[1] > diffAbs[0] ? 1 : 0
-  const dir = SWIPE_DIRECTIONS[(axis * 2) + +(diff[axis] < 0)]
-  //                                ^               ^  get direction via sign (+ = up|left, - = down|right)
-  //                                ^ this is either 0 or 2, as axis is either 0 or 1
-  return [dir, diffAbs[axis], diff]
+export interface Gesture {
+  start: Point
+  diff: Point
+  diffAbs: Point
+  direction: 'up' | 'down' | 'left' | 'right'
+  dist: number
+  type: 'start' | 'move' | 'end' | 'cancel'
 }
 
-export interface onSwipeOpts {
+const DIRECTIONS: Gesture['direction'][] = ['up', 'down', 'left', 'right']
+
+function resolve([x1, y1]: Point, [x2, y2]: Point, type: Gesture['type']): Gesture {
+  // on these vars: 0 is vertical, 1 is horizontal
+  const diff: Point = [y1 - y2, x1 - x2]
+  const diffAbs = diff.map(Math.abs) as Point
+  const axis = diffAbs[1] > diffAbs[0] ? 1 : 0
+  const dist = diffAbs[axis]
+  const direction = DIRECTIONS[(axis * 2) + +(diff[axis] < 0)]
+  //                                ^               ^  get direction via sign (+ = up|left, - = down|right)
+  //                                ^ this is either 0 or 2, as axis is either 0 or 1
+  return { start: [x1, y1], diff, diffAbs, direction, dist, type }
+}
+
+export function gestureObserve(target: HTMLElement, handler: (gesture: Gesture) => void) {
+  let ID: number | null = null
+  let start: Point | null = null
+  const reset = () => {
+    ID = null
+    start = null
+    rmEvtlistener(document, ['touchmove', 'touchend', 'touchcancel'], wrapper)
+  }
+  const wrapper = (evt: TouchEvent) => {
+    let touch!: Touch
+    // If we running a gesture and the ID of the pointer event doesn't match ours, ignore this event
+    if (ID !== null) {
+      for (const idx of Array.from(evt.changedTouches)) if (idx.identifier === ID) {
+        touch = idx
+        break
+      }
+      if (!touch) return
+    }
+    // Init. and start gesture recognition
+    if (evt.type === 'touchstart') {
+      evtlistener(document, ['touchmove', 'touchend', 'touchcancel'], wrapper, { passive: true })
+      touch = evt.changedTouches[0]
+      ID = touch.identifier
+      start = [touch.clientX, touch.clientY]
+    }
+    // Gesture running
+    if (ID !== null && start) {
+      let type!: GestureTypes
+      switch (evt.type) {
+        case 'touchstart':  type = 'start';  break
+        case 'touchmove':   type = 'move';   break
+        case 'touchend':    type = 'end';    break
+        case 'touchcancel': type = 'cancel'; break
+      }
+      const gesture = resolve(start, [touch.clientX, touch.clientY], type)
+      handler(gesture)
+      if (type === 'end' || type === 'cancel') reset()
+    }
+  }
+  target.addEventListener('touchstart', wrapper, { passive: true })
+  return () => target.removeEventListener('touchstart', wrapper)
+}
+
+export interface OnSwipeOpts {
   /** Can be used to enable and disable the swipe.
    *  Return true to enable recognition, return false to disable recognition. */
   condition?: () => boolean
   /** Function to call upon the user swiping. */
-  callback: (target: HTMLElement, current: SwipeEvent) => void
-  /** Function that, if provided, is called on the 'pointermove' event and given the current swipe state. */
-  onMoveCallback?: (target: HTMLElement, current: SwipeEvent) => void
-  /** Function that is called if a potential swipe failed. */
-  onCancel?: (target: HTMLElement, current: SwipeEvent) => void
+  callback: (target: HTMLElement, gesture: Gesture) => void
+  /** Function that, if provided, is called on the every event and given the current swipe state. */
+  eventCallback?: (target: HTMLElement, gesture: Gesture) => void
   /** Swipe direction to recognize. */
-  direction: SwipeDirection
+  direction: Gesture['direction']
   /** Minimum distance in pixels needed for a swipe to count. */
   threshold: number
   /** Minimum distance needed for the swipe recognition to be started.
@@ -45,7 +94,8 @@ export interface onSwipeOpts {
    *  Pass `0` or `false` to have no timeout. */
   timeout?: number | false
 }
-const ONSWIPE_DEFAULT_OPTS: onSwipeOpts = {
+
+const ONSWIPE_DEFAULT_OPTS: OnSwipeOpts = {
   callback: () => null,
   direction: 'up',
   immediate: true,
@@ -53,104 +103,53 @@ const ONSWIPE_DEFAULT_OPTS: onSwipeOpts = {
   minThreshold: 10,
   timeout: 250
 }
+
 /** Starts an event listener that will recognize swipes on the specified element.
  *  Works natively with Svelte elements, if used as an `use:onSwipe` action.
  *  For basic usage, provide `direction` and `callback` properties in the options object.
  *  @example `use:onSwipe={{ callback: callback, direction: 'up' }}` */
-export function onSwipe(target: HTMLElement, inOpts: Partial<onSwipeOpts> = {}) {
-  let opts: onSwipeOpts
-  /** Updates the currently set options for the swipe recognizer. */
-  const update = (newOpts: Partial<onSwipeOpts>) => {
+export function onSwipe(target: HTMLElement, opts: Partial<OnSwipeOpts>) {
+  let timeout: number | undefined
+  let started = false
+  let cancelled = false
+  const handler = (gesture: Gesture) => {
+
+    if (gesture.type === 'start') {
+      started = false
+      cancelled = false
+    }
+
+    if (cancelled) return
+    if (!started && opts.condition && !opts.condition()) return
+
+    const cancel = () => {
+      cancelled = true
+      if (started) opts.eventCallback?.(target, { ...gesture, type: 'cancel' })
+    }
+
+    const { direction, dist, type } = gesture
+    const sameDir = direction === opts.direction
+    const valid = sameDir && dist > opts.threshold!
+    const minValid = started || (sameDir && dist > opts.minThreshold!)
+
+    if (!sameDir && dist > opts.minThreshold!) cancel()
+
+    if (!cancelled) {
+      if (minValid) {
+        started = true
+        opts.eventCallback?.(target, gesture)
+      }
+      // Execute callback if valid && immediate mode or if the gesture ended
+      if (valid && ((type === 'move' && opts.immediate) || type === 'end')) opts.callback!(target, gesture)
+      // Handle timeout
+      else if (timeout && (type === 'end' || type === 'cancel')) clearTimeout(timeout)
+      else if (minValid && opts.timeout && !timeout) setTimeout(cancel, opts.timeout)
+    }
+  }
+  const update = (newOpts: Partial<OnSwipeOpts>) => {
     opts = { ...ONSWIPE_DEFAULT_OPTS, ...newOpts }
   }
-  /** Destroys the swipe listeners and ends swipe recognition. */
-  const destroy = () => {
-    disable()
-    target.removeEventListener('touchstart', handler)
-  }
+  const destroy = gestureObserve(target, handler)
 
-  // Set our initial options
-  update(inOpts)
-  // BTW we also listen to the 'pointerdown' event
-  const events = ['touchmove', 'touchend', 'touchcancel']
-  // State variables
-  let ID = -1 // If -1 we do not have a pointer event chain running (we are waiting to see a gesture)
-  let start: Point
-  let timeout: number | undefined
-  let started: boolean
-
-  /** Disables the event listeners and resets the state. */
-  const disable = () => {
-    clearInterval(timeout)
-    timeout = undefined
-    ID = -1
-    started = false
-    rmEvtlistener(document, events, handler, { passive: false })
-  }
-
-  /** Handler function for the assigned pointer events. */
-  const handler = (evt: TouchEvent) => {
-    let touch!: Touch
-    // If we running a gesture and the ID of the pointer event doesn't match ours, ignore this event
-    if (ID !== -1) {
-      for (const idx of Array.from(evt.changedTouches)) if (idx.identifier === ID) {
-        touch = idx
-        break
-      }
-      if (!touch) return
-    }
-
-    // Init. and start gesture recognition
-    if (evt.type === 'touchstart') {
-      if (opts.condition && !opts.condition()) return
-      evtlistener(document, events, handler, { passive: false })
-      const touch = evt.changedTouches[0]
-      ID = touch.identifier
-      start = [touch.clientX, touch.clientY]
-    }
-    // Gesture already running
-    else {
-      const current = resolveSwipe(start, [touch.clientX, touch.clientY])
-
-      if (evt.cancelable === false || (!started && current[0] !== opts.direction && current[1] > opts.threshold)) {
-        disable()
-        return
-      }
-
-      const valid = current[0] === opts.direction && current[1] > opts.threshold
-      const minValid = started || (current[0] === opts.direction && current[1] > opts.minThreshold)
-
-      if (minValid && evt.type === 'touchmove') {
-        started = true
-        evt.preventDefault()
-      }
-
-      // Execute callback if valid && immediate mode or if the gesture ended
-      if (valid && ((evt.type === 'touchmove' && opts.immediate) || evt.type === 'touchend')) {
-        disable()
-        opts.callback(target, current)
-      }
-      // Cancel gesture if invalid && gesture ended/cancelled
-      else if (evt.type === 'touchend' || evt.type === 'touchcancel') {
-        opts.onCancel?.(target, current)
-        disable()
-      }
-      // The gesture has not been ended and is still running
-      else if (minValid) {
-        opts.onMoveCallback?.(target, current)
-        // Start the recognition timeout if we have moved the pointer enough and it hasn't already been started
-        if (opts.timeout && !timeout) setTimeout(() => {
-          opts.onCancel?.(target, current)
-          disable()
-        }, opts.timeout)
-      }
-    }
-  }
-
-  // Ready now, so we can listen for pointer events
-  target.addEventListener('touchstart', handler, { passive: false })
-
-  // Returning the `update()` and `destroy()` functions like this makes this function work very well with Svelte
-  // For Svelte elements, do: `use:onSwipe={{ callback: callback, direction: 'up' }}`
   return { update, destroy }
 }

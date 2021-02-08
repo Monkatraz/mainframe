@@ -9,7 +9,7 @@
     Markdown as MarkdownComponent,
     SubHeader, Toggle, DetailsMenu, Button, Card, TabControl, Tab
   } from '@components'
-  import type { onSwipeOpts } from '@components'
+  import type { OnSwipeOpts } from '@components'
   import EditorBlock from './EditorBlock.svelte'
   import Topbar from './Topbar.svelte'
 
@@ -69,8 +69,8 @@
     key: 'scroll-sync',
     read() {
       if (scrollingWith === 'editor') {
-        const scrollTop = Editor.view.scrollDOM.scrollTop
-        editorScrollSpring.set(scrollTop)
+        const scrollTop = Editor.scrollTop
+        editorScrollSpring.set(scrollTop, { hard: true })
         // get top most visible line
         const pos = Editor.view.visualLineAtHeight(scrollTop, 0).from
         if (pos === 0) {
@@ -92,22 +92,22 @@
         if (lineHeight) {
           // fudge value to prevent the preview from getting "sticky"
           const diff = scrollTop - Editor.heightAtLine(curLine + 1)
-          previewScrollSpring.set(lineHeight + diff)
+          previewScrollSpring.set(lineHeight + diff, { hard: small })
         }
       } else {
         const scrollTop = preview.scrollTop
-        previewScrollSpring.set(scrollTop)
+        previewScrollSpring.set(scrollTop, { hard: true })
         // filter for the closest line height
         const line = heightlist.findIndex(height => scrollTop < height)
         if (line !== -1) {
           // fudge to prevent the editor from getting sticky
           const diff = (scrollTop - heightlist[line]) * 0.75
-          editorScrollSpring.set(Editor.heightAtLine(line) + diff)
+          editorScrollSpring.set(Editor.heightAtLine(line) + diff, { hard: small })
         }
       }
     },
     write() {
-      if (scrollingWith === 'preview') Editor.view.scrollDOM.scrollTop = $editorScrollSpring
+      if (scrollingWith === 'preview') Editor.scrollTop = $editorScrollSpring
       else preview.scrollTop = $previewScrollSpring
     }
   }
@@ -124,7 +124,7 @@
     elem.style.transition = ''
   }
 
-  const swipeHandler: Partial<onSwipeOpts> = {
+  const swipeHandler: Partial<OnSwipeOpts> = {
     condition: () => small,
     threshold: 70,
     immediate: false,
@@ -133,12 +133,14 @@
       $settings.preview.enable = !$settings.preview.enable
       swipeCancel(elem)
     },
-    onMoveCallback: (elem, [ dir, dist, diff ]) => {
-      const state = $settings.preview.enable
-      elem.style.transition = 'none'
-      elem.style.transform = `translateX(calc(${state ? '-100% + ' : ''}${-diff[1]}px))`
-    },
-    onCancel: swipeCancel
+    eventCallback: (elem, { type, diff }) => {
+      if (type === 'move') {
+        const state = $settings.preview.enable
+        elem.style.transition = 'none'
+        elem.style.transform = `translateX(calc(${state ? '-100% + ' : ''}${-diff[1]}px))`
+      }
+      else if (type === 'cancel' || type === 'end') swipeCancel(elem)
+    }
   }
 
   // @hmr:reset

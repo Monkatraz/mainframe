@@ -168,6 +168,9 @@ export class EditorCore {
    *  This includes all selected lines, the line the cursor is present on, etc. */
   activeLines = writable(new Set<number>())
 
+  get scrollTop() { return this.view.scrollDOM.scrollTop }
+  set scrollTop(val: number) { this.view.scrollDOM.scrollTop = val }
+
   /** Starts the editor. */
   async init(parent: Element, source: string | SourceOrigin, extensions: Extension[] = []) {
 
