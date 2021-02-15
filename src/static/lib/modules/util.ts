@@ -7,8 +7,8 @@
 /** Very quickly generates a (non-secure) hash from the given string. */
 export function hash(s: string) {
   let h = 0
-  for (const c of s)
-    h = Math.imul(31, h) + c.charCodeAt(0) | 0
+  for (let i = 0; i < s.length; i++)
+  	h = Math.imul(31, h) + s.charCodeAt(i) | 0
   return h
 }
 

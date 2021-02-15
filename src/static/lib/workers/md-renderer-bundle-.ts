@@ -157,12 +157,12 @@ import ParserInline from 'markdown-it/lib/parser_inline'
 /** General purpose cache for the renderer. */
 const mdCache: Map<number, any> = new Map()
 
-// https://stackoverflow.com/a/8831937
 // https://gist.github.com/hyamamoto/fd435505d29ebfa3d9716fd2be8d42f0#gistcomment-2694461
-function quickHash(s: string) {
+/** Very quickly generates a (non-secure) hash from the given string. */
+export function quickHash(s: string) {
   let h = 0
-  for (const c of s)
-    h = Math.imul(31, h) + c.charCodeAt(0) | 0
+  for (let i = 0; i < s.length; i++)
+  	h = Math.imul(31, h) + s.charCodeAt(i) | 0
   return h
 }
 
