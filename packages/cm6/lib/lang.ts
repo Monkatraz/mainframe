@@ -6,7 +6,8 @@ import {
 } from 'lezer-markdown'
 import { styleTags, Tag, tags as t } from '@codemirror/highlight'
 import { languages as languagesData } from '@codemirror/language-data'
-import { NodeProp } from 'lezer-tree'
+import { LanguageDescription } from '@codemirror/language'
+import { NodeProp, stringInput, Tree, TreeBuffer } from 'lezer-tree'
 import { createMonarchLanguage } from 'cm6-monarch'
 
 // -- MARKDOWN
@@ -24,8 +25,17 @@ const extensions = (): MarkdownConfig[] => [
 
   delim('@@', 'Escape', { consume: true }),
 
-  fence('$$$', 'TeXBlock', t.monospace),
-  delim('$', 'TeXInline', { tag: t.monospace, consume: true }),
+  fence('$$$', 'TeXBlock', {
+    render(_, offset, contents) {
+      return parseNested(TexGrammar.description, offset, contents)
+    }
+  }),
+  delim('$', 'TeXInline', {
+    consume: true,
+    render(_, offset, contents) {
+      return parseNested(TexGrammar.description, offset, contents)
+    }
+  }),
 
   delim(['{++', '++}'], 'CriticAddition',  { all: t.inserted, flanking: false }),
   delim(['{--', '--}'], 'CriticDeletion',  { all: t.deleted, flanking: false }),
@@ -78,8 +88,13 @@ const extensions = (): MarkdownConfig[] => [
       [/`+/, '@mark']
     ],
     tags: {
-      Lang: t.labelName,
-      Code: t.monospace
+      Lang: t.labelName
+    },
+    render: {
+      Code(_, offset, contents, tokens) {
+        const lang = tokens[1].text ? LanguageDescription.matchLanguageName(languages, tokens[1].text) : null
+        return lang ? parseNested(lang, offset, contents) : []
+      }
     }
    }),
 
@@ -229,12 +244,14 @@ const genStyles = () => styleTags({
 const PUNCT_REGEX = /[!"#$%&'()*+,\-.\/:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/
 const SPACE_REGEX = /\s|^$/
 
+/** Converts a string into a list of numbers representing character code points. */
 function toPoints(str: string) {
   const codes: number[] = []
   for (const ch of str) codes.push(ch.codePointAt(0)!)
   return codes
 }
 
+/** Checks if given chunk of text (`pos + len`) matches CommonMark flanking rules. */
 function isFlanking(cx: InlineContext, pos: number, len: number, strict: boolean) {
   const
     prev = pos > cx.offset ? String.fromCharCode(cx.char(pos - 1)) : ' ',
@@ -259,8 +276,16 @@ function isFlanking(cx: InlineContext, pos: number, len: number, strict: boolean
   return { left, right }
 }
 
-interface StyleOpts { tag?: Tag, mark?: Tag, all?: Tag }
+interface StyleOpts {
+  /** Determines which tag will be associated with this syntax. */
+  tag?: Tag,
+  /** Determines which tag will be associated with the markers of this syntax. */
+  mark?: Tag,
+  /** Determines which tag will be associated with both the markers and the syntax itself. */
+  all?: Tag
+}
 
+/** Adds the given name to the `styles` table, and automatically handles the `Mark` variant of the name. */
 function addStyles(tagName: string, opts?: StyleOpts | Tag) {
   const name = tagName + '/...'
   const mark = name + 'Mark'
@@ -280,6 +305,8 @@ function addStyles(tagName: string, opts?: StyleOpts | Tag) {
   }
 }
 
+/** Checks whether or not the given list of character codes can be found in the
+ *  `Line`/`InlineContext` at the given position. */
 function matches(points: number[], pos: number, cx: InlineContext | Line) {
   if (cx instanceof InlineContext)
     return points.every((ch, idx) => cx.char(pos + idx) === ch)
@@ -288,6 +315,9 @@ function matches(points: number[], pos: number, cx: InlineContext | Line) {
   else return false
 }
 
+// -- NAUGHTY PRIVATE API HACKERY
+
+/** Parses the text given and returns the list of found elements. */
 function parseInline(parser: MarkdownParser, text: string, offset: number): Element[] {
   let cx = new (InlineContext as any)(parser, text, offset)
   outer: for (let pos = offset; pos < cx.end;) {
@@ -301,15 +331,54 @@ function parseInline(parser: MarkdownParser, text: string, offset: number): Elem
   return cx.resolveMarkers(0)
 }
 
+/** Satisfies the interface of `Element` but takes in a `Tree` or `TreeBuffer` node instead of a type. */
+class TreeElement implements Element {
+  type!: number
+  constructor(readonly tree: Tree | TreeBuffer, readonly from: number) {}
+
+  get to() { return this.from + this.tree.length }
+
+  writeTo(buf: any, offset: number) {
+    buf.nodes.push(this.tree)
+    buf.content.push(buf.nodes.length - 1, this.from + offset, this.to + offset, -1)
+  }
+
+  toTree() { return this.tree }
+}
+
+/** Sync. parses the text given and returns a list of `TreeElements`.
+ *  The language provided must be in the format of a `LanguageDescription`.
+ *  If the language has not been loaded, it will be async. loaded for later usage. */
+function parseNested(lang: LanguageDescription, offset: number, text: string): Element[] {
+  if (!lang.support) { lang.load(); return [] }
+  const parse = lang.support.language.parser.startParse(stringInput(text), 0, {})
+  let tree: Tree | null = null
+  while (!(tree = parse.advance())) {}
+  return tree.children.map((ch, i) => new TreeElement(ch, offset + tree!.positions[i]))
+
+}
+
 // -- SYNTAX EXTENSIONS
 
 // -- SYNTAX GENERATORS
 
-type ChainSub = { type: string, match: RegExp }
-
+/** A chain rule can take three forms:
+ *  - `[/regex/]`
+ *      - Requires that the chain matches this text, but gives it no particular type.
+ *  - `[/regex/, 'type']`
+ *      - Maps the matched text to the given type.
+ *  - `[/regex/, opts?: { type?, sub? }]`
+ *      - Maps the matched text to (optionally) a type, and handles 'sub' matching.
+ *
+ *  A 'sub' matcher will take in the matched text and repeatedly match tokens inside of it.
+ *  It must be given both a global `match` regex, and a `type`. This can be used for repeated lists of tokens,
+ *  like an argument list inside of a function.
+ */
 type ChainRule =
   [match: RegExp, type?: string] |
   [match: RegExp, opts: { type?: string, sub?: ChainSub }]
+
+type ChainSub = { type: string, match: RegExp }
 
 interface ChainIR {
   regex: RegExp
@@ -390,15 +459,26 @@ function chainCompile(chain: ChainRule[]) {
 }
 
 interface ChainOpts {
+  /** Base name of the syntax. */
   name: string
+  /** A list of successive rules that identify and match tokens of the syntax. */
   chain: ChainRule[],
+  /** A symbol that is inexpensively checked prior to doing anything else.
+   *  This determines whether or not the more expensive chain parser should be ran. */
   predicate?: string
+  /** If provided, the chain syntax becomes the starting delimiter of a delimiter pair.
+   *  The provided string becomes the ending symbol of the delimiter pair. */
   endWith?: string
+  /** Defaults to 'Emphasis'. Inserts this syntax before the given one, causing it to be checked first. */
   before?: string
+  /** A mapping of chain types to tags. */
   tags?: Record<string, Tag>
+  /** A mapping of chain types to `Element` returning render functions. */
+  render?: Record<string, (cx: InlineContext, offset: number, contents: string, tokens: ChainToken[]) => Element[]>
 }
 
-function chain({ name, chain, predicate, endWith, before = 'Emphasis', tags }: ChainOpts): MarkdownConfig {
+/** Returns a `MarkdownConfig` extension that matches an inline chunk of text to a list of matcher rules. */
+function chain({ name, chain, predicate, endWith, before = 'Emphasis', tags, render }: ChainOpts): MarkdownConfig {
 
   const mark = name + 'Mark'
   const pred = predicate ? toPoints(predicate) : null
@@ -414,28 +494,38 @@ function chain({ name, chain, predicate, endWith, before = 'Emphasis', tags }: C
   if (!tags || !('@mark' in tags)) marks.push(name)
 
   const parse: InlineParser['parse'] = (cx, _, pos) => {
+    // handle `endWith` symbol first
     if (delimiter && matches(endChars, pos, cx))
       return cx.addDelimiter(delimiter, pos, pos + endChars.length, false, true)
+
     if (pred && !matches(pred, pos, cx)) return -1
+
     const text = cx.slice(pos, cx.end)
     const result = chainParse(text)
     if (!result) return -1
 
     const { tokens, len } = result
     const children: Element[] = []
-    for (const { text, type, start, end } of tokens) {
-      const posStart = pos + start, posEnd = pos + end
-      if (type === '@mark') children.push(cx.elt(mark, posStart, posEnd))
+    for (const { text, type, start: localStart, end: localEnd } of tokens) {
+      const start = pos + localStart, end = pos + localEnd
+      // @mark special type, which is a shorthand for a generic marker type
+      if (type === '@mark') children.push(cx.elt(mark, start, end))
+      // @wrap special type, which 'nests' inline-parsed elements
+      // giving '@wrap foo' wraps the elements in a 'foo' node
       else if (type.startsWith('@wrap')) {
-        const nest = parseInline(cx.parser, text, posStart)
+        const nest = parseInline(cx.parser, text, start)
         if (type === '@wrap') children.push(...nest)
         else {
           const wrap = type.split(/\s+/)[1]
-          if (wrap) children.push(cx.elt(name + wrap, posStart, posEnd, nest))
+          if (wrap) children.push(cx.elt(name + wrap, start, end, nest))
           else children.push(...nest)
         }
       }
-      else if (type) children.push(cx.elt(name + type, posStart, posEnd))
+      // non-special types
+      else if (type) {
+        const nested = render && type in render ? render[type](cx, start, text, tokens) : []
+        children.push(cx.elt(name + type, start, end, nested))
+      }
     }
 
     if (!delimiter) return cx.addElement(cx.elt(name, pos, pos + len, children))
@@ -453,10 +543,16 @@ function chain({ name, chain, predicate, endWith, before = 'Emphasis', tags }: C
 }
 
 interface LineOpts extends StyleOpts {
+  /** Whether or not this syntax can interrupt certain blocks, such as paragraphs,
+   *  without requiring a blank new line. */
   interrupt?: boolean
+  /** Whether or not this syntax entirely 'consumes' all characters matched by it.
+   *  If false, which is the default, the matched characters will be inline-parsed. */
   consume?: boolean
 }
 
+/** Returns `MarkdownConfig` extension that adds a syntax matching 'line-start' syntax, like JS `//` comments.
+ *  @example const ext = line('//' 'LineComment', t.lineComment) */
 function line(str: string, name: string, opts?: LineOpts | Tag): MarkdownConfig {
 
   const { interrupt = false, consume = false } = opts && !(opts instanceof Tag) ? opts : {}
@@ -495,10 +591,15 @@ function line(str: string, name: string, opts?: LineOpts | Tag): MarkdownConfig 
 }
 
 interface FenceOpts extends StyleOpts {
+  /** Whether or not this syntax can interrupt certain blocks, such as paragraphs,
+   *  without requiring a blank new line. */
   interrupt?: boolean
+  /** A function which must return a list of `Element`s, given the content of the fenced block. */
   render?: (cx: BlockContext, offset: number, contents: string, info: string) => Element[]
 }
 
+/** Returns a `MarkdownConfig` extension that adds a syntax delimiting fenced blocks of text.
+ *  @example const ext = fence('$$$', 'MathBlock', t.monospace) */
 function fence(str: string | [string, string], name: string, opts?: FenceOpts | Tag): MarkdownConfig {
 
   const { interrupt = false, render = null } = opts && !(opts instanceof Tag) ? opts : {}
@@ -569,13 +670,25 @@ function fence(str: string | [string, string], name: string, opts?: FenceOpts | 
 }
 
 interface DelimOpts extends StyleOpts {
+  /** Determines how 'flanking' rules should be handled.
+   *  - If false, the delimiters can be placed anywhere in a line.
+   *  - If true, the delimiters cannot be standing 'alone' in whitespace, e.g. `** not valid **`.
+   *  - If 'strict', the delimiters must fully match CommonMark flanking rules. */
   flanking?: boolean | 'strict'
+  /** Whether or not this syntax entirely 'consumes' all characters matched by it.
+   *  If false, which is the default, the matched characters will be inline-parsed. */
   consume?: boolean
+  /** A function which must return a list of `Element`s, given the contents of the matched text.
+   *  Requires `consume` to be true to work. */
+  render?: (cx: InlineContext, offset: number, contents: string) => Element[]
 }
 
+/** Returns a `MarkdownConfig` extension that adds a syntax that matches
+ *  inline text found between a pair of delimiters.
+ * @example const ext = delim('*', 'EmphasisStrong', t.strong) */
 function delim(str: string | [string, string], name: string, opts?: DelimOpts | Tag): MarkdownConfig {
 
-  const { flanking = 'strict', consume = false } = opts && !(opts instanceof Tag) ? opts : {}
+  const { flanking = 'strict', consume = false, render = null } = opts && !(opts instanceof Tag) ? opts : {}
 
   const mark = name + 'Mark'
   const delimiter = { resolve: name, mark }
@@ -608,11 +721,12 @@ function delim(str: string | [string, string], name: string, opts?: DelimOpts | 
       if (idx !== null) {
         const start = (cx as any).parts[idx].from
         cx.takeContent(idx)
-        const marks = [
+        const children = [
           cx.elt(mark, start, start + len[0]),
+          ...(render ? render(cx, start + len[0], cx.slice(start + len[0], pos)) : []),
           cx.elt(mark, pos, pos + len[1])
         ]
-        return cx.addElement(cx.elt(name, start, pos + len[1], marks))
+        return cx.addElement(cx.elt(name, start, pos + len[1], children))
       }
       else if (!open) return -1
     }

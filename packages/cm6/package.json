@@ -37,7 +37,7 @@
     "lezer": "^0.13.1",
     "lezer-tree": "^0.13.1",
     "lezer-markdown": "^0.14.2",
-    "esbuild": "^0.8.45",
-    "cm6-monarch": "^0.2.2"
+    "esbuild": "^0.8.46",
+    "cm6-monarch": "^0.3.0"
   }
 }
