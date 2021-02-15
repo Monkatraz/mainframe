@@ -317,7 +317,8 @@ function matches(points: number[], pos: number, cx: InlineContext | Line) {
 
 // -- NAUGHTY PRIVATE API HACKERY
 
-/** Parses the text given and returns the list of found elements. */
+/** Parses the text given and returns the list of found elements.
+ *  Taken from the `lezer-markdown` source. */
 function parseInline(parser: MarkdownParser, text: string, offset: number): Element[] {
   let cx = new (InlineContext as any)(parser, text, offset)
   outer: for (let pos = offset; pos < cx.end;) {
@@ -331,31 +332,29 @@ function parseInline(parser: MarkdownParser, text: string, offset: number): Elem
   return cx.resolveMarkers(0)
 }
 
-/** Satisfies the interface of `Element` but takes in a `Tree` or `TreeBuffer` node instead of a type. */
+/** Satisfies (mostly) the interface of `Element` but takes in a `Tree` or `TreeBuffer` node instead of a type.
+ *  Taken from the `lezer-markdown` source. */
 class TreeElement implements Element {
-  type!: number
+  type!: number // just to make typescript happy :)
   constructor(readonly tree: Tree | TreeBuffer, readonly from: number) {}
-
   get to() { return this.from + this.tree.length }
-
   writeTo(buf: any, offset: number) {
     buf.nodes.push(this.tree)
     buf.content.push(buf.nodes.length - 1, this.from + offset, this.to + offset, -1)
   }
-
   toTree() { return this.tree }
 }
 
 /** Sync. parses the text given and returns a list of `TreeElements`.
  *  The language provided must be in the format of a `LanguageDescription`.
- *  If the language has not been loaded, it will be async. loaded for later usage. */
+ *  If the language has not been loaded, it will be async. loaded for later usage.
+ *  Taken from the `lezer-markdown` source's `HTMLTag` syntax. */
 function parseNested(lang: LanguageDescription, offset: number, text: string): Element[] {
   if (!lang.support) { lang.load(); return [] }
   const parse = lang.support.language.parser.startParse(stringInput(text), 0, {})
   let tree: Tree | null = null
   while (!(tree = parse.advance())) {}
   return tree.children.map((ch, i) => new TreeElement(ch, offset + tree!.positions[i]))
-
 }
 
 // -- SYNTAX EXTENSIONS
