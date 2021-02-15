@@ -1,7 +1,7 @@
 const esbuildSettings = '--outbase=./packages/cm6 --outdir=./packages/cm6/dist --bundle --format=esm'
 
 module.exports = {
-  exclude: ['./node-modules', '**/*.d.ts'],
+  exclude: ['./node_modules/**', '**/*.d.ts'],
   mount: {
     'src': '/',
     'public': {
@@ -11,7 +11,8 @@ module.exports = {
     },
     'packages/cm6/dist': {
       url: '/static/packages/cm6',
-      static: true
+      static: true,
+      resolve: false
     }
   },
   packageOptions: {
@@ -45,6 +46,7 @@ module.exports = {
     target: 'es2020'
   },
   plugins: [
+    './dev/snowpack/esbuild-compat.js',
     ['@snowpack/plugin-build-script', { cmd: 'js-yaml', input: ['.yaml'], output: ['.json'] }],
     ['@snowpack/plugin-run-script', {
       name: 'CM6',
