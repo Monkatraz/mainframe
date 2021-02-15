@@ -1,6 +1,6 @@
 <script lang='ts'>
   import { settings, EditorCore } from './editor-core'
-  import { EditorView } from './codemirror-bundle-'
+  import { EditorView } from 'cm6-mainframe'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { spring } from 'svelte/motion'
   import { Markdown } from '../../modules/workers'
@@ -40,7 +40,7 @@
 
   // -- EDITOR
 
-  const Editor = new EditorCore() // @hmr:keep
+  const Editor = new EditorCore()
   const activeLines = Editor.activeLines
 
   onMount(async () => {
@@ -219,6 +219,12 @@
             <span slot='button' class='fs-sm'>HTML Output</span>
             <div class='preview-html'>
               <EditorBlock content={Markdown.render($Editor.value, true)} lang='html' />
+            </div>
+          </Tab>
+          <Tab>
+            <span slot='button' class='fs-sm'>Syntax Tree</span>
+            <div class='preview-html'>
+              <EditorBlock content={ $Editor.value ? Editor.printTree() : '' }, lang='LezerTree' />
             </div>
           </Tab>
         </TabControl>

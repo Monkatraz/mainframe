@@ -11,8 +11,8 @@
 | `*...*` | Bold | *This is just bolded text.*
 | `**...**` | Strong | **This is very important, strong text.**
 | `__...__` | Underline | __This is underlined, not emphasized.__
-| `^...^` | Superscript | 10^10^ Some^tiny text.^
-| `~...~` | Subscript | X~1~, X~2~, Some~more tiny text.~
+| `^...^` | Superscript | 10^10^
+| `~...~` | Subscript | X~1~, X~2~
 | `--...--` | Strikethrough | --This text was a mistake.--
 | `==...==`| Mark | ==This text is important, so it is highlighted.==
 
@@ -29,8 +29,8 @@
 | | | |
 | :--: | :-- | :-- |
 | `` `...` `` | Monospace | `Monospaced text.`
-| `` `lang|...` ``| Inline Code | `js|console.log('Inline code!')`
-| `$...$` | Math (TeX) | $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$.
+| `` `lang\|...` ``| Inline Code | `js\|console.log('Inline code!')`
+| `$...$` | Math (TeX) | $\int_{-\infty}^\infty e^{-x^2}\,dx =\sqrt{\pi}$
 | `@@...@@`| Escaped | @@/This text is __escaped__, and **will only be rendered as plain text.**/@@
 
 ###### Inline Spans:
@@ -50,21 +50,6 @@
 - #class fs-serif|Setting font class manually.|#
 - #class fs-mono token function|Multiple classes.|#
 - #class fs-serif|Nesting #color red|with|# #font sans bold|inline elements.|#|#
-
-###### Block:
-Term 1
-: Definition 1
-: Definition 2
-
-  More of definition 2.
-  
-Term 2
-  ~ Definition 1
-  ~ Definition 2
-
-Term 3
-  : Definition 1
-  : Definition 2
 
 ##### Math
 $\begin{aligned}
@@ -98,8 +83,6 @@ This is some content with a comment at the very end.
 /* This is a 
   block comment.
 */
-/* This pattern
- * looks cleaner. */
 
 ## Tests
 ***
@@ -312,24 +295,6 @@ Ad amet irure est magna id mollit Lorem in do duis enim. Excepteur velit nisi ma
 ## Highlighted
 
 Et fugiat ad nisi amet magna labore do cillum fugiat occaecat cillum Lorem proident. In sint dolor ullamco ad do adipisicing amet id excepteur Lorem aliquip sit irure veniam laborum duis cillum. Aliqua occaecat minim cillum deserunt magna sunt laboris do do irure ea nostrud consequat ut voluptate ex.
-
-```go
-package main
-
-import (
-    "fmt"
-    "net/http"
-)
-
-func handler(w http.ResponseWriter, r *http.Request) {
-    fmt.Fprintf(w, "Hi there, I love %s!", r.URL.Path[1:])
-}
-
-func main() {
-    http.HandleFunc("/", handler)
-    http.ListenAndServe(":8080", nil)
-}
-```
 
 ```ts
 class LazyDocument {

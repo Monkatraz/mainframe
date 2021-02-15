@@ -6,8 +6,8 @@
 import {
   EditorState, Extension,
   EditorView, ViewPlugin, ViewUpdate,
-  getExtensions
-} from './codemirror-bundle-'
+  getExtensions, syntaxTree, printTree
+} from 'cm6-mainframe'
 // Misc.
 import type { Page } from '@schemas'
 import * as API from '../../modules/api'
@@ -247,6 +247,10 @@ export class EditorCore {
   /** Returns the scroll-offset from the top of the editor for the specified line. */
   heightAtLine(line: number) {
     return this.view.visualLineAt(this.doc.line(line).from).top
+  }
+
+  printTree() {
+    return printTree(syntaxTree(this.state), this.doc.toString())
   }
 
   /** Whether or not the browser's spellchecker is enabled for the editor. */

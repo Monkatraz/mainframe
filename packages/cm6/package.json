@@ -1,0 +1,43 @@
+{
+  "name": "cm6-mainframe",
+  "license": "MIT",
+  "private": "true",
+  "scripts": {
+    "build": "esbuild ./lib/index.ts --bundle --sourcemap --minify --splitting --format=esm --outdir=./dist"
+  },
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "browserslist": [
+    "> 2%",
+    "last 2 versions",
+    "Firefox ESR",
+    "not dead",
+    "not op_mini all",
+    "not ie > 0"
+  ],
+  "dependencies": {
+    "@codemirror/autocomplete": "^0.17.4",
+    "@codemirror/closebrackets": "^0.17.2",
+    "@codemirror/commands": "^0.17.2",
+    "@codemirror/comment": "^0.17.1",
+    "@codemirror/fold": "^0.17.1",
+    "@codemirror/gutter": "^0.17.2",
+    "@codemirror/highlight": "^0.17.2",
+    "@codemirror/history": "^0.17.2",
+    "@codemirror/lang-markdown": "^0.17.2",
+    "@codemirror/language": "^0.17.4",
+    "@codemirror/language-data": "^0.17.2",
+    "@codemirror/matchbrackets": "^0.17.2",
+    "@codemirror/rectangular-selection": "^0.17.1",
+    "@codemirror/search": "^0.17.1",
+    "@codemirror/state": "^0.17.1",
+    "@codemirror/text": "^0.17.2",
+    "@codemirror/view": "^0.17.7",
+    "@codemirror/rangeset": "^0.17.1",
+    "lezer": "^0.13.1",
+    "lezer-tree": "^0.13.1",
+    "lezer-markdown": "^0.14.2",
+    "esbuild": "^0.8.45",
+    "cm6-monarch": "^0.2.2"
+  }
+}

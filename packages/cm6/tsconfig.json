@@ -2,15 +2,14 @@
   "compilerOptions": {
     "module": "esnext",
     "target": "esnext",
-    "allowJs": true,
     "moduleResolution": "node",
     "jsx": "preserve",
+    "allowJs": true,
     "resolveJsonModule": true,
     "useDefineForClassFields": true,
     "allowSyntheticDefaultImports": true,
     "importsNotUsedAsValues": "error",
     "isolatedModules": true,
-    "noEmit": true,
     "sourceMap": true,
     "strict": true,
     "skipLibCheck": true,
@@ -21,30 +20,12 @@
       "WebWorker"
     ],
     "baseUrl": "./",
-    "paths": {
-      "@vendor/*": [
-        "./public/vendor/*"
-      ],
-      "@data/*": [
-        "./src/static/data/*"
-      ],
-      "@components": [
-        "./src/static/lib/components/index.ts"
-      ],
-      "@schemas": [
-        "./src/static/data/schemas.d.ts"
-      ],
-      "cm6-mainframe": [
-        "./packages/cm6/lib/index.ts"
-      ]
-    }
   },
   "typeAcquisition": {
     "enable": true
   },
   "include": [
-    "./src",
-    "dev/types"
+    "./lib/index.ts"
   ],
   "exclude": [
     "./node_modules"

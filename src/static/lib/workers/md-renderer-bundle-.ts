@@ -7,10 +7,7 @@ import { expose } from 'threads'
 import { transfer, decode } from './_worker_lib'
 // Imports
 import MarkdownIt from 'markdown-it'
-import MDMultiMDTables from 'markdown-it-multimd-table'
-import MDDefLists from 'markdown-it-deflist'
 import katex from 'katex'
-import fmtHTML from 'html-prettify'
 // Import Prism
 import type { } from 'prismjs' // haha uhh don't question this
 import '@vendor/prism.js'
@@ -359,10 +356,6 @@ const synExt = [
   // Escaping text
   syntaxWrap({ symb: '@@', ignoreFlanking: true, render: str => str }),
 
-  // Imported plugins.
-  MDMultiMDTables,
-  MDDefLists,
-
   // Disables syntax that we replaced or that we don't want.
   (md: MarkdownIt) => md.disable('strikethrough').disable('emphasis').disable('code'),
 
@@ -441,7 +434,7 @@ expose({
   render(buffer: ArrayBuffer, pretty = false) {
     const str = decode(buffer)
     let html = renderer.render(str)
-    if (pretty) html = fmtHTML(html.replaceAll(/ data\-line=".*?"/g, ''))
+    if (pretty) html = html.replaceAll(/ data\-line=".*?"/g, '')
     return transfer(html)
   },
 
