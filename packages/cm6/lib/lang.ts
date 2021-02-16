@@ -70,7 +70,7 @@ const extensions = (): MarkdownConfig[] => [
       [/#/, '@mark'],
       [/\w+/, 'Type'],
       [/\s+/],
-      [/[^#|]*?/, { sub: { type: 'Parameter', match: /.+?(?:\s|$)/g } }],
+      [/[^#|]*?/, { sub: { type: 'Parameter', match: /[^\s]+/g } }],
       [/\|\s*/, '@mark']
     ],
     tags: {
@@ -446,7 +446,7 @@ function chainCompile(chain: ChainRule[]) {
           const index = submatch?.index ?? 0
           pos = start + index + submatch[0].length
           tokens.push({
-            type: group.sub.type, text: submatch[0], start: substart + index, end: pos
+            type: group.sub.type, text: submatch[0], start: substart, end: pos
           })
         }
       }
