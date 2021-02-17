@@ -18,7 +18,7 @@
   "dependencies": {
     "@codemirror/autocomplete": "^0.17.4",
     "@codemirror/closebrackets": "^0.17.2",
-    "@codemirror/commands": "^0.17.2",
+    "@codemirror/commands": "^0.17.3",
     "@codemirror/comment": "^0.17.1",
     "@codemirror/fold": "^0.17.1",
     "@codemirror/gutter": "^0.17.2",

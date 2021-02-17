@@ -1,5 +1,3 @@
-const eslintSveltePreprocess = require('./dev/eslint-svelte-preprocess')
-
 function useDefault(type, rules) {
   return Object.assign({}, ...rules.map(rule => ({ [rule]: type })))
 }
@@ -151,43 +149,38 @@ const rules = {
 const baseRules = { ...rules.code, ...rules.restrict, ...rules.style }
 const typeRules = { ...rules.typescript, ...rules.typeChecked }
 
-const tsConfig = {
-  env: { browser: true, es2021: true },
+module.exports = {
+  ignorePatterns: ['**/node_modules/**'],
+  plugins: ['svelte3', '@typescript-eslint'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     sourceType: 'module',
-    createDefaultProgram: true,
-    project: 'tsconfig.json'
+    tsconfigRootDir: __dirname,
+    project: ['./tsconfig.json'],
+    extraFileExtensions: ['.svelte']
   },
-  extends: [
-    'plugin:compat/recommended'
-  ],
-  rules: { ...baseRules, ...typeRules }
-}
-
-module.exports = {
-  ignorePatterns: ['**/node_modules/**'],
   overrides: [
     // JavaScript (Node)
     {
       files: ['*.js'],
-      env: { es2021: true, node: true },
+      env: { node: true, es2021: true },
+      parserOptions: { createDefaultProgram: true },
       rules: baseRules
     },
     // TypeScript (Browser)
     {
       files: ['*.ts', '*.tsx'],
-      plugins: ['@typescript-eslint'],
-      ...tsConfig
+      env: { browser: true, es2021: true },
+      rules: { ...baseRules, ...typeRules }
     },
     // Svelte + TypeScript (Browser)
     {
-      files: ['*.svelte'],
-      plugins: ['svelte3', '@typescript-eslint'],
+      files: ['**/*.svelte'],
       processor: 'svelte3/svelte3',
-      ...tsConfig,
+      env: { browser: true, es2021: true },
+      rules: { ...baseRules, ...typeRules },
       settings: {
-        'svelte3/preprocess': eslintSveltePreprocess(),
+        'svelte3/typescript': require('typescript'),
         'svelte3/ignore-styles': () => true
       }
     }

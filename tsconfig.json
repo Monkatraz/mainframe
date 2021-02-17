@@ -43,6 +43,8 @@
     "enable": true
   },
   "include": [
+    "./snowpack.config.js",
+    "./.eslintrc.js",
     "./src",
     "dev/types"
   ],

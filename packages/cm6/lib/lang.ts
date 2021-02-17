@@ -371,8 +371,7 @@ function parseNested(lang: LanguageDescription, offset: number, text: string): E
  *
  *  A 'sub' matcher will take in the matched text and repeatedly match tokens inside of it.
  *  It must be given both a global `match` regex, and a `type`. This can be used for repeated lists of tokens,
- *  like an argument list inside of a function.
- */
+ *  like an argument list inside of a function. */
 type ChainRule =
   [match: RegExp, type?: string] |
   [match: RegExp, opts: { type?: string, sub?: ChainSub }]

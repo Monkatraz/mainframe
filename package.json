@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "snowpack dev",
     "build": "snowpack build",
-    "postinstall": "patch-package && (cd packages/cm6 && npm i)",
+    "postinstall": "(cd packages/cm6 && npm i)",
     "lint:sl": "stylelint src/**/*.styl --custom-syntax stylelint-plugin-stylus/custom-syntax || echo 'done'",
     "lint:es": "eslint src/ || echo 'done'",
     "test": "echo \"Mainframe does not currently include a test runner.\""
@@ -24,7 +24,7 @@
   "module": "esnext",
   "dependencies": {
     "@iconify/iconify": "^2.0.0-rc.6",
-    "@popperjs/core": "^2.6.0",
+    "@popperjs/core": "^2.7.0",
     "animejs": "^3.2.1",
     "dompurify": "^2.2.6",
     "faunadb": "^4.0.3",
@@ -54,15 +54,13 @@
     "typescript": "^4.1.5"
   },
   "optionalDependencies": {
-    "@typescript-eslint/eslint-plugin": "4.15.1",
-    "@typescript-eslint/parser": "4.15.1",
-    "eslint": "7.20.0",
-    "eslint-plugin-compat": "3.9.0",
-    "eslint-plugin-svelte3": "3.0.0",
-    "patch-package": "6.2.2",
-    "stylelint": "13.10.0",
-    "stylelint-config-rational-order": "0.1.2",
-    "stylelint-order": "4.1.0",
-    "stylelint-plugin-stylus": "0.10.0"
+    "@typescript-eslint/eslint-plugin": "^4.15.1",
+    "@typescript-eslint/parser": "^4.15.1",
+    "eslint": "^7.20.0",
+    "eslint-plugin-svelte3": "^3.1.0",
+    "stylelint": "^13.10.0",
+    "stylelint-config-rational-order": "^0.1.2",
+    "stylelint-order": "^4.1.0",
+    "stylelint-plugin-stylus": "^0.10.0"
   }
 }

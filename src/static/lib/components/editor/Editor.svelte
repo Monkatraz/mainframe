@@ -18,7 +18,7 @@
   let mounted = false
 
   let editorContainer: HTMLElement
-  let preview: HTMLDivElement
+  let preview: HTMLElement
 
   let scrollingWith: 'editor' | 'preview' = 'editor'
   const previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
@@ -177,7 +177,7 @@
         </DetailsMenu>
       </div>
 
-      <div class=editor bind:this={editorContainer}/>
+      <div class='editor' bind:this={editorContainer}/>
 
     </div>
 
