@@ -42,7 +42,7 @@
     "@snowpack/plugin-svelte": "^3.5.2",
     "autoprefixer": "^10.2.4",
     "css-mquery-packer": "^1.2.4",
-    "esbuild": "^0.8.46",
+    "esbuild": "^0.8.52",
     "postcss": "^8.2.6",
     "punycode": "^2.1.1",
     "snowpack": "^3.0.11",
