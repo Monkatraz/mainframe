@@ -27,7 +27,7 @@
   "module": "esnext",
   "dependencies": {
     "@iconify/iconify": "^2.0.0-rc.6",
-    "@popperjs/core": "^2.9.1",
+    "@popperjs/core": "^2.9.2",
     "animejs": "^3.2.1",
     "dompurify": "^2.2.7",
     "faunadb": "^4.1.3",
