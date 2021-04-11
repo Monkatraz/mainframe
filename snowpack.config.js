@@ -11,10 +11,6 @@ module.exports = {
     }
   },
   packageOptions: {
-    knownEntrypoints: [
-      './packages/cm6',
-      './packages/tarnation'
-    ],
     polyfillNode: true,
     packageLookupFields: [ 'svelte' ]
   },
