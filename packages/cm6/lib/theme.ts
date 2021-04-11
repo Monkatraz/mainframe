@@ -77,9 +77,9 @@ const confinementTheme = EditorView.theme({
 
   '&.cm-focused .cm-selectionBackground': { backgroundColor: selection },
   '.cm-selectionBackground': { backgroundColor: selection },
-  $activeLine: { background: hover },
-  $selectionMatch: { backgroundColor: selection },
-  $searchMatch: {
+  '.cm-activeLine': { background: hover },
+  '.cm-selectionMatch': { backgroundColor: selection },
+  '.cm-searchMatch': {
     backgroundColor: selection,
     borderRadius: '0.125rem'
   },
@@ -93,13 +93,12 @@ const confinementTheme = EditorView.theme({
     '&::selection': { color: 'inherit !important' }
   },
 
-  '.cm-activeLine': { backgroundColor: hover },
-
   '.cm-panels': {
     backgroundColor: background,
     color: text,
     padding: '0.5rem 0'
   },
+
   '.cm-panels-top': { borderBottom: `2px solid ${border}` },
   '.cm-panels-bottom': { borderTop: `2px solid ${border}` },
 
@@ -132,10 +131,14 @@ const confinementTheme = EditorView.theme({
     border: `1px solid ${border}`
   },
 
+  '@keyframes cm-tooltip-fadein': { '0%': { opacity: '0' }, '100%': { opacity: '1' } },
+
   '.cm-tooltip': {
     border: `1px solid ${border}`,
-    backgroundColor: background
+    backgroundColor: background,
+    animation: 'cm-tooltip-fadein 0.125s 1 0s backwards ease-out'
   },
+
   '.cm-tooltip.autocomplete': {
     '& > ul > li[aria-selected]': { backgroundColor: background }
   }
