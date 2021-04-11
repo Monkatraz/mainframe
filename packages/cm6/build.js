@@ -16,7 +16,7 @@
    minify: true,
    splitting: true,
    format: 'esm',
-   plugins: [nodeExternalsPlugin({ allowList: ['cm-tarnation'] })],
+   plugins: [nodeExternalsPlugin(/* { allowList: ['cm-tarnation'] } */)],
    logLevel: 'info'
  }
 
