@@ -8,9 +8,6 @@ let ready = false
 /** Promise that resolves when the WASM binding has loaded. */
 const loading = init()
 
-/** Module-global logging flag. */
-let log = false
-
 /** Actual output of the WASM instantiation. */
 let wasm: Binding.InitOutput | null = null
 
@@ -30,10 +27,6 @@ function free(...objs: any) {
 
 expose({
 
-  logging(state: boolean) {
-    log = state
-  },
-
   async version() {
     await loading
     return Binding.version()
@@ -42,14 +35,14 @@ expose({
   async preprocess(raw: ArrayBuffer) {
     await loading
     const str = decode(raw)
-    return transfer(Binding.preprocess(str, log))
+    return transfer(Binding.preprocess(str))
   },
 
   async tokenize(raw: ArrayBuffer) {
     await loading
     const str = decode(raw)
 
-    const tokenized = Binding.tokenize(str, log)
+    const tokenized = Binding.tokenize(str)
     const tokens = tokenized.tokens()
 
     free(tokenized)
@@ -61,8 +54,8 @@ expose({
     await loading
     const str = decode(raw)
 
-    const tokenized = Binding.tokenize(str, log)
-    const parsed = Binding.parse(tokenized, log)
+    const tokenized = Binding.tokenize(str)
+    const parsed = Binding.parse(tokenized)
     const parsedTree = parsed.syntax_tree()
 
     const ast = parsedTree.get()
@@ -77,12 +70,12 @@ expose({
     await loading
     const str = decode(raw)
 
-    const tokenized = Binding.tokenize(str, log)
-    const parsed = Binding.parse(tokenized, log)
+    const tokenized = Binding.tokenize(str)
+    const parsed = Binding.parse(tokenized)
     const ast = parsed.syntax_tree()
 
     try {
-      const rendered = Binding.render_html(ast, log)
+      const rendered = Binding.render_html(ast)
       rendered.free()
     } catch {}
 
@@ -95,17 +88,17 @@ expose({
     await loading
     const str = decode(raw)
 
-    const tokenized = Binding.tokenize(str, log)
+    const tokenized = Binding.tokenize(str)
     const tokens = tokenized.tokens()
 
-    const parsed = Binding.parse(tokenized, log)
+    const parsed = Binding.parse(tokenized)
     const parsedTree = parsed.syntax_tree()
 
     const ast = parsedTree.get()
     const warnings = parsed.warnings()
 
     try {
-      const rendered = Binding.render_html(parsedTree, log)
+      const rendered = Binding.render_html(parsedTree)
       rendered.free()
     } catch {}
 
@@ -120,7 +113,7 @@ expose({
     await loading
     const str = decode(raw)
 
-    const tokenized = Binding.tokenize(str, log)
+    const tokenized = Binding.tokenize(str)
     const tokens = tokenized.tokens()
 
     free(tokenized)

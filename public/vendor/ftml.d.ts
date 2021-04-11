@@ -1,33 +1,29 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
-* @param {string} text
-* @param {boolean} should_log
-* @returns {string}
-*/
-export function preprocess(text: string, should_log: boolean): string;
-/**
-* @param {SyntaxTree} syntax_tree
-* @param {boolean} should_log
-* @returns {HtmlOutput}
-*/
-export function render_html(syntax_tree: SyntaxTree, should_log: boolean): HtmlOutput;
-/**
-* @param {Tokenization} tokens
-* @param {boolean} should_log
-* @returns {ParseOutcome}
-*/
-export function parse(tokens: Tokenization, should_log: boolean): ParseOutcome;
-/**
-* @param {string} text
-* @param {boolean} should_log
-* @returns {Tokenization}
-*/
-export function tokenize(text: string, should_log: boolean): Tokenization;
-/**
 * @returns {string}
 */
 export function version(): string;
+/**
+* @param {string} text
+* @returns {string}
+*/
+export function preprocess(text: string): string;
+/**
+* @param {SyntaxTree} syntax_tree
+* @returns {HtmlOutput}
+*/
+export function render_html(syntax_tree: SyntaxTree): HtmlOutput;
+/**
+* @param {Tokenization} tokens
+* @returns {ParseOutcome}
+*/
+export function parse(tokens: Tokenization): ParseOutcome;
+/**
+* @param {string} text
+* @returns {Tokenization}
+*/
+export function tokenize(text: string): Tokenization;
 
 
 export interface IHtmlOutput {
@@ -138,22 +134,22 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly preprocess: (a: number, b: number, c: number, d: number) => void;
+  readonly version: (a: number) => void;
+  readonly preprocess: (a: number, b: number, c: number) => void;
   readonly __wbg_htmloutput_free: (a: number) => void;
   readonly htmloutput_html: (a: number, b: number) => void;
   readonly htmloutput_style: (a: number, b: number) => void;
   readonly htmloutput_html_meta: (a: number) => number;
-  readonly render_html: (a: number, b: number) => number;
+  readonly render_html: (a: number) => number;
   readonly __wbg_parseoutcome_free: (a: number) => void;
   readonly parseoutcome_syntax_tree: (a: number) => number;
   readonly parseoutcome_warnings: (a: number) => number;
   readonly __wbg_syntaxtree_free: (a: number) => void;
   readonly syntaxtree_get: (a: number) => number;
-  readonly parse: (a: number, b: number) => number;
+  readonly parse: (a: number) => number;
   readonly tokenization_text: (a: number, b: number) => void;
   readonly tokenization_tokens: (a: number) => number;
-  readonly tokenize: (a: number, b: number, c: number) => number;
-  readonly version: (a: number) => void;
+  readonly tokenize: (a: number, b: number) => number;
   readonly __wbg_tokenization_free: (a: number) => void;
   readonly __wbindgen_malloc: (a: number) => number;
   readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;

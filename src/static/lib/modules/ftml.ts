@@ -69,14 +69,14 @@ export function version(): string {
 /** Returns a preprocessed string of wikitext. */
 export function preprocess(str: string): string {
   if (!ready) throw new Error('FTML has not been instantiated yet!')
-  return Binding.preprocess(str, log)
+  return Binding.preprocess(str)
 }
 
 /** Tokenizes a string of wikitext into an {@link FTMLToken} array. */
 export function tokenize(str: string): FTMLToken[] {
   if (!ready) throw new Error('FTML has not been instantiated yet!')
 
-  const tokenized = Binding.tokenize(str, log)
+  const tokenized = Binding.tokenize(str)
   const tokens = tokenized.tokens()
   ptrs.set(tokens, tokenized)
 
@@ -94,7 +94,7 @@ export function parse(tokens: FTMLToken[] | string): Parse {
   assertClass(tokenized, Binding.Tokenization)
   assertNotMoved(tokenized)
 
-  const parsed = Binding.parse(tokenized, log)
+  const parsed = Binding.parse(tokenized)
 
   // TODO: syntaxTree and warnings don't have any meaningful properties rn
   const parsedTree = parsed.syntax_tree()
