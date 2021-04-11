@@ -3,13 +3,26 @@
  * @author Monkatraz
  */
 // Imports
-import { spawn, Thread, Worker } from 'threads'
-import type { ModuleThread } from 'threads'
-import { transfer, decode } from '../workers/_worker_lib'
+import { spawn, Thread, Worker, Transfer, ModuleThread  } from 'threads'
 import { sleep } from './util'
 import DOMPurify from 'dompurify'
 import morphdom from 'morphdom'
 import type * as FTMLBinding from '@vendor/ftml'
+
+interface TypedArray extends ArrayBuffer { buffer: ArrayBufferLike }
+type TransferInput = string | ArrayBuffer | TypedArray
+
+const decoder = new TextDecoder()
+const encoder = new TextEncoder()
+
+export const transfer = (buffer: TransferInput) => {
+  if (typeof buffer === 'string')    return Transfer(encoder.encode(buffer).buffer)
+  if ('buffer' in buffer)            return Transfer(buffer.buffer)
+  if (buffer instanceof ArrayBuffer) return Transfer(buffer)
+  throw new TypeError('Expected a string, ArrayBuffer, or typed array!')
+}
+
+export const decode = (buffer: ArrayBuffer) => decoder.decode(buffer)
 
 // -- WORKER MODULE
 
