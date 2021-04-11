@@ -109,8 +109,8 @@
   >
     <!-- Left | Editor Pane -->
     <div class='editor-pane'
-      in:tnAnime={small ? undefined : { translateX: ['-200%', '0'], duration: 800, easing: 'easeOutExpo' }}
-      out:tnAnime={small ? undefined : { translateX: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
+      in:tnAnime={small ? undefined : { left: ['-200%', '0'], duration: 800, easing: 'easeOutExpo' }}
+      out:tnAnime={small ? undefined : { left: '-600%', duration: 200, delay: 50, easing: 'easeInExpo' }}
     >
       <Topbar/>
 
