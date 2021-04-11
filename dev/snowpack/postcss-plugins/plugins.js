@@ -13,4 +13,4 @@ const postcssPlugins = [
 // And now we turn them back on
 console.warn = oldWarn
 
-module.exports = postcssPlugins
+module.exports = { plugins: postcssPlugins }

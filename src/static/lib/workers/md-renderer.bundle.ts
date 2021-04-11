@@ -3,7 +3,7 @@
  * @author Monkatraz
  */
 // Worker Handler
-import { expose } from 'threads'
+import { expose } from 'threads/worker'
 import { transfer, decode } from './_worker_lib'
 // Imports
 import MarkdownIt from 'markdown-it'

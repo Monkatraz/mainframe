@@ -3,10 +3,11 @@
   "license": "MIT",
   "private": "true",
   "scripts": {
-    "build": "esbuild ./lib/index.ts --bundle --sourcemap --minify --splitting --format=esm --outdir=./dist"
+    "build": "node build.js build",
+    "dev": "node build.js dev"
   },
-  "main": "dist/lib/index.js",
-  "types": "dist/lib/index.d.ts",
+  "main": "dist/index.js",
+  "types": "lib/index.ts",
   "browserslist": [
     "> 2%",
     "last 2 versions",
@@ -16,28 +17,33 @@
     "not ie > 0"
   ],
   "dependencies": {
-    "@codemirror/autocomplete": "^0.17.4",
-    "@codemirror/closebrackets": "^0.17.2",
-    "@codemirror/commands": "^0.17.3",
-    "@codemirror/comment": "^0.17.1",
-    "@codemirror/fold": "^0.17.1",
-    "@codemirror/gutter": "^0.17.2",
-    "@codemirror/highlight": "^0.17.2",
-    "@codemirror/history": "^0.17.2",
-    "@codemirror/lang-markdown": "^0.17.2",
-    "@codemirror/language": "^0.17.4",
-    "@codemirror/language-data": "^0.17.2",
-    "@codemirror/matchbrackets": "^0.17.2",
-    "@codemirror/rectangular-selection": "^0.17.1",
-    "@codemirror/search": "^0.17.1",
-    "@codemirror/state": "^0.17.1",
-    "@codemirror/text": "^0.17.2",
-    "@codemirror/view": "^0.17.7",
-    "@codemirror/rangeset": "^0.17.1",
-    "lezer": "^0.13.1",
-    "lezer-tree": "^0.13.1",
-    "lezer-markdown": "^0.14.2",
-    "esbuild": "^0.8.46",
-    "cm6-monarch": "^0.3.0"
+    "@codemirror/autocomplete": "^0.18.3",
+    "@codemirror/closebrackets": "^0.18.0",
+    "@codemirror/commands": "^0.18.0",
+    "@codemirror/comment": "^0.18.0",
+    "@codemirror/fold": "^0.18.0",
+    "@codemirror/gutter": "^0.18.0",
+    "@codemirror/highlight": "^0.18.3",
+    "@codemirror/history": "^0.18.1",
+    "@codemirror/lang-markdown": "^0.18.0",
+    "@codemirror/language": "^0.18.1",
+    "@codemirror/language-data": "^0.18.0",
+    "@codemirror/legacy-modes": "^0.18.0",
+    "@codemirror/matchbrackets": "^0.18.0",
+    "@codemirror/rangeset": "^0.18.0",
+    "@codemirror/rectangular-selection": "^0.18.0",
+    "@codemirror/search": "^0.18.2",
+    "@codemirror/state": "^0.18.3",
+    "@codemirror/text": "^0.18.0",
+    "@codemirror/view": "^0.18.3",
+    "cm-tarnation": "file:..\\tarnation",
+    "lezer": "^0.13.4",
+    "lezer-markdown": "^0.14.4",
+    "lezer-tree": "^0.13.2"
+  },
+  "devDependencies": {
+    "esbuild": "^0.11.2",
+    "esbuild-node-externals": "^1.0.3",
+    "lezer-generator": "^0.13.3"
   }
 }

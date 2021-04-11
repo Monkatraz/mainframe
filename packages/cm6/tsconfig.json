@@ -20,12 +20,13 @@
       "WebWorker"
     ],
     "baseUrl": "./",
+    "outDir": "./dist"
   },
   "typeAcquisition": {
     "enable": true
   },
   "include": [
-    "./lib/index.ts"
+    "./lib/"
   ],
   "exclude": [
     "./node_modules"

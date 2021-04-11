@@ -5,24 +5,23 @@ module.exports = function (snowpackConfig, pluginOptions) {
     name: 'compiler-workers',
 
     resolve: {
-      input: ['.ts'],
-      output: ['.js']
+      input: ['.bundle.ts'],
+      output: ['.bundle.js']
     },
 
     async load({ filePath = '' }) {
-      if (!filePath.endsWith('-bundle-.ts')) return
       const result = await esbuild.build({
         entryPoints: [filePath],
         bundle: true,
         treeShaking: true,
-        sourcemap: true,
+        // sourcemap: true,
         outdir: './',
         outbase: './',
         format: 'esm',
         write: false
       })
-      const ret = { code: result.outputFiles[1].text, map: result.outputFiles[0].text }
-      return { '.js': ret }
+      const ret = { code: result.outputFiles[0].text }
+      return { '.bundle.js': ret }
     }
   }
 }

@@ -163,8 +163,7 @@ class Client {
     this.client = new FaunaDB.Client({
       secret: key,
       domain: ENV.API.FDB_DOMAIN,
-      scheme: 'https',
-      fetch: fetch
+      scheme: 'https'
     })
     this.query = this.client.query.bind(this.client)
     this.paginate = this.client.paginate.bind(this.client)

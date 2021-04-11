@@ -1,14 +1,22 @@
 import { markdown } from '@codemirror/lang-markdown'
+import { parser as CSSAttrParser } from './grammars/css-attribute'
+import { cssLanguage, cssCompletion } from '@codemirror/lang-css'
 import {
   MarkdownConfig,
   Subscript, Superscript, Table, TaskList, Emoji,
-  InlineParser, InlineContext, BlockContext, Line, Element, MarkdownParser
+  InlineParser, InlineContext, BlockContext, Line, Element
 } from 'lezer-markdown'
 import { styleTags, Tag, tags as t } from '@codemirror/highlight'
 import { languages as languagesData } from '@codemirror/language-data'
-import { LanguageDescription } from '@codemirror/language'
+import {
+  LanguageDescription, LanguageSupport, LezerLanguage,
+  continuedIndent, indentNodeProp
+} from '@codemirror/language'
 import { NodeProp, stringInput, Tree, TreeBuffer } from 'lezer-tree'
-import { createMonarchLanguage } from 'cm6-monarch'
+import { TarnationLanguage } from 'cm-tarnation'
+// import { createMonarchLanguage } from 'cm6-monarch'
+import type { Parser, ParserConfig } from 'lezer'
+import type { Extension } from '@codemirror/state'
 
 // -- MARKDOWN
 
@@ -26,15 +34,15 @@ const extensions = (): MarkdownConfig[] => [
   delim('@@', 'Escape', { consume: true }),
 
   fence('$$$', 'TeXBlock', {
-    render(_, offset, contents) {
-      return parseNested(TexGrammar.description, offset, contents)
-    }
+    // render(_, offset, contents) {
+    //   return parseNested(TexGrammar.description, offset, contents)
+    // }
   }),
   delim('$', 'TeXInline', {
-    consume: true,
-    render(_, offset, contents) {
-      return parseNested(TexGrammar.description, offset, contents)
-    }
+    consume: true
+    // render(_, offset, contents) {
+    //   return parseNested(TexGrammar.description, offset, contents)
+    // }
   }),
 
   delim(['{++', '++}'], 'CriticAddition',  { all: t.inserted, flanking: false }),
@@ -43,11 +51,11 @@ const extensions = (): MarkdownConfig[] => [
   delim(['{>>', '<<}'], 'CriticComment',   { all: t.special(t.comment), flanking: false }),
   chain({ name: 'CriticSubstitution', predicate: '{~~',
     chain: [
-      [/{~~/, '@mark'],
+      [/\{~~/, '@mark'],
       [/.*?/, '@wrap Delete'],
       [/~>/,  'Arrow'],
       [/.*?/, '@wrap Insert'],
-      [/~~}/, '@mark']
+      [/~~\}/, '@mark']
     ],
     tags: {
       '@mark': t.changed,
@@ -70,7 +78,7 @@ const extensions = (): MarkdownConfig[] => [
       [/#/, '@mark'],
       [/\w+/, 'Type'],
       [/\s+/],
-      [/[^#|]*?/, { sub: { type: 'Parameter', match: /[^\s]+/g } }],
+      [/[^#|]*?/, { sub: { type: 'Parameter', match: /\S+/g } }],
       [/\|\s*/, '@mark']
     ],
     tags: {
@@ -106,74 +114,181 @@ const extensions = (): MarkdownConfig[] => [
 
 // -- MISC. GRAMMARS
 
-export const LezerTreeGrammar = createMonarchLanguage({
+interface LangDefinition {
+  name: string
+  parser: Parser
+  configure?: ParserConfig
+  alias?: string[]
+  ext?: string[]
+  languageData?: Record<string, any>
+  extensions?: Extension[]
+}
+
+export function createLang(opts: LangDefinition) {
+  const langDesc = Object.assign(
+    { name: opts.name },
+    opts.alias ? { alias: opts.alias } : {},
+    opts.ext ? { extensions: opts.ext } : {}
+  )
+  const langData = { ...langDesc, ...(opts.languageData ?? {}) }
+
+  const load = function () {
+    const lang = LezerLanguage.define({ parser: opts.parser.configure(opts.configure ?? {}), languageData: langData })
+    return new LanguageSupport(lang, opts.extensions)
+  }
+
+  const description = LanguageDescription.of({ ...langDesc, load: async () => load() })
+
+  return { load, description }
+
+}
+
+export const LezerTreeGrammar = new TarnationLanguage({
   name: 'LezerTree',
-  lexer: {
-    defaultToken: 'string',
-    unicode: true,
-    tokenizer: {
+  grammar: {
+    fallback: ['t.string'],
+    brackets: [
+      { name: 't.bracket', pair: ['[', ']'] }
+    ],
+    states: {
       root: [
-        [/[\u251C\u2514\u2502\u2500]/, 'punctuation'],
-        [/'.+'$/, 'string'],
-        [/([^\s]*?\s)(\[)(\d+)(\.\.)(\d+)(\]:?)/, [
-          'content', 'squareBracket', 'integer', 'operator', 'integer', 'squareBracket'
-        ]],
-        [/([^\s]*?\s)(\d+)/, ['content', 'integer']]
+        [/[\u251C\u2514\u2502\u2500]/, 't.punctuation'],
+        [/'.+'$/, 't.string'],
+        [/(\S*?\s)(\[)(\d+)(\.\.)(\d+)(\])(:?)/,
+          ['t.content', '@BR', 't.integer', 't.operator', 't.integer', '@BR', 't.separator']
+        ],
+        [/(\S*?\s)(\d+)/, ['t.content', 't.integer']]
       ]
     }
   }
 })
 
-export const TexGrammar = createMonarchLanguage({
-  name: 'TeX',
-  lexer: {
-    defaultToken: 'unit',
-    texBrackets: ['(', ')', '[', ']', '{', '}'],
-    texSymbols: [
-      '+', '-', '=', '!', '/', '<', '>', '|', "'", ':', '*'
+export const FTMLTokensGrammar = new TarnationLanguage({
+  name: 'FTMLTokens',
+  grammar: {
+    fallback: ['t.string'],
+    brackets: [
+      { name: 't.bracket', pair: ['[', ']'] }
     ],
-    tokenizer: {
+    states: {
       root: [
-        [/%.*$/, 'comment'], // %comments
-
-        // begin{}, end{}
-        [/(\\(?:begin|end))({)(.*?)(})/, [
-          'string',
-          'brace',
-          { cases: {
-            '\\w+\\s[^}]*': 'string',
-            '@default': 'keyword'
-          } },
-          'brace'
-        ]],
-
-        [/([a-zA-Z]+)(?=\(.*?\))/, 'name'], // styles 'fn()'
-        [/\\#?[a-zA-Z0-9]+/, 'string'],     // commands
-        [/\\[,>;!]/, 'string'],             // spacing
-        [/\\+/, 'escape'],                  // \\ and the like
-        [/[\^_&]/, 'keyword'],              // special keywords/operators
-
-        // symbols, non word/digit characters
-        [/\W/, { cases: {
-          '@texSymbols': 'operator',
-          '@texBrackets': 'bracket',
-          '@default': 'emphasis'
-        } }],
-
-        // words/digit characters
-        [/\w/, { cases: {
-          '[0-9]': 'unit',
-          '@default': 'emphasis'
-        } }]
+        [/^(\[)(\d+)( <-> )(\d+)(\])(:)(\s*)(\S+)(\s*)(=>)(.*$)/,
+          [
+            '@BR', 't.integer', 't.operator', 't.integer', '@BR', 't.separator', '',
+            't.content', '', 't.operator', 't.string'
+          ]
+        ]
       ]
     }
+  }
+})
+
+// export const LezerTreeGrammar = createMonarchLanguage({
+//   name: 'LezerTree',
+//   lexer: {
+//     defaultToken: 'string',
+//     unicode: true,
+//     tokenizer: {
+//       root: [
+//         [/[\u251C\u2514\u2502\u2500]/, 'punctuation'],
+//         [/'.+'$/, 'string'],
+//         [/(\S*?\s)(\[)(\d+)(\.\.)(\d+)(\]:?)/, [
+//           'content', 'squareBracket', 'integer', 'operator', 'integer', 'squareBracket'
+//         ]],
+//         [/(\S*?\s)(\d+)/, ['content', 'integer']]
+//       ]
+//     }
+//   }
+// })
+
+// export const TexGrammar = createMonarchLanguage({
+//   name: 'wikimath',
+//   lexer: {
+//     defaultToken: 'unit',
+//     texBrackets: ['(', ')', '[', ']', '{', '}'],
+//     texSymbols: [
+//       '+', '-', '=', '!', '/', '<', '>', '|', "'", ':', '*'
+//     ],
+//     tokenizer: {
+//       root: [
+//         [/%.*$/, 'comment'], // %comments
+
+//         // begin{}, end{}
+//         [/(\\(?:begin|end))(\{)(.*?)(\})/, [
+//           'string',
+//           'brace',
+//           { cases: {
+//             '\\w+\\s[^}]*': 'string',
+//             '@default': 'keyword'
+//           } },
+//           'brace'
+//         ]],
+
+//         [/([a-zA-Z]+)(?=\(.*?\))/, 'name'], // styles 'fn()'
+//         [/\\#?[a-zA-Z0-9]+/, 'string'],     // commands
+//         [/\\[,>;!]/, 'string'],             // spacing
+//         [/\\+/, 'escape'],                  // \\ and the like
+//         [/[\^_&]/, 'keyword'],              // special keywords/operators
+
+//         // symbols, non word/digit characters
+//         [/\W/, { cases: {
+//           '@texSymbols': 'operator',
+//           '@texBrackets': 'bracket',
+//           '@default': 'emphasis'
+//         } }],
+
+//         // words/digit characters
+//         [/\w/, { cases: {
+//           '[0-9]': 'unit',
+//           '@default': 'emphasis'
+//         } }]
+//       ]
+//     }
+//   }
+// })
+
+export const CSSAttributeGrammar = createLang({
+  name: 'CSS-Attribute',
+  parser: CSSAttrParser,
+  languageData: {
+    ...(cssLanguage.data as any).default[0],
+    ...(cssCompletion as any).value
+  },
+  configure: {
+    props: [
+      indentNodeProp.add({
+        Declaration: continuedIndent()
+      }),
+      styleTags({
+        'PropertyName': t.propertyName,
+        'NumberLiteral': t.number,
+        'callee': t.keyword,
+        'CallTag ValueName': t.atom,
+        'Callee': t.variableName,
+        'Unit': t.unit,
+        'BinOp': t.arithmeticOperator,
+        'Important': t.modifier,
+        'Comment': t.blockComment,
+        'ParenthesizedContent': t.special(t.name),
+        'ColorLiteral': t.color,
+        'StringLiteral': t.string,
+        ':': t.punctuation,
+        'PseudoOp #': t.derefOperator,
+        '; ,': t.separator,
+        '( )': t.paren,
+        '[ ]': t.squareBracket,
+        '{ }': t.brace
+      })
+    ]
   }
 })
 
 export const languages = [
   ...languagesData,
   LezerTreeGrammar.description,
-  TexGrammar.description
+  FTMLTokensGrammar.description,
+  // TexGrammar.description,
+  CSSAttributeGrammar.description
 ]
 
 // -- UTIL
@@ -241,7 +356,7 @@ const genStyles = () => styleTags({
   ...styles
 })
 
-const PUNCT_REGEX = /[!"#$%&'()*+,\-.\/:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/
+const PUNCT_REGEX = /[!"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/
 const SPACE_REGEX = /\s|^$/
 
 /** Converts a string into a list of numbers representing character code points. */
@@ -316,21 +431,6 @@ function matches(points: number[], pos: number, cx: InlineContext | Line) {
 }
 
 // -- NAUGHTY PRIVATE API HACKERY
-
-/** Parses the text given and returns the list of found elements.
- *  Taken from the `lezer-markdown` source. */
-function parseInline(parser: MarkdownParser, text: string, offset: number): Element[] {
-  let cx = new (InlineContext as any)(parser, text, offset)
-  outer: for (let pos = offset; pos < cx.end;) {
-    let next = cx.char(pos)
-    for (let token of (parser as any).inlineParsers) if (token) {
-      let result = token(cx, next, pos)
-      if (result >= 0) { pos = result; continue outer }
-    }
-    pos++
-  }
-  return cx.resolveMarkers(0)
-}
 
 /** Satisfies (mostly) the interface of `Element` but takes in a `Tree` or `TreeBuffer` node instead of a type.
  *  Taken from the `lezer-markdown` source. */
@@ -511,7 +611,7 @@ function chain({ name, chain, predicate, endWith, before = 'Emphasis', tags, ren
       // @wrap special type, which 'nests' inline-parsed elements
       // giving '@wrap foo' wraps the elements in a 'foo' node
       else if (type.startsWith('@wrap')) {
-        const nest = parseInline(cx.parser, text, start)
+        const nest = cx.parser.parseInline(text, start)
         if (type === '@wrap') children.push(...nest)
         else {
           const wrap = type.split(/\s+/)[1]
@@ -569,7 +669,7 @@ function line(str: string, name: string, opts?: LineOpts | Tag): MarkdownConfig 
 
       // starting marker (e.g. '//' in a line comment)
       const children = [cx.elt(mark, start, offset)]
-      if (!consume) children.push(...cx.parseInline(line.text.slice(pos + len), offset))
+      if (!consume) children.push(...cx.parser.parseInline(line.text.slice(pos + len), offset))
       cx.nextLine()
       cx.addElement(cx.elt(name, start, cx.prevLineEnd(), children))
       return true

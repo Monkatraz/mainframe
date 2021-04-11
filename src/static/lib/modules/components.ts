@@ -7,6 +7,7 @@
 import tippy, { Props as TippyProps, roundArrow as TippyRoundArrow  } from 'tippy.js'
 import * as Popper from '@popperjs/core'
 import anime, { AnimeParams } from 'animejs'
+import * as easings from 'svelte/easing'
 import { hash, animationFrame } from './util'
 
 /** Tiny helper Svelte use action for executing a callback when the element is loaded. */
@@ -184,6 +185,27 @@ export function tip(elem: Element, opts: Partial<TippyProps> | string = '') {
       setState(opts.content)
     },
     destroy() { tp.destroy() }
+  }
+}
+
+interface AnimOpts {
+  delay?: number
+  duration?: number
+  easing?: keyof typeof easings
+  css: (t: number, u: number) => string | string[]
+}
+
+export function anim(node: HTMLElement, { delay = 0, duration = 500, easing = 'quintInOut', css }: AnimOpts) {
+  const cb = (t: number, u: number) => {
+    const result = css(t, u)
+    return typeof result === 'string' ? result : result.join(';')
+  }
+
+  return {
+    delay,
+    duration,
+    easing: easings[easing],
+    css: cb
   }
 }
 

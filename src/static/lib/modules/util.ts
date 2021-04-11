@@ -12,6 +12,19 @@ export function hash(s: string) {
   return h
 }
 
+/** Performance measuring utility.
+ *
+ *  To use, execute the function and store the returned value.
+ *  The returned value is a function that will end the performance timer and log the measured time to the console. */
+ export function perfy(meta?: string, threshold?: number): () => number {
+  const start = performance.now()
+  return () => {
+    const time = parseFloat((performance.now() - start).toFixed(4))
+    if (meta && threshold && time > threshold) console.log(`${meta}: ${time}ms`)
+    return time
+  }
+}
+
 /** Returns a promise that resolves after the specified number of miliseconds. */
 export function sleep(ms: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, ms))

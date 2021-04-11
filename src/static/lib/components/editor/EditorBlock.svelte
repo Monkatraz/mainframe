@@ -1,10 +1,11 @@
 <script lang='ts'>
   import {
-    EditorState, EditorView, tagExtension,
+    EditorState, EditorView, Compartment,
     LanguageDescription, languages,
     getNoEditExtensions
   } from 'cm6-mainframe'
   import { onDestroy, onMount } from 'svelte'
+  import { createIdleQueued } from '../../modules/util'
 
   export let content: string | Promise<string>
   export let lang = ''
@@ -12,12 +13,18 @@
   let container: HTMLElement
   let view: EditorView
 
-  $: if (content && view) getDoc().then(doc => view.dispatch({
-    changes: { from: 0, to: view.state.doc.length, insert: doc }
+  const update = createIdleQueued(() => getDoc().then((doc) => {
+    if (view) view.dispatch({
+      changes: { from: 0, to: view.state.doc.length, insert: doc }
+    })
   }))
 
+  const langCompartment = new Compartment()
+
+  $: if (content && view) update()
+
   $: if (lang && view) getLang().then(lang => view.dispatch({
-    reconfigure: { 'current-lang': lang }
+    effects: langCompartment.reconfigure(lang!)
   }))
 
   async function getLang() {
@@ -38,7 +45,7 @@
         doc: await getDoc(),
         extensions: [
           ...getNoEditExtensions(),
-          tagExtension('current-lang', await getLang() ?? [])
+          langCompartment.of(await getLang() ?? [])
         ]
       })
     })

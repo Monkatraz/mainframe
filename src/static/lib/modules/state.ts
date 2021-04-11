@@ -138,7 +138,6 @@ export namespace LocalDrafts {
     if (!idx) throw new Error('No such page in database!')
     await db.delete('drafts', idx)
   }
-
 }
 
 // -- PREFERENCES

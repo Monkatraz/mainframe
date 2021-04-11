@@ -4,7 +4,7 @@
  */
 
 import {
-  EditorState, Extension,
+  EditorState, Extension, Compartment,
   EditorView, ViewPlugin, ViewUpdate,
   getExtensions, syntaxTree, printTree
 } from 'cm6-mainframe'
@@ -210,6 +210,8 @@ export class EditorCore {
         extensions: [
           ...getExtensions(),
           ...extensions,
+          this.spellcheckCompartment.of(EditorView.contentAttributes.of({ spellcheck: 'false' })),
+          this.guttersCompartment.of(EditorView.editorAttributes.of({ class: '' })),
           updateHandler
         ]
       })
@@ -253,21 +255,24 @@ export class EditorCore {
     return printTree(syntaxTree(this.state), this.doc.toString())
   }
 
+  spellcheckCompartment = new Compartment()
+  guttersCompartment = new Compartment()
+
   /** Whether or not the browser's spellchecker is enabled for the editor. */
   set spellcheck(state: boolean) {
     this.view.dispatch({
-      reconfigure: {
-        spellcheck: EditorView.contentAttributes.of({ spellcheck: String(state) })
-      }
+      effects: this.spellcheckCompartment.reconfigure(
+        EditorView.contentAttributes.of({ spellcheck: String(state) })
+      )
     })
   }
 
   /** Whether or not the line-numbers and associated gutter panel is shown. */
   set gutters(state: boolean) {
     this.view.dispatch({
-      reconfigure: {
-        'hide-gutters': EditorView.editorAttributes.of({ class: state ? '' : 'hide-gutters' })
-      }
+      effects: this.guttersCompartment.reconfigure(
+        EditorView.editorAttributes.of({ class: state ? '' : 'hide-gutters' })
+      )
     })
   }
 }

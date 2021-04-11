@@ -103,8 +103,8 @@ const rules = {
         'no-extra-non-null-assertion',
         'no-unnecessary-type-constraint',
         'prefer-as-const',
-        'prefer-enum-initializers',
-        'prefer-for-of',
+        // 'prefer-enum-initializers',
+        // 'prefer-for-of',
         'prefer-namespace-keyword',
         'prefer-optional-chain',
         'prefer-regexp-exec',
@@ -143,15 +143,52 @@ const rules = {
     ...useDefault('warn', [
       'dot-notation'
     ])
+  },
+
+  regex: {
+    ...prefixKeys('clean-regex/', {
+      // code
+      ...useDefault('error', [
+        'confusing-quantifier',
+        'no-empty-alternative',
+        'no-empty-backreference',
+        'no-obscure-range',
+        'no-octal-escape',
+        'no-optional-assertion',
+        'no-unnecessary-assertions',
+        'no-zero-quantifier',
+        'optimal-lookaround-quantifier'
+      ]),
+
+      // style
+      ...useDefault('warn', [
+        'identity-escape',
+        'no-trivially-nested-lookaround',
+        'no-trivially-nested-quantifier',
+        'no-unnecessary-character-class',
+        'no-unnecessary-lazy',
+        'no-unnecessary-quantifier',
+        'optimal-concatenation-quantifier',
+        'optimized-character-class',
+        'prefer-character-class',
+        // 'prefer-predefined-assertion',
+        'prefer-predefined-character-set',
+        'prefer-predefined-quantifiers',
+        'simple-constant-quantifier',
+        'sort-flags'
+      ]),
+
+      'consistent-match-all-characters': ['warn', { charClass: '[^]' }]
+    })
   }
 }
 
-const baseRules = { ...rules.code, ...rules.restrict, ...rules.style }
+const baseRules = { ...rules.code, ...rules.restrict, ...rules.style, ...rules.regex }
 const typeRules = { ...rules.typescript, ...rules.typeChecked }
 
 module.exports = {
   ignorePatterns: ['**/node_modules/**'],
-  plugins: ['svelte3', '@typescript-eslint'],
+  plugins: ['svelte3', '@typescript-eslint', 'clean-regex'],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     sourceType: 'module',
@@ -169,7 +206,7 @@ module.exports = {
     },
     // TypeScript (Browser)
     {
-      files: ['*.ts', '*.tsx'],
+      files: ['*.d.ts', '*.ts', '*.tsx'],
       env: { browser: true, es2021: true },
       rules: { ...baseRules, ...typeRules }
     },

@@ -1,16 +1,11 @@
-const esbuildSettings = '--outbase=./packages/cm6 --outdir=./packages/cm6/dist --bundle --format=esm'
+// const esbuildSettings = '--outbase=./packages/cm6 --outdir=./packages/cm6/dist --format=esm'
 
 module.exports = {
-  exclude: ['./node_modules/**', '**/*.d.ts'],
+  workspaceRoot: './packages',
   mount: {
-    'src': '/',
-    'public': {
+    src: '/',
+    public: {
       url: '/',
-      static: true,
-      resolve: false
-    },
-    'packages/cm6/dist': {
-      url: '/static/packages/cm6',
       static: true,
       resolve: false
     }
@@ -33,28 +28,34 @@ module.exports = {
     '@vendor':       './public/vendor',
     '@data':         './src/static/data',
     '@components':   './src/static/lib/components/index.ts',
-    '@schemas':      './src/static/data/schemas.d.ts',
-    'cm6-mainframe': './packages/cm6/dist/lib/index.js'
+    '@schemas':      './src/static/data/schemas.d.ts'
   },
   routes: [ { src: '.*', dest: '/index.html', match: 'routes' } ],
   optimize: {
-    preload: true,
     minify: true,
     treeshake: true,
-    splitting: false,
+    splitting: true,
+    sourcemap: 'external',
     manifest: true,
     target: 'es2020'
   },
   plugins: [
-    './dev/snowpack/esbuild-compat.js',
     ['@snowpack/plugin-build-script', { cmd: 'js-yaml', input: ['.yaml'], output: ['.json'] }],
     ['@snowpack/plugin-run-script', {
       name: 'CM6',
       cmd: '(cd packages/cm6 && npm run build)',
-      watch: `esbuild ./packages/cm6/lib/index.ts --watch ${esbuildSettings}`
+      watch: '(cd packages/cm6 && npm run dev)'
+    }],
+    ['@snowpack/plugin-run-script', {
+      name: 'Tarnation',
+      cmd: '(cd packages/tarnation && npm run build)',
+      watch: '(cd packages/tarnation && npm run dev)'
     }],
     '@snowpack/plugin-svelte',
-    './dev/snowpack/compile-css.js',
+    ['snowpack-plugin-stylus', {
+      paths: ['./src/static/css/', './dev/snowpack/stylus-plugins/']
+    }],
+    '@snowpack/plugin-postcss',
     './dev/snowpack/workers.js'
   ]
 }

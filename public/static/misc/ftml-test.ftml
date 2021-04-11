@@ -1,0 +1,793 @@
+//italic text//
+**bold text**
+//**italic and bold**//
+__underline text__
+--strikethrough text--
+{{teletype (monospaced) text}}
+normal ^^superscript^^
+normal ,,subscript,,
+[!-- invisible comment --]
+[[span style="color:red"]]custom //span// element[[/span]]
+[[span id="mySpan"]]My span element[[/span]]
+[[span id="u-mySpan"]]My span element[[/span]]
+##blue|predefined## or ##44FF88|custom-code## color
+
+[[size smaller]]smaller text[[/size]]
+[[size larger]]larger text[[/size]]
+[[size 80%]]80% of current size[[/size]]
+[[size 100%]]100% of current size[[/size]]
+[[size 150%]]150% of current size[[/size]]
+[[size 0.8em]]80% of current size[[/size]]
+[[size 1em]]100% of current size[[/size]]
+[[size 1.5em]]150% of current size[[/size]]
+
+[[size xx-small]]xx-small text[[/size]]
+[[size x-small]]x-small text[[/size]]
+[[size small]]small text[[/size]]
+[[size large]]large text[[/size]]
+[[size x-large]]x-large text[[/size]]
+[[size xx-large]]xx-large text[[/size]]
+[[size 7px]]text size 7 pixels[[/size]]
+[[size 18.75px]]text size 18.75 pixels[[/size]]
+
+First paragraph. Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
+
+Second paragraph. Aenean a libero. Vestibulum adipiscing, felis ac faucibus imperdiet, erat lacus accumsan neque, vitae nonummy lorem pede ac elit.
+Just a new line.
+Another new line.
+
+Only 5x space+ Enter:
+
+Last line after 5 x enter 
+
+With special Line-Break: _
+ _
+ _
+ _
+ _
+Last line after 5 x special line-Break
+
+``quotation''
+`quotation'
+,,quotation''
+<<quotation>>
+>>quotation<<
+dots...
+em -- dash
+
+This //text// gets **parsed**.
+@@This //text// does not get **parsed**.@@
+
+HTML entities: @<U umlaut: &#252;>@
+@<[[code]]>@
+@<Hello world @@ !!!!>@
+@<Something **not** bold>@
+@<[[module ListPages]]>@
+@<Copyright sign: &copy;>@
+@<[[/code]]>@
+Or, @<@&lt;>@ and @<&gt;@>@
+
+[!--
+This text will not be rendered.
+--]
+[!--This text will not be rendered.--]
+
++ Level 1 Heading
+++ Level 2 Heading
++++ Level 3 Heading
+++++ Level 4 Heading
++++++ Level 5 Heading
+++++++ Level 6 Heading
+
+[[toc]]
+[[f>toc]] - right-float table of contents
+[[f<toc]] - left-float table of contents
+
++ This section appears in the TOC
++* And this one does not
+++* Neither does this one
+
+* Bullet 1
+* Bullet 2
+ * Bullet 2.1
+
+* Bullet 1 _
+ another line
+* Bullet 2
+ * Bullet 2.1
+
+# Item 1
+# Item 2
+ # Item 2.1
+
+# Item 1 _
+ another line
+# Item 2
+ # Item 2.1
+
+[[ul]]
+ [[li class="item1" data-toggle="data1"]]Item1[[/li]]
+ [[li_ style="color: red;"]]Item 2
+  [[ol]]
+    [[li_]]Item 2.1[[/li]]
+    [[li_]]Item 2.2[[/li]]
+  [[/ol]]
+ [[/li]]
+[[/ul]]
+
+: Item 1 : Something
+: Item 2 : Something else
+
+: Item 1 : Something _
+another line
+: Item 2 : Something else
+
+This is normal text here.
+
+> Indent me! The quick brown fox jumps over the lazy dog. \
+Now this the time for all good men to come to the aid of \
+their country. Notice how we can continue the block-quote \
+in the same "paragraph" by using a backslash at the end of \
+the line.
+>
+> Another block, leading to...
+>> Second level of indenting. This second is indented even \
+more than the previous one.
+
+Back to normal text.
+
+[[collapsible show="+ Show whatever" hide="- Hide whatever"]]
+Whatever text to show/hide.
+[[/collapsible]]
+
+[[div class="foldable-list-container"]]
+* Links
+ * Wikidot
+  * [*http://www.wikidot.com/doc Documentation]
+  * [*http://www.wikidot.com/doc:wiki-syntax wiki-syntax]
+  * [*http://community.wikidot.com/howto:howto-list How-To's]
+ * Search Engines
+  * [*http://www.google.com Google]
+  * [*http://www.yahoo.com Yahoo]
+* Main Category 1
+ * [# Main 1 - Sub 1]
+ * [# Main 1 - Sub 2]
+* Main Category 2
+ * [# Main 2 - Sub 1]
+ * [# Main 2 - Sub 2]
+ * [# Main 2 - Sub 3]
+* Main Category 3
+ * [# Main 3 - Sub 1]
+[[/div]]
+
+[[[link-to-a-page]]]
+[[[link "TO" a; pagE]]]
+[[[category: sample page]]]
+[[[some page| custom text]]]
+[[[doc|Documentation]]]
+[[[some page|]]]
+[[[doc#toc1|Section 1]]]
+[[[doc#toc1]]]
+[[[/| Home]]]
+
+[[[http://www.wikidot.com | Wikidot]]]
+[[[*http://www.wikidot.com | Wikidot]]]
+[[[/category:page/option1/option2 | link text]]]
+[[[/blog:post/edit/true | edit this post]]]
+http://www.wikidot.com
+[http://www.wikidot.com wikidot]
+*http://www.wikidot.com
+[*http://www.wikidot.com wikidot]
+[[a href="http://www.wikidot.com"]] Wikidot[[/a]]
+[# empty link]
+[/category:page/option1/option2 link text]
+
+[[# anchor-name]]
+[#anchor-name text to display]
+
+support@example.com
+[support@example.com email me!]
+
+[wikipedia:Albert_Einstein]
+[wikipedia:Albert_Einstein Albert]
+[wikipedia:it:Albert_Einstein Albert]
+
+[[image image-source attribute1="value1" attribute2="value2"]]
+[[image http://www.example.com/image.jpg attribute1="value1" attribute2="value2"]]
+[[image exampleimage.jpg attribute1="value1" attribute2="value2"]]
+[[image :first attribute1="value1" attribute2="value2"]]
+[[image /another-page/exampleimage.jpg attribute1="value1" attribute2="value2"]]
+[[image flickr:83001279 attribute1="value1" attribute2="value2"]]
+[[image flickr:149666562_debab08866 attribute1="value1" attribute2="value2"]]
+
+[[=image http://www.example.com/image.jpg attribute1="value1" attribute2="value2"]]
+[[<image http://www.example.com/image.jpg attribute1="value1" attribute2="value2"]]
+[[>image http://www.example.com/image.jpg attribute1="value1" attribute2="value2"]]
+[[f<image http://www.example.com/image.jpg attribute1="value1" attribute2="value2"]]
+[[f>image http://www.example.com/image.jpg attribute1="value1" attribute2="value2"]]
+
+[[gallery size="image-size"]]
+
+[[gallery size="image-size"]]
+: image-source1 attribute1="value1" attribute2="value2"
+: image-source2 attribute1="value1" attribute2="value2"
+[[/gallery]]
+
+[[note]]
+example note
+[[/note]]
+
+[[#expr abs(-100) ]]
+[[#expr min(4, 1, -4, 6, -10) ]]
+[[#expr max(4, 1, -4, 6, -10) ]]
+[[#expr 2*4/12-4+66%2 ]]
+[[#ifexpr 2*4/12-4+66%2 < -3.5 | less than -3.5 | greater than -3.5 ]]
+[[#expr 2*(2-1) ]]
+[[#if true | display if true | display if false ]]
+
+[[if name]]
+if code ...
+[[/if]]
+
+[[if !name]]
+if code ...
+[[/if]]
+
+[[if name]]
+if code ...
+[[else]]
+else code ...
+[[/if]]
+
+[[if site_subtitle]]
+[[if site_locked]]
+[[if page_title]]
+[[if breadcrumbs]]
+[[if tags]]
+[[if topbar]]
+[[if sidebar]]
+[[if ssl_warning]]
+[[if page_exists]]
+[[if license_text]]
+[[if custom_footer]]
+
+[[module NaviBar]] - Wikidot's branded top bar
+[[module FooterBar]] - Wikidot's Interesting Sites
+[[module LoginStatus]] - Sign in/Create account button or User logged in
+[[module PageOptionsBottom]] - Page options: edit, tags etc.
+[[action_area]] - Indicates the position on the page that PageOptionsBottom will use when it needs to display additional content, e.g. a file upload form. It's needed for correct functioning of PageOptionsBottom module
+
+[[module AdModuleAboveContent]] - Ad box for Pro users
+[[module AdModuleBelowContent]] - Ad box for Pro users
+[[module AdModuleAboveSidebar]] - Ad box for Pro users
+[[module AdModuleBelowSidebar]] - Ad box for Pro users
+[[module AdModuleBelowFooter]] - Ad box for Pro users
+[[module Ad label="custom_location"]] - Ad box for Pro users (custom location support)
+
+[[site_name]] - Site title, former <h1>
+[[site_subtitle]] - Site subtitle, former <h2>
+[[content]] - It's rather obvious, content of the page
+[[search_box]] - Box for searching within a site
+[[site_locked]] - Information about a lock on the site
+[[page_title]] - Page title
+[[breadcrumbs]] - Breadcrumbs elements
+[[tags]] - Displays list of tags
+[[topbar]] - Top navigation
+[[sidebar]] - Side navigation, displayed if enabled
+[[ssl_warning]] - Warning about disabled SSL if Pro+ subscription expires
+[[page_not_exists]] - Information displayed when page does not exist
+[[license_text]] - License text (set up in Admin Panel)
+[[footer]] - Inserts footer, default or custom
+
+[[note]]example note[[/note]]
+
+[[f<image %%form_raw{bandimage}%% width="150px"]]
+
+++ %%title%%
+
+Band type: %%form_data{type}%%
+Band website: %%form_data{bandwebsite}%%
+Is the band currently recording?: %%form_data{current}%%
+
+====
+
+[[form]]
+fields:
+  type:
+    label: Music type
+    type: select
+    values:
+      0: Classical
+      1: Country
+      2: Folk
+      3: Indie
+      4: Jazz
+      5: Pop
+      6: Rock
+    default: 6
+  bandimage:
+    label: Image
+    type: file
+  bandwebsite:
+    label: Band website
+    type: url
+  current:
+    label: Currently Recording
+    type: select
+    values:
+      0: "Yes"
+      1: "No"
+    default: 0
+[[/form]]
+
+[[div style="float:right; width: 200px; border: 1px solid #999; margin: 10px;"]]
+%%content{1}%%
+[[/div]]
+
+%%content{2}%%
+
+[[table]]
+[[row]]
+[[column]]
+%%content{3}%%
+[[/column]]
+[[column]]
+%%content{4}%%
+[[/column]]
+[[/row]]
+[[/table]]
+
+==== 
+
+This will be content of the side bar.
+
+==== 
+
+The main content.
+
+==== 
+
+This will go into the left cell of the table.
+
+==== 
+
+And this into the right cell.
+
+[[html]]
+<h1>Custom HTML</h1>
+<p>Something else</p>
+<img src="anything.png" alt="hello ;-)"/>
+[[/html]]
+
+[[code type="php"]]
+<?php
+/* comment */
+for($i=0; $i<100; $i++){
+echo "number".$i."\n";
+}
+?>
+[[/code]]
+
+||~ head 1 ||~ head 2 ||~ head 3 ||
+|| cell 1 || cell 2 || cell 3 ||
+|||| long cell 4 || cell 5 ||
+||cell 6 |||| long cell 7 ||
+|||||| looong cell 8||
+
+|| lines must start and end || with double vertical bars || nothing ||
+|| cells are separated by || double vertical bars || nothing ||
+|||| you can span multiple columns by || starting each cell ||
+|| with extra cell |||| separators ||
+|||||| but perhaps an example is _
+the easiest way to see ||
+
+[[table]]
+[[row]]
+[[hcell style="border: 1px solid silver; background-color: yellow;"]]
+header cell 0.0
+[[/hcell]]
+[[hcell style="border: 1px solid silver"]]
+header cell 0.1
+[[/hcell]]
+[[hcell style="border: 1px solid silver" ]]
+header cell 0.2
+[[/hcell]]
+[[/row]]
+[[row]]
+[[cell style="border: 1px solid silver" colspan="2"]]
+cell 1.0
+[[/cell]]
+[[cell style="border: 1px solid silver; background-color: yellow;"]]
+cell 1.2
+[[/cell]]
+[[/row]]
+[[row]]
+[[cell style="border: 1px solid silver" rowspan="2"]]
+cell 2.0
+[[/cell]]
+[[cell style="border: 1px solid silver"]]
+cell 2.1
+[[/cell]]
+[[cell style="border: 1px solid silver"]]
+cell 2.2
+[[/cell]]
+[[/row]]
+[[row]]
+[[cell style="border: 1px solid silver"]]
+cell 3.1
+[[/cell]]
+[[cell style="border: 1px solid silver"]]
+cell 3.2
+[[/cell]]
+[[/row]]
+[[/table]]
+
+[[=]]
+Lorem ipsum dolor sit amet, consectetuer adipiscing elit.\
+Aenean a libero. Vestibulum adipiscing, felis ac faucibus \
+imperdiet, erat lacus accumsan neque, vitae nonummy lorem \
+pede ac elit.
+
+Maecenas in urna. Curabitur hendrerit risus vitae ligula.
+[[/=]]
+
+[[<]]
+…
+[[/<]]
+[[>]]
+…
+[[/>]]
+[[=]]
+…
+[[/=]]
+[[==]]
+…
+[[/==]]
+
+= Centered line
+
+[[div style="float:left; width: 45%; padding: 0 2%"]]
+left column left column left column left column left column
+left column left column left column left column left column
+[[/div]]
+[[div style="float:left; width: 45%; padding: 0 2%"]]
+right column right column right column right column right column
+right column right column right column right column right column
+[[/div]]
+
+[[math label1]]
+\rho _{\rm GJ} = -\sigma (r) \left[ (1 - \eta _{\ast }^2 {\kappa \over {\eta ^3}}) \cos \chi \right.
++ \left. {3\over 2} \theta (\eta) H(\eta)
+\xi \sin \chi \cos \phi \right]
+[[/math]]
+
+[[math type="align"]]
+E = mc^2
+[[/math]]
+
+[[math]]
+\begin{align}
+E = mc^2
+\end{align}
+[[/math]]
+
+[[$ E = mc^2 $]] is much more popular than
+[[$ G_{\mu\nu} - \Lambda g_{\mu\nu} = \kappa T_{\mu\nu} $]]
+
+Some text[[footnote]]And a small footnote.[[/footnote]]. Here we go
+with another footnote[[footnote]]Content of another footnote.[[/footnote]].
+
+[[footnoteblock]]
+
+The first pulsar was observed by J. Bell and A. Hewish [((bibcite bell))]. Another reference [see ((bibcite guy))].
+
+[[bibliography]]
+: bell : Bell, J.; Hewish, A.; Pilkington, J. D. H.; Scott, P. F.; and Collins, R. A. //Observation of a Rapidly Pulsating Radio Source.// Nature 217, 709, 1968.
+: guy : Guy, R. K. //Modular Difference Sets and Error Correcting Codes.// §C10 in Unsolved Problems in Number Theory, 2nd ed. New York: Springer-Verlag, pp. 118-121, 1994.
+[[/bibliography]]
+
+[[date 1216153821]]
+[[date 1216153821 format="%d. %m. %Y|agohover"]]
+[[date 681746400 format="James is %O young"]]
++++ Minutes from [[date 1234567890 format="%e %B|agohover"]]
+
+[[include pagename var1=value1 | 
+number_books = 43 | 
+title=Best Wiki Ever | 
+variable_name = just a variable | 
+variableName = another variable ]]
+
+{$var1}, {$number_books}, {$title}, {$variable_name}, {$variableName}
+
+[[include :sitename:pagename]]
+
+[[embedvideo]]
+<embed style="width:400px; height:326px;" id="VideoPlayback" align="middle"
+type="application/x-shockwave-flash"
+src="http://video.google.com/googleplayer.swf?docId=263244138622602613"
+allowScriptAccess="sameDomain" quality="best" bgcolor="#ffffff" scale="noScale" salign="TL"
+FlashVars="playerMode=embedded"> </embed>
+[[/embedvideo]]
+
+[[embedaudio]]
+<embed src="http://www.odeo.com/flash/audio_player_standard_gray.swf"
+quality="high" width="300" height="52" name="audio_player_standard_gray"
+align="middle" allowScriptAccess="always" wmode="transparent"
+type="application/x-shockwave-flash" flashvars="audio_id=99133&audio_duration=282.0&valid_sample_rate=true&external_url=http://www.vitalpodcasts.com/FileSystem/podcasts/89/opensource_episode1.mp3" pluginspage="http://www.macromedia.com/go/getflashplayer" />
+</embed><br /><a style="font-size: 9px; padding-left: 110px; color: #f39;
+letter-spacing: -1px; text-decoration: none" href="http://odeo.com/audio/99133/view">
+powered by <strong>ODEO</strong></a>
+[[/embedaudio]]
+
+[[embed]]
+<script type="text/javascript" src="http://del.icio.us/feeds/js/tags/michal_frackowiak?icon;size=12-35;color=87ceeb-0000ff;title=my%20del.icio.us%20tags"></script>
+[[/embed]]
+
+[[iframe url-source frameborder="0"]]
+
+[[iftags +tag1 -tag2 tag3]] ... [[/iftags]]
+
+[[iftags +science]]
+This page is labeled as: science.
+
+Click here to view more science articles >
+[[/iftags]]
+
+[[iftags +bug -fixed]]
+This is a bug, but it's not fixed yet.
+[[/iftags]]
+
+[[file /another-page/filename | custom-text]]
+
+[[user user-name]]
+e.g. [[user michal frackowiak]]
+[[*user user-name]]
+e.g. [[*user michal frackowiak]]
+
+[[social blinklist,blogmarks,connotea,del.icio.us,digg,fark,feedmelinks,furl,linkagogo,newsvine,netvouz,reddit,simpy,spurl,wists,yahoomyweb,facebook]]
+
+[[social digg,furl,del.icio.us,facebook]]
+
+[[>]]
+[[button source style="background-image: url(http://www.wikidot.com/local--files/files/view-source.png); background-repeat: no-repeat; background-position: bottom right; padding-right: 20px; color: #444"]]
+[[button print style="background-image: url(http://www.wikidot.com/local--files/files/document-print.png); background-repeat: no-repeat; background-position: bottom right; padding-right: 20px;color: #444"]]
+[[/>]]
+
+[[button set-tags +tag1 -tag2 text="Change tags"]]
+[[button set-tags +favorite +_book -_movie text="Change tags"]]
+[[button set-tags +favorite -* text="Change tags"]]
+[[button set-tags -* -_* text="Change tags"]]
+[[button set-tags -* +favorite +_book text="Change tags"]]
+
+[[tabview]]
+[[tab Title of Tab No. 1]]
+Content of Tab No. 1.
+[[/tab]]
+[[tab Title of Tab No. 2]]
+Content of Tab No. 2.
+[[/tab]]
+[[tab Title of Tab No. 3]]
+Content of Tab No. 3.
+[[/tab]]
+[[/tabview]]
+
+[[module CSS]]
+#side-bar { 
+    visibility: hidden; 
+    width: 0
+}
+[[/module]]
+
+[[module ListDrafts pageType="exists"]]
+
+[[module ListPages arguments...]]
+module body
+[[/module]]
+
+[[module ListPages separate="no" limit="5"]]
+%%title_linked%% - [[user %%created_by%%]] - %%created_at%%
+[[/module]]
+
+[[module CountPages category="wiki,blog" tags="_closed"]]
+%%total%% active pages.
+[[/module]]
+
+[[module ListUsers users="."]]
+**You are user number %%number%%, %%title%% (%%name%%)!**
+[[/module]]
+
+[[module TagCloud minFontSize="1em" maxFontSize="2em" maxColor="8,8,8" minColor="200,200,228" category="news"]]
+
+[[module PageCalendar category="doc"]]
+[[module ListPages category="doc" perPage="7" date="@URL" separate="false" prependLine="||~ Page||~ Date created||~ Created by ||"]]
+|| %%linked_title%% || %%date%% || %%author%% ||
+[[/module]]
+
+[[module ListPages category="carousel" wrapper="no" separate="no" _active="yes"]]
+  [[head]]
+    [[ul id="u-myList" class="..."]]
+  [[/head]]
+
+  [[body]]
+    [[li class="list-item"]]%%title_linked%% by (%%created_by%%)[[/li]]
+  [[/body]]
+
+  [[foot]]
+    [[/ul]]
+  [[/foot]]
+[[/module]]
+
+[[module PageTree root="doc" showRoot="true"]]
+
+[[module Backlinks]]
+
+++ Categories:
+
+[[[category:cars]]], [[[category:bikes]]]
+
+[[module WantedPages]]
+
+[[module OrphanedPages]]
+
+[[module Categories]]
+
+[[module Watchers]]
+
+[[module Members group="moderators"]]
+
+[[module Join button="Join this site, it is cool!"]]
+
+[[module SendInvitations]]
+
+[[module WhoInvited]]
+
+[[module NewPage template="template:module,template:howto"]]
+
+[[module Clone]]
+
+[[module Redirect destination="http://www.example.com/base/"]]
+
+[[module ThemePreviewer]]
+
+[[module MailForm title="New message from MailForm documentation page"]]
+# name
+ * title: Your name
+ * type: text
+ * rules:
+  * required: true 
+# affiliation
+ * title: Institute/Organization/Company
+ * hint: leave blank in none
+# address 
+ * title: Address
+ * rules:
+  * required: true 
+  * minLength: 2
+# address2
+ * title: Address (cont.)
+# country
+ * title: Country
+ * rules:
+  * minLength: 2
+# phone
+ * title: Phone
+# email
+ * title: Email
+ * type: text
+ * rules:
+  * match: /^[_a-zA-Z0-9-]+(\.[_a-zA-Z0-9-]+)*@[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/
+# payment
+ * title: I will pay by
+ * type: select
+ * options:
+  * creditcard: Credit card
+  * banktransfer: Bank wire transfer
+  * desk: At the registration desk
+  * na: Not applicable
+# logging
+ * title: Please find me a hotel
+ * type: checkbox
+ * hint: we will contact you via email if yes
+# comments
+ * type: textarea
+ * title: Extra comments
+ * rules:
+  * maxLength: 500
+[[/module]]
+
+[[module PetitionAdmin]]
+
+[[module SiteGrid limit="20"]]
+wikipiano
+michal
+wikiwealth
+quake
+fretsonfire
+squark
+istorijska-biblioteka
+angels
+string-theory
+fifa360
+liquidrescale
+qttabbar
+osx86
+moonworld
+wiihd
+wherearethejoneses
+sniki.org
+wow-unity
+heroesmush
+bvswiki.com
+scp-wiki
+www.digistan.org
+mechanics
+aeldaria
+coffeetime
+f-g
+thehurl
+arch1k
+comicbooks
+karmalab
+scmapdb
+tibasicdev
+gamedesign
+herald-tips-tricks
+swib
+skyscraper-en
+terrasdeportugal
+scmapdb
+l4dmapdb
+[[/module]]
+
+[[module FeaturedSite]]
+community.wikidot.com
+[[/module]]
+
+[[module Feed src="http://rss.slashdot.org/Slashdot/slashdot;http://digg.com/rss/containertechnology.xml" limit="20"]]
+++ %%linked_title%% (%%linked_channel_title%%)
+
+%%date%%, submitted by %%custom digg:submitter_username%% %%custom dc:creator%%
+
+%%description%%
+[[/module]]
+
+[[module Feed src="http://rss.slashdot.org/Slashdot/slashdot;http://digg.com/rss/containertechnology.xml" offset="20" limit="20"]]
+**%%linked_title%%** (%%linked_channel_title%%, %%date%% by %%custom digg:submitter_username%% %%custom dc:creator%%)
+[[/module]]
+
+[[module FrontForum category="8" feed="news" feedTitle="Wikidot site news"]]
+++ %%linked_title%%
+
+%%date|%e %b %Y, %H:%M %Z (%O ago)%%
+
+%%content%%
+
+%%comments%% | category: %%category%%
+[[/module]]
+
+[[module Comments hide="true"]]
+
+[[module RecentPosts]]
+
+[[module MiniRecentThreads limit="3"]]
+
+[[module MiniActiveThreads limit="5"]]
+
+[[module MiniRecentPosts limit="3"]]
+
+[[module Rate]]
+
+[[module Rate]]
+Average Rating %%rating%% from %%rating_votes%% votes
+[[/module]]
+
+[[module Files]]
+
+[[module Search]]
+
+[[module SearchUsers]]
+
+[[module SearchAll]]
+
+[[module SiteChanges]]
+

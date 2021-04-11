@@ -1,0 +1,127 @@
+kw<word> { @specialize[@name={word}]<identifier, word> }
+nm<word> { @specialize[@name=Name]<identifier, word> }
+id<name> { identName[@name={name}] { identifier } }
+
+@external grammar parser as css from "lezer-css"
+
+// Grammar
+@top Document { (nl | chunk)+ }
+
+chunk {
+    Raw
+  | RawBlock
+  | BlockNode
+}
+
+BlockNode { BlockLeft any* BlockRight}
+
+text {
+    StrongMark
+  | EmphasisMark
+  | StrikethroughMark
+  | UnderlineMark
+  | SuperscriptMark
+  | SubscriptMark
+  | ColorMark
+  | MonospaceLeft
+  | MonospaceRight
+}
+
+@skip { Comment }
+
+Comment { CommentLeft any* CommentRight }
+
+@tokens {
+
+  any { ![] }
+  char { ![\n\r\\"'] | '\\' $["'\\rnt] }
+  identifier { std.asciiLetter ($[-_] | std.asciiLetter | std.digit)+ }
+  nl { '\n' }
+  space { $[\t ] }
+
+  Other { ![\n\r\[\]@<>*/\-_^,#{}\t ] }
+  Whitespace { $[ \n\t\r]+ }
+
+  LineBreak { nl }
+  ParagraphBreak { nl nl+ }
+
+  RawLeft  { '@<' }
+  RawRight { '>@' }
+  RawMark  { '@@' }
+
+  RawBlock { RawLeft any* RawRight }
+  Raw { RawMark any* RawMark }
+
+  CommentLeft        { '[!--' }
+  CommentRight       { '--]'  }
+  BracketLeft        { '['   $[#*]? }
+  BlockLeft          { '[['  $[/*]? }
+  LinkLeft           { '[[[' $[*]?  }
+  BracketRight       { ']'    }
+  BlockRight         { ']]'   }
+  LinkRight          { ']]]'  }
+
+  StrongMark        { '**' }
+  EmphasisMark      { '//' }
+  StrikethroughMark { '--' }
+  UnderlineMark     { '__' }
+  SuperscriptMark   { '^^' }
+  SubscriptMark     { ',,' }
+  ColorMark         { '##' }
+  MonospaceLeft     { '{{' }
+  MonospaceRight    { '}}' }
+
+  @precedence {
+    RawLeft, RawRight, RawMark,
+    RawBlock, Raw,
+    CommentLeft, CommentRight,
+    BracketLeft, BlockLeft, LinkLeft,
+    BracketRight, BlockRight, LinkRight,
+    StrongMark,
+    EmphasisMark,
+    StrikethroughMark,
+    UnderlineMark,
+    SuperscriptMark,
+    SubscriptMark,
+    ColorMark,
+    MonospaceLeft, MonospaceRight,
+    Name,
+    identifier,
+    nl,
+    space,
+    any,
+    text,
+    Whitespace,
+    Other
+  }
+
+  // General Syntax
+  Variable { '$' identifier }
+  VariableStatement { '{' Variable '}' }
+
+  String { "'" char* "'" | '"' char* '"' }
+
+  CSS  { 'CSS' }
+  Name { identifier }
+  Slug { ':'? (![\n\r\t\[\]: ]+ ':')* ![\n\r\t\[\]: ]+ }
+  @precedence { CSS, Name }
+
+  // Align Types
+  '[[>]]'  '[[<]]'  '[[=]]'  '[[==]]'
+  '[[/>]]' '[[/<]]' '[/[=]]' '[[/==]]'
+
+  // Marks
+  '{' '$' '}' '|' '[[' '[[/' ']]' '/'[@name=EndSlash]
+
+  // Formatting Marks
+  '@@' '@<' '>@' '**' '//' '__' '^^' ',,' '##' '{{' '}}'
+
+  @precedence {
+    Comment,
+    VariableStatement,
+    identifier,
+    Text
+  }
+}
+
+@detectDelim

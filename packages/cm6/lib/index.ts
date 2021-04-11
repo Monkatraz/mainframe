@@ -1,4 +1,4 @@
-import { EditorState, Extension, tagExtension }                      from '@codemirror/state'
+import { EditorState, Extension, Compartment }                      from '@codemirror/state'
 import { EditorView, ViewPlugin, ViewUpdate, drawSelection, keymap } from '@codemirror/view'
 
 import { highlightActiveLine, highlightSpecialChars }     from '@codemirror/view'
@@ -16,15 +16,20 @@ import { rectangularSelection }                           from '@codemirror/rect
 import { redo }                                           from '@codemirror/history'
 import { copyLineDown }                                   from '@codemirror/commands'
 
-import { mfmarkdown }  from './lang'
+import { FTMLLanguage }  from './ftml'
 import { indentHack }  from './indent'
 import { confinement } from './theme'
+
+import { cssCompletion } from '@codemirror/lang-css'
+import { htmlCompletion } from '@codemirror/lang-html'
+
+// import { javascript } from '@codemirror/lang-javascript'
 
 // -- RE-EXPORTS
 
 export type { Extension }
 
-export { EditorState, tagExtension }
+export { EditorState, Compartment }
 export { EditorView, ViewPlugin, ViewUpdate }
 export { syntaxTree, LanguageDescription }
 
@@ -34,10 +39,10 @@ export { printTree } from './util'
 // -- MISC. EXT.
 
 const hideGuttersTheme = EditorView.theme({
-  '$.hide-gutters $gutters': {
+  '&.hide-gutters .cm-gutters': {
     display: 'none !important'
   },
-  '$.hide-gutters $content': {
+  '&.hide-gutters .cm-content': {
     paddingLeft: '0.5rem'
   }
 })
@@ -76,7 +81,9 @@ export function getExtensions() {
       defaultTabBinding
     ]),
     hideGuttersTheme,
-    mfmarkdown(),
+    FTMLLanguage.load(),
+    cssCompletion,
+    htmlCompletion,
     confinement
   ]
 }

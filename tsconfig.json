@@ -33,10 +33,10 @@
       ],
       "@schemas": [
         "./src/static/data/schemas.d.ts"
-      ],
-      "cm6-mainframe": [
-        "./packages/cm6/lib/index.ts"
       ]
+      // "cm6-mainframe": [
+      //   "./packages/cm6/lib/index.ts"
+      // ]
     }
   },
   "typeAcquisition": {
@@ -46,6 +46,7 @@
     "./snowpack.config.js",
     "./.eslintrc.js",
     "./src",
+    "./packages",
     "dev/types"
   ],
   "exclude": [

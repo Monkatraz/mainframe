@@ -1,0 +1,22 @@
+{
+  "name": "ftml",
+  "collaborators": [
+    "Ammon Smith <ammon.i.smith@gmail.com>"
+  ],
+  "description": "Foundation Text Markup Language - a library to render Wikidot text as HTML",
+  "version": "0.5.0",
+  "license": "AGPL-3.0-or-later",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/scpwiki/wikijump/tree/develop/ftml"
+  },
+  "files": [
+    "ftml_bg.wasm",
+    "ftml.js",
+    "ftml.d.ts",
+    "LICENSE.md"
+  ],
+  "module": "ftml.js",
+  "types": "ftml.d.ts",
+  "sideEffects": false
+}

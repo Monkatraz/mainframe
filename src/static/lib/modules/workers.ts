@@ -64,8 +64,55 @@ class WorkerModule {
 
 // -- WORKERS
 
+export namespace FTML {
+  const module = new WorkerModule('ftml-wasm', '../workers/ftml.bundle.js', { persist: true })
+
+  export interface FTMLToken {
+    slice: string
+    span: { start: number, end: number }
+    token: string
+  }
+
+  // TODO: placeholder values
+  export interface Parse {
+    ast: unknown
+    warnings: unknown[]
+  }
+
+  export interface DetailedRender {
+    tokens: FTMLToken[]
+    ast: unknown
+    warnings: unknown[]
+    html: string
+  }
+
+  export async function preprocess(raw: string) {
+    return decode(await module.invoke<ArrayBuffer>(() => module.worker.preprocess(transfer(raw))))
+  }
+
+  export async function tokenize(raw: string) {
+    return await module.invoke<FTMLToken[]>(() => module.worker.tokenize(transfer(raw)))
+  }
+
+  export async function parse(raw: string) {
+    return await module.invoke<Parse>(() => module.worker.parse(transfer(raw)))
+  }
+
+  export async function render(raw: string) {
+    return decode(await module.invoke<ArrayBuffer>(() => module.worker.render(transfer(raw))))
+  }
+
+  export async function detailedRender(raw: string) {
+    return await module.invoke<DetailedRender>(() => module.worker.detailedRender(transfer(raw)))
+  }
+
+  export async function inspectTokens(raw: string) {
+    return decode(await module.invoke<ArrayBuffer>(() => module.worker.inspectTokens(transfer(raw))))
+  }
+}
+
 export namespace Markdown {
-  const module = new WorkerModule('md-renderer', '../workers/md-renderer-bundle-.js', { persist: true })
+  const module = new WorkerModule('md-renderer', '../workers/md-renderer.bundle.js', { persist: true })
 
   /** Safely renders (async) the given Markdown string into HTML.
    *  Passing `true` for the `pretty` parameter formats and indents the output HTML. */
@@ -95,7 +142,7 @@ export namespace Markdown {
 }
 
 export namespace Prism {
-  const module = new WorkerModule('prism', '../workers/md-renderer-bundle-.js')
+  const module = new WorkerModule('prism', '../workers/md-renderer.bundle.js')
 
   /** Returns a syntax highlighted HTML string. */
   export async function highlight(code: string, lang: string) {
@@ -105,7 +152,7 @@ export namespace Prism {
 }
 
 export namespace YAML {
-  const module = new WorkerModule('yaml', '../workers/yaml-bundle-.js')
+  const module = new WorkerModule('yaml', '../workers/yaml.bundle.js')
 
   /** Parses a YAML source and returns an equivalent JSON object. */
   export async function parse<T = JSONObject>(src: string) {

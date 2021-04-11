@@ -55,7 +55,7 @@ module.exports = function (snowpackConfig, pluginOptions) {
     },
     async load({ filePath = '' }) {
       // Don't load partials
-      if (/\\_.*\.styl$/.test(filePath)) return {}
+      if (/\\_.*\.styl$/.test(filePath)) return
 
       // Get our file
       const src = await fs.readFile(filePath, { encoding: 'utf-8' })

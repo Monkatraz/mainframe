@@ -1,13 +1,10 @@
 <script lang='ts'>
   import { settings, EditorCore } from './editor-core'
-  import { EditorView } from 'cm6-mainframe'
   import { onDestroy, onMount, setContext } from 'svelte'
-  import { spring } from 'svelte/motion'
-  import { Markdown } from '../../modules/workers'
+  import { FTML } from '../../modules/workers'
   import {
     matchMedia, tnAnime, focusGroup, onSwipe,
-    Markdown as MarkdownComponent,
-    SubHeader, Toggle, DetailsMenu, Button, Card, TabControl, Tab
+    Wikitext, SubHeader, Toggle, DetailsMenu, Button, Card, TabControl, Tab
   } from '@components'
   import type { OnSwipeOpts } from '@components'
   import EditorBlock from './EditorBlock.svelte'
@@ -19,15 +16,6 @@
 
   let editorContainer: HTMLElement
   let preview: HTMLElement
-
-  let scrollingWith: 'editor' | 'preview' = 'editor'
-  const previewScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
-  const editorScrollSpring = spring(0, { stiffness: 0.05, damping: 0.25 })
-  $: if ($previewScrollSpring || $editorScrollSpring) scrollSync(true)
-
-  // from Markdown component
-  let heightmap: Map<number, number>
-  let heightlist: number[]
 
   $: small = $matchMedia('thin', 'below')
   $: containerClass = $settings.preview.enable ? 'show-preview' : 'show-editor'
@@ -41,17 +29,11 @@
   // -- EDITOR
 
   const Editor = new EditorCore()
-  const activeLines = Editor.activeLines
 
   onMount(async () => {
     await Editor.init(
       editorContainer,
-      await fetch('/static/misc/md-test.md').then(res => res.text()),
-      [EditorView.domEventHandlers({
-        touchstart: () => { scrollingWith = 'editor' },
-        wheel: () => { scrollingWith = 'editor' },
-        scroll: () => { scrollSync() }
-      })]
+      await fetch('/static/misc/ftml-test2.ftml').then(res => res.text())
     )
     mounted = true
   })
@@ -62,60 +44,6 @@
   $: if (mounted) Editor.gutters = $settings.gutters
 
   setContext('editor', Editor)
-
-  // -- PREVIEW <-> EDITOR
-
-  const measure = {
-    key: 'scroll-sync',
-    read() {
-      if (scrollingWith === 'editor') {
-        const scrollTop = Editor.scrollTop
-        editorScrollSpring.set(scrollTop, { hard: true })
-        // get top most visible line
-        const pos = Editor.view.visualLineAtHeight(scrollTop, 0).from
-        if (pos === 0) {
-          previewScrollSpring.set(0)
-          return
-        }
-        const line = Editor.doc.lineAt(pos ?? 0).number
-        // find our line height
-        let lineHeight = 0
-        let curLine = line
-        // check if we have our line or not
-        if (heightmap.has(line)) lineHeight = heightmap.get(line)!
-        // no? get closest line before this one
-        else for (;curLine > 0; curLine--) if (heightmap.has(curLine)) {
-          lineHeight = heightmap.get(curLine)!
-          break
-        }
-        // set preview scroll
-        if (lineHeight) {
-          // fudge value to prevent the preview from getting "sticky"
-          const diff = scrollTop - Editor.heightAtLine(curLine + 1)
-          previewScrollSpring.set(lineHeight + diff, { hard: small })
-        }
-      } else {
-        const scrollTop = preview.scrollTop
-        previewScrollSpring.set(scrollTop, { hard: true })
-        // filter for the closest line height
-        const line = heightlist.findIndex(height => scrollTop < height)
-        if (line !== -1) {
-          // fudge to prevent the editor from getting sticky
-          const diff = (scrollTop - heightlist[line]) * 0.75
-          editorScrollSpring.set(Editor.heightAtLine(line) + diff, { hard: small })
-        }
-      }
-    },
-    write() {
-      if (scrollingWith === 'preview') Editor.scrollTop = $editorScrollSpring
-      else preview.scrollTop = $previewScrollSpring
-    }
-  }
-
-  function scrollSync(writeOnly = false) {
-    if (!(mounted && preview && Editor.view && heightmap && heightlist)) return
-    Editor.view.requestMeasure(writeOnly ? { read() {}, write: measure.write } : measure)
-  }
 
   // -- SWIPING
 
@@ -143,11 +71,16 @@
     }
   }
 
+  async function safeFTMLRender(raw: string) {
+    try {
+      return await FTML.render(raw)
+    } catch (err) {
+      return 'Failed to render\n' + String(err)
+    }
+  }
+
   // @hmr:reset
 </script>
-
-<!-- some chores to do on resize -->
-<svelte:window on:resize={() => scrollSync()}/>
 
 <SubHeader>Editor</SubHeader>
 
@@ -205,26 +138,32 @@
         <TabControl noborder contain compact conditional>
           <Tab>
             <span slot='button' class='fs-sm'>Result</span>
-            <div class='preview codetheme-dark' bind:this={preview}
-              on:scroll={() => scrollSync()}
-              on:touchstart={() => scrollingWith = 'preview'} on:wheel={() => scrollingWith = 'preview'}
-            >
-              <MarkdownComponent details morph bind:heightmap bind:heightlist
-                on:firstrender={() => preview.scrollTop = $previewScrollSpring}
-                template={$Editor.value} activelines={$settings.preview.activelines ? $activeLines : new Set()}
-              />
+            <div class='preview codetheme-dark' bind:this={preview}>
+              <Wikitext template={$Editor.value} morph/>
             </div>
           </Tab>
           <Tab>
             <span slot='button' class='fs-sm'>HTML Output</span>
             <div class='preview-html'>
-              <EditorBlock content={Markdown.render($Editor.value, true)} lang='html' />
+              <EditorBlock content={safeFTMLRender($Editor.value)} lang='html' />
             </div>
           </Tab>
           <Tab>
-            <span slot='button' class='fs-sm'>Syntax Tree</span>
+            <span slot='button' class='fs-sm'>Editor Tree</span>
             <div class='preview-html'>
-              <EditorBlock content={ $Editor.value ? Editor.printTree() : '' }, lang='LezerTree' />
+              <EditorBlock
+                content={ $Editor.value ? Editor.printTree() : '' },
+                lang='LezerTree'
+              />
+            </div>
+          </Tab>
+          <Tab>
+            <span slot='button' class='fs-sm'>FTML Tokens</span>
+            <div class='preview-html'>
+              <EditorBlock
+                content={FTML.inspectTokens($Editor.value)}
+                lang='FTMLTokens'
+              />
             </div>
           </Tab>
         </TabControl>
@@ -385,7 +324,7 @@
     contain: strict
 
   .preview
-    padding: 0 1rem
+    padding: 1rem
     padding-bottom: 100%
     overflow-y: scroll
 

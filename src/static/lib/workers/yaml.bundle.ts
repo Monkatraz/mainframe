@@ -2,7 +2,7 @@
  * @file Worker for rendering yaml or for serializing objects to yaml.
  * @author Monkatraz
  */
-import { expose } from 'threads'
+import { expose } from 'threads/worker'
 import { decode } from './_worker_lib'
 import yaml from 'js-yaml'
 

@@ -30,7 +30,7 @@
     border: solid 0.075rem colvar('border')
     border-radius: 0.5rem
     contain: content
-    shadow-elevation(8)
+    shadow-elevation(4)
 
   .titles
     padding-bottom: 0.25rem

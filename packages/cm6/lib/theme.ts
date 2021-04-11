@@ -37,17 +37,17 @@ const
   special    = 'var(--colcode-special)'
 
 const confinementTheme = EditorView.theme({
-  $: {
+  '&': {
     color: text,
     backgroundColor: background,
     '& ::selection': { backgroundColor: selection },
     caretColor: accent,
-    '&$focused': { outline: 'none' },
+    '&.cm-focused': { outline: 'none' },
     width: 'auto',
     height: '100%'
   },
 
-  $scroller: {
+  '.cm-scroller': {
     fontFamily: 'var(--font-mono)',
     height: '100%',
     fontSize: '13px',
@@ -57,60 +57,65 @@ const confinementTheme = EditorView.theme({
     zIndex: 0
   },
 
-  $content: {
+  '.cm-content': {
     paddingBottom: '70vh',
     maxWidth: '45rem',
-    lineHeight: '18px',
-    overflowWrap: 'normal'
+    lineHeight: '18px'
   },
 
-  '$$focused $cursor': {
+  '&.cm-focused .cm-cursor': {
     borderLeftColor: accent,
     transition: 'left 0.05s ease-out, top 0.05s ease-out'
   },
 
-  '$$focused $cursorLayer': {
+  '&.cm-focused .cm-cursorLayer': {
     animation: 'cubic-bezier(0.95, 0, 0.05, 1) cm-blink 1.2s infinite'
   },
 
   '@keyframes cm-blink': { '0%': {}, '50%': { opacity: '0' }, '100%': {} },
   '@keyframes cm-blink2': { '0%': {}, '50%': { opacity: '0' }, '100%': {} },
 
-  '$$focused $selectionBackground': { backgroundColor: selection },
-  '$selectionBackground': { backgroundColor: selection },
+  '&.cm-focused .cm-selectionBackground': { backgroundColor: selection },
+  '.cm-selectionBackground': { backgroundColor: selection },
   $activeLine: { background: hover },
   $selectionMatch: { backgroundColor: selection },
   $searchMatch: {
     backgroundColor: selection,
     borderRadius: '0.125rem'
   },
-  '$searchMatch.selected': {
+  '.cm-searchMatch.selected': {
     backgroundColor: selection,
     boxShadow: `0 0 0 0.075rem ${accent}`
   },
 
-  $line: {
+  '.cm-line': {
     '& ::selection': { color: 'inherit !important' },
     '&::selection': { color: 'inherit !important' }
   },
 
-  $panels: { backgroundColor: background, color: text },
-  '$panels.top': { borderBottom: `2px solid ${border}` },
-  '$panels.bottom': { borderTop: `2px solid ${border}` },
+  '.cm-activeLine': { backgroundColor: hover },
 
-  '$matchingBracket, $nonmatchingBracket': {
+  '.cm-panels': {
+    backgroundColor: background,
+    color: text,
+    padding: '0.5rem 0'
+  },
+  '.cm-panels-top': { borderBottom: `2px solid ${border}` },
+  '.cm-panels-bottom': { borderTop: `2px solid ${border}` },
+
+  '.cm-matchingBracket, .cm-nonmatchingBracket': {
     backgroundColor: hover,
     outline: `1px solid ${selection}`
   },
 
-  $gutters: {
+  '.cm-gutters': {
     backgroundColor: background,
     color: comment,
     border: 'none'
   },
-  '$gutterElement.lineNumber': { color: 'inherit' },
+  '.cm-gutterElement.lineNumber': { color: 'inherit' },
 
-  $foldPlaceholder: {
+  '.cm-foldPlaceholder': {
     background: doc,
     border: 'none',
     padding: '0 0.5rem',
@@ -118,18 +123,27 @@ const confinementTheme = EditorView.theme({
     color: 'white'
   },
 
-  $tooltip: {
-    border: '1px solid #181a1f',
-    backgroundColor: '#606862'
+  '.cm-button': {
+    border: `1px solid ${border}`,
+    background: background
   },
-  '$tooltip.autocomplete': {
+
+  '.cm-textfield': {
+    border: `1px solid ${border}`
+  },
+
+  '.cm-tooltip': {
+    border: `1px solid ${border}`,
+    backgroundColor: background
+  },
+  '.cm-tooltip.autocomplete': {
     '& > ul > li[aria-selected]': { backgroundColor: background }
   }
 }, { dark: true })
 
 // const mt = monarchMarkdown.tags
 
-const confinementHighlightStyle = HighlightStyle.define(
+const confinementHighlightStyle = HighlightStyle.define([
   // Keywords + Operators
   {
     tag: [t.keyword],
@@ -250,6 +264,6 @@ const confinementHighlightStyle = HighlightStyle.define(
   // // critical markup
   // { tag: mt.criticHighlight, color: highlight },
   // { tag: mt.criticComment, color: note }
-)
+])
 
 export const confinement: Extension = [confinementTheme, confinementHighlightStyle]

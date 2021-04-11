@@ -27,6 +27,7 @@ export { default as Toasts } from './Toasts.svelte'
 export { default as Toggle } from './Toggle.svelte'
 export { default as Transition } from './Transition.svelte'
 export { default as UserPanel } from './UserPanel.svelte'
+export { default as Wikitext } from './Wikitext.svelte'
 
 // -- Component Function Library
 

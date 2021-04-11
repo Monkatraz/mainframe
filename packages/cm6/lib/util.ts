@@ -1,47 +1,64 @@
-import { Input, stringInput, Tree } from 'lezer-tree'
+import { Input, NodeType, stringInput, Tree, TreeCursor } from 'lezer-tree'
 
 // credit to: https://discuss.codemirror.net/u/grayen/summary
-export function printTree(tree: Tree, input: Input | string, from = 0, to = input.length): string {
+function focusedNode(
+  cursor: TreeCursor
+): { readonly type: NodeType; readonly from: number; readonly to: number } {
+  const { type, from, to } = cursor
+  return { type, from, to }
+}
+// credit to: https://discuss.codemirror.net/u/grayen/summary
+export function printTree(
+  tree: Tree,
+  input: Input | string,
+  options: { from?: number; to?: number; start?: number; includeParents?: boolean } = {}
+): string {
+  const cursor = tree.cursor()
   if (typeof input === 'string') input = stringInput(input)
-  let out = ''
-  const c = tree.cursor()
-  const childPrefixes: string[] = []
+  const { from = 0, to = input.length, start = 0, includeParents = false } = options
+  let output = ''
+  const prefixes: string[] = []
   for (;;) {
-    const { type } = c
-    const cfrom = c.from
-    const cto = c.to
+    const node = focusedNode(cursor)
     let leave = false
-    if (cfrom <= to && cto >= from) {
-      if (!type.isAnonymous) {
+    if (node.from <= to && node.to >= from) {
+      const enter = (includeParents || (node.from >= from && node.to <= to))
+      if (enter) {
         leave = true
-        if (!type.isTop) {
-          out += '\n' + childPrefixes.join('')
-          if (c.nextSibling() && c.prevSibling()) {
-            out += '├─ '
-            childPrefixes.push('│  ')
+        const isTop = output === ''
+        if (!isTop || node.from > 0) {
+          output += (!isTop ? '\n' : '') + prefixes.join('')
+          const hasNextSibling = cursor.nextSibling() && cursor.prevSibling()
+          if (hasNextSibling) {
+            output += ' ├─ '
+            prefixes.push(' │  ')
           } else {
-            out += '└─ '
-            childPrefixes.push('   ')
+            output += ' └─ '
+            prefixes.push('    ')
           }
         }
-        out += type.name
+        output += node.type.isAnonymous ? '<Anonymous>' : node.type.name
       }
-      const isLeaf = !c.firstChild()
-      if (!type.isAnonymous) {
-        const hasRange = cfrom !== cto
-        out += ` ${hasRange ? `[${cfrom}..${cto}]` : cfrom}`
-        if (isLeaf && hasRange) {
-          const str = input.read(cfrom, cto).trim().replaceAll('\n', '\\n')
-          out += `: '${str.length > 30 ? str.slice(0, 27) + '...' : str}'`
+      const isLeaf = !cursor.firstChild()
+      if (enter) {
+        const hasRange = node.from !== node.to
+        output +=
+          ' ' +
+          (hasRange
+            ? '[' + (start + node.from) + '..' + (start + node.to) + ']'
+            : start + node.from)
+        if (hasRange && isLeaf) {
+          const str = input.read(node.from, node.to).trim().replaceAll('\n', '\\n')
+          output += `: '${str.length > 30 ? str.slice(0, 27) + '...' : str}'`
         }
       }
-      if (!isLeaf || type.isTop) continue
+      if (!isLeaf) continue
     }
     for (;;) {
-      if (leave) childPrefixes.pop()
-      leave = c.type.isAnonymous
-      if (c.nextSibling()) break
-      if (!c.parent()) return out
+      if (leave) prefixes.pop()
+      leave = cursor.type.isAnonymous
+      if (cursor.nextSibling()) break
+      if (!cursor.parent()) return output
       leave = true
     }
   }

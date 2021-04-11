@@ -51,7 +51,7 @@
   <slot slot='true'>
     <!-- Editor -->
     <div out:fade={{ duration: 100, delay: 300 }}>
-      {#await import(EditorURL)}
+      {#await import(EditorURL).catch()}
         <Spinny width=150px top=50% left=50%/>
       {:then Editor}
         <svelte:component this={Editor.default}/>

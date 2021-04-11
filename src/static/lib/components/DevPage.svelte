@@ -18,6 +18,30 @@
 
 </script>
 
+<!--
+<div
+  style="
+    position: absolute;
+    top: {'test'}px;
+    left: func(calc(100% - 20px));
+    right: var(--some-var);
+    asdf: 'cool {beans}'
+  "
+></div>
+
+<div style="background: #ffe7e8; border: 2px solid #e66465;">
+  <p style="margin: 15px; line-height: 1.5; text-align: center;">
+      Well, I am the slime from your video<br>
+      Oozin' along on your livin' room floor.</p>
+</div>
+
+<div style="background-color: black; height: 200px; width: 200px;"></div>
+<div style="background-color: rgb(255, 0, 255); height: 200px; width: 200px;"></div>
+<div style="background-color: #333666; height: 200px; width: 200px;"></div>
+
+<div hidden style="width: 100%" --text-color="red"/>
+-->
+
 <div role='presentation' out:fade={{ duration: 100 }}>
   <div class='rhythm' role='presentation' in:tnAnime={pageReveal}>
     <TabControl>

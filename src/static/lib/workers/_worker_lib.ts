@@ -2,7 +2,7 @@
  * @file Exports various functions commonly used by Mainframe workers.
  * @author Monkatraz
  */
-import { Transfer } from 'threads'
+import { Transfer } from 'threads/worker'
 
 interface TypedArray extends ArrayBuffer { buffer: ArrayBufferLike }
 type TransferInput = string | ArrayBuffer | TypedArray
