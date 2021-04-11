@@ -1,4 +1,4 @@
-import { EditorState, Extension, Compartment }                      from '@codemirror/state'
+import { EditorState, Extension, Compartment }                       from '@codemirror/state'
 import { EditorView, ViewPlugin, ViewUpdate, drawSelection, keymap } from '@codemirror/view'
 
 import { highlightActiveLine, highlightSpecialChars }     from '@codemirror/view'
@@ -15,6 +15,7 @@ import { commentKeymap }                                  from '@codemirror/comm
 import { rectangularSelection }                           from '@codemirror/rectangular-selection'
 import { redo }                                           from '@codemirror/history'
 import { copyLineDown }                                   from '@codemirror/commands'
+import { linter, lintKeymap }                             from '@codemirror/lint'
 
 import { FTMLLanguage }  from './ftml'
 import { indentHack }  from './indent'
@@ -32,6 +33,7 @@ export type { Extension }
 export { EditorState, Compartment }
 export { EditorView, ViewPlugin, ViewUpdate }
 export { syntaxTree, LanguageDescription }
+export { linter }
 
 export { languages } from './lang'
 export { printTree } from './util'
@@ -74,6 +76,7 @@ export function getExtensions() {
       ...foldKeymap,
       ...commentKeymap,
       ...completionKeymap,
+      ...lintKeymap,
       ...[
         { key: 'Mod-Shift-z', run: redo, preventDefault: true },
         { key: 'Mod-d', run: copyLineDown, preventDefault: true }

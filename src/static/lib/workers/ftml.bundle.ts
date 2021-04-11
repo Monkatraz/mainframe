@@ -64,13 +64,11 @@ expose({
     const tokenized = Binding.tokenize(str, log)
     const parsed = Binding.parse(tokenized, log)
     const parsedTree = parsed.syntax_tree()
-    const parsedWarnings = parsed.warnings()
 
-    // TODO: placeholder values
-    const ast: unknown = {}
-    const warnings: unknown[] = []
+    const ast = parsedTree.get()
+    const warnings = parsed.warnings()
 
-    free(tokenized, parsed, parsedTree, parsedWarnings)
+    free(tokenized, parsed, parsedTree)
 
     return { ast, warnings }
   },
@@ -102,18 +100,16 @@ expose({
 
     const parsed = Binding.parse(tokenized, log)
     const parsedTree = parsed.syntax_tree()
-    const parsedWarnings = parsed.warnings()
 
-    // TODO: placeholder values
-    const ast: unknown = {}
-    const warnings: unknown[] = []
+    const ast = parsedTree.get()
+    const warnings = parsed.warnings()
 
     try {
       const rendered = Binding.render_html(parsedTree, log)
       rendered.free()
     } catch {}
 
-    free(tokenized, parsed, parsedTree, parsedWarnings)
+    free(tokenized, parsed, parsedTree)
 
     const html = '<i>Placeholder Output (FTML cannot render yet)</i>'
 

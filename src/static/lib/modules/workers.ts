@@ -9,6 +9,7 @@ import { transfer, decode } from '../workers/_worker_lib'
 import { sleep } from './util'
 import DOMPurify from 'dompurify'
 import morphdom from 'morphdom'
+import type * as FTMLBinding from '@vendor/ftml'
 
 // -- WORKER MODULE
 
@@ -67,22 +68,15 @@ class WorkerModule {
 export namespace FTML {
   const module = new WorkerModule('ftml-wasm', '../workers/ftml.bundle.js', { persist: true })
 
-  export interface FTMLToken {
-    slice: string
-    span: { start: number, end: number }
-    token: string
-  }
-
-  // TODO: placeholder values
   export interface Parse {
-    ast: unknown
-    warnings: unknown[]
+    ast: FTMLBinding.ISyntaxTree
+    warnings: FTMLBinding.IParseWarning[]
   }
 
   export interface DetailedRender {
-    tokens: FTMLToken[]
-    ast: unknown
-    warnings: unknown[]
+    tokens: FTMLBinding.IToken[]
+    ast: FTMLBinding.ISyntaxTree
+    warnings: FTMLBinding.IParseWarning[]
     html: string
   }
 
@@ -91,7 +85,7 @@ export namespace FTML {
   }
 
   export async function tokenize(raw: string) {
-    return await module.invoke<FTMLToken[]>(() => module.worker.tokenize(transfer(raw)))
+    return await module.invoke<FTMLBinding.IToken[]>(() => module.worker.tokenize(transfer(raw)))
   }
 
   export async function parse(raw: string) {

@@ -16,14 +16,14 @@
    minify: true,
    splitting: true,
    format: 'esm',
-   plugins: [nodeExternalsPlugin()],
+   plugins: [nodeExternalsPlugin({ allowList: ['cm-tarnation'] })],
    logLevel: 'info'
  }
 
  const devSettings = {
    ...buildSettings,
    minify: false,
-   sourcemap: false,
+   sourcemap: 'inline',
    watch: {
     onRebuild(error, result) {
       if (error) console.error('watch build failed:', error)

@@ -2,6 +2,7 @@
   import { settings, EditorCore } from './editor-core'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { FTML } from '../../modules/workers'
+  import { linter } from 'cm6-mainframe'
   import {
     matchMedia, tnAnime, focusGroup, onSwipe,
     Wikitext, SubHeader, Toggle, DetailsMenu, Button, Card, TabControl, Tab
@@ -28,12 +29,34 @@
 
   // -- EDITOR
 
+  const FTMLLinter = linter(async (view) => {
+    const { warnings } = await FTML.parse(view.state.doc.toString())
+    // TODO: type this correctly
+    const diagnostics: any[] = []
+
+    for (const { kind, rule, span: { start, end }, token } of warnings) {
+      if (kind === 'no-rules-match' || kind === 'rule-failed') continue
+      diagnostics.push({
+        from: start,
+        to: end,
+        severity: 'error',
+        source: `${token}: ${rule}`,
+        message: kind
+      })
+    }
+
+    diagnostics.sort(({ from: from1 }, { from: from2 }) => from1 - from2)
+
+    return diagnostics
+  })
+
   const Editor = new EditorCore()
 
   onMount(async () => {
     await Editor.init(
       editorContainer,
-      await fetch('/static/misc/ftml-test2.ftml').then(res => res.text())
+      await fetch('/static/misc/ftml-test2.ftml').then(res => res.text()),
+      [FTMLLinter]
     )
     mounted = true
   })
@@ -68,14 +91,6 @@
         elem.style.transform = `translateX(calc(${state ? '-100% + ' : ''}${-diff[1]}px))`
       }
       else if (type === 'cancel' || type === 'end') swipeCancel(elem)
-    }
-  }
-
-  async function safeFTMLRender(raw: string) {
-    try {
-      return await FTML.render(raw)
-    } catch (err) {
-      return 'Failed to render\n' + String(err)
     }
   }
 
@@ -145,7 +160,7 @@
           <Tab>
             <span slot='button' class='fs-sm'>HTML Output</span>
             <div class='preview-html'>
-              <EditorBlock content={safeFTMLRender($Editor.value)} lang='html' />
+              <EditorBlock content={FTML.render($Editor.value)} lang='html' />
             </div>
           </Tab>
           <Tab>
@@ -154,6 +169,15 @@
               <EditorBlock
                 content={ $Editor.value ? Editor.printTree() : '' },
                 lang='LezerTree'
+              />
+            </div>
+          </Tab>
+          <Tab>
+            <span slot='button' class='fs-sm'>FTML AST</span>
+            <div class='preview-html'>
+              <EditorBlock
+                content={FTML.parse($Editor.value).then(({ ast }) => JSON.stringify(ast, undefined, 2))}
+                lang='JSON'
               />
             </div>
           </Tab>

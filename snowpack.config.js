@@ -21,6 +21,7 @@ module.exports = {
   buildOptions: {
     out: 'build',
     clean: true,
+    baseUrl: '',
     metaUrlPath: 'static/snowpack',
     sourcemap: true
   },
