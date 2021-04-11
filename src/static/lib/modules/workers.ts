@@ -15,11 +15,13 @@ import type * as FTMLBinding from '@vendor/ftml'
 
 interface WorkerModuleOpts {
   persist?: boolean
+  timeout?: number
 }
 
 class WorkerModule {
   name: string
   persist = false
+  timeout = 10000
   url: URL
   worker!: ModuleThread
 
@@ -28,6 +30,7 @@ class WorkerModule {
     this.url = new URL(url, import.meta.url)
     if (opts) {
       if (opts.persist) this.persist = true
+      this.timeout = opts.timeout ?? 10000
     }
   }
 
@@ -42,6 +45,7 @@ class WorkerModule {
 
   private async _terminate() {
     if (this.worker) await Thread.terminate(this.worker)
+    this.worker = undefined as any
   }
 
   private async _restart() {
@@ -51,7 +55,7 @@ class WorkerModule {
 
   async invoke<T>(fn: () => Promise<T>) {
     await this._ready()
-    const result = await Promise.race([fn(), sleep(10000)])
+    const result = this.timeout ? await Promise.race([fn(), sleep(this.timeout)]) : await fn()
     if (result) {
       if (!this.persist) await this._terminate()
       return result
@@ -66,7 +70,7 @@ class WorkerModule {
 // -- WORKERS
 
 export namespace FTML {
-  const module = new WorkerModule('ftml-wasm', '../workers/ftml.bundle.js', { persist: true })
+  const module = new WorkerModule('ftml-wasm', '../workers/ftml.bundle.js', { persist: true, timeout: 0 })
 
   export interface Parse {
     ast: FTMLBinding.ISyntaxTree
