@@ -2,7 +2,7 @@
   import { settings, EditorCore } from './editor-core'
   import { onDestroy, onMount, setContext } from 'svelte'
   import { FTML } from '../../modules/workers'
-  import { linter } from 'cm6-mainframe'
+  import { createFTMLLinter } from 'cm6-mainframe'
   import {
     matchMedia, tnAnime, focusGroup, onSwipe,
     Wikitext, SubHeader, Toggle, DetailsMenu, Button, Card, TabControl, Tab
@@ -29,38 +29,13 @@
 
   // -- EDITOR
 
-  const FTMLLinter = linter(async (view) => {
-    const doc = view.state.doc.toString()
-    const len = doc.length
-
-    const { warnings } = await FTML.parse(doc)
-    // TODO: type this correctly
-    const diagnostics: any[] = []
-
-    for (const { kind, rule, span: { start, end }, token } of warnings) {
-      if (kind === 'no-rules-match' || kind === 'rule-failed') continue
-      if (end > len) continue
-      diagnostics.push({
-        from: start,
-        to: end,
-        severity: 'error',
-        source: `${token}: ${rule}`,
-        message: kind
-      })
-    }
-
-    diagnostics.sort(({ from: from1 }, { from: from2 }) => from1 - from2)
-
-    return diagnostics
-  })
-
   const Editor = new EditorCore()
 
   onMount(async () => {
     await Editor.init(
       editorContainer,
       await fetch('/static/misc/ftml-test2.ftml').then(res => res.text()),
-      [FTMLLinter]
+      [createFTMLLinter(async str => (await FTML.parse(str)).warnings)]
     )
     mounted = true
   })

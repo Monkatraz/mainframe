@@ -93,15 +93,6 @@ const confinementTheme = EditorView.theme({
     '&::selection': { color: 'inherit !important' }
   },
 
-  '.cm-panels': {
-    backgroundColor: background,
-    color: text,
-    padding: '0.5rem 0'
-  },
-
-  '.cm-panels-top': { borderBottom: `2px solid ${border}` },
-  '.cm-panels-bottom': { borderTop: `2px solid ${border}` },
-
   '.cm-matchingBracket, .cm-nonmatchingBracket': {
     backgroundColor: hover,
     outline: `1px solid ${selection}`
@@ -141,7 +132,35 @@ const confinementTheme = EditorView.theme({
 
   '.cm-tooltip.autocomplete': {
     '& > ul > li[aria-selected]': { backgroundColor: background }
-  }
+  },
+
+  '.cm-panels': {
+    backgroundColor: background,
+    color: text
+  },
+
+  '.cm-panels-top': { borderBottom: `2px solid ${border}` },
+  '.cm-panels-bottom': { borderTop: `2px solid ${border}` },
+
+  '.cm-panel.cm-panel-lint ul': {
+    maxHeight: '16rem',
+    outline: 'none',
+    paddingRight: '0.5rem'
+  },
+
+  '.cm-panel.cm-panel-lint ul > li': {
+    marginBottom: '0.25rem',
+    transition: 'background-color 0.075s ease',
+    cursor: 'pointer'
+  },
+
+  '.cm-panel.cm-panel-lint ul > li:hover': {
+    backgroundColor: hover
+  },
+
+  '.cm-panel.cm-panel-lint ul [aria-selected]': { backgroundColor: hover },
+  '.cm-panel.cm-panel-lint ul:focus [aria-selected]': { backgroundColor: accent }
+
 }, { dark: true })
 
 // const mt = monarchMarkdown.tags

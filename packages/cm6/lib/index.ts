@@ -15,7 +15,7 @@ import { commentKeymap }                                  from '@codemirror/comm
 import { rectangularSelection }                           from '@codemirror/rectangular-selection'
 import { redo }                                           from '@codemirror/history'
 import { copyLineDown }                                   from '@codemirror/commands'
-import { linter, lintKeymap }                             from '@codemirror/lint'
+import { nextDiagnostic, openLintPanel }                  from '@codemirror/lint'
 
 import { FTMLLanguage }  from './ftml'
 import { indentHack }  from './indent'
@@ -33,10 +33,10 @@ export type { Extension }
 export { EditorState, Compartment }
 export { EditorView, ViewPlugin, ViewUpdate }
 export { syntaxTree, LanguageDescription }
-export { linter }
 
 export { languages } from './lang'
 export { printTree } from './util'
+export { createFTMLLinter } from './ftml-lint'
 
 // -- MISC. EXT.
 
@@ -76,7 +76,10 @@ export function getExtensions() {
       ...foldKeymap,
       ...commentKeymap,
       ...completionKeymap,
-      ...lintKeymap,
+      ...[
+        { key: 'Mod-l', run: openLintPanel, preventDefault: true },
+        { key: 'F8', run: nextDiagnostic, preventDefault: true }
+      ],
       ...[
         { key: 'Mod-Shift-z', run: redo, preventDefault: true },
         { key: 'Mod-d', run: copyLineDown, preventDefault: true }
