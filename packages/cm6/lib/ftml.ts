@@ -97,6 +97,8 @@ export const FTMLLanguage = new TarnationLanguage({
 
   grammar: () => ({
 
+    ignoreCase: true,
+
     start: 'root',
 
     variables: {
@@ -349,6 +351,11 @@ export const FTMLLanguage = new TarnationLanguage({
 
           blk_val_el: lkup(['size']),
 
+          blk_el: lkup([
+            // unofficial
+            'footnote'
+          ]),
+
           mods: lkup(['Backlinks', 'Categories', 'Join', 'PageTree', 'Rate'])
         } },
 
@@ -374,6 +381,36 @@ export const FTMLLanguage = new TarnationLanguage({
           ['@BR', 't.keyword', { embedded: 'wikimath!' }, 't.keyword', '@BR']
         ],
 
+        // [[math]]
+        { begin: [/(@bs)(@bm?)(math)(@bsf)(.*?)(@be)/, 'BlockNode',
+            ['@BR', 't.modifier', 'BlockName', 't.modifier', 't.string', '@BR']
+          ],
+          end:   [/(@bsc)(math)(@be)/, 'BlockNode', ['@BR', 'BlockName', '@BR']],
+          type: 'BlockNested',
+          embedded: 'wikimath!'
+        },
+
+        // [[module css]]
+        { begin: [/(@bs)(module)(\s+)(css)(@be)/,  'BlockNode', ['@BR', 'BlockNameModule', '', 'ModuleName', '@BR']],
+          end:   [/(@bsc)(module)(@be)/, 'BlockNode', ['@BR', 'BlockNameModule', '@BR']],
+          type: 'BlockNested',
+          embedded: 'css!'
+        },
+
+        // [[css]]
+        { begin: [/(@bs)(css)(@be)/,  'BlockNode', ['@BR', 'BlockName', '@BR']],
+          end:   [/(@bsc)(css)(@be)/, 'BlockNode', ['@BR', 'BlockName', '@BR']],
+          type: 'BlockNested',
+          embedded: 'css!'
+        },
+
+        // [[html]]
+        { begin: [/(@bs)(html)(@be)/,  'BlockNode', ['@BR', 'BlockName', '@BR']],
+          end:   [/(@bsc)(html)(@be)/, 'BlockNode', ['@BR', 'BlockName', '@BR']],
+          type: 'BlockNested',
+          embedded: 'html!'
+        },
+
         // block (map)
         [[/(@bs)(@bm?)/, '@blk_map', /(@bsf)(.*?)(@be)/], 'BlockNode',
           ['@BR', 't.modifier', 'BlockName', 't.modifier', 't.string', '@BR']
@@ -394,29 +431,6 @@ export const FTMLLanguage = new TarnationLanguage({
           ['@BR', 't.modifier', 'BlockNameModule', 't.modifier', '', 'ModuleName', 'BlockValue', '@BR']
         ],
 
-        // [[math]]
-        { begin: [/(@bs)(@bm?)(math)(@bsf)(.*?)(@be)/, 'BlockNode',
-            ['@BR', 't.modifier', 'BlockName', 't.modifier', 't.string', '@BR']
-          ],
-          end:   [/(@bsc)(math)(@be)/, 'BlockNode', ['@BR', 'BlockName', '@BR']],
-          type: 'BlockNested',
-          embedded: 'wikimath!'
-        },
-
-        // [[css]]
-        { begin: [/(@bs)(css)(@be)/,  'BlockNode', ['@BR', 'BlockName', '@BR']],
-          end:   [/(@bsc)(css)(@be)/, 'BlockNode', ['@BR', 'BlockName', '@BR']],
-          type: 'BlockNested',
-          embedded: 'css!'
-        },
-
-        // [[html]]
-        { begin: [/(@bs)(html)(@be)/,  'BlockNode', ['@BR', 'BlockName', '@BR']],
-          end:   [/(@bsc)(html)(@be)/, 'BlockNode', ['@BR', 'BlockName', '@BR']],
-          type: 'BlockNested',
-          embedded: 'html!'
-        },
-
         // block containers (map, elements)
         { begin: [[/(@bs)(@bm?)/, '@blk_map_el', /(@bsf)(.*?)(@be)/], 'BlockNode',
             ['@BR', 't.modifier', 'BlockName', 't.modifier', 't.string', '@BR']
@@ -430,6 +444,14 @@ export const FTMLLanguage = new TarnationLanguage({
             ['@BR', 't.modifier', 'BlockName', 't.modifier', 'BlockValue', '@BR']
           ],
           end: [[/@bsc/, '@blk_val_el', /@be/], 'BlockNode', ['@BR', 'BlockName', '@BR']],
+          type: 'BlockContainer'
+        },
+
+        // block containers (elements)
+        { begin: [[/(@bs)(@bm?)/, '@blk_el', /(@bsf)(@be)/], 'BlockNode',
+            ['@BR', 't.modifier', 'BlockName', 't.modifier', '@BR']
+          ],
+          end: [[/@bsc/, '@blk_el', /@be/], 'BlockNode', ['@BR', 'BlockName', '@BR']],
           type: 'BlockContainer'
         },
 

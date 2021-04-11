@@ -248,7 +248,7 @@ export class Grammar {
         }
 
         ids.add(beginRule.id)
-        if (!(rules && embedded)) ids.add(endRule.id)
+        if (!embedded && !rules) ids.add(endRule.id)
 
       } catch (err) {
         console.warn('Grammar: Failed to add rule state. Ignoring...')
