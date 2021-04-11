@@ -30,12 +30,16 @@
   // -- EDITOR
 
   const FTMLLinter = linter(async (view) => {
-    const { warnings } = await FTML.parse(view.state.doc.toString())
+    const doc = view.state.doc.toString()
+    const len = doc.length
+
+    const { warnings } = await FTML.parse(doc)
     // TODO: type this correctly
     const diagnostics: any[] = []
 
     for (const { kind, rule, span: { start, end }, token } of warnings) {
       if (kind === 'no-rules-match' || kind === 'rule-failed') continue
+      if (end > len) continue
       diagnostics.push({
         from: start,
         to: end,

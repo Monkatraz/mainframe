@@ -150,18 +150,6 @@ function _assertClass(instance, klass) {
     return instance.ptr;
 }
 /**
-* @param {SyntaxTree} syntax_tree
-* @returns {HtmlOutput}
-*/
-export function render_html(syntax_tree) {
-    _assertClass(syntax_tree, SyntaxTree);
-    var ptr0 = syntax_tree.ptr;
-    syntax_tree.ptr = 0;
-    var ret = wasm.render_html(ptr0);
-    return HtmlOutput.__wrap(ret);
-}
-
-/**
 * @param {Tokenization} tokens
 * @returns {ParseOutcome}
 */
@@ -171,6 +159,18 @@ export function parse(tokens) {
     tokens.ptr = 0;
     var ret = wasm.parse(ptr0);
     return ParseOutcome.__wrap(ret);
+}
+
+/**
+* @param {SyntaxTree} syntax_tree
+* @returns {HtmlOutput}
+*/
+export function render_html(syntax_tree) {
+    _assertClass(syntax_tree, SyntaxTree);
+    var ptr0 = syntax_tree.ptr;
+    syntax_tree.ptr = 0;
+    var ret = wasm.render_html(ptr0);
+    return HtmlOutput.__wrap(ret);
 }
 
 /**
@@ -394,8 +394,8 @@ async function init(input) {
     }
     const imports = {};
     imports.wbg = {};
-    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
-        var ret = getStringFromWasm0(arg0, arg1);
+    imports.wbg.__wbindgen_json_parse = function(arg0, arg1) {
+        var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
         return addHeapObject(ret);
     };
     imports.wbg.__wbindgen_json_serialize = function(arg0, arg1) {
@@ -409,24 +409,9 @@ async function init(input) {
     imports.wbg.__wbindgen_object_drop_ref = function(arg0) {
         takeObject(arg0);
     };
-    imports.wbg.__wbindgen_json_parse = function(arg0, arg1) {
-        var ret = JSON.parse(getStringFromWasm0(arg0, arg1));
+    imports.wbg.__wbindgen_string_new = function(arg0, arg1) {
+        var ret = getStringFromWasm0(arg0, arg1);
         return addHeapObject(ret);
-    };
-    imports.wbg.__wbg_debug_324bcf8a37a39027 = function(arg0, arg1) {
-        console.debug(getObject(arg0), getObject(arg1));
-    };
-    imports.wbg.__wbg_error_b17df7f2d52d911b = function(arg0, arg1) {
-        console.error(getObject(arg0), getObject(arg1));
-    };
-    imports.wbg.__wbg_info_0b6b5a59787f9a14 = function(arg0, arg1) {
-        console.info(getObject(arg0), getObject(arg1));
-    };
-    imports.wbg.__wbg_log_3e069e57f1a5b0b6 = function(arg0, arg1) {
-        console.log(getObject(arg0), getObject(arg1));
-    };
-    imports.wbg.__wbg_warn_fa63639e18426e72 = function(arg0, arg1) {
-        console.warn(getObject(arg0), getObject(arg1));
     };
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));

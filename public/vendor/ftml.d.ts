@@ -10,36 +10,20 @@ export function version(): string;
 */
 export function preprocess(text: string): string;
 /**
-* @param {SyntaxTree} syntax_tree
-* @returns {HtmlOutput}
-*/
-export function render_html(syntax_tree: SyntaxTree): HtmlOutput;
-/**
 * @param {Tokenization} tokens
 * @returns {ParseOutcome}
 */
 export function parse(tokens: Tokenization): ParseOutcome;
 /**
+* @param {SyntaxTree} syntax_tree
+* @returns {HtmlOutput}
+*/
+export function render_html(syntax_tree: SyntaxTree): HtmlOutput;
+/**
 * @param {string} text
 * @returns {Tokenization}
 */
 export function tokenize(text: string): Tokenization;
-
-
-export interface IHtmlOutput {
-    html: string;
-    style: string;
-    meta: IHtmlMeta[];
-}
-
-export interface IHtmlMeta {
-    tag_type: string;
-    name: string;
-    value: string;
-}
-
-
-
 
 
 export interface IElement {
@@ -60,6 +44,22 @@ export interface IParseWarning {
         end: number;
     };
     kind: string;
+}
+
+
+
+
+
+export interface IHtmlOutput {
+    html: string;
+    style: string;
+    meta: IHtmlMeta[];
+}
+
+export interface IHtmlMeta {
+    tag_type: string;
+    name: string;
+    value: string;
 }
 
 
@@ -136,17 +136,17 @@ export interface InitOutput {
   readonly memory: WebAssembly.Memory;
   readonly version: (a: number) => void;
   readonly preprocess: (a: number, b: number, c: number) => void;
-  readonly __wbg_htmloutput_free: (a: number) => void;
-  readonly htmloutput_html: (a: number, b: number) => void;
-  readonly htmloutput_style: (a: number, b: number) => void;
-  readonly htmloutput_html_meta: (a: number) => number;
-  readonly render_html: (a: number) => number;
   readonly __wbg_parseoutcome_free: (a: number) => void;
   readonly parseoutcome_syntax_tree: (a: number) => number;
   readonly parseoutcome_warnings: (a: number) => number;
   readonly __wbg_syntaxtree_free: (a: number) => void;
   readonly syntaxtree_get: (a: number) => number;
   readonly parse: (a: number) => number;
+  readonly __wbg_htmloutput_free: (a: number) => void;
+  readonly htmloutput_html: (a: number, b: number) => void;
+  readonly htmloutput_style: (a: number, b: number) => void;
+  readonly htmloutput_html_meta: (a: number) => number;
+  readonly render_html: (a: number) => number;
   readonly tokenization_text: (a: number, b: number) => void;
   readonly tokenization_tokens: (a: number) => number;
   readonly tokenize: (a: number, b: number) => number;
