@@ -1,6 +1,6 @@
 import { expose } from 'threads/worker'
 import { transfer, decode } from './_worker_lib'
-import initFTML, * as Binding from 'ftml'
+import initFTML, * as Binding from '@vendor/ftml'
 
 /** Indicates if the WASM binding is loaded. */
 let ready = false

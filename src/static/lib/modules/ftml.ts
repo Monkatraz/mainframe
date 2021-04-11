@@ -1,4 +1,4 @@
-import initFTML, * as Binding from 'ftml'
+import initFTML, * as Binding from '@vendor/ftml'
 import { perfy } from './util'
 
 // -- WASM MANAGEMENT
