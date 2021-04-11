@@ -20,6 +20,14 @@ async function init() {
   ready = true
 }
 
+/** Safely frees any WASM objects provided. */
+function free(...objs: any) {
+  for (const obj of objs) {
+    if (typeof obj !== 'object' || !('ptr' in obj)) continue
+    if (obj.ptr !== 0) obj.free()
+  }
+}
+
 expose({
 
   logging(state: boolean) {
@@ -40,26 +48,48 @@ expose({
   async tokenize(raw: ArrayBuffer) {
     await loading
     const str = decode(raw)
-    return Binding.tokenize(str, log).tokens()
+
+    const tokenized = Binding.tokenize(str, log)
+    const tokens = tokenized.tokens()
+
+    free(tokenized)
+
+    return tokens
   },
 
   async parse(raw: ArrayBuffer) {
     await loading
     const str = decode(raw)
+
     const tokenized = Binding.tokenize(str, log)
     const parsed = Binding.parse(tokenized, log)
-    const ast = parsed.syntax_tree()
-    const warnings = parsed.warnings()
+    const parsedTree = parsed.syntax_tree()
+    const parsedWarnings = parsed.warnings()
+
+    // TODO: placeholder values
+    const ast: unknown = {}
+    const warnings: unknown[] = []
+
+    free(tokenized, parsed, parsedTree, parsedWarnings)
+
     return { ast, warnings }
   },
 
   async render(raw: ArrayBuffer) {
     await loading
     const str = decode(raw)
+
     const tokenized = Binding.tokenize(str, log)
     const parsed = Binding.parse(tokenized, log)
     const ast = parsed.syntax_tree()
-    try { const rendered = Binding.render_html(ast, log) } catch {}
+
+    try {
+      const rendered = Binding.render_html(ast, log)
+      rendered.free()
+    } catch {}
+
+    free(tokenized, parsed, ast)
+
     return transfer('<i>Placeholder Output (FTML cannot render yet)</i>')
   },
 
@@ -71,10 +101,20 @@ expose({
     const tokens = tokenized.tokens()
 
     const parsed = Binding.parse(tokenized, log)
-    const ast = parsed.syntax_tree()
-    const warnings = parsed.warnings()
+    const parsedTree = parsed.syntax_tree()
+    const parsedWarnings = parsed.warnings()
 
-    try { const rendered = Binding.render_html(ast, log) } catch {}
+    // TODO: placeholder values
+    const ast: unknown = {}
+    const warnings: unknown[] = []
+
+    try {
+      const rendered = Binding.render_html(parsedTree, log)
+      rendered.free()
+    } catch {}
+
+    free(tokenized, parsed, parsedTree, parsedWarnings)
+
     const html = '<i>Placeholder Output (FTML cannot render yet)</i>'
 
     return { tokens, ast, warnings, html }
@@ -86,6 +126,8 @@ expose({
 
     const tokenized = Binding.tokenize(str, log)
     const tokens = tokenized.tokens()
+
+    free(tokenized)
 
     let out = ''
     for (const { slice, span: { start, end }, token } of tokens) {
