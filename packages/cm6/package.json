@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "esbuild": "^0.11.7",
-    "esbuild-node-externals": "^1.0.3",
+    "esbuild-node-externals": "^1.1.0",
     "lezer-generator": "^0.13.3"
   }
 }

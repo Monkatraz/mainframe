@@ -8,7 +8,7 @@
   "scripts": {
     "dev": "snowpack dev",
     "build": "snowpack build",
-    "postinstall": "(cd packages/cm6 && npm i) && (cd ../tarnation && npm i)",
+    "packages": "(cd packages/cm6 && npm i) && (cd ../tarnation && npm i)",
     "lint:sl": "stylelint src/**/*.styl --custom-syntax stylelint-plugin-stylus/custom-syntax || echo 'done'",
     "lint:es": "eslint src/ || echo 'done'",
     "test": "echo \"Mainframe does not currently include a test runner.\""
