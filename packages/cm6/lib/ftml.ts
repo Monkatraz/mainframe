@@ -4,13 +4,8 @@ import { TarnationLanguage, lb, re, lkup } from 'cm-tarnation'
 import { completeFTML } from './ftml-autocomplete'
 import { languages } from './lang'
 
-// TODO: bibliography
-// TODO: mailform, sitegrid mini-languages
-// TODO: tab (custom syntax)
 // TODO: figure out indentation
 // TODO: floats
-
-// TODO: make containers work with escaping (oh god)
 
 const TexLanguage = new TarnationLanguage({
   name: 'wikimath',
@@ -82,8 +77,8 @@ export const FTMLLanguage = new TarnationLanguage({
       // }),
       foldNodeProp.add({
         'BlockComment': tree =>
-          ({ from: tree.from, to: tree.to }),
-        'Container': (tree, state) =>
+          ({ from: tree.from + 3, to: tree.to - 3 }),
+        'Container Table': (tree, state) =>
           ({ from: Math.min(tree.from + 20, state.doc.lineAt(tree.from).to), to: tree.to - 1 }),
         'BlockNested BlockContainer': (tree, state) => {
           const from = state.doc.lineAt(tree.from).to
@@ -103,24 +98,15 @@ export const FTMLLanguage = new TarnationLanguage({
 
     variables: {
 
-      esc: / (?:_|\\)$/,
-
-      ws: /[^\S\r\n]/,    // whitespace, no newlines
-      s: /^(?!@esc)@ws*/, // starting whitespace
-      enl: /^@ws*$/,      // empty new line
+      esc: /@ws(?:_|\\)$/, // escape next line
+      ws: /[^\S\r\n]/,     // whitespace, no newlines
+      s: /^(?!@esc)@ws*/,  // starting whitespace
+      enl: /^@ws*$/,       // empty new line
 
       // control characters, aka anything used to maybe signify something
-      control:    /[\n!"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/,
-      nocontrol: /[^\n!"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/,
-      escapes: /\\@control/,
-
-      // symbols that interrupt a paragraph on line start
-      interrupt: /(?:\++\*?@ws)|(?:\[{2,})|(?:[*#]@ws)|(?:[-=]{4,})|(?::)|(?:>+@ws)|(?:>$)|(?:\|{2})/,
-      // symbols that represent the starting line syntax of a container
-      containers: />+@ws|>$|[*#]@ws/,
-
-      hr: /(?:-{4,}|={4,})@ws*$/,     // horizontal rules
-      heading: /(?:\++\*?)@ws+(?!$)/  // headings
+      control:    /[\s!"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/,
+      nocontrol: /[^\s!"#$%&'()*+,\-./:;<=>?@\[\\\]^_`{|}~\xA1\u2010-\u2027]/,
+      escapes: /\\@control/
 
     },
 
@@ -133,9 +119,16 @@ export const FTMLLanguage = new TarnationLanguage({
     ],
 
     global: [
-      [/@esc/, 't.escape'],
-      [/@escapes/, 't.escape'],
-      [/(\[!--)([^]+?)(--\])/, 't.blockComment', ['@BR', '', '@BR']],
+
+      { style: {
+        BlockComment: t.blockComment,
+        EscapedNewline: t.escape,
+        EscapedCharacter: t.escape
+      } },
+
+      [/@esc/, 'EscapedNewline'],
+      [/@escapes/, 'EscapedCharacter'],
+      [/(\[!--)([^]+?)(--\])/, 'BlockComment', ['@BR', '', '@BR']],
       [/@nocontrol+/]
     ],
 
@@ -144,25 +137,32 @@ export const FTMLLanguage = new TarnationLanguage({
       root: [
         { include: '#block_markup' },
         { include: '#inline' },
+        { include: '#include' },
         { include: '#block' }
       ],
 
       inline: [
-        { include: '#text' },
-        { include: '#block' }
-      ],
-
-      text: [
         { include: '#special' },
         { include: '#typography' },
-        { include: '#markup' }
+        { include: '#markup' },
+        { include: '#include' },
+        { include: '#block' }
       ],
 
       block_markup: [
 
         { style: {
-          HeadingMark: t.heading,
-          CenterMark: t.heading
+          'HeadingMark': t.heading,
+          'CenterMark': t.heading,
+          'BlockquoteMark ListBulletedMark ListNumberedMark': t.keyword
+        } },
+
+        { variables: {
+          // symbols that interrupt a paragraph on line start
+          interrupt: /(?:\++\*?@ws)|(?:[\[\]])|(?:[*#]@ws)|(?:[-=]{4,})|(?::)|(?:>+@ws)|(?:>$)|(?:\|{2})/,
+          hr: /(?:-{4,}|={4,})@ws*$/,          // horizontal rules
+          heading: /(?:\++\*?)@ws+(?!$)/,      // headings
+          cs: /@s(?:(?:>+@ws|>|[*#]@ws)@ws*)+/ // container start
         } },
 
         // horizontal rules
@@ -170,7 +170,48 @@ export const FTMLLanguage = new TarnationLanguage({
         // headings
         [/(@s@heading)(.+?)$/, 'Heading', ['HeadingMark', { strict: false, rules: '#inline' }]],
         // center rule
-        [/(@s=@ws+)(.+?)$/, 'Center', ['CenterMark', { strict: false, rules: '#inline' }]]
+        [/(@s=@ws+)(.+?)$/, 'Center', ['CenterMark', { strict: false, rules: '#inline' }]],
+
+        // tables
+        { begin: [/@s\|{2}/, '@RE'],
+          end: [re`/(?<!@esc\s*)(@enl|^((?!\|{2}).)+$)/` ?? /@enl|^((?!\|{2}).)+$/, '@RE'],
+          type: 'Table',
+          rules: [
+            [/(\|{2,})([~=]?)/, 'TableMark', ['t.separator', 't.operator']],
+            { include: '#inline' }
+          ]
+        },
+
+        // containers
+        { begin: [/@cs/, '@RE'],
+          end: [re`/(?<!@esc\s*)(@enl|(?!@cs)@s)/` ?? /@enl|(?!@cs)@s/, '@RE'],
+          type: 'Container',
+          rules: [
+            // horizontal rules
+            [/(@s)(>+|[*#])(@ws*@hr)/, ['', { rules: '#container_mark_type' }, 't.contentSeparator']],
+            // headings
+            [/(@s)(>+|[*#])(@ws*@heading.+?$)/, ['', { rules: '#container_mark_type' }, { rules: [
+              [/(@ws*@heading)(.+)/, 'Heading', ['HeadingMark', { strict: false, rules: '#inline' }]]]
+            }]],
+            // normal container start
+            [/(@s)(>+|[*#])/, ['', { rules: '#container_mark_type' }]],
+
+            { include: '#inline' }
+          ]
+        },
+
+        // paragraphs
+        { begin: [/@s(?!@interrupt)\S/, '@RE'],
+          end: [/@s(?:@interrupt)|@enl/, '@RE'],
+          type: 'Paragraph',
+          rules: '#inline'
+        }
+      ],
+
+      container_mark_type: [
+        [/>+/, 'BlockquoteMark'],
+        ['*',  'ListBulletedMark'],
+        ['#',  'ListNumberedMark']
       ],
 
       special: [
@@ -190,7 +231,7 @@ export const FTMLLanguage = new TarnationLanguage({
         // page variables
         [/(%%)(.*?)(%%)/, 'PageVariable', [
           '@BR/O:vp',
-          { rules: [
+          { strict: false, rules: [
             [/^[^{}]+/, 't.variableName'],
             [/(\{)(.*?)(\})$/, 'PageVariableAccessor', ['@BR', 't.string', '@BR']]
           ] },
@@ -314,10 +355,11 @@ export const FTMLLanguage = new TarnationLanguage({
           BlockName: t.tagName,
           BlockNameModule: t.keyword,
           BlockNameUnknown: t.invalid,
-
           BlockValue: t.string,
+          ModuleName: t.className,
 
-          ModuleName: t.className
+          IncludeValue: t.link,
+          IncludeParameterProperty: t.propertyName
         } },
 
         { variables: {
@@ -327,17 +369,18 @@ export const FTMLLanguage = new TarnationLanguage({
           bs: /\[{2}(?!\[)(?!\/)/, // block node start
           bsc: /\[{2}\//,          // block closing node start
           be: /(?!\]{3})\]{2}/,    // block node end
-          bm: /[*=><](?!=)|f>|f</, // block prefix modifiers
           bsf: /_?(?=@ws|@be)/,    // block name suffix
+          // block prefix modifiers
+          bm: /(?:[*=><](?![*=><])|f>|f<)(?!@ws|@be)/,
 
           tls: /\[{3}(?!\[)/,    // triple link start
           tle: /(?!\]{4})\]{3}/, // triple link end
 
           blk_map: lkup(['checkbox']),
 
-          blk_val: lkup(['lines', 'newlines']),
+          blk_val: lkup(['#', 'lines', 'newlines']),
 
-          blk_valmap: lkup([/* 'include', */ 'iframe', 'radio', 'radio-button']),
+          blk_valmap: lkup(['iframe', 'radio', 'radio-button']),
 
           blk_map_el: lkup([
             'a', 'anchor', 'blockquote', 'quote', 'b', 'bold', 'strong',
@@ -353,7 +396,7 @@ export const FTMLLanguage = new TarnationLanguage({
 
           blk_el: lkup([
             // unofficial
-            'footnote'
+            'footnote', '=', '>', '<', '=='
           ]),
 
           mods: lkup(['Backlinks', 'Categories', 'Join', 'PageTree', 'Rate'])
@@ -366,16 +409,20 @@ export const FTMLLanguage = new TarnationLanguage({
           { name: 'BlockNode',  pair: ['[[', ']]'],               tag: 't.squareBracket' }
         ] },
 
-        // triple links
+        // -- TRIPLE LINK
+
         [/(@tls)([^\n\[\]]+)(@tle)/, 'LinkTriple', ['@BR:li', { rules: [
           // [[[link | text]]]
           [/^([*#]?)([^|]*)(@ws*\|@ws*)(.*)$/,
-            ['t.keyword', 't.link', 't.separator', { strict: false, rules: '#text' }]
+            ['t.keyword', 't.link', 't.separator', { strict: false, rules: '#inline' }]
           ],
           // [[[link]]]
           [/^([*#]?)([^|]+)$/, ['t.keyword', 't.link']]
         ] }, '@BR:li']],
 
+        // -- EMBEDDED
+
+        // unofficial
         // inline math block [[$...$]]
         [/(@bs)(\$)(.*?)(\$)(@be)/, 'BlockInlineMath',
           ['@BR', 't.keyword', { embedded: 'wikimath!' }, 't.keyword', '@BR']
@@ -411,6 +458,16 @@ export const FTMLLanguage = new TarnationLanguage({
           embedded: 'html!'
         },
 
+        // TODO: make type attribute work
+        // [[code]]
+        { begin: [/(@bs)(code)(@be)/,  'BlockNode', ['@BR', 'BlockName', '@BR']],
+          end:   [/(@bsc)(code)(@be)/, 'BlockNode', ['@BR', 'BlockName', '@BR']],
+          type: 'BlockNested',
+          rules: []
+        },
+
+        // -- BLOCKS
+
         // block (map)
         [[/(@bs)(@bm?)/, '@blk_map', /(@bsf)(.*?)(@be)/], 'BlockNode',
           ['@BR', 't.modifier', 'BlockName', 't.modifier', 't.string', '@BR']
@@ -430,6 +487,8 @@ export const FTMLLanguage = new TarnationLanguage({
         [[/(@bs)(@bm?)(module)(@bsf)(\s*)/, '@mods', /(.*?)(@be)/], 'BlockNode',
           ['@BR', 't.modifier', 'BlockNameModule', 't.modifier', '', 'ModuleName', 'BlockValue', '@BR']
         ],
+
+        // -- BLOCK CONTAINERS
 
         // block containers (map, elements)
         { begin: [[/(@bs)(@bm?)/, '@blk_map_el', /(@bsf)(.*?)(@be)/], 'BlockNode',
@@ -455,20 +514,54 @@ export const FTMLLanguage = new TarnationLanguage({
           type: 'BlockContainer'
         },
 
-        // unknown block nodes
+        // -- UNKNOWN
+
         [/(@bs|@bsc)(@bm?)([^\\#*\s\]]+?)(@bsf)(.*?)(@be)/, 'BlockNode',
           ['@BR', 't.modifier', 'BlockNameUnknown', 't.modifier', 't.string', '@BR']
         ],
 
-        // single links
+        // -- SINGLE LINKS
+
         [/(\[)([^\n\[\]]+)(\])/, 'LinkSingle', ['@BR:li', { rules: [
           // [link text]
-          [/^@lslug(@ws+|\|)(.*)$/, ['t.keyword', 't.link', 't.separator', { strict: false, rules: '#text' }]],
+          [/^@lslug(@ws+|\|)(.*)$/, ['t.keyword', 't.link', 't.separator', { strict: false, rules: '#inline' }]],
           // [link]
           [/^@lslug$/, ['t.keyword', 't.link']],
           // [# anchortext]
-          [/^(#)(@ws.+)$/, ['t.keyword', { strict: false, rules: '#text' }]]
+          [/^(#)(@ws.+)$/, ['t.keyword', { strict: false, rules: '#inline' }]]
         ] }, '@BR:li']]
+      ],
+
+      include: [
+
+        { style: {
+          BlockNameInclude: t.keyword,
+          IncludeValue: t.link,
+          IncludeParameterProperty: t.propertyName
+        } },
+
+        { variables: {
+            bs: /\[{2}(?!\[)(?!\/)/, // block node start
+            be: /(?!\]{3})\]{2}/,    // block node end
+            bsf: /_?(?=@ws|@be)/    // block name suffix
+        } },
+
+        { begin: [/(@bs)(include)(@bsf)((?:@ws*)[^\s\]]+)/,
+            ['@BR', 'BlockNameInclude', 't.modifier', 'IncludeValue']
+          ],
+          end: [/@be/, '@BR'],
+          type: 'IncludeNode',
+          rules: [
+            ['|', 't.separator'],
+            { begin: [/([^\s=]+)(\s*=\s*)/,
+                ['IncludeParameterProperty', ['t.operator', { parser: '<<IncludeParameterValue' }]]
+              ],
+              end: [/@be|\|/, '@RE', { parser: '<</IncludeParameterValue' }],
+              type: 'IncludeParameter',
+              rules: '#root'
+            }
+          ]
+        }
       ]
     }
   })

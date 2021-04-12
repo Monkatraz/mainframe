@@ -100,6 +100,19 @@ This text will not be rendered.
  another line
 # Item 2
  # Item 2.1
+ 
+||~ head 1 ||~ head 2 ||~ head 3 ||
+|| cell 1 || cell 2 || cell 3 ||
+|||| long cell 4 || cell 5 ||
+||cell 6 |||| long cell 7 ||
+|||||| looong cell 8||
+
+|| lines must start and end || with double vertical bars || nothing ||
+|| cells are separated by || double vertical bars || nothing ||
+|||| you can span multiple columns by || starting each cell ||
+|| with extra cell |||| separators ||
+|||||| but perhaps an example is _
+the easiest way to see ||
 
 [[ul]]
  [[li class="item1" data-toggle="data1"]]Item1[[/li]]

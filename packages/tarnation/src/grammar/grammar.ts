@@ -55,6 +55,8 @@ export class Grammar {
   private rules = new Map<number, Rule>()
   private states = new Map<string | SubState, Set<number>>()
 
+  private includeMap = new Map<Set<number>, Set<string>>()
+
   constructor(def: DF.Grammar) {
     const grammar = demangleGrammar(def)
     const { ignoreCase = false, variables = {}, start = 'root' } = grammar
@@ -75,7 +77,14 @@ export class Grammar {
     this.global = this.addRules(global)
 
     for (const bracket of brackets) this.addBracket(bracket)
-    for (const name in states) this.addState(name, states)
+    for (const name in states) this.addState(name)
+
+    this.includeMap.forEach((includes, state) => {
+      for (const include of includes) {
+        const ids = this.addState(include)
+        ids.forEach(id => state.add(id))
+      }
+    })
   }
 
   // PUBLIC UTILITY METHODS
@@ -185,10 +194,14 @@ export class Grammar {
 
   private addRules(rules: (DF.Directive | DM.Rule | DM.RuleState)[]): Set<number> {
     const ids = new Set<number>()
+    const includes = new Set<string>()
+    this.includeMap.set(ids, includes)
+
     for (const rule of rules) {
       // include directive
       if ('include' in rule) {
-        this.addState(rule.include).forEach(id => ids.add(id))
+        this.addState(rule.include)
+        includes.add(rule.include)
       }
       // props directive
       else if ('props' in rule) {
@@ -235,20 +248,16 @@ export class Grammar {
           end.action.embedded = '@pop'
         }
 
-        const beginRule = this.addRule(begin)
-        const endRule = this.addRule(end)
-
         if (embedded) {
-          this.states.set(state, new Set([endRule.id]))
+          this.states.set(state, new Set([this.addRule(end).id]))
         }
         else if (rules) {
-          this.states.set(state, new Set(
-            [endRule.id, ...(isString(rules) ? this.addState(rules) : this.addRules(rules))]
-          ))
+          const stateRules = [end, ...(isString(rules) ? [{ include: rules }] : rules)]
+          this.states.set(state, this.addRules(stateRules as any))
         }
 
-        ids.add(beginRule.id)
-        if (!embedded && !rules) ids.add(endRule.id)
+        ids.add(this.addRule(begin).id)
+        if (!embedded && !rules) ids.add(this.addRule(end).id)
 
       } catch (err) {
         console.warn('Grammar: Failed to add rule state. Ignoring...')
@@ -267,11 +276,12 @@ export class Grammar {
 
   // STATES
 
-  addState(name: string, states = this.grammar.states): Set<number> {
+  addState(name: string): Set<number> {
     if (this.states.has(name)) return this.states.get(name)!
+    const states = this.grammar.states
     const state = states[name]
     if (!state) throw new Error('Undefined state specified in grammar!')
-    this.states.set(name, new Set()) // prevents cyclic shenanigans
+    this.states.set(name, new Set()) // prevents cyclic
     const ids = this.addRules(state)
     this.states.set(name, ids)
     return ids
@@ -279,7 +289,7 @@ export class Grammar {
 
   addSubstate(substate: SubState, rules: (DF.Directive | DM.Rule | DM.RuleState)[] | Set<number>) {
     if (this.states.has(substate)) return this.states.get(substate)!
-    this.states.set(substate, new Set()) // prevents cyclic shenanigans
+    this.states.set(substate, new Set()) // prevents cyclic
     const ids = rules instanceof Set ? rules : this.addRules(rules)
     this.states.set(substate, ids)
     return ids
