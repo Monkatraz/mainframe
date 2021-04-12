@@ -6,7 +6,7 @@ interface FTMLWarning {
   span: { start: number, end: number }
   /** The rule that emitted the warning. */
   rule: string
-  /** The token type that the rule failed on. */
+  /** The token type that the rule emitted a warning on. */
   token: string
   /** The type of warning emitted. */
   kind: string
@@ -35,7 +35,7 @@ const warningInfo: Record<string, WarningInfo | null> = {
   },
 
   'invalid-include': {
-    message: 'This include isn\'t valid and will not be included in the rendered output.',
+    message: 'This include isn\'t valid and can\'t be rendered.',
     severity: 'error'
   },
 
@@ -110,7 +110,7 @@ async function lint(view: EditorView, getWarnings: (str: string) => Promise<FTML
       if (!warningInfo[kind]) continue
 
       let { message, severity } = warningInfo[kind]!
-      const source = `ftml(${rule}) [${from}, ${to}]`
+      const source = `ftml(${rule}: ${kind} at ${token}) [${from}, ${to}]`
 
       if (typeof message === 'function') {
         message = message(rule, doc.sliceString(from, to))

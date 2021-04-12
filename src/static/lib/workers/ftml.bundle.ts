@@ -38,9 +38,9 @@ expose({
     return transfer(Binding.preprocess(str))
   },
 
-  async tokenize(raw: ArrayBuffer) {
+  async tokenize(raw: ArrayBuffer, preprocess = true) {
     await loading
-    const str = decode(raw)
+    const str = preprocess ? Binding.preprocess(decode(raw)) : decode(raw)
 
     const tokenized = Binding.tokenize(str)
     const tokens = tokenized.tokens()
@@ -50,9 +50,9 @@ expose({
     return tokens
   },
 
-  async parse(raw: ArrayBuffer) {
+  async parse(raw: ArrayBuffer, preprocess = true) {
     await loading
-    const str = decode(raw)
+    const str = preprocess ? Binding.preprocess(decode(raw)) : decode(raw)
 
     const tokenized = Binding.tokenize(str)
     const parsed = Binding.parse(tokenized)
@@ -66,9 +66,9 @@ expose({
     return { ast, warnings }
   },
 
-  async render(raw: ArrayBuffer) {
+  async render(raw: ArrayBuffer, preprocess = true) {
     await loading
-    const str = decode(raw)
+    const str = preprocess ? Binding.preprocess(decode(raw)) : decode(raw)
 
     const tokenized = Binding.tokenize(str)
     const parsed = Binding.parse(tokenized)
@@ -84,9 +84,23 @@ expose({
     return transfer('<i>Placeholder Output (FTML cannot render yet)</i>')
   },
 
-  async detailedRender(raw: ArrayBuffer) {
+  async warnings(raw: ArrayBuffer) {
     await loading
     const str = decode(raw)
+
+    const tokenized = Binding.tokenize(str)
+    const parsed = Binding.parse(tokenized)
+
+    const warnings = parsed.warnings()
+
+    free(tokenized, parsed)
+
+    return warnings
+  },
+
+  async detailedRender(raw: ArrayBuffer) {
+    await loading
+    const str = Binding.preprocess(decode(raw))
 
     const tokenized = Binding.tokenize(str)
     const tokens = tokenized.tokens()
@@ -106,12 +120,12 @@ expose({
 
     const html = '<i>Placeholder Output (FTML cannot render yet)</i>'
 
-    return { tokens, ast, warnings, html }
+    return { preprocessed: str, tokens, ast, warnings, html }
   },
 
-  async inspectTokens(raw: ArrayBuffer) {
+  async inspectTokens(raw: ArrayBuffer, preprocess = true) {
     await loading
-    const str = decode(raw)
+    const str = preprocess ? Binding.preprocess(decode(raw)) : decode(raw)
 
     const tokenized = Binding.tokenize(str)
     const tokens = tokenized.tokens()

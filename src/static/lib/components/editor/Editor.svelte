@@ -35,7 +35,7 @@
     await Editor.init(
       editorContainer,
       await fetch('/static/misc/ftml-test2.ftml').then(res => res.text()),
-      [createFTMLLinter(async str => (await FTML.parse(str)).warnings)]
+      [createFTMLLinter(FTML.warnings)]
     )
     mounted = true
   })

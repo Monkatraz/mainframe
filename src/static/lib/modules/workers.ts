@@ -91,6 +91,7 @@ export namespace FTML {
   }
 
   export interface DetailedRender {
+    preprocessed: string
     tokens: FTMLBinding.IToken[]
     ast: FTMLBinding.ISyntaxTree
     warnings: FTMLBinding.IParseWarning[]
@@ -111,6 +112,10 @@ export namespace FTML {
 
   export async function render(raw: string) {
     return decode(await module.invoke<ArrayBuffer>(() => module.worker.render(transfer(raw))))
+  }
+
+  export async function warnings(raw: string) {
+    return await module.invoke<FTMLBinding.IParseWarning[]>(() => module.worker.warnings(transfer(raw)))
   }
 
   export async function detailedRender(raw: string) {
