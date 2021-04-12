@@ -1,6 +1,11 @@
 /* tslint:disable */
 /* eslint-disable */
 /**
+* @param {Tokenization} tokens
+* @returns {ParseOutcome}
+*/
+export function parse(tokens: Tokenization): ParseOutcome;
+/**
 * @returns {string}
 */
 export function version(): string;
@@ -9,11 +14,6 @@ export function version(): string;
 * @returns {string}
 */
 export function preprocess(text: string): string;
-/**
-* @param {Tokenization} tokens
-* @returns {ParseOutcome}
-*/
-export function parse(tokens: Tokenization): ParseOutcome;
 /**
 * @param {SyntaxTree} syntax_tree
 * @returns {HtmlOutput}
@@ -134,14 +134,15 @@ export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembl
 
 export interface InitOutput {
   readonly memory: WebAssembly.Memory;
-  readonly version: (a: number) => void;
-  readonly preprocess: (a: number, b: number, c: number) => void;
   readonly __wbg_parseoutcome_free: (a: number) => void;
   readonly parseoutcome_syntax_tree: (a: number) => number;
   readonly parseoutcome_warnings: (a: number) => number;
   readonly __wbg_syntaxtree_free: (a: number) => void;
   readonly syntaxtree_get: (a: number) => number;
   readonly parse: (a: number) => number;
+  readonly __wbg_tokenization_free: (a: number) => void;
+  readonly version: (a: number) => void;
+  readonly preprocess: (a: number, b: number, c: number) => void;
   readonly __wbg_htmloutput_free: (a: number) => void;
   readonly htmloutput_html: (a: number, b: number) => void;
   readonly htmloutput_style: (a: number, b: number) => void;
@@ -150,11 +151,10 @@ export interface InitOutput {
   readonly tokenization_text: (a: number, b: number) => void;
   readonly tokenization_tokens: (a: number) => number;
   readonly tokenize: (a: number, b: number) => number;
-  readonly __wbg_tokenization_free: (a: number) => void;
-  readonly __wbindgen_malloc: (a: number) => number;
-  readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
   readonly __wbindgen_add_to_stack_pointer: (a: number) => number;
   readonly __wbindgen_free: (a: number, b: number) => void;
+  readonly __wbindgen_malloc: (a: number) => number;
+  readonly __wbindgen_realloc: (a: number, b: number, c: number) => number;
 }
 
 /**
